@@ -158,6 +158,13 @@ jobs:
           # Drop manifest entries for documents that no longer exist
           python3 .github/scripts/record_deps.py --prune .pdf-deps.json .
         #continue-on-error: true # Job continues even if this step fails
+      - name: Upload PDFs for PR review
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-pdfs
+          path: build-pdf
+          retention-days: 14
       - name: Sync PDFs for TA review
         run: |
           rm -rf pdfs
