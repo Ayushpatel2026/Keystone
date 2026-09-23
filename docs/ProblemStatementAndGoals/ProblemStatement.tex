@@ -46,30 +46,68 @@ part of the problem.  The problem is ``what'' you want to do, not ``how'' you
 want to do it.  The problem statement should be written in a way that is
 understandable to a non-technical audience.}
 
+We want to streamline the capstone team and project selection process for students and supervisors.
+Currently it is fragmented on Teams, MS Forms for supervisors, email for supervisor communication, etc.
+This creates frustration and lack of transparency.
+Project descriptions vary widely in accuracy and detail, so students struggle to compare opportunities.
+We saw this first hand, the system described in the project description was not fully representative of what the supervisor actually wanted us to work on.
+Students have limited visibility into which projects are still available and which teams are still looking for members.
+There's no unified way to track a project's status (open, filled, in progress) from submission through team assignment
+This creates wasted time, mismatched teams, and administrative overhead for course coordinators and TAs
+
+If this platform allowed you to see who else is interested in a project, it might be easier to form teams and find teammates with similar interests.
+
 \subsection{Inputs and Outputs}
 
 \wss{Characterize the problem in terms of ``high level'' inputs and outputs.  
 Use abstraction so that you can avoid details.}
 
+Inputs:
+- Project proposals/descriptions submitted by supervisors
+- Student profiles
+- Student expressions of interest / applications to projects
+- Administrative decisions (approvals, status changes etc.)
+Outputs:
+- Searchable/filterable catalog of available projects
+- project status and availability information
+- confirmed project-team assignments
+
 \subsection{Stakeholders}
+
+- Capstone Students (primary users, browse/apply to projects, form teams)
+
+- Capstone Project Supervisors - can be professors or industry sponsors (submit and manage project proposals)
+
+- Capstone Course Coordinator (oversees process, needs visibility/control)
+
+- Capstone Course TAs (support administration of the process)
 
 \subsection{Environment}
 
 \wss{Hardware and Software Environment for the users.  The developer environment
 is summarized as part of the developer plan.}
 
+Software - the application can be accessed through any modern web browser. The application is designed to be compatible with Windows, macOS, and Linux operating systems. It requires an internet connection for full functionality.
+Hardware - The application is designed to run on standard desktop and laptop computers, as well as tablets and smartphones. It does not require any specialized hardware.
+
 \section{Goals}
+
+- Provide supervisors/sponsors a standardized way to submit clear, complete project descriptions
+- Reduce administrative overhead/manual tracking (e.g., spreadsheets, emails) currently required to manage the process
+- Improve transparency so all stakeholders can see project availability and progress at any time
+
+TODO - each goal needs a way for it to be measured / tested - not everything can be measured quantitatively, but there should be a way to determine if the goal has been met.
+
 
 \section{Stretch Goals}
 
 \wss{Goals you hope to get to, but not necessary.  They are also helpful if the
 scope of the original project needs to be expanded.}
+- Make team formation easier by suggesting projects or teammates based on interests and work style
+- Make it easier for course coordinators and TAs to manage the process by providing dashboards and analytics on project submissions, team formation, and student engagement
+
 
 \section{Custom Documents (CDs)}
-
-\wss{For CAS 741: State whether the project is a research project. This
-designation, with the approval (or request) of the instructor, can be modified
-over the course of the term.}
 
 \wss{For SE Capstone: List your custom documents (CDs).  Potential CDs include
 usability testing, code walkthroughs, user documentation, formal proof,
@@ -79,11 +117,13 @@ term).  Approval of the CDs will be part of the discussion with the instructor
 for approving the project. The CDs, with the approval (or request) of the
 instructor, can be modified over the course of the term.}
 
+User/Stakeholder/Client interview report - will document the interviews conducted with users, stakeholders, and clients to gather requirements for the application.
+
+Usability Report - will document the usability testing of the application, including user feedback and recommendations for improvements.
+
 \newpage{}
 
 \section*{Appendix --- Reflection}
-
-\wss{Not required for CAS 741}
 
 \input{../Reflection.text}
 
