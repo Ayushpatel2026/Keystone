@@ -150,22 +150,21 @@ that proves that the project is feasible through the functional prototype and th
 \hline
 \textbf{Main Risk(s)} & \textbf{How it threatens success} & \textbf{What will be demonstrated in the PoC} \\ \hline
 
-Project may have poor usability or ineffective core workflow &
+Professor and Student Workflows may not connect effectively or support interactions between both parties &
 The core idea that the solution should aim to introduce is convenience.
-If the product has an interface that is difficult to use and a workflow that
-does not resolve the main problems with the current capstone process, the solution 
-is likely to still cause confusion and will not be adopted in the future.&
+If the product has a workflow that fails to allow capstone projects to be posted, then found, then requested, then approved,
+then it does not fulfill its intended purpose and may not be adopted in the future.&
 The PoC must showcase a clear interface and registration procedure that
-allows professors to clearly outline capstone project specifications.  
-It should also be easy to filter and find available projects.\\ \hline
+allows professors to clearly outline capstone project specifications. Students
+should be able to select desired available projects while professors accept a group of students to work on the project.\\ \hline
 
-Service-providing algorithms may be too complex or difficult to implement/scale &
+Matching or Recommendation Algorithms could be complex and not return relevant matches for students &
 A non-functioning matching, processing, recommendation, or searching system would greatly 
-hinder the success of the solution at the MVP stage. If the project cannot fulfill
-the basic requirement of efficiently establishing a connection between capstone project 
+hinder the success of the solution. If the project cannot fulfill
+the basic requirement of providing recommendations and matches between capstone project 
 providers and students, then the project will undergo many difficulties moving forward. &
 The PoC should demonstrate simplified algorithms that can at least allow professors to post projects
-and students to find and select projects based on sufficient information/basic recommendations with sample data. \\ \hline
+and students to obtain basic recommendations to available projects with sample data. \\ \hline
 
 \end{tabular}
 \caption{Main project risks and proof of concept demonstrations.}
@@ -174,23 +173,22 @@ and students to find and select projects based on sufficient information/basic r
 
 \subsection{Proof of Concept Plan}
 
-To ensure that the high-priority risks above are mitigated, the following PoC plan should be executed:
+To ensure that the high-priority risks above are mitigated, the following PoC plan will demonstrate the following:
 
 \begin{enumerate}
-    \item Simple UI dashboard used for navigation to post a capstone project.
-    \item An intuitive interface that enables detailed project descriptions to be entered such as title, supervisor name, availability,
+    \item A professor should navigate a simple UI to post a capstone project entering details such as title, supervisor name, availability,
     number of students interested, problem, technologies, difficulty, tasks, pre-requisites, current status (if already started), etc.
-    \item A location for students to enter basic information and create a profile.
-    \item A clear central location for students to filter and select projects based on interests and skills.
+    \item A student should be able to enter basic information and create a profile.
+    \item A student should be able to filter and select projects based on interests and skills.
     \item Basic matching algorithms should provide simple recommendations through pattern searching between student profile and capstone description.
     \item A request should be made from the student side to the professor side with professor having the ability to accept.
 \end{enumerate}
 
 \subsection{Success Criteria}
 \begin{itemize}
-    \item Easy-to-navigate UI for both students to find projects and professors.
-    \item Algorithms accurately enable basic posting, recommendation, and selection functionalities.
-    \item Clear descriptions for student to sufficiently make decisions.
+    \item A professor can successfully navigate the UI and publish a capstone project with sufficient details.
+    \item A student can create a profile, browse projects, and select desired projects without workflow errors.
+    \item The matching algorithm should returns recommendations for students based on skills and interests.
 \end{itemize}
 
 \section{Expected Technology}
