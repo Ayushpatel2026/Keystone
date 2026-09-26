@@ -23,6 +23,8 @@
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
 September 25th 2026 & Ayush Patel & Added intro and Sections 1 - 3 \\
+September 26th 2026 & All Team Members & Added Team Meeting and Communication Plan and Team Roles \\
+September 26th 2026 & All Team Members & Added Expected Technology and AI Use \\
 Date2 & Name(s) & Description of changes\\
 ... & ... & ...\\
 \bottomrule
@@ -221,23 +223,21 @@ implementation helps understand the challenge level and feasibility of a
 project.  It may also help with early identification of areas where project
 members will need to augment their training.}
 
-Topics to discuss include the following:
-
 \begin{itemize}
-\item Specific programming language
-\item Specific libraries
-\item Pre-trained models
-\item Specific linter tool (if appropriate)
-\item Specific unit testing framework
-\item Investigation of code coverage measuring tools
-\item Specific plans for Continuous Integration (CI), or an explanation that CI
-  is not being done
-\item Specific performance measuring tools (like Valgrind), if
-  appropriate
-\item Tools you will likely be using?
+    \item \textbf{Version Control and Project Management:} Git, Github and GitHub projects
+    \item \textbf{Frontend:} React -- chosen for its large ecosystem, team familiarity, and strong component-based structure suited to an interactive web application. \textbf{Trade-off:} steeper initial setup compared to simpler frameworks, but this is offset by better long-term maintainability.
+    \item \textbf{Backend:} Python with FastAPI -- chosen for fast development speed, built-in data validation, automatic API documentation, and strong support for any data-processing or ML-adjacent work the project may require. \textbf{Trade-off:} lower raw performance than a compiled-language backend, which is an acceptable trade-off given the project's expected scale.
+    \item \textbf{Backend unit testing:} pytest -- chosen over the built-in \texttt{unittest} module for its more concise syntax, fixture system, and better plugin ecosystem for coverage reporting.
+    \item \textbf{Frontend unit testing:} Jest -- chosen for its tight integration with React and minimal configuration overhead.
+    \item \textbf{E2E Testing:} Playwright -- industry standard for end to end testing of web applications
+    \item \textbf{Frontend linter:} ESLint -- industry standard for TypeScript/JavaScript, configurable to enforce team-agreed style rules.
+    \item \textbf{Backend linter:} Ruff -- industry standard linter, easiest to setup, fastest and most modern
+    \item \textbf{Unit test coverage tool:}  SonarQube -- industry standard for reporting and visualizing code coverage
+    \item \textbf{Database:} PostgreSQL - relational database will make it easier
+    \item \textbf{Application Packaging:} Docker - production standard to package application components and dependencies into one executable container \textbf{Trade-off:} Extra set up is required but this will ensure our code will run anywhere we choose to deploy in the future
+    \item \textbf{Continuous Integration:} GitHub Actions. CI will run on every push and pull request, checking: linting (ESLint/Pylint), unit test pass/fail (Jest/pytest), and SonarQube coverage reports.
+    \item \textit{Note: the technologies listed here reflect the team's current expectations and are not binding constraints. They may evolve as the project's design becomes more concrete.}
 \end{itemize}
-
-\wss{git, GitHub and GitHub projects should be part of your technology.}
 
 \section{Use of AI and LLMs}
 
@@ -245,6 +245,31 @@ Topics to discuss include the following:
 in your project as important enough to warrant their own section.  
 How will your team be using LLMs for code and documentation development?  
 What tools will you be using?  How will you verify the output of your LLMs?}
+
+
+\begin{itemize}
+    \item \textbf{Purpose:} AI will be used to accelerate development and ensure deliverables align with the rubric and checklists, while the team retains ownership of all thinking, design, and logic decisions.
+    \item \textbf{Tools:} Claude and ChatGPT for documentation and code implementation assistance, GitHub Copilot or Claude Code for in-editor code assistance.
+    \item \textbf{Documentation use of AI:}
+    \begin{itemize}
+        \item Brainstorming and idea generation
+        \item Proofreading, grammar, and spelling checks.
+        \item Assistance with LaTeX syntax and compilation issues.
+        \item Checking documents against the rubric and checklist for completeness.
+    \end{itemize}
+    Documentation content itself will be written by the team, not generated wholesale by AI.
+    \item \textbf{Code use of AI:}
+    \begin{itemize}
+        \item A walking skeleton of the codebase must be written manually by the team.
+        \item Function logic should first be written out as pseudocode by a team member; AI may then be used to help implement that pseudocode, rather than generating logic from scratch.
+        \item AI is not used to make architecture or design decisions -- these remain human decisions.
+        \item All AI-generated code must be reviewed line by line before being committed. Data structure choices, naming conventions, and other design decisions are made by the team, not the AI.
+        \item AI may assist in generating unit tests and identifying edge cases, but all generated tests must be reviewed and understood by the team, not accepted blindly.
+        \item Team members must manually verify that AI-generated tests are actually testing the intended behaviour (e.g. by intentionally breaking the implementation and confirming the test fails).
+    \end{itemize}
+    \item \textit{Note: this section covers AI's role in building the project. AI use in drafting this document itself is disclosed separately in the Generative AI Use Disclosure appendix.}
+\end{itemize}
+
 
 \section{Coding Standard}
 
