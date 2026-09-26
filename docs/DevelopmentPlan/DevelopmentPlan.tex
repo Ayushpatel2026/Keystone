@@ -2,6 +2,7 @@
 
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{float}
 
 \title{Development Plan\\\progname}
 
@@ -23,7 +24,7 @@
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
 September 25th 2026 & Ayush Patel & Added intro and Sections 1 - 3 \\
-Date2 & Name(s) & Description of changes\\
+September 25th 2026 & Andrew Habib & Added PoC Demo Plan Section 9\\
 ... & ... & ...\\
 \bottomrule
 \end{tabularx}
@@ -128,9 +129,69 @@ for deadlines.}
 
 \section{Proof of Concept Demonstration Plan}
 
-What is the main risk, or risks, for the success of your project?  What will you
+\wss{What is the main risk, or risks, for the success of your project?  What will you
 demonstrate during your proof of concept demonstration to convince yourself that
-you will be able to overcome this risk?
+you will be able to overcome this risk?}
+
+It is clear that the main purpose of the solution is to have a central location where professors 
+can clearly outline their capstone project expectations while students can find and select available 
+projects that match their interests and gain the opportunity to work with like-minded individuals.
+
+Part of the success that comes with the project is proving that the project is able to 
+overcome the risks associated with it while addressing the requirements. A proof of concept 
+plan is required to study the highest-risk parts of the project idea and showcase a demonstration 
+that proves that the project is feasible through the functional prototype and the goals can be met.
+
+
+\subsection{Main Risks for the Project}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{0.2\textwidth}|p{0.40\textwidth}|p{0.40\textwidth}|}
+\hline
+\textbf{Main Risk(s)} & \textbf{How it threatens success} & \textbf{What will be demonstrated in the PoC} \\ \hline
+
+Project may have poor usability or ineffective core workflow &
+The core idea that the solution should aim to introduce is convenience.
+If the product has an interface that is difficult to use and a workflow that
+does not resolve the main problems with the current capstone process, the solution 
+is likely to still cause confusion and will not be adopted in the future.&
+The PoC must showcase a clear interface and registration procedure that
+allows professors to clearly outline capstone project specifications.  
+It should also be easy to filter and find available projects.\\ \hline
+
+Service-providing algorithms may be too complex or difficult to implement/scale &
+A non-functioning matching, processing, recommendation, or searching system would greatly 
+hinder the success of the solution at the MVP stage. If the project cannot fulfill
+the basic requirement of efficiently establishing a connection between capstone project 
+providers and students, then the project will undergo many difficulties moving forward. &
+The PoC should demonstrate simplified algorithms that can at least allow professors to post projects
+and students to find and select projects based on sufficient information/basic recommendations with sample data. \\ \hline
+
+\end{tabular}
+\caption{Main project risks and proof of concept demonstrations.}
+\label{tab:poc-plan}
+\end{table}
+
+\subsection{Proof of Concept Plan}
+
+To ensure that the high-priority risks above are mitigated, the following PoC plan should be executed:
+
+\begin{enumerate}
+    \item Simple UI dashboard used for navigation to post a capstone project.
+    \item An intuitive interface that enables detailed project descriptions to be entered such as title, supervisor name, availability,
+    number of students interested, problem, technologies, difficulty, tasks, pre-requisites, current status (if already started), etc.
+    \item A location for students to enter basic information and create a profile.
+    \item A clear central location for students to filter and select projects based on interests and skills.
+    \item Basic matching algorithms should provide simple recommendations through pattern searching between student profile and capstone description.
+    \item A request should be made from the student side to the professor side with professor having the ability to accept.
+\end{enumerate}
+
+\subsection{Success Criteria}
+\begin{itemize}
+    \item Easy-to-navigate UI for both students to find projects and professors.
+    \item Algorithms accurately enable basic posting, recommendation, and selection functionalities.
+    \item Clear descriptions for student to sufficiently make decisions.
+\end{itemize}
 
 \section{Expected Technology}
 
