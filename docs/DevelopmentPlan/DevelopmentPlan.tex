@@ -23,6 +23,7 @@
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
 September 25th 2026 & Ayush Patel & Added intro and Sections 1 - 3 \\
+September 25th 2026 & Ayush Patel & Added Workflow Plan \\
 Date2 & Name(s) & Description of changes\\
 ... & ... & ...\\
 \bottomrule
@@ -109,10 +110,84 @@ likely change throughout the year.}
 \section{Workflow Plan}
 
 \begin{itemize}
-	\item How will you be using git, including branches, pull request, etc.?
-	\item How will you be managing issues, including template issues, issue
-	classification, etc.?
-  \item Use of CI/CD
+
+    \item \textbf{Git Usage:} We will primarily be using GitHub for managing the project files.
+    The feature branch strategy will be used with each member creating a dedicated branch for each task that they work on.
+    This branch can be deleted after the task is completed and merged into the main branch.
+    The member should open a pull request after completion of their assigned task. If
+    multiple members are collaborating on the same task, they will work within the same branch. Once completed,
+    a pull request can be opened which will be reviewed by the other team members.
+
+    \textbf{Overall Workflow Plan}
+    \begin{enumerate}
+        \item \textbf{Issue Creation:} For each deliverable, we will create many different issues. Each issue equates to a specific task that needs to be completed. An issue could be about multiple related sections of a deliverable or a single modular piece of code functionality.
+        \item \textbf{Branching:} Each team member will create a branch for each task that they work on. If multiple members
+        collaborate on the same task, they will work on the same branch to avoid merge conflicts.
+        \item \textbf{Checklist:} As each member is working through their respective sections, they will keep track of the checklist in our repository, and use the checklist in the repository and rubric on Avenue to check their work.
+        \item \textbf{Commit Process:} All changes will be regularly committed to the respective branches. We will follow the Conventional Commits standard (e.g. \texttt{feat:}, \texttt{fix:}, \texttt{docs:}, \texttt{chore:}, \texttt{refactor:}) so that commit history is easy to scan and purposeful. Each commit should represent a single, working, well-documented change -- no commit farming (i.e. no meaningless, placeholder, or "WIP" commits left in the final history). Commit messages should clearly describe \emph{what} changed and, where not obvious, \emph{why}.
+        \item \textbf{Pull Requests (PRs):} Once a team member has completed a task, a pull request on GitHub will be created. Directly pushing to the main branch is not allowed.
+        A pull request must be created and it must pass all CI checks before it can be merged into the main branch.
+        Every PR must include a description. For straightforward or self-explanatory changes, a brief description is sufficient. For changes where the intent, approach, or impact would not be immediately obvious to a reviewer (particularly code changes), the author must provide a more detailed description covering what was changed, why, and any tradeoffs or design decisions made. This makes it much easier for reviewers to understand the changes and provide meaningful feedback.
+        \item \textbf{Team Member Review:} The PR will be reviewed by at least one other team member to ensure that all of the rubric criteria has been met.
+        If the PR contains code changes, the PR will also be reviewed for code quality and functionality. The reviewer(s) provide feedback through comments. The author
+        of the section should respond or implement any feedback provided by the member who reviewed the submission. If a merge conflict arises during review, it is the responsibility of the branch owner to resolve it (or resolved collaboratively if the branch is shared) before requesting re-review.
+        \item \textbf{Merging:} Once the PR has been reviewed, approved, and confirmed that all of the rubric criteria has been met, it will successfully
+        be merged into the main branch. We will not use squash merging, to ensure that all commits are visible in the main branch. To maintain a linear history, we will use rebase and merge.
+        \item \textbf{Definition of Done:} An issue/task is considered complete when: its checklist items are fully addressed, its associated PR has passing CI checks and, where required, at least one approving review and it has been merged into the main branch.
+    \end{enumerate}
+
+
+    \textbf{Branch Protection Rules:}
+    To enforce the above process, the following protections will be applied to the main branch:
+    \begin{itemize}
+        \item No direct pushes to main -- all changes must go through a pull request.
+        \item Pull requests must pass all required CI checks before merging.
+        \item Code-related pull requests will additionally require review and approval from a designated code owner (at least one of the 4 team members), enforced via a \texttt{CODEOWNERS} file. This file will be created once the project's technology stack has been finalized, so that the file can be made using the relevant language/framework directory structure and file extension.
+        \item Non-code files (e.g. documentation, LaTeX files, images) will not have mandatory reviewer approval enforced through branch protection, so that minor changes such as wording fixes, typos, or adding images are not bottlenecked by teammate availability. The team will still follow the PR review process as a best practice for major documentation-related tasks, even where it is not explicitly enforced.
+        \item Force-pushes to main are disabled.
+    \end{itemize}
+
+
+    \textbf{Project Management:}
+    We will be using GitHub Issues to keep track of the following items: tasks, meetings, and other important items.
+    Each issue will be part of a milestone that corresponds to a specific deliverable (i.e. Problem Statement and Development Plan, SRS, etc.)
+    All issues and milestones will be part of a GitHub Project (\href{https://github.com/users/Ayushpatel2026/projects/3}{Keystone Project}) in a Kanban style so we can visualize and track the progress of our project.
+
+    There are template issues readily available from the course instructor, as shown below, and we will be using these throughout our capstone. \\
+
+    \textbf{Issue Templates Available:}
+    \begin{itemize}
+        \item Lectures: Used to track team details during lectures (i.e. important notes, attendance)
+        \item Peer Review: Individuals outside of the team review one of our items
+        \item Supervisor Meeting: Agenda template for meetings with supervisors/stakeholders
+        \item TA Meeting: Agenda template for meetings with TA
+        \item Team Meeting: Agenda template for weekly meetings with our team
+        \item Blank Issue: Blank template to be used to create a new issue \\
+    \end{itemize}
+
+    \textbf{Issue Labels Classification:}
+
+    Below are the set of labels in GitHub Issues that we will be using when creating issues to organize them:
+
+    \begin{itemize}
+        \item Bug: Used for issues that indicate something is not working as expected
+        \item Feature: Used for issues that represent any new functionality that provides visible value to users.
+        \item TA Meeting: Used for issues that include meeting notes, feedback and actions from TA sessions.
+        \item Team Meeting: Used for issues where team meeting discussions are noted.
+        \item Supervisor / Stakeholder Meeting: Used for issues where meetings with the project supervisors and stakeholders are documented.
+        \item Documentation: Used for issues corresponding to any work related to documentation, including updates to the ReadMe's and latex files.
+    \end{itemize}
+
+
+    \item \textbf{Use of CI/CD:} We will be using GitHub Actions as our CI/CD platform to ensure that all of our documentation and project files are being built,
+    formatted, and reviewed properly before they are merged into the main branch of the project. Workflows, which are defined in
+    YAML files, will trigger automatically on pushes and pull requests. To ensure consistency across
+    all files, merges require both teammate approval (only for code files, using a CODEOWNERS file) and passing CI checks.
+    While we will still use the PR review process for all major documentation-related tasks, we will not officially enforce teammate approval for documentation-related PRs, to ensure that we are not bottlenecked by teammate availability for minor changes.
+    CI will also run all unit tests to make sure we are not introducing any regressions.
+    Checks will be added to ensure linting, code quality analysis, and unit test coverage (see Technology and Coding Standard sections for more details).
+    Enforcing CI checks ensures errors are caught early and also ensures we follow industry-standard practices.
+
 \end{itemize}
 
 \section{Project Decomposition and Scheduling}
