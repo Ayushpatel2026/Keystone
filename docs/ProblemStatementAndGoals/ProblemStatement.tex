@@ -22,7 +22,7 @@
 \toprule
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Description of Changes}\\
 \midrule
-Sept 25th 2026 & Ayush Patel & Added custom documents\\
+Sept 25th 2026 & Ayush Patel & Added Problem Statement and Custom Documents\\
 ... & ... & ...\\
 \bottomrule
 \end{tabularx}
@@ -45,17 +45,98 @@ part of the problem.  The problem is ``what'' you want to do, not ``how'' you
 want to do it.  The problem statement should be written in a way that is
 understandable to a non-technical audience.}
 
+Capstone team and project selection at McMaster is currently fragmented
+across multiple disconnected tools, including Teams, GitLab, MS Forms, and email. This fragmentation
+creates administrative overhead, frustration and a lack of transparency for everyone involved.
+
+Project descriptions vary widely in accuracy and level of detail, making it
+difficult for students to compare opportunities and understand what a
+project actually involves. We experienced this firsthand as the project
+description we were originally interested in did not accurately reflect what the
+supervisor actually wanted us to work on. When mismatches like
+this occur, students can lose weeks of an eight-month project reworking
+scope, and supervisors may become reluctant to offer projects in future
+years, reducing opportunities for future cohorts.
+
+
+Students also have limited visibility into which projects are still
+available. There is no unified way to track a project's status
+from initial submission through final team assignment.
+
+Beyond finding a project, students also struggle to find teammates who
+share similar skills, work styles, and interest in the same projects.
+Team formation currently happens informally, through personal networks or
+chance, which makes it difficult for students to find compatible teammates
+and can lead to mismatched teams.
+
+Together, these issues lead to wasted time, mismatched teams, and added
+administrative overhead for course instructors and TAs.
+
+
 \subsection{Inputs and Outputs}
 
 \wss{Characterize the problem in terms of ``high level'' inputs and outputs.  
 Use abstraction so that you can avoid details.}
 
+\textbf{Inputs:}
+\begin{itemize}
+  \item Project proposals and descriptions submitted by supervisors
+  \item Student profiles
+  \item Student expressions of interests and applications to projects
+  \item Administrative decisions (approvals, status changes, etc.)
+\end{itemize}
+
+\textbf{Outputs:}
+\begin{itemize}
+  \item A searchable and filterable catalog of available projects
+  \item Project status and availability information
+  \item Confirmed project--team assignments
+  \item Suggested teammates based on student profiles
+\end{itemize}
+
+
 \subsection{Stakeholders}
+
+
+\begin{itemize}
+  \item \textbf{Capstone Students} --- The primary users of the platform.
+  They browse and filter available projects, express interest or apply, and
+  form teams. Their main need is clear, accurate, and up-to-date
+  information so they can make informed decisions and avoid wasted effort
+  pursuing unavailable or misrepresented projects.
+
+  \item \textbf{Capstone Project Supervisors} --- Professors or industry
+  sponsors who submit and manage project proposals. Their main need is a
+  simple, standardized way to describe their project, specify how many
+  teams they are willing to take on, and manage student interest without
+  relying on ad hoc email communication.
+
+  \item \textbf{Capstone Course Instructor} --- Oversees the capstone
+  process as a whole. Needs visibility into which projects and teams exist,
+  the ability to track progress across the cohort, and administrative
+  control to resolve issues
+
+  \item \textbf{Capstone Course TAs} --- Support the coordinator in
+  administering the process. Need efficient tools to help manage
+  day-to-day tasks such as verifying project submissions, tracking
+  applications, and assisting students and supervisors.
+\end{itemize}
+
 
 \subsection{Environment}
 
 \wss{Hardware and Software Environment for the users.  The developer environment
 is summarized as part of the developer plan.}
+
+\textbf{Software} --- The application is accessible through any modern web
+browser and is designed to be compatible with Windows, macOS, and Linux
+operating systems. An internet connection is required for full
+functionality.
+
+\textbf{Hardware} --- The application is designed to run on standard
+desktop and laptop computers, as well as tablets and smartphones. It does
+not require any specialized hardware.
+
 
 \section{Goals}
 
