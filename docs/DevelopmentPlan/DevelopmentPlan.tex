@@ -23,10 +23,11 @@
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
 September 25th 2026 & Ayush Patel & Added intro and Sections 1 - 3 \\
+September 25th 2026 & Ayush Patel & Added Workflow Plan \\
 September 26th 2026 & All Team Members & Added Team Meeting and Communication Plan and Team Roles \\
 September 26th 2026 & All Team Members & Added Expected Technology and AI Use and Team Charter \\
 Sept 26th 2026 & Waqar Ul-Hassan & Added reflection information\\
-Date2 & Name(s) & Description of changes\\
+September 26th 2026 & Andrew Habib & Added Coding Standard Section 12 \\
 ... & ... & ...\\
 \bottomrule
 \end{tabularx}
@@ -185,22 +186,119 @@ likely change throughout the year.}
 \section{Workflow Plan}
 
 \begin{itemize}
-	\item How will you be using git, including branches, pull request, etc.?
-	\item How will you be managing issues, including template issues, issue
-	classification, etc.?
-  \item Use of CI/CD
+
+    \item \textbf{Git Usage:} We will primarily be using GitHub for managing the project files.
+    The feature branch strategy will be used with each member creating a dedicated branch for each task that they work on.
+    This branch can be deleted after the task is completed and merged into the main branch.
+    The member should open a pull request after completion of their assigned task. If
+    multiple members are collaborating on the same task, they will work within the same branch. Once completed,
+    a pull request can be opened which will be reviewed by the other team members.
+
+    \textbf{Overall Workflow Plan}
+    \begin{enumerate}
+        \item \textbf{Issue Creation:} For each deliverable, we will create many different issues. Each issue equates to a specific task that needs to be completed. An issue could be about multiple related sections of a deliverable or a single modular piece of code functionality.
+        \item \textbf{Branching:} Each team member will create a branch for each task that they work on. If multiple members
+        collaborate on the same task, they will work on the same branch to avoid merge conflicts.
+        \item \textbf{Commit Process:} All changes will be regularly committed to the respective branches. We will follow the Conventional Commits standard (e.g. \texttt{feat:}, \texttt{fix:}, \texttt{docs:}, \texttt{chore:}, \texttt{refactor:}) so that commit history is easy to scan and purposeful. Each commit should represent a single, working, well-documented change -- no commit farming (i.e. no meaningless, placeholder, or "WIP" commits left in the final history). Commit messages should clearly describe \emph{what} changed and, where not obvious, \emph{why}.
+        \item \textbf{Pull Requests (PRs):} Once a team member has completed a task, a pull request on GitHub will be created. Directly pushing to the main branch is not allowed.
+        A pull request must be created and it must pass all CI checks before it can be merged into the main branch.
+        Every PR must include a description. For straightforward or self-explanatory changes, a brief description is sufficient. For changes where the intent, approach, or impact would not be immediately obvious to a reviewer (particularly code changes), the author must provide a more detailed description covering what was changed, why, and any tradeoffs or design decisions made. This makes it much easier for reviewers to understand the changes and provide meaningful feedback.
+        \item \textbf{Team Member Review:} The PR will be reviewed by at least one other team member to ensure that all of the rubric criteria has been met.
+        If the PR contains code changes, the PR will also be reviewed for code quality and functionality. The reviewer(s) provide feedback through comments. The author
+        of the section should respond or implement any feedback provided by the member who reviewed the submission. If a merge conflict arises during review, it is the responsibility of the branch owner to resolve it (or resolved collaboratively if the branch is shared) before requesting re-review.
+        \item \textbf{Merging:} Once the PR has been reviewed, approved, and confirmed that all of the rubric criteria has been met, it will successfully
+        be merged into the main branch. We will not use squash merging, to ensure that all commits are visible in the main branch. To maintain a linear history, we will use rebase and merge.
+        \item \textbf{Definition of Done:} An issue/task is considered complete when: its checklist items are fully addressed, its associated PR has passing CI checks and, where required, at least one approving review and it has been merged into the main branch.
+    \end{enumerate}
+
+
+    \textbf{Branch Protection Rules:}
+    To enforce the above process, the following protections will be applied to the main branch:
+    \begin{itemize}
+        \item No direct pushes to main -- all changes must go through a pull request.
+        \item Pull requests must pass all required CI checks before merging.
+        \item Code-related pull requests will additionally require review and approval from a designated code owner (at least one of the 4 team members), enforced via a \texttt{CODEOWNERS} file. This file will be created once the project's technology stack has been finalized, so that the file can be made using the relevant language/framework directory structure and file extension.
+        \item Non-code files (e.g. documentation, LaTeX files, images) will not have mandatory reviewer approval enforced through branch protection, so that minor changes such as wording fixes, typos, or adding images are not bottlenecked by teammate availability. The team will still follow the PR review process as a best practice for major documentation-related tasks, even where it is not explicitly enforced.
+    \end{itemize}
+
+
+    \textbf{Project Management:}
+    We will be using GitHub Issues to keep track of the following items: tasks, meetings, and other important items.
+    Each issue will be part of a milestone that corresponds to a specific deliverable (i.e. Problem Statement and Development Plan, SRS, etc.)
+    All issues and milestones will be part of a GitHub Project (\href{https://github.com/users/Ayushpatel2026/projects/3}{Keystone Project}) in a Kanban style so we can visualize and track the progress of our project.
+
+    There are template issues readily available from the course instructor, as shown below, and we will be using these throughout our capstone. \\
+
+    \textbf{Issue Templates Available:}
+    \begin{itemize}
+        \item Lectures: Used to track team details during lectures (i.e. important notes, attendance)
+        \item Peer Review: Individuals outside of the team review one of our items
+        \item Supervisor Meeting: Agenda template for meetings with supervisors/stakeholders
+        \item TA Meeting: Agenda template for meetings with TA
+        \item Team Meeting: Agenda template for weekly meetings with our team
+        \item Blank Issue: Blank template to be used to create a new issue \\
+    \end{itemize}
+
+    \textbf{Issue Labels Classification:}
+
+    Below are the set of labels in GitHub Issues that we will be using when creating issues to organize them:
+
+    \begin{itemize}
+        \item Bug: Used for issues that indicate something is not working as expected
+        \item Feature: Used for issues that represent any new functionality that provides visible value to users.
+        \item TA Meeting: Used for issues that include meeting notes, feedback and actions from TA sessions.
+        \item Team Meeting: Used for issues where team meeting discussions are noted.
+        \item Supervisor / Stakeholder Meeting: Used for issues where meetings with the project supervisors and stakeholders are documented.
+        \item Documentation: Used for issues corresponding to any work related to documentation, including updates to the ReadMe's and latex files.
+    \end{itemize}
+
+
+    \item \textbf{Use of CI/CD:} We will be using GitHub Actions as our CI/CD platform to ensure that all of our documentation and project files are being built,
+    formatted, and reviewed properly before they are merged into the main branch of the project. Workflows, which are defined in
+    YAML files, will trigger automatically on pushes and pull requests. To ensure consistency across
+    all files, merges require both teammate approval (only for code files, using a CODEOWNERS file) and passing CI checks.
+    While we will still use the PR review process for all major documentation-related tasks, we will not officially enforce teammate approval for documentation-related PRs, to ensure that we are not bottlenecked by teammate availability for minor changes.
+    CI will also run all unit tests to make sure we are not introducing any regressions.
+    Checks will be added to ensure linting, code quality analysis, and unit test coverage (see Technology and Coding Standard sections for more details).
+    Enforcing CI checks ensures errors are caught early and also ensures we follow industry-standard practices.
+
 \end{itemize}
 
 \section{Project Decomposition and Scheduling}
 
-\begin{itemize}
-  \item How will you be using GitHub projects?
-  \item Include a link to your GitHub project
-\end{itemize}
-
 \wss{How will the project be scheduled?  This is the big picture schedule, not
 details. You will need to reproduce information that is in the course outline
 for deadlines.}
+
+\subsection*{GitHub Projects}
+
+GitHub projects will be the primary place where issues are tracked. Each issue
+is part of a milestone, which is a group of issues that have an explicit due
+date. Issues move through the stages using a Kanban-style board in the following order:
+Backlog $\rightarrow$ Ready $\rightarrow$ In-Progress $\rightarrow$ In-Review $\rightarrow$ Done.
+
+Each issue has a title, a description if needed, a set of assignees, priority level, 
+and classification (feature, bug, task, documentation, meeting). Milestone due
+dates correspond to deliverable deadlines.\\
+
+\noindent\href{https://github.com/users/Ayushpatel2026/projects/3}{Link to GitHub Project}
+
+\subsection*{Schedule}
+
+This project is organized into 10 milestones spanning two terms. 
+
+\begin{itemize}
+  \item Milestone 1 (Weeks 3-4): Problem Statement, Proof of Concept Plan, Development Plan, Team Charter
+  \item Milestone 2 (Weeks 5-6): Software Requirements Specification, Hazard Analysis (Rev 0), User/Stakeholder/Client Interview Report (Fall Custom Document Rev 0)
+  \item Milestone 3 (Weeks 7-8): Verification and Validation Plan (Rev 0)
+  \item Milestone 4 (Weeks 9-10): Design Document (Rev -1)
+  \item Milestone 5 (Weeks 11-13): Proof of Concept Demo, Interviews
+  \item Milestone 6 (Weeks 14-16): Design Document (Rev 0)
+  \item Milestone 7 (Weeks 17-19): Revision 0 Demo, Interviews
+  \item Milestone 8 (Weeks 20-22): Verification and Validation Report (Rev 0), Usability Testing Report (Winter Custom Document Rev 0)
+  \item Milestone 9 (Weeks 23-24): Final Demonstration (Rev 1)
+  \item Milestone 10 (Weeks 25-26): EXPO Demonstration, Final Documentation (Rev 1)
+\end{itemize}
 
 \section{Proof of Concept Demonstration Plan}
 
@@ -275,6 +373,35 @@ What tools will you be using?  How will you verify the output of your LLMs?}
 \section{Coding Standard}
 
 \wss{What coding standard will you adopt?}
+
+The team will follow the coding standards and conventions below to ensure consistency, 
+readability, maintainability, and code quality across the project:
+
+\begin{itemize}
+    \item \textbf{Python / FastAPI:} Python code should adhere to \textbf{PEP 8}. 
+    Ruff is the Python Linter used to enforce these standards and identify common code-quality issues.
+
+    \item \textbf{Typescript / React:} Frontend code will follow consistent Typescript and React conventions 
+    for naming, formatting, component structure, and static typing typically enforced by ESLint.
+    
+    \item \textbf{Software Design/Architectural Principles:} \textbf{SOLID} and \textbf{GRASP} principles 
+    should be used to ensure proper design principles are followed such as single responsibility, separation of 
+    concerns, high cohesion, low coupling, modularity, abstraction, and extensibility. Following these will allow
+    the project to have a maintainable system design.
+
+    \item \textbf{Testing Standards:} Test design should be guided by ISO/IEC/IEEE 29119-4
+    to ensure consistent software testing practices based on requirements. The standards cover software testing 
+    techniques used to evaluate boundary conditions, edge cases, and expected failure conditions.
+
+    \item \textbf{Statement Coverage:} Automated tests should target approximately 80\% statement coverage for application code. 
+    Statement coverage along with test design standards defined above should determine overall desired test quality.
+
+    \item \textbf{Readability and Naming:} Code should use descriptive and consistent names and favour clear, 
+    simple implementations over unnecessary complexity. Comments should give high-level implementation explanations.
+
+    \item \textbf{Error Handling:} Failure conditions should be handled explicitly, with clear and consistent error messages.
+
+\end{itemize}
 
 \newpage{}
 
