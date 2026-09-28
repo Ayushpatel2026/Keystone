@@ -311,32 +311,30 @@ This project is organized into 10 milestones spanning two terms.
 demonstrate during your proof of concept demonstration to convince yourself that
 you will be able to overcome this risk?}
 
-It is clear that the main purpose of the solution is to have a central location where supervisors 
-can add information on a project while adhering to a standard of documentation for their requested 
-project. On the other hand, students can find and select available projects that match their interests 
-and gain the opportunity to work with like-minded individuals.
-
-Part of the success that comes with the project is proving that the project is able to 
-overcome the risks associated with it while addressing the requirements. A proof of concept 
-plan is required to study the highest-risk parts of the project idea and showcase a demonstration 
-that proves that the project is feasible.
+The main purpose of the solution is to give supervisors a central place to
+publish projects in a standard format and allow students to find and request available projects 
+with a clear understanding of the project's status. This plan focuses on the solution's greatest 
+implementation risk and demonstrates it in a small, targeted demo rather than a full system.
 
 
 \subsection{Main Risks for the Project}
 \begin{table}[H]
 \centering
-\begin{tabular}{|p{0.2\textwidth}|p{0.40\textwidth}|p{0.40\textwidth}|}
+\begin{tabular}{|p{0.3\textwidth}|p{0.3\textwidth}|p{0.40\textwidth}|}
 \hline
 \textbf{Main Risk(s)} & \textbf{How it threatens success} & \textbf{What will be demonstrated in the PoC} \\ \hline
 
-Project assignment logic may incorrectly mark projects as available or unavailable if the underlying data 
-model does not reliably track project and group states. &
-The core idea that the solution should aim to introduce is convenience which can only be achieved if the 
-project status functionality behaves correctly. If the product has a workflow that fails to enforce the correct 
-constraints and app states, then it does not fulfill its intended purpose and may not be adopted in the future.&
-The PoC must showcase a complete project assignment workflow that allows supervisors to publish or student groups 
-to request multiple projects. Supervisors must be able to invite only one group where the group can accept one and
-cannot accept the remaining requested projects. The project should also be made unavailable to other student groups. \\ \hline
+Project availability or group assignment states may become inconsistent between students and supervisors. 
+A group can request several projects, and each project can accept one or more teams (at most the capacity), so the underlying data 
+model must correctly track capacity, requests, and acceptances. &
+To exhibit success, the platform must correctly display project availability and overall state. If the data 
+model cannot properly enforce rules and constraints based on the current application state, the platform would show 
+incorrect availability and create the same confusion it is meant to remove.&
+Using sample data, a group requests several projects while supervisors can accept one or more requests without 
+exceeding the project capacity. Once a group is accepted, their remaining project 
+requests are withdrawn. The accepted project's remaining capacity updates (unavailable when full). After each 
+action, the student and supervisor views should show a synched status. The demo should also show that invalid actions 
+are rejected (accepting requests from a group placed elsewhere, or sending a request for a filled project). \\ \hline
 
 \end{tabular}
 \caption{Main project risks and proof of concept demonstrations.}
@@ -347,28 +345,36 @@ cannot accept the remaining requested projects. The project should also be made 
 
 \subsection{Proof of Concept Plan}
 
-To ensure that the high-priority risk above is mitigated, the following PoC plan will demonstrate the following:
+To address the high-priority risk above, the following PoC plan will be demonstrated:
 
 \begin{enumerate}
     \item A supervisor should be able to create a capstone project.
     \item A student group should be able to browse available projects.
-    \item A request should be made from the student group to any desired project with any professor having the ability to invite a group to work on the project.
-    \item A student group accepts the project and is unable to accept any other projects. (PoC Requirement)
-    \item The system should mark the project as unavailable to other groups. (PoC Requirement)
+    \item A request should be made from the student group to any desired project.
+    \item A supervisor should have the ability to accept or reject a group.
+    \item The system should mark the project as unavailable to other groups once project is at capacity. (PoC Requirement)
+    \item The student and supervisor views should display a synchronized status after each 
+    action (pending, accepted, declined, withdrawn)
+    \item Invalid actions from out-of-date views are attempted by users and rejected by the system 
+    (e.g. accepting a group placed on another project or sending a request to a project that has been filled)
 \end{enumerate}
 
 \subsection{Success Criteria}
 \begin{itemize}
-    \item A supervisor can successfully publish a capstone project.
-    \item A student group can successfully request many projects.
-    \item Only one student group can be invited to work on the project.
-    \item The student group can only accept one project and no others can join.
+    \item Data model yields the correct state after each action
+    \begin{itemize}
+        \item Student group obtains at most one project and no others are able join a full project
+        \item Project never exceeds its supervisor's team limit
+        \item Views may be briefly out-of-date, but actions taken from an out-of-date view that is no 
+        longer valid must be rejected by the system.
+    \end{itemize}
 \end{itemize}
 
 \subsection{Mitigation Strategy}
-In the event the PoC fails, the mitigation strategy would be to simplify the 
-workflow and data model. Complexity can be reduced if the constraints were
-relaxed.
+In the event the PoC fails to maintain consistency in project availability, group assignments, or capacity tracking, 
+the data model or overall assignment workflow will be simplified. Complexity can be reduced by deferring features such 
+as multi-team projects. Constraints can also be relaxed by reducing the amount of automated checks and state updates. 
+An example would be allowing supervisors to manually mark a project as taken.
 
 \section{Expected Technology}
 
