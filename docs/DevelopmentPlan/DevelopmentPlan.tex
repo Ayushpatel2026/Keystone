@@ -329,37 +329,46 @@ that proves that the project is feasible.
 \hline
 \textbf{Main Risk(s)} & \textbf{How it threatens success} & \textbf{What will be demonstrated in the PoC} \\ \hline
 
-Supervisor and Student Workflows may not connect effectively or support interactions between both parties &
-The core idea that the solution should aim to introduce is convenience.
-If the product has a workflow that fails to allow capstone projects to be posted, found, requested, or approved in the correct order,
-then it does not fulfill its intended purpose and may not be adopted in the future.&
-The PoC must showcase a clear interface and registration procedure that
-allows supervisors to clearly outline capstone project specifications. Students
-should be able to select desired available projects while supervisors accept a group of students to work on the project.\\ \hline
+Project assignment logic may incorrectly mark projects as available or unavailable if the underlying data 
+model does not reliably track project and group states. &
+The core idea that the solution should aim to introduce is convenience which can only be achieved if the 
+project status functionality behaves correctly. If the product has a workflow that fails to enforce the correct 
+constraints and app states, then it does not fulfill its intended purpose and may not be adopted in the future.&
+The PoC must showcase a complete project assignment workflow that allows supervisors to publish or student groups 
+to request multiple projects. Supervisors must be able to invite only one group where the group can accept one and
+cannot accept the remaining requested projects. The project should also be made unavailable to other student groups. \\ \hline
 
 \end{tabular}
 \caption{Main project risks and proof of concept demonstrations.}
 \label{tab:poc-plan}
 \end{table}
 
+\textbf{Note:} Team formation is not in the scope of this PoC as it is similar in logic to project selection.
+
 \subsection{Proof of Concept Plan}
 
 To ensure that the high-priority risk above is mitigated, the following PoC plan will demonstrate the following:
 
 \begin{enumerate}
-    \item A supervisor should navigate a simple UI to post a capstone project entering details such as title, supervisor name, availability,
-    number of students interested, problem, technologies, difficulty, tasks, pre-requisites, current status (if already started), etc.
-    \item A student should be able to enter basic information and create a profile.
-    \item A student should be able to filter and select projects based on interests and skills.
-    \item A request should be made from the student side to the supervisor side with supervisor having the ability to accept.
+    \item A supervisor should be able to create a capstone project.
+    \item A student group should be able to browse available projects.
+    \item A request should be made from the student group to any desired project with any professor having the ability to invite a group to work on the project.
+    \item A student group accepts the project and is unable to accept any other projects. (PoC Requirement)
+    \item The system should mark the project as unavailable to other groups. (PoC Requirement)
 \end{enumerate}
 
 \subsection{Success Criteria}
 \begin{itemize}
-    \item A supervisor can successfully navigate the UI and publish a capstone project with sufficient details.
-    \item A student can create a profile, browse projects, and select desired projects without workflow errors.
-    \item A student can successfully request a project and a supervisor is able to accept students.
+    \item A supervisor can successfully publish a capstone project.
+    \item A student group can successfully request many projects.
+    \item Only one student group can be invited to work on the project.
+    \item The student group can only accept one project and no others can join.
 \end{itemize}
+
+\subsection{Mitigation Strategy}
+In the event the PoC fails, the mitigation strategy would be to simplify the 
+workflow and data model. Complexity can be reduced if the constraints were
+relaxed.
 
 \section{Expected Technology}
 
