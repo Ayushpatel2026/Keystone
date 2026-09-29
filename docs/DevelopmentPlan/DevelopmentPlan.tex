@@ -36,6 +36,7 @@
         Sept 28th 2026 & Andrew Habib          & Added reflection information                             \\
         Sept 28th 2026 & Ahmed Rashrash        & Added GitHub url                                         \\
         Sept 28th 2026 & All Team Members      & Added AI disclosures                                     \\
+        Sept 28th 2026 & Ayush Patel & Minor Formatting and Proofreading changes                          \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -92,6 +93,8 @@ arising from use of the software. The
 license} for the project can be found in the team repository.
 
 \section{Team Meeting Plan}
+
+\label{sec:meeting-plan}
 
 \wss{This section is for meetings between the team members, and meetings between
     the team and their supervisor/advisor (as appropriate).}
@@ -154,12 +157,14 @@ license} for the project can be found in the team repository.
 \begin{itemize}
     \item \textbf{Primary asynchronous channel:} Microsoft Teams chat, for day-to-day communication and quick questions.
     \item \textbf{Task-level communication:} GitHub -- issues, pull requests, and code review comments are used for anything related to a specific task, so discussion stays attached to the relevant work item. Members will \@-mention each other in PRs/issues, assign issues directly, and request reviews through GitHub's review request feature.
-    \item \textbf{Meeting minutes:} Recorded and stored on GitHub (see Team Meeting Plan).
+    \item \textbf{Meeting minutes:} Recorded and stored on GitHub (see \nameref{sec:meeting-plan}).
     \item \textbf{Supervisor/stakeholder communication:} Email (Dr. Smith prefers email), routed through the team liaison to keep a single point of contact.
     \item \textbf{Response-time expectation:} Each member will respond to direct communication in the team's Teams chat within 24 hours.
 \end{itemize}
 
 \section{Team Member Roles}
+
+\label{sec:team-member}
 
 \wss{You should identify the types of roles you anticipate, like notetaker,
     leader, meeting chair, reviewer.  Assigning specific people to those roles is
@@ -182,14 +187,14 @@ license} for the project can be found in the team repository.
 
     \item \textbf{Documentation Quality Assurance:} Rotates per deliverable alphabetically by first name starting with Ahmed for the first deliverable.
           The member(s) in this role are responsible for checking the completed deliverable against both the repository checklist and the Avenue rubric before submission, and flagging any gaps to the team with enough time to address them before the deadline.
-    \item This is in addition to, not a replacement for, normal PR review.
+          This is in addition to, not a replacement for, normal PR review.
 
     \item \textbf{Technical Roles:}
           \begin{itemize}
               \item Frontend developer: Responsible for development of a user
                     friendly interface - All members
               \item Backend developer: Responsible for developing the backend
-                    and databse layer - All members
+                    and database layer - All members
               \item Reviewer (code): all members.
               \item Reviewer (documentation): all members.
               \item Technical QA: Responsible for doing functional testing
@@ -230,7 +235,7 @@ license} for the project can be found in the team repository.
               \item \textbf{Team Member Review:} The PR will be reviewed by at least one other team member to ensure that all of the rubric criteria has been met.
                     If the PR contains code changes, the PR will also be reviewed for code quality and functionality. The reviewer(s) provide feedback through comments. The author
                     of the section should respond or implement any feedback provided by the member who reviewed the submission. If a merge conflict arises during review, it is the responsibility of the branch owner to resolve it (or resolved collaboratively if the branch is shared) before requesting re-review.
-              \item \textbf{Merging:} Once the PR has been reviewed, approved, and confirmed that all of the rubric criteria has been met, it will successfully
+              \item \textbf{Merging:} Once the PR has been reviewed and approved, it will successfully
                     be merged into the main branch. We will not use squash merging, to ensure that all commits are visible in the main branch. To maintain a linear history, we will use rebase and merge.
               \item \textbf{Definition of Done:} An issue/task is considered complete when: its checklist items are fully addressed, its associated PR has passing CI checks and, where required, at least one approving review and it has been merged into the main branch.
           \end{enumerate}
@@ -311,7 +316,7 @@ license} for the project can be found in the team repository.
           all files, merges require both teammate approval (only for code files, using a CODEOWNERS file) and passing CI checks.
           While we will still use the PR review process for all major documentation-related tasks, we will not officially enforce teammate approval for documentation-related PRs, to ensure that we are not bottlenecked by teammate availability for minor changes.
           CI will also run all unit tests to make sure we are not introducing any regressions.
-          Checks will be added to ensure linting, code quality analysis, and unit test coverage (see Technology and Coding Standard sections for more details).
+          Checks will be added to ensure linting, code quality analysis, and unit test coverage (see \nameref{sec:tech} and \nameref{sec:coding-standard}.
           Enforcing CI checks ensures errors are caught early and also ensures we follow industry-standard practices.
 
 \end{itemize}
@@ -408,18 +413,18 @@ To address the high-priority risk above, the following PoC plan will be
 demonstrated:
 
 \begin{enumerate}
-    \item A supervisor should be able to create a capstone project.
-    \item A student group should be able to browse available projects.
-    \item A request should be made from the student group to any desired
-          project.
-    \item A supervisor should have the ability to accept or reject a group.
-    \item The system should mark the project as unavailable to other groups
-          once project is at capacity. (PoC Requirement)
-    \item The student and supervisor views should display a synchronized status
-          after each action (pending, accepted, declined, withdrawn)
-    \item Invalid actions from out-of-date views are attempted by users and
-          rejected by the system (e.g. accepting a group placed on another
-          project or sending a request to a project that has been filled)
+    \item A supervisor creates a project with a set number of teams they will
+          accept (e.g.\ one project accepting one team and another accepting two).
+    \item A student group browses available projects and requests several of them.
+    \item A supervisor accepts a group's request, up to the project's team limit.
+    \item Once a group is accepted, its other requests are withdrawn and it
+          cannot be accepted by any other project.
+    \item Once a project reaches its team limit, it is marked unavailable to
+          other groups.
+    \item Once refreshed, the student and supervisor views should display a synchronized status after each
+          action (e.g. pending, accepted, declined, withdrawn)
+    \item Stale views might exist for a short period of time and if invalid actions from stale views are attempted by users, they are rejected by the system
+          (e.g. accepting a group placed on another project or sending a request to a project that has been filled)
 \end{enumerate}
 
 \subsection{Success Criteria}
@@ -428,7 +433,7 @@ demonstrated:
           \begin{itemize}
               \item Student group obtains at most one project and no others are
                     able join a full project
-              \item Project never exceeds its supervisor's team limit
+              \item Project never exceeds its team capacity limit
               \item Views may be briefly out-of-date, but actions taken from an
                     out-of-date view that is no longer valid must be rejected
                     by the system.
@@ -445,6 +450,8 @@ supervisors to manually mark a project as taken.
 
 \section{Expected Technology}
 
+\label{sec:tech}
+
 \wss{What programming language or languages do you expect to use?  What external
     libraries?  What frameworks?  What technologies.  Are there major components of
     the implementation that you expect you will implement, despite the existence of
@@ -460,7 +467,7 @@ supervisors to manually mark a project as taken.
     members will need to augment their training.}
 
 \begin{itemize}
-    \item \textbf{Version Control and Project Management:} Git, Github and GitHub projects
+    \item \textbf{Version Control and Project Management:} Git, GitHub and GitHub projects
     \item \textbf{Frontend:} React -- chosen for its large ecosystem, team familiarity, and strong component-based structure suited to an interactive web application. \textbf{Trade-off:} steeper initial setup compared to simpler frameworks, but this is offset by better long-term maintainability.
     \item \textbf{Backend:} Python with FastAPI -- chosen for fast development speed, built-in data validation, automatic API documentation, and strong support for any data-processing or ML-adjacent work the project may require. \textbf{Trade-off:} lower raw performance than a compiled-language backend, which is an acceptable trade-off given the project's expected scale.
     \item \textbf{Backend unit testing:} pytest -- chosen over the built-in \texttt{unittest} module for its more concise syntax, fixture system, and better plugin ecosystem for coverage reporting.
@@ -469,7 +476,7 @@ supervisors to manually mark a project as taken.
     \item \textbf{Frontend linter:} ESLint -- industry standard for TypeScript/JavaScript, configurable to enforce team-agreed style rules.
     \item \textbf{Backend linter:} Ruff -- industry standard linter, easiest to setup, fastest and most modern
     \item \textbf{Unit test coverage tool:}  SonarQube -- industry standard for reporting and visualizing code coverage
-    \item \textbf{Database:} PostgreSQL - relational database will make it easier
+    \item \textbf{Database:} PostgreSQL - relational database, chosen for its strong support for relational data and constraints relevant to our assignment/status-tracking logic.
     \item \textbf{Application Packaging:} Docker - production standard to package application components and dependencies into one executable container \textbf{Trade-off:} Extra set up is required but this will ensure our code will run anywhere we choose to deploy in the future
     \item \textbf{Continuous Integration:} GitHub Actions. CI will run on every push and pull request, checking: linting (ESLint/Pylint), unit test pass/fail (Jest/pytest), and SonarQube coverage reports.
     \item \textit{Note: the technologies listed here reflect the team's current expectations and are not binding constraints. They may evolve as the project's design becomes more concrete.}
@@ -519,6 +526,8 @@ supervisors to manually mark a project as taken.
 \end{itemize}
 
 \section{Coding Standard}
+
+\label{sec:coding-standard}
 
 \wss{What coding standard will you adopt?}
 
@@ -911,7 +920,7 @@ consistency, readability, maintainability, and code quality across the project:
           no unreviewed "AI slop."
     \item Every deliverable is checked against both the Avenue rubric and the
           repository checklist before submission, by the assigned documentation
-          QA role for that deliverable (see Team Member Roles) in addition to
+          QA role for that deliverable (see \nameref{sec:team-member}) in addition to
           the author.
     \item Members are expected to arrive at meetings ready to give a meaningful
           update or raise questions.
