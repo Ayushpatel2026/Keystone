@@ -36,7 +36,8 @@
         Sept 28th 2026 & Andrew Habib          & Added reflection information                             \\
         Sept 28th 2026 & Ahmed Rashrash        & Added GitHub url                                         \\
         Sept 28th 2026 & All Team Members      & Added AI disclosures                                     \\
-        Sept 28th 2026 & Ayush Patel & Minor Formatting and Proofreading changes                          \\
+        Sept 28th 2026 & Ayush Patel           & Minor Formatting and Proofreading changes                \\
+        Oct 2nd 2026   & Ayush Patel           & Added role backups and Definition of Done clarification  \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -119,9 +120,34 @@ license} for the project can be found in the team repository.
     \item \textbf{Weekly Team Meeting:} Once a week for one hour -- Wednesdays, 2:30pm to 3:30pm, in person.
           Additional virtual meetings will be scheduled as needed when approaching a deliverable deadline.
 
-    \item \textbf{Meeting Chair:} Waqar Ul-Hassan - prepares and sends out the meeting agenda and leads the meetings
+    \item \textbf{Meeting Chair:} Waqar Ul-Hassan -- prepares and sends out
+          the meeting agenda and leads the meetings.
 
-    \item \textbf{Notetaker:} Ahmed Rashrash - record the meeting minutes using the template below
+    \item \textbf{Notetaker:} Ahmed Rashrash -- records the meeting minutes
+          using the template below.
+
+    \item \textbf{Backup Chair and Notetaker:} To avoid a single point of
+          failure, each role has a designated backup:
+          \begin{itemize}
+              \item If Waqar is absent, Ayush Patel acts as meeting chair.
+              \item If Ahmed is absent, Andrew Habib acts as notetaker.
+              \item If a backup is also absent, the remaining available
+                    member covers the role, since only one person is left
+                    to do so. For example, if Waqar and Ayush are both
+                    absent, Andrew becomes meeting chair, because Ahmed is
+                    already the notetaker.
+          \end{itemize}
+
+    \item \textbf{Absence Handoff:} In non-emergency situations, a member who
+          will be absent from a meeting must notify the team in the Teams
+          chat at least 48 hours before the meeting. If the absent member is
+          the chair or notetaker, this notice also tells the backup to take
+          over the role. The backup uses the same agenda and minutes
+          templates, and the same ``Team/Supervisor/TA Meeting'' GitHub Issue, as the
+          regular chair or notetaker would. The agenda deadline (24 hours
+          before the meeting) still applies to the backup chair. In
+          emergencies, the member should notify the team as soon as
+          reasonably possible.
 
     \item \textbf{Supervisor Meetings:} We will meet with Dr. Smith at least once a month, and more frequently as needed. These will primarily occur during lecture time, with virtual meetings as a backup when an in-lecture meeting is not possible.
 
@@ -177,9 +203,11 @@ license} for the project can be found in the team repository.
               \item Team Liaison: Ayush Patel -- primary point of contact with
                     the supervisor and course staff.
               \item Meeting Chair: Waqar Ul-Hassan -- prepares and sends out
-                    the meeting agenda and leads the meetings.
-              \item Notetaker: Ahmed Rashrash -- record the meeting minutes
-                    using the template below.
+                    the meeting agenda and leads the meetings. Backup:
+                    Ayush Patel.
+              \item Notetaker: Ahmed Rashrash -- records the meeting minutes
+                    using the template in Section~\ref{sec:meeting-plan}.
+                    Backup: Andrew Habib.
               \item GitHub Manager: Andrew Habib -- responsible for keeping
                     labels, issue templates, branch protection rules, and the
                     project board consistent and up to date.
@@ -237,7 +265,35 @@ license} for the project can be found in the team repository.
                     of the section should respond or implement any feedback provided by the member who reviewed the submission. If a merge conflict arises during review, it is the responsibility of the branch owner to resolve it (or resolved collaboratively if the branch is shared) before requesting re-review.
               \item \textbf{Merging:} Once the PR has been reviewed and approved, it will successfully
                     be merged into the main branch. We will not use squash merging, to ensure that all commits are visible in the main branch. To maintain a linear history, we will use rebase and merge.
-              \item \textbf{Definition of Done:} An issue/task is considered complete when: its checklist items are fully addressed, its associated PR has passing CI checks and, where required, at least one approving review and it has been merged into the main branch.
+              \item \textbf{Definition of Done:} An issue/task is considered
+                    complete when: its checklist items are fully addressed,
+                    its associated PR has passing CI checks and, where
+                    required, at least one approving review, and it has been
+                    merged into the main branch. Post-merge functional
+                    testing is a separate follow-up activity and is not part
+                    of the Definition of Done (see below).
+              \item \textbf{Post-Merge Functional QA:} After each functionality-related PR is merged, the Technical QA
+                    member (see Section~\ref{sec:team-member}) performs
+                    functional testing on the main branch. This testing
+                    should be completed before the end of the current
+                    deliverable period, and the result is recorded as a
+                    comment on the original issue (pass, or a link to any
+                    defect found).
+                  \begin{itemize}
+                      \item \textbf{If QA passes:} No further action is
+                            needed, and the original issue stays closed.
+                      \item \textbf{If QA finds a defect:} The Technical QA member creates a new
+                            issue labelled \emph{Bug} (or \emph{Feature}
+                            if the gap is missing functionality). The new
+                            issue must reference the original issue and
+                            the PR that introduced the defect, and the
+                            original issue gets a comment linking back to
+                            it, so the history stays traceable in both
+                            directions. The new issue is added to the same milestone
+                            and the GitHub Project board. It is assigned, by
+                            default, to the author of the original PR, or
+                            to another member if the team agrees.
+                  \end{itemize}
           \end{enumerate}
 
           \textbf{Branch Protection Rules:}
