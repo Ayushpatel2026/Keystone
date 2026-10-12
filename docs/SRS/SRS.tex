@@ -176,6 +176,12 @@ Date 2 & 1.1 & Notes\\
   broader life-cycle context that underlines modern requirements engineering
   practice.}
 
+  This software requirements specification (SRS) document describes the system and product vision
+  as well as the functional and non-functional requirements for \projname{}. The SRS is intended
+  to be a reference for the development team, stakeholders, and future maintainers of the system.
+  This document is constructed using the IEEE 29148 and IEEE 15288 standards
+  as a guide \citep{ISOIECIEEE29148_2018, ISOIECIEEE15288_2023}.
+
   \subsection{Purpose}
 
   \plt{State the purpose of the system.}
@@ -185,8 +191,23 @@ Date 2 & 1.1 & Notes\\
   grade, you should not mention this.  Instead, ``fake it'' as if this is a real
   project.}
 
-  \projname{} is intended to solve ... \plt{What problem does your program solve?
+  The purpose of \projname{} is to make capstone project proposals, discovery, team formation, and
+  team project approval transparent, consistent, and easy to manage for the students, supervisors, and
+  course instructors involved.
+
+  \plt{What problem does your program solve?
   The description here should be in the problem space, not the solution space.}
+
+  Capstone project team formation, project selection, and approval currently happens across
+  disconnected tools such as email, forms, and shared files, and the information in them is often
+  inaccurate or out of date. As a result, students cannot tell which projects are really available,
+  supervisors cannot easily see who is interested in their projects or what skills those students have,
+  and instructors spend significant time coordinating the process by hand.
+  See \nameref{sec:problem-statement} for a more detailed description of the problem.
+
+  \projname{} is intended to solve these problems by giving every participant a single, trustworthy
+  source of information about capstone projects, teams, and their status, from the moment a project
+  is proposed until it is approved.
 
   \subsection{Scope}
   \plt{Briefly describe:
@@ -198,19 +219,77 @@ Date 2 & 1.1 & Notes\\
       \item Clarifying the scope often means saying what the software doesn't do
     \end{itemize}
   }
-
   \plt{The scope section is relevant for understanding the boundaries of the system. It is also relevant for later determining typical values of inputs. The scope should make it clear what inputs are reasonable to expect. This is a distinction between scope and context (context is a later section).  Scope affects the inputs while context affects how the software will be used.}
 
-  TODO
+
+\textbf{Problem being solved.} The fragmented and unreliable flow of information in capstone
+  project and team selection, as described in the \nameref{sec:problem-statement} section below.
+
+  \textbf{Intended users.} Capstone students, project supervisors (McMaster faculty and industry
+  sponsors), course instructors, and teaching assistants (TAs), across the Software Engineering (SE),
+  Computer Science (CS), and Mechatronics (TRON) capstone courses.
+
+  \textbf{Major functionality.} \projname{} covers the lifecycle from project proposal to team project approval.
+  Within that boundary the system:
+  \begin{itemize}
+    \item collects project proposals in a standardized format
+    \item provides a searchable catalog of projects showing which are open, taken, or able to take
+    more teams
+    \item lets students create structured profiles of their skills, experience, interests, and work style
+    that other students and supervisors can view, indicate whether they are looking for a team,
+    and find teammates interested in the same projects
+    \item lets students propose their own projects which other students and supervisors can see
+    \item lets student teams express their interest to work on supervisor proposed project
+    \item lets supervisors review and accept or decline interested student teams and confirm their willingness to work with a
+    team;
+    \item gives instructors visibility across courses into projects, teams, and their status, including
+    which supervisors' projects were not selected;
+    \item provides supervisors with course process, timeline, and expectation
+    information, configurable by the course instructor
+    \item lets students submit their team and project for instructor approval and lets teams submit later changes to
+    their project information for review
+    \item lets instructors approve, request changes to, or reject a team’s project submission and later changes to
+    its information
+  \end{itemize}
+
+  \textbf{What \projname{} does not do.}
+  \begin{itemize}
+    \item It does not judge whether a project is feasible, sufficiently complex, or appropriate
+    for a capstone course; this remains the responsibility of the course instructor.
+    \item It does not make approval decisions. Final approval of teams and projects always rests
+    with the course instructor. Courses may carry out approval inside the platform or in an external process.
+    \item It does not resolve intellectual property (IP), confidentiality, or non-disclosure
+    questions between students and supervisors.
+    \item It does not find supervisors for student-proposed projects. Student-proposed projects are
+    visible to all users of the platform, but \projname{} provides no matching or request mechanism
+    for supervisors.
+    \item It does not handle supervision after a project begins, such as feedback requests to
+    supervisors, team performance concerns, or grading.
+  \end{itemize}
+
+  \textbf{Expected inputs.} Inputs are text-based project and profile information entered by users,
+  and project status changes made by authorized users.
+
+  \textbf{Expected benefits.} Students can compare projects reliably and avoid pursuing projects that
+  are taken or misrepresented; supervisors receive better-informed applicants and fewer repeated
+  emails; and instructors spend less time on repetitive coordination and gain visibility into the
+  whole process.
 
   \subsection{Stakeholders}
-  \begin{itemize}
-    \item Customer
-    \item End Users
-    \item Project Sponsor
-    \item Development Team
-    \item Administrators
-  \end{itemize}
+
+    \begin{itemize}
+      \item \textbf{Customer:} Course instructors for the SE, CS, and TRON capstone courses
+      (Dr.~Smith, Dr.~Moradi, and Dr.~Wassyng respectively). They decide which features their course
+      uses and make the final project and team approval decisions.
+      \item \textbf{End Users:}
+        \begin{itemize}
+          \item Capstone students, who browse projects, create profiles, form teams, and apply to projects.
+          \item Project supervisors, who propose projects, manage their capacity, and review and confirm
+          teams. Supervisors are either McMaster faculty or industry sponsors.
+          \item Course instructors and TAs, who manage users, projects, project status, and course configuration.
+        \end{itemize}
+      \item \textbf{Development Team:} Ayush Patel, Waqar Ul-Hassan, Ahmed Rashrash, and Andrew Habib.
+    \end{itemize}
 
   \subsection{Definitions and Acronyms}
 
@@ -221,10 +300,37 @@ Date 2 & 1.1 & Notes\\
     \toprule
     Term & Definition\\
     \midrule
-    TODO & TODO\\
+    Capstone course & A final-year design course in which student teams spend roughly eight months
+    (September to April) designing, implementing, and validating a system for a real group of
+    stakeholders. In this document, the SE, CS, and TRON capstone courses.\\
+    SE, CS, TRON & Software Engineering, Computer Science, and Mechatronics Engineering, the three
+    programs in the Computing and Software Department whose capstone courses \projname{} supports.\\
+    Course instructor & The instructor responsible for a capstone course and for approving its
+    teams and projects.\\
+    Supervisor & A McMaster faculty member or industry sponsor who proposes a project, or who agrees to
+    advise a team on a project, and provides domain knowledge or acts as a client.\\
+    Industry sponsor & A supervisor from outside McMaster, who may have no McMaster account (MacID).\\
+    Project proposal & A description of a project submitted by a supervisor, or a student, for
+    teams to consider.\\
+    Student-proposed project & A project proposed by a student team rather than by a supervisor.\\
+    Project status & The position of a project in its lifecycle, for example proposed, listed, taken,
+    or approved. \\
+    Supervisor capacity & The number of teams a supervisor is willing to supervise on a project.\\
+    Team formation rules & Course rules on team composition: which programs may work together on
+    which projects, and the minimum and maximum team size.\\
+    Team project approval & The course instructor's decision to approve a team's selected project
+    and membership \\
+    Approval mode & How a course handles approval: in-platform, external, or integrated.\\
+    Custom document & A deliverable, chosen by each team from a list, that suits the type of project
+    (for example, a usability testing report).\\
+    TA & Teaching assistant assigned to a capstone team after its project is approved.\\
+    MacID & A McMaster University user account identifier.\\
     \bottomrule
     \caption{Definitions and Acronyms} \label{tab:DefinitionsAndAcronyms}
   \end{longtable}
+
+  % TODO: add ``Proposal approval'' (instructor review of supervisor proposals before the list is
+  % published) if Dr. Smith confirms that this is actually what he does
 
   \subsection{Characteristics of Intended Reader} \label{sec_IntendedReader}
 
@@ -243,6 +349,13 @@ Date 2 & 1.1 & Notes\\
   instance, is high school physics adequate, or should the reader have had a
   graduate course on advanced quantum mechanics?}
 
+  The intended reader of this SRS should have a background in software engineering,
+  including knowledge of software development processes, requirements engineering,
+  and system design principles. They do not have to be experts on these topics,
+  but they should at least have the knowledge of a final year undergraduate student
+  in software engineering. No knowledge of the capstone course process beyond the definitions
+  in this section is required.
+
 % ==============================================================
   \section{System Overview}
 
@@ -260,6 +373,8 @@ Date 2 & 1.1 & Notes\\
   same, while specific details are changed between family members.}
 
   \subsection{Problem Statement}
+
+  \label{sec:problem-statement}
 
   \plt{Current situation, problem, impact, desired improvement.  You will likely borrow some text from your problem description document.}
 
