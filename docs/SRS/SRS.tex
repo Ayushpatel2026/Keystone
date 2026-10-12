@@ -238,6 +238,7 @@ Date 2 & 1.1 & Notes\\
     \item lets students create structured profiles of their skills, experience, interests, and work style
     that other students and supervisors can view, indicate whether they are looking for a team,
     and find teammates interested in the same projects
+    \item suggests compatible teammates and suitable projects to students, based on their profiles and preferences
     \item lets students propose their own projects which other students and supervisors can see
     \item lets student teams express their interest to work on supervisor proposed project
     \item lets supervisors review and accept or decline interested student teams and confirm their willingness to work with a
@@ -378,7 +379,62 @@ Date 2 & 1.1 & Notes\\
 
   \plt{Current situation, problem, impact, desired improvement.  You will likely borrow some text from your problem description document.}
 
-  TODO
+  \textbf{Current situation.} Capstone team and project selection is spread across disconnected
+  tools, including email, online forms, MS Teams, Avenue to Learn and GitLab.
+  A supervisor's proposal is collected through a form and distributed to
+  students as a static list. Students then form teams informally, mainly through discussion
+  forums on Avenue to Learn / Teams and personal contacts, contact supervisors by email, and
+  submit their chosen project and team for instructor approval through a course-specific process.
+  No single place shows the state of the whole process.
+
+  \textbf{Problems.} The following problems arise from this situation.
+  \begin{itemize}
+    \item \textbf{Unreliable project information.} Project descriptions vary widely in accuracy and
+    detail. For example, they often do not state how much of the project already exists or what a supervisor's
+    expectations are at the end. This makes projects difficult to compare and leads to mismatched expectations
+    between students and supervisors.
+    \item \textbf{No visibility of availability.} Students cannot see which projects are still
+    available, which have been taken, or whether a supervisor is willing to take more than one team.
+    After a rejection, students do not know which projects remain. Supervisors have no way to
+    express how many teams they can take.
+    \item \textbf{Difficulty forming teams.} Students looking for teammates currently post in a course discussion forum,
+    where some describe themselves and their work style and others describe a project idea they want a team for.
+    The posts are free text with no standard structure, so students cannot easily compare skills, interests,
+    or work styles, or find others interested in the same project.
+    \item \textbf{Student information and ideas are not visible to supervisors} Students with their own project idea
+    describe it in the forum, where supervisors cannot see it. This includes supervisors who would like to
+    supervise a student-proposed project. Supervisors also cannot see students’ skills, experience, or
+    work style when deciding whether to work with a team. Student-proposed ideas are not tracked alongside
+    supervisor-proposed projects.
+    \item \textbf{Weak communication between students and supervisors.} Supervisors receive
+    multiple emails from teams, including after a team has been selected, and have no structured way to learn about the
+    students contacting them. Students sometimes say that a supervisor agreed to work with them even though the
+    supervisor has no record of the team, so agreements must be confirmed separately.
+    \item \textbf{Important information arrives too late.} Before proposing a project, supervisors receive only a
+    short summary of the capstone course’s expectations and process. They learn more about its purpose, timeline,
+    and expectations only after teams and projects have been settled, which leads to misunderstandings about
+    what a capstone project should deliver and to many questions to the instructor.
+    \item \textbf{Limited visibility for instructors.} Instructors of different capstone courses
+    cannot see which projects have been selected by students in the other courses, so they cannot
+    tell which proposed projects were not selected. Supervisors whose projects were not selected
+    are not officially notified, leaving them in the dark and potentially discouraging them from
+    proposing projects in future year.
+    \item \textbf{High administrative effort for team project approval} Instructors repeat the same checks and review
+    comments for many teams and students and students must fill out tedious JSON files (in SE)
+    \item \textbf{Records drift after approval.} Team and project information changes after approval
+    (for example, titles, supervisors, and links), but updating the official record takes effort, so
+    it is often not updated and the instructor's records become out of date.
+  \end{itemize}
+
+  \textbf{Impact.} Students lose time early in a project of limited duration, teams end up
+  mismatched with their projects or with each other, supervisors may become reluctant to propose
+  projects in later years, and course instructors carry the administrative burden of the process.
+
+  \textbf{Desired improvement.} All participants share a single, accurate and current source of
+  information about projects, supervisors' capacity, teams, and approval status; students can find
+  suitable projects and teammates; supervisors can see students’ skills and ideas and receive
+  information about the course when they need it; and course instructors keep full control of
+  approval decisions while spending less time on repetitive tasks.
 
   \subsection{Product Vision}
 
@@ -394,7 +450,38 @@ Date 2 & 1.1 & Notes\\
   \plt{You will likely borrow from your goal statements in your problem
   description document.}
 
-  TODO
+
+  \projname{} will be the central place where capstone projects are proposed, discovered, and
+  matched with student teams, and where instructors can see and manage the process. Each course
+  decides which features it uses and how its approval process is carried out, so the platform can
+  be adopted by different courses, departments, and universities.
+
+  The goals of \projname{} are:
+  \begin{enumerate}
+    \item \textbf{Reliable project information.} Every project is described in a consistent format
+    that makes its objectives, required skills, current state, and expected deliverables clear.
+    \item \textbf{Visibility of availability.} Users can tell which projects are open, taken, or
+    able to take additional teams.
+    \item \textbf{Easier team formation.} Students can describe their skills, experience, and work style
+    in a structured profile, find teammates with compatible profiles and project preferences, and propose
+    projects of their own for others to join.
+    \item \textbf{Informed matching.} Students receive suggestions of compatible teammates and suitable projects
+    based on their profiles and preferences.
+    \item \textbf{Clear agreement between supervisors and teams.} A supervisor's willingness to
+    work with a team is recorded in the platform and is visible to the instructor.
+    \item \textbf{Informed supervisors.} Supervisors can see student-proposed projects and the skills and experience
+    of the students and teams interested in their projects.
+    \item \textbf{Timely process information.} Supervisors have access to information
+    about the capstone course, its timeline, and its expectations, as configured by the course
+    instructor.
+    \item \textbf{Oversight for instructors.} Instructors can see projects, teams, supervisors,
+    and their status across courses, including projects that were not selected.
+    \item \textbf{Instructor-controlled approval.} Final approval decisions remain with the course
+    instructor. The platform supports the approval process carried out in the course, whether that
+    takes place in the platform or elsewhere.
+    \item \textbf{Configurable and reusable.} Features can be turned on or off, and course-specific
+    rules can be configured, so that the platform serves different courses without modification.
+  \end{enumerate}
 
   \subsection{System Context}
 
@@ -428,15 +515,43 @@ Date 2 & 1.1 & Notes\\
     stays away from the detail of listing every required properties.}
 
   \begin{itemize}
-    \item User Responsibilities:
+    \item Student Responsibilities:
     \begin{itemize}
-      \item
+      \item Provide an accurate profile including skills, interests, experience, and project preferences.
+      \item Express interest in projects and respond to supervisors' decisions.
+      \item Provide accurate team and project information, including student-proposed projects.
+    \end{itemize}
+    \item Supervisor Responsibilities:
+    \begin{itemize}
+      \item Provide accurate, complete project proposals, including the current state of the project,
+      expected outcomes, and the number of teams they are willing to supervise.
+      \item Review interested teams and confirm or decline willingness to supervise them.
+      \item Keep their capacity and project information current.
+    \end{itemize}
+    \item Course Instructor Responsibilities:
+    \begin{itemize}
+      \item Configure the features, rules, and approval mode that apply to their course.
+      \item Make final decisions on teams and projects, including approval, requests for changes, and
+      rejection.
+      \item Judge project feasibility and appropriateness for the course.
+      \item Provide the course process and timeline information shown to supervisors.
+    \end{itemize}
+    \item TA Responsibilities:
+    \begin{itemize}
+      \item Update project and team status as directed by instructors, in courses where approval
+      takes place outside \projname{}.
+      \item Assist instructors and users in keeping records accurate.
     \end{itemize}
     \item \projname{} Responsibilities:
     \begin{itemize}
-      \item Detect data type mismatch, such as a string of characters instead of a
-      floating point number
-      \item
+      \item Check that required project, profile, and team information is present and well formed.
+      \item Show current project status and availability, and supervisor capacity.
+      \item Apply the team formation rules configured for each course.
+      \item Restrict what each user can see and change according to their role.
+      \item Record who made each change to a project or team, and when.
+      \item Notify users of events that need their attention.
+      \item Provide instructors with an overview of projects, teams, and their status.
+      \item Suggest compatible teammates and projects based on profile data.
     \end{itemize}
   \end{itemize}
 
@@ -450,6 +565,12 @@ Date 2 & 1.1 & Notes\\
   analogous to, the idea to the Automotive Safety Integrity Levels (ASILs) that
   McSCert uses in their automotive hazard analyses.}
 
+  \projname{} is used to coordinate an academic process. Use is concentrated around the start of
+  the academic year, when projects are proposed and teams are formed, with lighter use afterwards.
+  It is not mission-critical or safety-critical. A failure delays the coordination of projects and
+  teams but does not cause harm. The data handled includes personal information about students, so
+  privacy is the main risk to be managed, rather than safety.
+
   \subsection{User Characteristics} \label{SecUserCharacteristics}
 
   \plt{This section summarizes the knowledge/skills expected of the user.
@@ -460,6 +581,25 @@ Date 2 & 1.1 & Notes\\
     user characteristics should be specific an unambiguous.  For instance, ``The
     end user of \projname{} should have an understanding of undergraduate Level 1
     Calculus and Physics.''}
+
+  \begin{itemize}
+    \item \textbf{Students} are final-year undergraduate students in the programs the capstone
+    courses serve. They are comfortable using web applications, and many have professional
+    experience from co-op placements or internships. They use \projname{} mainly at the start of the
+    course, and need little training. They are motivated to find a suitable project quickly, but
+    differ in whether they already have a team or a project idea.
+    \item \textbf{Supervisors} are McMaster faculty or industry sponsors. They have a wide range of
+    backgrounds. They may use \projname{} only a few times a year, have limited time, and may be
+    unfamiliar with the capstone course, its purpose, and its timeline. Industry sponsors may have
+    no McMaster account. No technical training beyond using a web application can be assumed, and
+    the effort needed to propose a project must stay low enough that it does not discourage them.
+    \item \textbf{Course instructors} know the course's process and rules. They configure the
+    platform for their course and make approval decisions. They use it throughout the term, and need
+    to configure it without developer help.
+    \item \textbf{TAs} are graduate students who know the course's process. They
+    help instructors with day-to-day administration and are comfortable using web applications and
+    technical tools.
+  \end{itemize}
 
   \subsection{System Constraints}
 
@@ -472,6 +612,20 @@ Date 2 & 1.1 & Notes\\
 
   \plt{This is where you would mention platform constrains, and licensing
   restrictions.}
+
+  \begin{itemize}
+    \item \textbf{Web-based.} \projname{} shall be accessible through current versions of common web
+    browsers on desktop, tablet, and mobile devices, and shall not require specialized hardware or
+    installation. An internet connection is required.
+    \item \textbf{Modular features.} Each major feature shall be able to be enabled or disabled
+    independently for each course, so that a course can use only the parts that fit its process.
+    \item \textbf{Independent of any one approval tool.} \projname{} shall not depend on a specific
+    external tool, such as the GitLab merge request process used by the Software Engineering course,
+    to function. It shall support courses that carry out approval in the platform, courses that carry
+    it out elsewhere, and, where an adapter exists, courses that synchronize with an external process.
+    \item \textbf{Users outside the university.} \projname{} shall support users who do not have a
+    McMaster account (such as industry sponsors) alongside users who do.
+  \end{itemize}
 
 % ==============================================================
   \section{Stakeholder Requirements}
