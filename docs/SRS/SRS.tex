@@ -90,7 +90,7 @@
 \newcommand{\stkS}{\hyperref[app:stk_student]{S}}
 \newcommand{\stkES}{\hyperref[app:stk_extsup]{ES}}
 \newcommand{\stkIS}{\hyperref[app:stk_intsup]{IS}}
-\newcommand{\stkI}{\hyperref[app:stk_instr]{I}}
+\newcommand{\stkSEI}{\hyperref[app:stk_instr]{SEI}}
 
 \usepackage{fullpage}
 
@@ -714,12 +714,12 @@ Date 2 & 1.1 & Notes\\
         Supervisors and instructors shall be able to propose a project using a
         structured template rather than a unstructured description. The template should
         include the expected scope/goals, the capstone team's deliverables, projectimpact, 
-        industry or field of study, confidentiality, and IP concerns. (\stkS, \stkI, \stkES)
+        industry or field of study, confidentiality, and IP concerns. (\stkS, \stkSEI, \stkES)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_OptionalFields}]
         The proposal template shall clearly distinguish required fields from optional ones,
         so that standardization does not discourage potential supervisors from
-        submitting good projects and ideas. (\stkI)
+        submitting good projects and ideas. (\stkSEI)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ProposalGuidance}]
         Supervisors and student teams shall have access to guidelines,
@@ -738,30 +738,30 @@ Date 2 & 1.1 & Notes\\
 
       % ---------- Project discovery and selection ----------
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_BrowseProjects}]
-        Students shall be able to browse through all available projects in one
-        place and see which projects are availible versus already assined to a team. (\stkS)
+        Students can browse through all available projects in one
+        place and see which projects are availible versus already assigned to a team. (\stkS)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ProjectStatus}]
         All stakeholders should be able to see the status of all project
-        (e.g., open, taken, dropped, approved) at any time. (\stkS, \stkES, \stkI)
+        (e.g., open, taken, dropped, approved) at any time. (\stkS, \stkES, \stkSEI)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StatusNotify}]
         Stakeholders shall be notified when the status of a project they care
         about changes via email. (\stkS, \stkES)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_UnselectedProjects}]
-        The instructor and admin shall be able to identify which projects have not been
-        selected after project selection, in order to follow up with their supervisors. (\stkI)
+        The instructors and TA's will be able to identify which projects have not been
+        selected after project selection, in order to follow up with their supervisors. (\stkSEI)
 
       % ---------- Approval ----------
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_HumanApproval}]
         Approval decisions shall be made by the instructor and not automated. Routine
-        checks and repeated feedback may be automated to reduce the instructors workload. (\stkI)
+        checks and repeated feedback should be automated to reduce the instructors workload. (\stkSEI)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ReviewDialogue}]
         Students and the instructor shall be able to exchange feedback iteratively
         during the approval process, preserving student exposure to review-based
-        workflows. (\stkI, \stkS)
+        workflows. (\stkSEI, \stkS)
 
       % ---------- Profiles and team matching ----------
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StudentProfiles}]
@@ -774,19 +774,14 @@ Date 2 & 1.1 & Notes\\
       %   and interests. This matching shall be optional and able to be turned off.
         
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamValidity}]
-        The instructor can get accurate, up-to-date, and validated
-        team composition data (e.g., all students are in exactly one team). (\stkI)
+        The instructor and TA's can get accurate, up-to-date, and validated
+        team composition data (e.g., all students are in exactly one team). (\stkSEI)
 
       % ---------- Schedule and expectations ----------
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_CrossCourseTimelines}]
         Supervisors working with teams across multiple capstone courses shall be
         able to see how the timelines and requirements differ between those
         courses. (\stkIS)
-
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_SuggestedMeetings}]
-        Teams and supervisors will be given suggested meeting times and agendas
-        aligned on the deliverables, Supervisors will be free to adopt their own schedule
-        based on the reccomendations. (\stkS, \stkES)
 
       % ---------- Communication ----------
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamContacts}]
@@ -809,13 +804,13 @@ Date 2 & 1.1 & Notes\\
         schedule, teams, communication, and notes) in one place. (\stkS, \stkES)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ReduceAdmin}]
-        Communication, and administrative tasks (such as
-        recording approved projects and groups) will be automated as much as
-        possible. (\stkI, \stkES)
+        Administrative tasks including the generation of a list of approved projects, 
+        groups, selected projects, and supervisors will be automated. 
+        (\stkSEI, \stkES)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Extensible}]
         The solution shall be modular and extendable, so it can later be adapted
-        for other capstone courses or other universities. (\stkI, \stkIS)
+        for other capstone courses or other universities. (\stkSEI, \stkIS)
 
   \end{itemize}
 
@@ -1303,62 +1298,62 @@ advises the instructors.
     Accounts are mentioned as a need (details not captured in notes).
 \end{itemize}
 
-% ==================== INSTRUCTOR ====================
-\paragraph{Instructor (I)} \label{app:stk_instr}
+% ==================== Software Engineering Instructor ====================
+\paragraph{Software Engineering Instructor (SEI)} \label{app:stk_instr}
 Professor who runs the course.
 
 \noindent \begin{itemize}
-  \item[I\refstepcounter{instn}\theinstn \label{I_CurrentProcess}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_CurrentProcess}]
     Current process: before the course, emails contacts to find projects.
     Interested supervisors submit an MS Form (title, organization, contact,
     description, confidentiality, IP concerns). A Google Form funnels into a
     spreadsheet that a script turns into LaTeX. Students form teams, choose
     projects, and organize meetings. A merge request in GitLab counts as
     approval.
-  \item[I\refstepcounter{instn}\theinstn \label{I_SupervisorChanges}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_SupervisorChanges}]
     Supervisor details often change and are updated. Supervisors are contacted
     to confirm they know a team will work with them, which often surfaces
     Expo and other capstone details.
-  \item[I\refstepcounter{instn}\theinstn]
+  \item[SEI\refstepcounter{instn}\theinstn]
     Teams are classified by project hardware (SE vs.\ Mech).
-  \item[I\refstepcounter{instn}\theinstn \label{I_TeamJSON}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_TeamJSON}]
     Team details are recorded in a JSON file, processed and verified by a
     Python script (e.g., every person is in exactly one team). The team
     composition CSV should be an output that is up to date, correct, and valid.
-  \item[I\refstepcounter{instn}\theinstn \label{I_Decisions}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_Decisions}]
     Would rather spend time on decisions such as project viability and
     approval.
-  \item[I\refstepcounter{instn}\theinstn \label{I_Recruiting}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_Recruiting}]
     Often has to reach out to potential supervisors to have enough projects
     each year.
-  \item[I\refstepcounter{instn}\theinstn \label{I_Unselected}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_Unselected}]
     Wants to know which projects have not been selected, e.g., to send a thank
     you email.
-  \item[I\refstepcounter{instn}\theinstn \label{I_Automate}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_Automate}]
     Coordination, communication, and details such as approved projects and
     groups should be automated as much as possible.
-  \item[I\refstepcounter{instn}\theinstn \label{I_ApprovalCriteria}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_ApprovalCriteria}]
     Approval criterion: enough substance. Game projects often need extra work
     to add substance (e.g., more analysis such as proving fairness, or more
     components).
-  \item[I\refstepcounter{instn}\theinstn \label{I_Standards}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_Standards}]
     Standards could be considered, but enforcing them can scare away good
     projects; optional questions may help.
-  \item[I\refstepcounter{instn}\theinstn \label{I_NoAIApproval}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_NoAIApproval}]
     No AI agents making approvals. AI-generated summaries could be considered,
     but their usefulness is unclear.
-  \item[I\refstepcounter{instn}\theinstn \label{I_PRs}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_PRs}]
     Pull requests are still favored because they expose students to CI and
     show its usefulness, and allow back-and-forth between professor and
     students.
-  \item[I\refstepcounter{instn}\theinstn \label{I_RepeatFeedback}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_RepeatFeedback}]
     The same feedback is sent to multiple groups. An AI agent could respond to
     PRs with already-resolved issues (e.g., professor not added as
     collaborator), leaving more important work to the instructor.
-  \item[I\refstepcounter{instn}\theinstn \label{I_Universal}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_Universal}]
     Possibly usable universally, which may require modularity and
     extensibility.
-  \item[I\refstepcounter{instn}\theinstn \label{I_MatchingOptional}]
+  \item[SEI\refstepcounter{instn}\theinstn \label{I_MatchingOptional}]
     Algorithmic matching of teams to projects could be interesting, with a way
     to turn it off. Overhead must be worth it; this could be offset by moving
     other things (e.g., meetings) from Teams or Zoom onto this platform.
