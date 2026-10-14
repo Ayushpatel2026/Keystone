@@ -199,9 +199,9 @@ Date 2 & 1.1 & Notes\\
   The description here should be in the problem space, not the solution space.}
 
   Capstone project and team selection currently happens across disconnected tools such as email,
-  online forms, discussion forums, and shared files, and the information in them is inconsistent
-  and often out of date. As a result, project descriptions do not set clear expectations, students
-  and supervisors cannot easily tell which projects are available or learn about each other, and
+  online forms, discussion forums, and shared files, leading to a lack of visibility, clarity, and detail in
+  information available to students, supervisors, and instructors. As a result, project descriptions do not set clear
+  expectations, students and supervisors cannot easily tell which projects are available or learn about each other, and
   instructors spend significant time manually coordinating the process.
   See \nameref{sec:problem-statement} for a more detailed description of the problem.
 
@@ -243,6 +243,8 @@ Date 2 & 1.1 & Notes\\
     and find teammates interested in the same projects;
     \item suggests compatible teammates and suitable projects to students, based on their profiles and preferences
     \item lets student teams express interest in supervisor-proposed projects;
+    \item supports communication between all users regarding project proposals, team formations, applications and
+    and approvals, ensuring discussions are organized and accessible to relevant parties;
     \item supports comment threads on projects, student posts, and applications, so that questions and
     answers are kept in one place;
     \item lets supervisors and student teams each accept or decline working together, and records when both
@@ -279,8 +281,8 @@ Date 2 & 1.1 & Notes\\
   \textbf{Expected inputs.} Inputs are text-based project and profile information entered by users,
   and project status changes made by authorized users.
 
-  \textbf{Expected benefits.} Students can compare projects reliably, avoid pursuing projects that are taken
-  or lack sufficient details, and find compatible teammates; supervisors know who is interested in their projects,
+  \textbf{Expected benefits.} Students can make more informed decisions on which projects to pursue,
+  and find compatible teammates; supervisors know who is interested in their projects,
   learn about the students, and receive fewer repeated emails; and instructors spend less time on repetitive
   coordination and gain visibility into the whole process.
 
@@ -442,9 +444,10 @@ Date 2 & 1.1 & Notes\\
     students in other capstone courses selected, so they cannot tell which proposed projects were not
     selected. Supervisors whose projects are not selected are not informed, which may discourage them from
     proposing projects in future years.
-    \item \textbf{Instructor review is repetitive.} Instructors review each team's submission manually and often
+    \item \textbf{Instructor review is repetitive and time consuming.} Instructors review each team's submission manually and often
     give the same comments to many teams on simple items, such as missing information, wasting the instructor's time.
-    Changes to proposals that are agreed with supervisors by email must then be applied to the project list by hand.
+    When reviewing project proposals, changes to proposals that are agreed with supervisors by email must then be
+    applied to the project list by hand.
     \item \textbf{Records drift after approval.} Team and project information changes after approval (for
     example, titles, supervisors, links, team composition, and TA assignments), but updating the official
     record takes extra steps, so it is often not updated and the instructor's records become out of date.
@@ -638,10 +641,10 @@ Date 2 & 1.1 & Notes\\
     Calculus and Physics.''}
 
   \begin{itemize}
-    \item \textbf{Students} are final-year undergraduate students in the programs the capstone
-    courses serve. They are comfortable using web applications, and many have professional
-    experience from co-op placements or internships. They use \projname{} mainly at the start of the
-    course, and need little training. They are motivated to find a suitable project quickly, but
+    \item \textbf{Students} are final-year undergraduate students in the SE, CS and TRON programs.
+    They are comfortable using web applications and should be able to figure out how to use
+    \projname{} without any training. They use \projname{} mainly at the start of the
+    course. They are motivated to find a suitable project quickly, but
     differ in whether they already have a team or a project idea.
     \item \textbf{Supervisors} are McMaster faculty or industry sponsors. They have a wide range of
     backgrounds. They may use \projname{} only a few times a year, have limited time, and may be
@@ -680,6 +683,9 @@ Date 2 & 1.1 & Notes\\
     it out elsewhere, and, where an adapter exists, courses that synchronize with an external process.
     \item \textbf{Users outside the university.} \projname{} shall support users who do not have a
     McMaster account (such as industry sponsors) alongside users who do.
+    \item \textbf{Configurable course rules.} As \projname{} should be extensible to different capstone courses,
+    course-specific rules, such as which programs may work together on which projects and the minimum and maximum
+    team size, shall be set by the course instructor as configuration and shall not be fixed in the design.
   \end{itemize}
 
 % ==============================================================
