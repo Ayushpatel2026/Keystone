@@ -82,6 +82,16 @@
 \newcommand{\lthelcnum}{LC\thelcnum}
 \newcommand{\lcref}[1]{LC\ref{#1}}
 
+% Stakeholder tags: clickable, jump to the appendix subsection
+\newcounter{sn}
+\newcounter{esn}
+\newcounter{isn}
+\newcounter{instn}
+\newcommand{\stkS}{\hyperref[app:stk_student]{S}}
+\newcommand{\stkES}{\hyperref[app:stk_extsup]{ES}}
+\newcommand{\stkIS}{\hyperref[app:stk_intsup]{IS}}
+\newcommand{\stkI}{\hyperref[app:stk_instr]{I}}
+
 \usepackage{fullpage}
 
 \begin{document}
@@ -699,12 +709,113 @@ Date 2 & 1.1 & Notes\\
   \plt{The stakeholder requirements are numbered so that you can have traceability to other parts of your document.}
 
   \noindent \begin{itemize}
+      % ---------- Project proposals ----------
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ProposalTemplate}]
+        Supervisors and instructors shall be able to propose a project using a
+        structured template rather than a unstructured description. The template should
+        include the expected scope/goals, the capstone team's deliverables, projectimpact, 
+        industry or field of study, confidentiality, and IP concerns. (\stkS, \stkI, \stkES)
 
-              \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Label1}] TODO
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_OptionalFields}]
+        The proposal template shall clearly distinguish required fields from optional ones,
+        so that standardization does not discourage potential supervisors from
+        submitting good projects and ideas. (\stkI)
 
-              \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Label2}] TODO
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ProposalGuidance}]
+        Supervisors and student teams shall have access to guidelines,
+        an FAQ section, and examples of past capstone projects to help them generate ideas
+        and judge appropriate size, scope, and content. (\stkS, \stkES)
 
-              \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Label3}] TODO
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_CourseInfoEarly}]
+        The course outline, calendar, objectives, and content-coverage expectations
+        shall be available to potential supervisors before they propose a
+        project. (\stkES)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StudentProposals}]
+        Student teams shall have a documented process for proposing their
+        own project and finding a supervisor for it - including a template and
+        guidance on how to calibrate the scope. (\stkS, \stkIS)
+
+      % ---------- Project discovery and selection ----------
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_BrowseProjects}]
+        Students shall be able to browse through all available projects in one
+        place and see which projects are availible versus already assined to a team. (\stkS)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ProjectStatus}]
+        All stakeholders should be able to see the status of all project
+        (e.g., open, taken, dropped, approved) at any time. (\stkS, \stkES, \stkI)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StatusNotify}]
+        Stakeholders shall be notified when the status of a project they care
+        about changes via email. (\stkS, \stkES)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_UnselectedProjects}]
+        The instructor and admin shall be able to identify which projects have not been
+        selected after project selection, in order to follow up with their supervisors. (\stkI)
+
+      % ---------- Approval ----------
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_HumanApproval}]
+        Approval decisions shall be made by the instructor and not automated. Routine
+        checks and repeated feedback may be automated to reduce the instructors workload. (\stkI)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ReviewDialogue}]
+        Students and the instructor shall be able to exchange feedback iteratively
+        during the approval process, preserving student exposure to review-based
+        workflows. (\stkI, \stkS)
+
+      % ---------- Profiles and team matching ----------
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StudentProfiles}]
+        Students should be able to provide background information (team bio,
+        interests, skills, experience, linkedln link) that supervisors can see before meeting
+        a team. (\stkES, \stkIS)
+
+      % \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Matching}]
+      %   Teams and projects shall be matched based on stated preferences, skills,
+      %   and interests. This matching shall be optional and able to be turned off.
+        
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamValidity}]
+        The instructor can get accurate, up-to-date, and validated
+        team composition data (e.g., all students are in exactly one team). (\stkI)
+
+      % ---------- Schedule and expectations ----------
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_CrossCourseTimelines}]
+        Supervisors working with teams across multiple capstone courses shall be
+        able to see how the timelines and requirements differ between those
+        courses. (\stkIS)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_SuggestedMeetings}]
+        Teams and supervisors will be given suggested meeting times and agendas
+        aligned on the deliverables, Supervisors will be free to adopt their own schedule
+        based on the reccomendations. (\stkS, \stkES)
+
+      % ---------- Communication ----------
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamContacts}]
+        Supervisors can see each team's members, team number,
+        the point of contact, and assigned TA. (\stkES, \stkIS)
+
+      % ---------- Notifications ----------
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_PushNotify}]
+        Stakeholders shall be notified of tasks and deadlines through channels
+        they already use (outlook), so that they do not have to remember to check for
+        them. (\stkES)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Checklist}]
+        Each stakeholder shall have a checklist of the actions required of them
+        and their current completion state. (\stkES)
+
+      % ---------- Overall platform ----------
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_SinglePlace}]
+        Stakeholders should be able to do capstone coordination (projects,
+        schedule, teams, communication, and notes) in one place. (\stkS, \stkES)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ReduceAdmin}]
+        Communication, and administrative tasks (such as
+        recording approved projects and groups) will be automated as much as
+        possible. (\stkI, \stkES)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Extensible}]
+        The solution shall be modular and extendable, so it can later be adapted
+        for other capstone courses or other universities. (\stkI, \stkIS)
 
   \end{itemize}
 
@@ -1001,8 +1112,257 @@ Date 2 & 1.1 & Notes\\
   \section{Appendices}
 
   \subsection{Appendix A: Additional Materials}
+  \label{app:additional}
 
-  TODO
+  \subsubsection{Stakeholder Interview Notes}
+  \label{app:interviews}
+
+The notes below were taken during stakeholder interviews. Each note is numbered
+with its stakeholder tag (S, ES, IS, I) so that stakeholder requirements can
+reference the specific note(s) they came from.
+
+% ==================== STUDENT ====================
+\paragraph{Student (S)} \label{app:stk_student}
+Student who chose a project from the list of given projects.
+
+\noindent \begin{itemize}
+  \item[S\refstepcounter{sn}\thesn \label{S_TeamFirst}]
+    Formed a team with classmates they already knew over the summer, and had
+    project ideas before the term started. In hindsight, picking the project
+    before the teammates might have been better, since teammates with shared
+    interests working on their preferred project could lead to a better
+    experience.
+  \item[S\refstepcounter{sn}\thesn]
+    Each member chose their top 5 projects after reading all of them, then the
+    team settled on a top 3 in case some were unavailable.
+  \item[S\refstepcounter{sn}\thesn \label{S_Vague}]
+    Project descriptions were often vague. Some were ignored and only the title
+    was read.
+  \item[S\refstepcounter{sn}\thesn \label{S_ProjectInfo}]
+    Information on hardware, software stack, and industry/field of study would
+    be helpful.
+  \item[S\refstepcounter{sn}\thesn]
+    One supervisor held a meeting with all interested groups right before the
+    project selection deadline, which added uncertainty.
+  \item[S\refstepcounter{sn}\thesn \label{S_Competition}]
+    Another group was competing for the same project, and losing it led to
+    frustration.
+  \item[S\refstepcounter{sn}\thesn \label{S_Uncertainty}]
+    Considerable uncertainty while landing a project, with worry about not
+    having one available.
+  \item[S\refstepcounter{sn}\thesn \label{S_OwnTemplate}]
+    A template for proposing their own project would help.
+  \item[S\refstepcounter{sn}\thesn \label{S_OwnGuidelines}]
+    Guidelines or an FAQ on proposing their own project would reduce
+    uncertainty about size, scope, and content requirements.
+  \item[S\refstepcounter{sn}\thesn \label{S_Status}]
+    Wants a way to know when a project is taken, open, dropped, etc.
+  \item[S\refstepcounter{sn}\thesn \label{S_Newsletter}]
+    A notification mechanism for project status would help; a newsletter was
+    suggested.
+  \item[S\refstepcounter{sn}\thesn \label{S_MeetingUnclear}]
+    Supervisor communication (mechanism, process, content) is unclear: is an
+    agenda needed, will the supervisor mostly speak, who leads each meeting?
+    Guidelines may be enough.
+  \item[S\refstepcounter{sn}\thesn]
+    Unsure whether supervisors will have time to meet regularly (e.g., weekly).
+  \item[S\refstepcounter{sn}\thesn \label{S_MeetingPurpose}]
+    Meetings are useful for answering a backlog of questions and filling
+    knowledge gaps with an expert instead of researching alone.
+  \item[S\refstepcounter{sn}\thesn \label{S_EmailSimple}]
+    Prefers email for simple questions.
+  \item[S\refstepcounter{sn}\thesn \label{S_SuggestedMeetings}]
+    ``Suggested meetings'' aligned with deliverables would set expectations and
+    help groups know whether they are on track.
+  \item[S\refstepcounter{sn}\thesn]
+    The GitLab approval process was intuitive due to prior GitHub/GitLab
+    experience.
+  \item[S\refstepcounter{sn}\thesn]
+    JSON files were a hassle but not problematic.
+  \item[S\refstepcounter{sn}\thesn \label{S_ManyTabs}]
+    Finding where things are is time consuming and requires many open tabs.
+  \item[S\refstepcounter{sn}\thesn]
+    Google Calendar was helpful but would benefit from more information.
+  \item[S\refstepcounter{sn}\thesn \label{S_OnePlace}]
+    Having everything in one place (like Avenue) would have been more helpful.
+\end{itemize}
+
+% ==================== EXTERNAL SUPERVISOR ====================
+\paragraph{External Supervisor (ES)} \label{app:stk_extsup}
+Supervisor from outside the university.
+
+\noindent \begin{itemize}
+  \item[ES\refstepcounter{esn}\theesn]
+    The proposal process was smooth, and working with one of the professors
+    and meeting the team was smooth as well.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_StatusHard}]
+    Knowing project statuses is a challenge.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_SharedNotes}]
+    A centralized platform for meeting notes would help. Some teams get more
+    information from meetings than others, and notes should be shared with
+    everyone. Summaries of meetings and project status, and a template for
+    them, would be great.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_Schedule}]
+    A schedule would clear up expectations. Some teams come in early and some
+    late; timelines and deadlines are unclear.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_Template}]
+    A template would be better than an open-ended description box for
+    proposals. It is hard to know what is expected from the capstone team, so a
+    best-effort approach is taken.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_CourseInfo}]
+    Guidelines on course content, content coverage, and capstone objectives
+    would let supervisors tailor the experience. The course calendar and
+    outline are wanted earlier, ideally before proposing.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_Examples}]
+    Examples (e.g., past capstones) would help with idea generation and
+    expectation setting. Ideas were thrown around and refined internally, but
+    guidance would have been better.
+  \item[ES\refstepcounter{esn}\theesn]
+    Extra back-and-forth with the professor (capstone processes, expectations,
+    IP questions) could be avoided by providing more information up front; a
+    template or FAQ would help.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_NotifyNotRemember}]
+    Being notified to do tasks on a platform is fine; having to remember to
+    open it is the problem. Email or phone notifications should be considered.
+    A notification and checklist is preferred over searching in the platform.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_ManyLogins}]
+    Too many platforms to log in to is tedious. A new application is fine.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_SuggestedTimes}]
+    Suggested meeting times and a schedule would help, though some supervisors
+    have their own schedule that works better.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_NoStudentInfo}]
+    No information about students before team meetings; a leap of faith was
+    required, relying on gut feeling and the right questions. Did not know
+    they had the final say.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_StudentProfiles}]
+    Wants a way to learn about students (team bio, interests, skills,
+    experience), even if not all shown up front; looking them up (e.g.,
+    LinkedIn) was mentioned.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_Matching}]
+    Wants teams matched to projects based on preference criteria and skill
+    sets.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_WhoToEmail}]
+    Hard to find where to communicate back to students. Groups usually had one
+    representative email and CC their members, which made emails hard to
+    search. With many names and no group numbers, they defaulted to the first
+    person who emailed. Inviting everyone was too taxing; wants some way to
+    streamline.
+  \item[ES\refstepcounter{esn}\theesn \label{ES_Admin}]
+    Overall, there is a lot of administration on the supervisor side.
+\end{itemize}
+
+% ==================== INTERNAL SUPERVISOR ====================
+\paragraph{Internal Supervisor (IS)} \label{app:stk_intsup}
+Professor at the university who supervises teams, submits proposals, and
+advises the instructors.
+
+\noindent \begin{itemize}
+  \item[IS\refstepcounter{isn}\theisn \label{IS_Role}]
+    Mostly a supervisor. Submits proposals and then waits to see what else is
+    on the list in case something interests him. Interviews and supervises
+    groups, attends lectures when possible, helps with presentations and Expo
+    posters, and is often on the outside of the course.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_StudentProposed}]
+    Unsure how student-proposed projects will be handled.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_ApprovalTiming}]
+    The three capstone courses are not well coordinated. The timing and method
+    of the approval process (whether a project can be a capstone project) is
+    not really known.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_Standardize}]
+    Current descriptions are 100--200 words. Standardizing them is hard and he
+    is unsure what the standard should be. Some supervisors may want something
+    specific, and one group delivered something related to, but very different
+    from, the proposal.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_Schedule}]
+    Supervisors do not know the course schedule (when the SRS is due, when
+    implementation starts, validation testing, user testing). There is
+    confusion about what happens and when things are due.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_MultiCourse}]
+    Supervisors with teams across multiple courses (SE/CS/Tron) may not know
+    that each course has different timelines and requirements.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_Procedure}]
+    No standardized procedure, e.g., how a group with an idea finds a
+    supervisor. Wants the timeline and procedure centralized and standardized.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_Reports}]
+    Wants a low-effort mechanism for supervisors to submit a report or
+    feedback at the end. One professor sends feedback emails, but others do
+    not seem to remember them and send reports voluntarily.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_Communication}]
+    Communication and regular updates (check-ins) between supervisors and
+    teams are essential and need to be accounted for. Discussion is needed on
+    weekly meetings and who questions go to (TA or professor).
+  \item[IS\refstepcounter{isn}\theisn \label{IS_KnowTA}]
+    Wants to know who each of his groups' TAs are.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_StudentSkills}]
+    Student skills would help guide discussions with supervisors.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_Scope}]
+    Would like the capstone process all in one place, but is unsure whether
+    that would work with other professors, or whether the platform should
+    cover only the proposal stage.
+  \item[IS\refstepcounter{isn}\theisn \label{IS_Accounts}]
+    Accounts are mentioned as a need (details not captured in notes).
+\end{itemize}
+
+% ==================== INSTRUCTOR ====================
+\paragraph{Instructor (I)} \label{app:stk_instr}
+Professor who runs the course.
+
+\noindent \begin{itemize}
+  \item[I\refstepcounter{instn}\theinstn \label{I_CurrentProcess}]
+    Current process: before the course, emails contacts to find projects.
+    Interested supervisors submit an MS Form (title, organization, contact,
+    description, confidentiality, IP concerns). A Google Form funnels into a
+    spreadsheet that a script turns into LaTeX. Students form teams, choose
+    projects, and organize meetings. A merge request in GitLab counts as
+    approval.
+  \item[I\refstepcounter{instn}\theinstn \label{I_SupervisorChanges}]
+    Supervisor details often change and are updated. Supervisors are contacted
+    to confirm they know a team will work with them, which often surfaces
+    Expo and other capstone details.
+  \item[I\refstepcounter{instn}\theinstn]
+    Teams are classified by project hardware (SE vs.\ Mech).
+  \item[I\refstepcounter{instn}\theinstn \label{I_TeamJSON}]
+    Team details are recorded in a JSON file, processed and verified by a
+    Python script (e.g., every person is in exactly one team). The team
+    composition CSV should be an output that is up to date, correct, and valid.
+  \item[I\refstepcounter{instn}\theinstn \label{I_Decisions}]
+    Would rather spend time on decisions such as project viability and
+    approval.
+  \item[I\refstepcounter{instn}\theinstn \label{I_Recruiting}]
+    Often has to reach out to potential supervisors to have enough projects
+    each year.
+  \item[I\refstepcounter{instn}\theinstn \label{I_Unselected}]
+    Wants to know which projects have not been selected, e.g., to send a thank
+    you email.
+  \item[I\refstepcounter{instn}\theinstn \label{I_Automate}]
+    Coordination, communication, and details such as approved projects and
+    groups should be automated as much as possible.
+  \item[I\refstepcounter{instn}\theinstn \label{I_ApprovalCriteria}]
+    Approval criterion: enough substance. Game projects often need extra work
+    to add substance (e.g., more analysis such as proving fairness, or more
+    components).
+  \item[I\refstepcounter{instn}\theinstn \label{I_Standards}]
+    Standards could be considered, but enforcing them can scare away good
+    projects; optional questions may help.
+  \item[I\refstepcounter{instn}\theinstn \label{I_NoAIApproval}]
+    No AI agents making approvals. AI-generated summaries could be considered,
+    but their usefulness is unclear.
+  \item[I\refstepcounter{instn}\theinstn \label{I_PRs}]
+    Pull requests are still favored because they expose students to CI and
+    show its usefulness, and allow back-and-forth between professor and
+    students.
+  \item[I\refstepcounter{instn}\theinstn \label{I_RepeatFeedback}]
+    The same feedback is sent to multiple groups. An AI agent could respond to
+    PRs with already-resolved issues (e.g., professor not added as
+    collaborator), leaving more important work to the instructor.
+  \item[I\refstepcounter{instn}\theinstn \label{I_Universal}]
+    Possibly usable universally, which may require modularity and
+    extensibility.
+  \item[I\refstepcounter{instn}\theinstn \label{I_MatchingOptional}]
+    Algorithmic matching of teams to projects could be interesting, with a way
+    to turn it off. Overhead must be worth it; this could be offset by moving
+    other things (e.g., meetings) from Teams or Zoom onto this platform.
+\end{itemize}
 
   \subsection{Appendix B: Development Plan}
 
