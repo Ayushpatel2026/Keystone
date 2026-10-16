@@ -73,6 +73,8 @@
 \newcounter{reqnum} %Functional Requirement (FR) Number
 \newcommand{\rthereqnum}{FR\thereqnum}
 \newcommand{\rref}[1]{FR\ref{#1}}
+\newcommand{\rationale}[1]{\par\emph{Rationale:} #1}
+\newcommand{\fitcrit}[1]{\par\emph{Fit Criterion:} #1}
 
 \newcounter{nfrnum} %Non-Functional Requirement (NFR) Number
 \newcommand{\rthenfrnum}{NFR\thenfrnum}
@@ -887,11 +889,135 @@ Date 2 & 1.1 & Notes\\
 
   \noindent \begin{itemize}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label1}:] The system shall ...
+              % ---------- Project Proposal ----------
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label1}:] The system shall allow supervisors to create and submit project proposals using a structured template including a title, problem statement/background, objectives, skills/requirements, team deliverables, project impact, team capacity details, level of current completion, relevant course (SE, TRON, CS), industry, information regarding confidentiality and IP concerns, and additional project terms. 
+              \rationale{Standardizing proposals reduces inconsistencies in project descriptions helping sudents understand exactly what the project is about and allowing supervisors to clearly highlight their expections.}
+              \fitcrit{Supervisors can successfully fill out the defined fields with the appropriate information and submit a proposal for review.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label2}:] The system shall ...
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label2}:] The system shall distinguish required project proposal fields from optional ones preventing submissions if any required fields are not sufficiently filled.
+              \rationale{Keeping most fields optional would prevent supervisors from being discouraged to propose a project idea if they lack some details regarding the scope of their project. A projec that lacks a detailed scope can still be a good idea.}
+              \fitcrit{The system prevents stakeholders from submitting projects where mandatory fields are not sufficiently filled but submits a project that has mandatory fields filled even if some optional fields are missing.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label3}:] The system shall ...
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label3}:] The system shall allow student teams to create and publish a project proposal using a structured template including the team number, title, problem statement/background, and proposed solution/methodology.
+              \rationale{Students need a dcumented way to present their own project ideas if they choose not to select from the list of ideas from supervisors.}
+              \fitcrit{A student team can successfully create a project proposal, fill out the defined fields with the above information, and submit the proposal for review.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label4}:] The system shall allow instructors to review project proposals submitted by supervisors and approve, request, or provide feedback and modification requests.
+              \rationale{Instructors need to verify that the proposed project is sufficient for a Senior-level capstone project and that the details provided are sufficiet for an understanding of the project.}
+              \fitcrit{A instructor can access a project proposal then accept, reject, or request changes successfully. Rejection or change requests are sent back to the supervisor for revision while accepted projects are included in the student project catalog.}
+
+              % ---------- Project Catalog ----------
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label5}:] The system shall provide a centralized catalog where all projects approved by the instructor can be found, filtered, and browsed based on details and availability.
+              \rationale{Students should be able to find projects and compare the varying opportunities with their team's skills and interests.}
+              \fitcrit{Users can view all the projects that were approved by the professor, search by title or keywords, and filter by the varying project fields. The filter and search options should also only return the relevant projects.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label6}:] The system shall display the current availability status of each project in the catalog (open, taken, dropped, approved) and the maximum number of teams it can take.
+              \rationale{It is critical for students and supervisors to have clear visibility which projects are still available for selection. This gives students the ability to still request available projects if they have been rejected from others and supervisors to properly advertise their status.}
+              \fitcrit{Each project in the catalog clearly displays the availability status and the team capacity. Even if labels are not updated in real-time, the core application should respond to user actions appropriately based on status (i.e. taken projects cannot be requested).}
+
+              % ---------- Student Profile ----------
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label7}:] The system shall allow students to create and update their profiles providing background information including bio, program, interests, project preferences, skills, experience, work style, and LinkedIn.
+              \rationale{Informative profiles allows students to discover other students with similar skills and interests when forming teams. It also allows supervisors to briefly evaluate interested students before interviewing them.}
+              \fitcrit{Students can create, save, update, and visit their profiles. These profiles should also be viewable by other students and supervisors.}
+
+              % ---------- Student Teams ----------
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label8}:] The system shall allow students to create teams, invite specific students to join, recruit additional members, and assign roles.
+              \rationale{Students should be able to use the platform to invite the people they know or fill in remaining spaces on their existing team by recruiting new individuals.}
+              \fitcrit{Students are able to create a team, send invitations to selected students to which those students can accept or deny, specify number of members needed and assign roles including a point-of-contact.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label9}:] The system shall validate team membership based on up-to-date course team formation rules, including minimum and maximum team sizes, permitted program combinations, and duplicate membership.
+              \rationale{The capstone course requires that certain constraints are met when forming teams and automating this reduces administrative efforts for TAs and Instructors.}
+              \fitcrit{The system prevents team formations that violate any of the rules mentioned above.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label10}:] The system shall allow students who are seeking teammates to indicate their availability and discover other students or teams looking for members.
+              \rationale{Students who do not have a team or simply want to join a team instead of creating one will have a catalog of other teams and other students seeking others with similar interests.}
+              \fitcrit{A student can indicate whether they are looking for a team and they can discover other teams/students looking for additional members.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label11}:] The system shall allow student teams to create and update a shared team profile including the member bios, collective skills, project interests, goals, and work style.
+              \rationale{Team profiles help supervisors evaluate the overal team's interests and whether the team's goals and skills align with the project in a consolidated way without having to go through each team member's profile.}
+              \fitcrit{Authorized team members can create and modify their team profile based on their team members' profiles. Other users can view these profiles.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label12}:] The system shall recommend other available students/teams and capstone projects based on shared skills, interests, experience, and project preferences.
+              \rationale{Recommendations help student obtain the desired experience from the capstone course and work on projects that match their interests while pairing with like-minded students.}
+              \fitcrit{Students can receive teammate and project recommendations after their profile is complete based on highest similarities.}
+
+              % ---------- Project Applications & Communication ----------
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label13}:] The system shall allow students to express interest in a supervisor-proposed project.
+              \rationale{A centralized application process allows supervisors to identify interested teams and schedule meetings without relying on back-and-forth email chains.}
+              \fitcrit{A student can submit an application expressing their interest to the project that can be reviewed by the supervisor.}
+              
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label14}:] The system shall allow supervisors to accept or decline requests from student teams to work on their proposed projects, and record when both parties agree to the working arrangement.
+              \rationale{This reduces confusion by explicitely recording when both parties have understood each other's terms and have formally agreed to work with each other.}
+              \fitcrit{Both the supervisor and students can record a decision to confirm or deny the terms of the project. An agreement is marked after both parties accept.}
+
+              % Explicit requirement to amend an agreement?
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label15}:] The system shall allow any authorized users to create and reply to threads associated with their own project proposals, student team formations, and project applications. For TAs and Professors, that will be any projects in their scope.
+              \rationale{Users can exchange meaningful feedback, ask for clarification during the project selection stage, and communicate to understand project and course needs.}
+              \fitcrit{An authorized user can create or respond to a thread under a project proposal, project application, or a team formation they are associated with.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label16}:] The system shall send email notifications to the relevant parties regarding project activity including project status changes, decisions, new threads, and new project listings via email.
+              \rationale{Notifications keep related stakeholders informed regarding project-related updates and decisions without repeatedly checking the platform.}
+              \fitcrit{Any changes to a project's status, decisions from either a student/supervisor, new project listings, and thread updates, the system sends an email identifying the event to all relevant and authorized users.}
+
+              % ---------- Project and Team Approvals ---------
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label17}:] The system shall allow student teams to submit (or re-submit after modification given instructor feedback) their selected project and team information for instructor approval when in-platform approval is enabled.
+              \rationale{A centralized submission allows students to provide all capstone project related details for instructors to approve without relying on external tools.}
+              \fitcrit{Student teams can submit their project and team information through in-platform approval process that can be reviewed by instructors.}
+              
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label18}:] The system shall allow course instructors to approve, reject, or request modifications with feedback to submitted team-project applications when in-platform approval is enabled.
+              \rationale{Instructors must give the final says so it should not be an automated process.}
+              \fitcrit{An instructor can select an approval decision for the submitted team-project and provide feedback to improve project descriptions or identify missing items.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label19}:] The system shall support recording capstone project and team approvals either manually by instructors or TAs associated with the project or automatically through an adapter.
+              \rationale{Different capstone courses have different approval systems that they would prefer to keep in place so the system must account for this.}
+              \fitcrit{For courses without integration adapter, either the TA or the instructor can manually update the status of the project as approved. If there is an adapter available, the system will automatically synchronize and update the approval status based on the information recieved from the external system.}              
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label20}:] The system shall validate submissions before sending them to instructors to ensure project information is complete, the project is available, the team does not already have another approved project, and the submission adheres to course-specific requirements.
+              \rationale{To reduce instructor workload, repeated feadback and routine checks based on course constriaints should be done automatically.}
+              \fitcrit{The system will prevent project submissions if any of the requirements above are not met, otherwise, the project can be submitted.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label21}:] The system shall allow users to submit changes to previously approved team and project information that will still require the instructor to review before confirming.
+              \rationale{Details about projects may change later and require updates.}
+              \fitcrit{Student teams can propose changes to approved project or team record. The orginal approval remains in effect until the instructor accepts the new changes.}
+
+              % ---------- Course Coordination and Admin ---------
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label22}:] The system shall allow course instructors to configure the platform features including team formation, project approvals, and project proposals rules by disabling any undesired features for their course.
+              \rationale{Different capstone courses have different requirements and workflows, so instructors must be able to configure or customize the system to meet their course's needs.}
+              \fitcrit{An instructor can successfully enable or disable a supported features and define constraints that match their course's workflow.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label23}:] The system shall allow course instructors to publish and maintain the course outline, course resources, FAQs, timelines, and past capstone examples for students and supervisors to view as reference.
+              \rationale{Early access to course expectations reduces confusion about project scope, deliverables, deadlines, and responsibilities for both the student and supervisor.}
+              \fitcrit{An instructor can add, edit, and publish course resources where students or supervisors and retrieve published resources.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label24}:] The system shall provide users with a checklist of required actions and their completion status based on the course requirements.
+              \rationale{Stakeholders need a concise way to identify outstanding responsiblities and monitor their progress in the capstone approval procedure. This helps them keep on top of tasks and prevents them from missing critical deadlines.}
+              \fitcrit{Users can view a checklist containing their assigned actions and corresponding completion states. The system updates completion states for actions that are done and verified, such as submitting a project proposal or completing an approval submission.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label25}:] The system shall send users administrative email notifications for upcoming deadlines and outstanding actions from a user's checklist.
+              \rationale{Email notifications will help stakeholders complete required tasks and fulfill their capstone responsibilities without regularly checking in the platform.}
+              \fitcrit{When configured, the system sends an email identifying incomplete or urgent action items and upcoming deadlines.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label26}:] The system shall provide authorized Instructors and TAs with access and detailed information for projects, teams, supervisors, and their statuses across their assigned capstone course or designated capstone teams.
+              \rationale{Instructors need visbility to identify unselected projects, coordinate with supervisors, and maintain accurate admin details.}
+              \fitcrit{An authorized instructor or TA can view and filter project and team statuses, monitor approval progress, and access relevant discussions.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label27}:] The system shall provide an automatically generated exportable report to Instructors and TAs providing a list of approved projects, team compositions, project selections, and supervisors.
+              \rationale{Automated reports reduce manual administrative work for Instructors and TAs if they want to obtain accurate course-wide records through compiled documentation.}
+              \fitcrit{An authorized instructor or TA can generate and download reports containing selected admin records reflecting approved projects, team compositions, project selections, and supervisor information.}
+
+              % ---------- Authentication and User Management ---------
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label28}:] The system shall allow users to authenticate via McMaster Single Sign-On (SSO) for McMaster students and staff or another trusted authentication system for external supervisors before accessing any other services.
+              \rationale{This allows the platform to uphold its security when handling sensitive information and that the account is accessed by the intended individual.}
+              \fitcrit{A user can sign in using an available identify provider and access the functions available to them.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label29}:] The system shall restrict access to system functionality and information according to the user's role and course permissions.
+              \rationale{Different stakeholders (Students, TAs, Instructors, and Supervisors) have different roles in the platform so access restrictions are critical to prevent unauthorized access when it comes to viewing and modifying content. An example is that teams should only have access to modify only their team's approved project details. An Instructor can modify any project's details.}
+              \fitcrit{Users are only able to access information and perform actions permitted by their assigned roles and scope.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label30}:] The system shall allow authorized administrators to manage users' course association and assigned roles.
+              \rationale{Different capstone courses involve different participants, and access permissions must reflect each users' responsibilities.}
+              \fitcrit{An authorized administrator can view and update a user's course association and permitted course role.}
 
   \end{itemize}
 
