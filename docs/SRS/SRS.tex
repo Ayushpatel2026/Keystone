@@ -904,40 +904,452 @@ Date 2 & 1.1 & Notes\\
 
 % ==============================================================
   \section{Use Cases}
-  \plt{Use cases are a way to describe the interactions between users and the system.
-  They are typically written in natural language and describe the steps that a
-  user takes to achieve a specific goal.  Use cases can be used to identify
-  functional requirements and to create test cases.}
-  \plt{Typically 8-15 substantial use cases.}
 
-  \refstepcounter{ucnum} \label{UC_Label1}
-  \subsection{\ucref{UC_Label1}: Example Use Case}
+% ---------------- UC 1 ----------------
+\refstepcounter{ucnum} \label{UC_SubmitProposal}
+\subsection{\ucref{UC_SubmitProposal}: Submit a Project Proposal}
 
-  \textbf{Primary Actor}
+\textbf{Primary Actor}
 
-  TODO
+External Supervisor or Internal Supervisor (Marcus, Dr. Malik)
 
-  \textbf{Preconditions}
-  \begin{itemize}
-    \item TODO
-  \end{itemize}
+\textbf{Preconditions}
+\begin{itemize}
+  \item The proposal submission period is open.
+  \item The supervisor has access to the system.
+\end{itemize}
 
-  \textbf{Main Success Scenario}
-  \begin{enumerate}
-    \item TODO
-    \item TODO
-    \item TODO
-  \end{enumerate}
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The supervisor chooses to propose a new project.
+  \item The system shows the proposal template, with required and optional
+    fields marked, links to guidelines, an FAQ, examples of past projects,
+    and the course outline.
+  \item The supervisor fills in the project title, organization, contact,
+    scope and goals, expected team deliverables, project impact, field of
+    study, confidentiality, and IP concerns.
+  \item The supervisor submits the proposal.
+  \item The system confirms receipt and gives the proposal the status
+    ``submitted''.
+  \item The system notifies the instructor of the new proposal.
+\end{enumerate}
 
-  \textbf{Alternative Flows}
-  \begin{itemize}
-    \item TODO
-  \end{itemize}
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 3a. The supervisor leaves a required field empty: the system highlights
+    it and does not allow submission.
+  \item 3b. The supervisor is not ready to finish: the system saves a draft
+    that can be completed later.
+  \item 4a. The submission period is closed: the system informs the supervisor
+    and does not accept the proposal.
+\end{itemize}
 
-  \textbf{Postconditions}
-  \begin{itemize}
-    \item TODO
-  \end{itemize}
+\textbf{Postconditions}
+\begin{itemize}
+  \item The proposal is stored with the status ``submitted'' and is visible to
+    the instructor.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_ProposalTemplate},
+\ref{SR_OptionalFields}, \ref{SR_ProposalGuidance}, \ref{SR_CourseInfoEarly}
+
+% ---------------- UC 2 ----------------
+\refstepcounter{ucnum} \label{UC_ReviewProposal}
+\subsection{\ucref{UC_ReviewProposal}: Review and Approve a Proposal}
+
+\textbf{Primary Actor}
+
+Instructor (Dr. Reyes)
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item At least one proposal has been submitted by a supervisor or a student
+    team.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The instructor opens the list of proposals awaiting review.
+  \item The system shows the instructor a proposal with all the filled out fields.
+  \item The instructor assesses the proposal against the approval criteria he has deteremined.
+  \item The instructor approves the proposal.
+  \item The system changes the status to ``approved'' and notifies the
+    proposer.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 4a. The proposal needs changes: the instructor writes feedback and
+    requests revision. The system notifies the proposer, who can respond and
+    resubmit. The flow returns to step 2.
+  \item 4b. The proposal does not have enough substance and cannot be fixed:
+    the instructor rejects it with a reason, and the system notifies the
+    proposer.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The proposal has the status ``approved'', ``revision requested'', or
+    ``rejected'', and the full feedback history is saved.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_HumanApproval},
+\ref{SR_ReviewDialogue}, \ref{SR_StatusNotify}, \ref{SR_ReduceAdmin}
+
+% ---------------- UC 3 ----------------
+\refstepcounter{ucnum} \label{UC_BrowseProjects}
+\subsection{\ucref{UC_BrowseProjects}: Browse Available Projects}
+
+\textbf{Primary Actor}
+
+Student (Priya)
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item The student is registered in the course.
+  \item At least one project is approved.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The student opens the project list.
+  \item The system shows all approved projects with their title, field of
+    study, summary, and status (open, taken, dropped).
+  \item The student filters the list (e.g., by field of study or status).
+  \item The student opens a project to read its full description, deliverables,
+    and supervisor.
+  \item The student marks the project as one of their team's preferences.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 3a. No project matches the filters: the system says so and offers to
+    clear the filters.
+  \item 4a. A project's status changes while the student is viewing it: the
+    system shows the updated status the next time the page is loaded.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The student's team has a saved list of preferred projects.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_BrowseProjects}, \ref{SR_ProjectStatus},
+\ref{SR_SinglePlace}
+
+% ---------------- UC 4 ----------------
+\refstepcounter{ucnum} \label{UC_SelectProject}
+\subsection{\ucref{UC_SelectProject}: Select a Project for a Team}
+
+\textbf{Primary Actor}
+
+Student (Priya)
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item The student is a member of a registered team.
+  \item The selected project is approved and has status ``open''.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The student opens an open project and chooses to select it for their
+    team.
+  \item The system checks that the project is still open.
+  \item The system assigns the project to the team and changes its status to
+    ``taken''.
+  \item The system notifies the project's supervisor and the instructor.
+  \item The system shows the student a confirmation with the supervisor's
+    contact.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 2a. Another team selected the project first: the system tells the
+    student the project is no longer available and shows the team's other
+    preferences and open projects.
+  \item 3a. The team drops the project later: the status returns to ``open''
+    and interested parties are notified.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The project is assigned to exactly one team, and its status is
+    visible to all stakeholders.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_ProjectStatus}, \ref{SR_StatusNotify},
+\ref{SR_BrowseProjects}
+
+% ---------------- UC 5 ----------------
+\refstepcounter{ucnum} \label{UC_ProposeOwnProject}
+\subsection{\ucref{UC_ProposeOwnProject}: Propose a Student-Initiated Project}
+
+\textbf{Primary Actor}
+
+Student (Priya)
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item The student's team has a project idea that is not on the project list.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The student chooses to propose their own project.
+  \item The system shows the process for student-initiated projects, the
+    proposal template, and guidance on appropriate scope.
+  \item The team fills in the template and names a prospective supervisor
+    (or requests help finding one).
+  \item The team submits the proposal.
+  \item The system notifies the instructor and the prospective supervisor.
+  \item The proposal proceeds through the review process
+    (see \ucref{UC_ReviewProposal}).
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 3a. The team has no supervisor: the system shows supervisors who have
+    indicated they are open to student projects, or notifies the instructor.
+  \item 5a. The prospective supervisor declines: the team is notified and may
+    choose another supervisor.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The proposal exists with the status ``submitted'' and is linked to
+    the team.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_StudentProposals},
+\ref{SR_ProposalTemplate}, \ref{SR_ProposalGuidance}
+
+% ---------------- UC 6 ----------------
+\refstepcounter{ucnum} \label{UC_TeamProfile}
+\subsection{\ucref{UC_TeamProfile}: Create and Maintain a Team Profile}
+
+\textbf{Primary Actor}
+
+Student (Priya)
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item The student is a member of a team.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The student opens their team profile.
+  \item The student enters a team bio, and for each member their interests,
+    skills, experience, and (optionally) a LinkedIn link.
+  \item The student saves the profile.
+  \item The system makes the profile visible to the team's supervisor and
+    the instructor.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 2a. A member prefers not to share certain information: the field can
+    be left blank, as only the team bio is required.
+  \item 3a. The team has no project yet: the profile is stored and shown to
+    the supervisor when a project is selected.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The team's profile is saved and visible to authorized stakeholders.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_StudentProfiles}
+
+% ---------------- UC 7 ----------------
+\refstepcounter{ucnum} \label{UC_ViewTeam}
+\subsection{\ucref{UC_ViewTeam}: View Team Details and Contacts}
+
+\textbf{Primary Actor}
+
+External Supervisor or Internal Supervisor (Marcus, Dr. Malik)
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item A team has been assigned to the supervisor's project.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The supervisor opens the page for their project.
+  \item The system shows the team number, members, designated point of
+    contact, and assigned TA.
+  \item The supervisor reads the team profile (skills, interests,
+    experience) before the first meeting.
+  \item The supervisor contacts the team's point of contact.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 2a. The team has not finished their profile: the system shows the
+    available details and indicates that the rest is missing.
+  \item 2b. No TA has been assigned yet: the system shows ``not yet
+    assigned''.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The supervisor knows who the team is and how to contact them.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_TeamContacts}, \ref{SR_StudentProfiles}
+
+% ---------------- UC 8 ----------------
+\refstepcounter{ucnum} \label{UC_ValidateTeams}
+\subsection{\ucref{UC_ValidateTeams}: Validate and Export Team Composition}
+
+\textbf{Primary Actor}
+
+Instructor (Dr. Reyes), Teaching Assistant
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item Students have registered teams in the system.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The instructor opens the team composition view.
+  \item The system checks the data (e.g., every student is in exactly one
+    team, every team has a project and a supervisor).
+  \item The system shows the result and any issues.
+  \item The instructor exports the validated team composition data.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 3a. The system finds a problem (e.g., a student in more than one team or in
+    none): it lists the affected students and teams, and the export is
+    blocked until the problem is resolved.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The exported team data is accurate, up to date, and valid.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin}
+
+% ---------------- UC 9 ----------------
+\refstepcounter{ucnum} \label{UC_FollowUpUnselected}
+\subsection{\ucref{UC_FollowUpUnselected}: Identify Unselected Projects}
+
+\textbf{Primary Actor}
+
+Instructor (Dr. Reyes), Teaching Assistant
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item The project selection period has ended.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The instructor opens the project list and filters for projects that
+    were not selected.
+  \item The system lists those projects with their supervisors and contact
+    details.
+  \item The instructor selects the projects and sends a message (e.g., a
+    thank-you) to their supervisors.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 2a. All approved projects were selected: the system shows an empty
+    list.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The instructor knows which projects were not chosen and can follow up
+    with their supervisors.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_UnselectedProjects},
+\ref{SR_ProjectStatus}
+
+% ---------------- UC 10 ----------------
+\refstepcounter{ucnum} \label{UC_ViewTimelines}
+\subsection{\ucref{UC_ViewTimelines}: View Course Timelines}
+
+\textbf{Primary Actor}
+
+Internal Supervisor (Dr. Malik), External Supervisor (Marcus)
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item The course schedules have been entered by the instructor.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The supervisor opens the course schedule.
+  \item The system shows the key dates for each course the supervisor's teams
+    are in (e.g., approval, SRS, implementation, validation and user testing,
+    Expo, end-of-term feedback).
+  \item The supervisor compares the timelines and requirements of the courses.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 2a. The dates for a course are not yet decided: the system marks them
+    ``to be announced'' and notifies the supervisor once they are set.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The supervisor knows the expectations and deadlines in each course.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_CrossCourseTimelines},
+\ref{SR_CourseInfoEarly}
+
+% ---------------- UC 11 ----------------
+\refstepcounter{ucnum} \label{UC_NotifyChecklist}
+\subsection{\ucref{UC_NotifyChecklist}: Receive Notifications and Complete Tasks}
+
+\textbf{Primary Actor}
+
+Any stakeholder (Priya, Marcus, Dr. Malik, Dr. Reyes)
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item The stakeholder has an action due (e.g., approve a proposal, submit
+    feedback, finish a team profile) or a relevant project status has changed.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The system sends the stakeholder an email about the task or status
+    change, with a link to the relevant item.
+  \item The stakeholder follows the link.
+  \item The system shows the stakeholder's checklist of required actions and
+    which are complete.
+  \item The stakeholder completes the task.
+  \item The system marks it complete on the checklist.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 1a. The email cannot be delivered: the system shows the notification
+    in the stakeholder's checklist and alerts the instructor.
+  \item 4a. The stakeholder does not complete the task by the deadline: the
+    system sends a reminder.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The task is recorded as complete and the checklist is up to date.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_PushNotify}, \ref{SR_Checklist},
+\ref{SR_StatusNotify}
 
 % ==============================================================
   \section{Functional Requirements}
