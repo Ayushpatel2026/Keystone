@@ -1936,10 +1936,10 @@ Student (Priya), Instructor (Dr. Reyes)
     \textbf{Rationale}: The system being inaccessible can result in missed deadlines, data loss, and overall frustration. This can impact adoption, perception, and erode trust.\\
     \textbf{Fit Criterion}: The system responds to a periodic probe with a success response at least \uptimePercent{} of the time.
 
-    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Access}:] \textbf{Access.}
+    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Security}:] \textbf{Security.}
     The system shall restrict access only to users directly enrolled in the capstone courses, or to potential supervisors approved by an instructor. All users are only able to access endpoints that they are approved to use. Non-approved users are unable to read or write any data.\\
     \textbf{Rationale}: System will likely be hosted on the internet which makes it susceptible to cyber attacks.\\
-    \textbf{Fit Criterion}: All unauthorized requests to an endpoint are rejected and recorded in an audit log.
+    \textbf{Fit Criterion}: Any unauthorized requests to an endpoint are rejected and recorded in an audit log.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Installability}:] \textbf{Installability.}
     The system shall be deployable by an IT professional by following the deployment guide with no assistance in under \deployTime{}.\\
