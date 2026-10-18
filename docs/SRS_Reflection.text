@@ -1,11 +1,44 @@
 \begin{enumerate}
-  \item What went well while writing this deliverable? 
+  \item Waqar
+  \item What went well while writing this deliverable?
+  During this deliverable, distributing work was very straightforward as there
+  was a lot of work, but it was separable by section. It was all work we have
+  seen before in prior courses with documentation, so it was very intuitive to
+  write and come up with solutions/answers.
+
   \item What pain points did you experience during this deliverable, and how did
   you resolve them?
+  During this deliverable, everyone was very busy because we had midterms and
+  a lot of assignments due alongside this report. Sometimes it also became
+  difficult to stay updated with everyone's parts. However, because we planned
+  out our schedule well in advance, we were able to finish everything on time
+  while also completing our other work. Everyone also posted updates in our
+  team chat when they got the chance, so we all stayed in the loop.
+
   \item How many of your requirements were inspired by speaking to your
   client(s) or their proxies (e.g. your peers, stakeholders, potential users)?
+  All of our stakeholder requirements came from conversations with
+  stakeholders as well as with each other (we are students as well). We interviewed a student who had been through project selection,
+  an external supervisor, an internal supervisor (a professor), and the
+  instructor who runs the course. Each requirement is tagged with the
+  stakeholder(s) who raised it, and the interview notes are in Appendix A so
+  each one can be traced back to what was actually said. For example, the
+  structured proposal template came from both supervisors and the student, the
+  project status visibility came from the student, external supervisor, and
+  instructor, and the instructor's preference for human-only approval
+  decisions shaped our approval requirements. Our personas and use cases were
+  also built from the same interview notes. The only parts that came from our own
+  judgment rather than a direct request were implementation-level details.
+
   \item Which of the courses you have taken, or are currently taking, will help
   your team to be successful with your capstone project.
+  Definitely SFWRENG 4HC3 which is user interfaces will be very useful later on as we start to actually 
+  design the idea for the UI/UX. This will be useful not just the implementation but also in the design 
+  development using tools like figma. Also, this course helps consider stakeholders which is exactly what 
+  we are doing right now so it's helping with not just interview development but also coming up with stakeholders. 
+  Furthermore, much of our stretch goals rely on AI, so SFWRENG 4AL3 will also be useful as it will help to develop 
+  the implementation behind those goals, like group suggestions based on other data like skills we collect of students.
+
   \item What knowledge and skills will the team collectively need to acquire to
   successfully complete this capstone project?  Examples of possible knowledge
   to acquire include domain specific knowledge from the domain of your
@@ -13,8 +46,25 @@
   computer science knowledge.  Skills may be related to technology, or writing,
   or presentation, or team management, etc.  You should look to identify at
   least one item for each team member.
+  For more domain specific knowledge, we need to understand how the capstone courses run: proposal intake, 
+  approval criteria, timelines across the SE, CS, and Tron courses, and the role of supervisors, TAs, and the 
+  instructor. We will get this through further conversations with the instructor and supervisors. Another point 
+  to consider is, Our stakeholders already use GitLab/GitHub merge requests for approval and email for communication. 
+  We need to learn how to integrate with or replace these (e.g., GitLab's API, email notification services) without 
+  making the workflow worse.
+
   \item For each of the knowledge areas and skills identified in the previous
   question, what are at least two approaches to acquiring the knowledge or
   mastering the skill?  Of the identified approaches, which will each team
   member pursue, and why did they make this choice?
+  For the first domain I mentioned; First we can interview other instructors (Tron, CS) and supervisors and 
+  ask them to walk through a full term. Another method would be read past course outlines, the proposal forms, 
+  and the existing GitLab repository and scripts to really understand the process on a more granular level. 
+  I will continue to pursue this.
+
+  For the second bit of knowledge I mentioned, the first thing I can do is read the official API documentation 
+  and build a small prototype to see if I can integrate with the current process. The second thing I can do is 
+  follow tutorials or examples of similar integrations to see how manageable it is. I can pursue this knowledge 
+  as well.
+
 \end{enumerate}
