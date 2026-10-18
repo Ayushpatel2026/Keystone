@@ -775,6 +775,10 @@ Oct 18th 2026 & 1.1 & Use Cases and User Personas\\
         The instructor and TA's can get accurate, up-to-date, and validated
         team composition data (e.g., all students are in exactly one team). (\stkSEI)
 
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamSubmissionChecks}]
+        When a team submits its project for approval, the system will check that
+        all required information, documents, and repository setup exist. (\stkSEI)
+
       % ---------- Schedule and expectations ----------
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_CrossCourseTimelines}]
         Supervisors working with teams across multiple capstone courses shall be
@@ -1348,6 +1352,64 @@ Any stakeholder (Priya, Marcus, Dr. Malik, Dr. Reyes)
 
 \textbf{Related Requirements:} \ref{SR_PushNotify}, \ref{SR_Checklist},
 \ref{SR_StatusNotify}
+
+% ---------------- UC 12 ----------------
+
+\refstepcounter{ucnum} \label{UC_ApproveTeamProject}
+\subsection{\ucref{UC_ApproveTeamProject}: Submit and Approve a Team's Project}
+
+\textbf{Primary Actor}
+
+Student (Priya), Instructor (Dr. Reyes)
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item A team has been formed.
+  \item A supervisor has agreed to work with the team on a project, either an
+    approved project from the list or a student-initiated one.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The student opens the team project submission form for their team.
+  \item The system shows the required items: team members, supervisor,
+    project, required documents, and a valid project repository.
+  \item The student fills in the form and attaches the required documents.
+  \item The student submits the team project for approval.
+  \item The system runs automated checks (e.g., all required fields and
+    documents are present, the repository exists and is set up correctly, the
+    instructor is added as a collaborator, every member is on exactly one team).
+  \item The system sends the instructor the submission with the results of the
+    checks.
+  \item The instructor reviews the submission and approves it.
+  \item The system changes the status to ``approved'' and notifies the team and
+    supervisor.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 5a. An automated check fails: the system tells the student exactly what
+    is missing or invalid, with standard guidance for fixing it, and does not
+    forward the submission to the instructor until the issues are fixed. This
+    replaces the repetitive comments the instructor writes today.
+  \item 7a. The instructor finds problems the checks cannot catch (e.g., scope
+    is too small): the instructor writes feedback and requests revision. The
+    system notifies the team, who can respond and resubmit. The flow returns to
+    step 5.
+  \item 7b. The instructor rejects the submission with a reason: the system
+    notifies the team and supervisor.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The team is recorded as approved for its project, the project status
+    becomes ``taken'', and the data feeds the team composition export (see
+    \ucref{UC_ValidateTeams}).
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_HumanApproval},
+\ref{SR_ReviewDialogue}, \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin},
+\ref{SR_TeamSubmissionChecks}
 
 % ==============================================================
   \section{Functional Requirements}
