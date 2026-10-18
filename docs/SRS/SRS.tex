@@ -97,6 +97,9 @@
 \newcommand{\stkIS}{\hyperref[app:stk_intsup]{IS}}
 \newcommand{\stkSEI}{\hyperref[app:stk_instr]{SEI}}
 
+\newcommand{\maintFrac}{5\%}
+\newcommand{\deployTime}{30 minutes}
+
 \usepackage{fullpage}
 
 \begin{document}
@@ -1885,13 +1888,13 @@ Student (Priya), Instructor (Dr. Reyes)
 
   \noindent \begin{itemize}
 
-              \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accuracy}:]
-              \textbf{Accuracy} \plt{Characterize the accuracy by giving the context/use for
-              the software.  Maybe something like, ``The accuracy of the computed
-              solutions should meet the level needed for $<$engineering or scientific
-              application$>$.  The level of accuracy achieved by \projname{} shall be
-              described following the procedure given in Section~X of the Verification and
-              Validation Plan.''  If you do this provide a link to the VnV plan.}
+              % \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accuracy}:]
+              % \textbf{Accuracy} \plt{Characterize the accuracy by giving the context/use for
+              % the software.  Maybe something like, ``The accuracy of the computed
+              % solutions should meet the level needed for $<$engineering or scientific
+              % application$>$.  The level of accuracy achieved by \projname{} shall be
+              % described following the procedure given in Section~X of the Verification and
+              % Validation Plan.''  If you do this provide a link to the VnV plan.}
 
               \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Usability}:] \textbf{Usability}
               \plt{Characterize the usability by giving the context/use for the software.
@@ -1899,11 +1902,29 @@ Student (Priya), Instructor (Dr. Reyes)
               usability achieved by the software shall be described following the
               procedure given in Section~X of the Verification and Validation Plan.  Include a link to the VnV plan.}
 
+              A first-time user shall be able to access the platform and complete their primary tasks
+              without the use of external documentation or assistance. 
+              
+              
+              \textbf{Rationale}: While students, instructors, and TAs are enrolled in/operate within the Computing and Software (CAS) department in the university and often possess advanced tech literacy, no assumptions can be made about external supervisors beyond basic web browsing abilities, as described in the user characteristics section (Section~\ref{SecUserCharacteristics}). Having to spend time learning to use the platform can introduce
+              unnecessary friction which can hurt adoption. Many existing web applications that perform similar functions are able to provide an intuitive experience requiring no prior knowledge.
+
+              \textbf{Fit Criterion}: A first-time user shall be able to complete the procedure as described in
+              Section~4.2.1 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan}
+              up to the described standard.
+
               \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Maintainability}:]
               \textbf{Maintainability} \plt{The effort required to make any of the likely
               changes listed for \projname{} should be less than FRACTION of the original
               development time.  FRACTION is then a symbolic constant that can be defined
               at the end of the report.}
+
+              The effort required to make changes shall be less than \maintFrac{} of the 
+              original development time.
+
+              \textbf{Rationale}: A system which is difficult to maintain will eventually reach an unusable state when environments change (e.g.: hardware changes or software updates introduce/expose bugs, vulnerabilities are discovered, privacy regulations change, etc.) and fixes/updates are too costly to perform.
+
+              \textbf{Fit Criterion}: Based on a development effort of 40 hours / week for 8 months, maintainence cost shall not exceed 2 hours / week.
 
               \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Portability}:]
               \textbf{Portability} \plt{This NFR is easier to write than the others.  The
@@ -1913,8 +1934,44 @@ Student (Priya), Instructor (Dr. Reyes)
               from a given section of the VnV plan can be successfully run on all of the
               possible operating environments.}
 
-              \item Other NFRs that might be discussed include verifiability,
-              understandability, reusability, performance, reliability and availability, security, and accessibility.  You may have to add other NFRs.
+              The system shall be accessible on Firefox (v158), Safari (v27), and any Chromium-based (v156) web browser running on a desktop-sized or mobile-sized screen. The hosted component of the system shall run on any machine that supports Docker (Engine version v29).
+
+              \textbf{Rationale}: Web browsers provide an abstraction layer that isolates functionality from the underlying operating system environment, making OS-support a concern for browser developers. Similarly, Docker provides an abstraction layer over the underlying operating system and a sandboxed environment for executing code.
+
+              \textbf{Fit Criterion}: The hosted portion shall build and run successfully on at least one host. Clients shall run on all browsers at their stated versions or a backwards-compatible future version.
+
+              \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_ReliabilityAvailability}:] \textbf{Reliability and Availability}
+              
+              The system shall be available with at least 99.9\% uptime ($\sim10$ minutes of unscheduled downtime per week).
+              
+              \textbf{Rationale}: The system being inaccessible can result in missed deadlines, data loss, and overall frustration. This can impact adoption, perception, and erode trust.
+
+              \textbf{Fit Criterion}: The system responds to a periodic probe with a success response at least 99.9\% of the time.
+
+              \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Privacy}:] \textbf{Privacy}
+              
+              The system shall collect personally identifiable information (PII) only to the extent which is necessary for facilitating the functions of the system and in accordance with applicable regulations.
+              
+              \textbf{Rationale}: Some PII is necessary, such as, full name, McMaster email, phone number, etc., for identifing users, verifying enrolment, receiving notifications, etc. Limiting stored PII decreases the impact of a potential incident.
+
+              \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Access}:] \textbf{Access}
+              
+              The system shall restrict access only to users directly enrolled in the capstone courses, or to potential supervisors approved by an instructor. All users are only able to access endpoints that they are approved to use. Non-approved users are unable to read or write any data. 
+              
+              \textbf{Rationale}: System will likely be hosted on the internet which makes it susceptible to cyber attacks. 
+
+              \textbf{Fit Criterion}: All unauthorized requests to an endpoint are rejected and recorded in an audit log.
+
+              \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Installability}:] \textbf{Installability}
+              
+              The system shall be deployable by an IT professional by following the deployment guide with no assistance in under \deployTime{}.
+              
+              \textbf{Rationale}: Issues during deployment can increase downtime which results in frustration with the platform.
+
+              \textbf{Fit Criterion}: A technically competent individual outside of the main development team is able to complete the task described in Section~4.2.2 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan} within the time constraint.
+
+              % \item Other NFRs that might be discussed include verifiability,
+              % understandability, reusability, performance, reliability and availability, security, and accessibility.  You may have to add other NFRs.
 
   \end{itemize}
 
