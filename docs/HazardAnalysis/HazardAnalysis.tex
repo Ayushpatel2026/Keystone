@@ -5,6 +5,10 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage[round]{natbib}
+\usepackage{pdflscape}
+\usepackage{longtable}
+\usepackage{array}
+
 
 \hypersetup{
     colorlinks=true,       % false: boxed links; true: colored links
@@ -263,8 +267,15 @@ this potential failure mode.}
         information that would otherwise be restricted.
 \end{enumerate}
 
+\setlength{\tabcolsep}{4pt}
+\newlength{\fw}
+\setlength{\fw}{\dimexpr\textheight-14\tabcolsep-12pt\relax}
+
+\begin{landscape}
 
 \section{Failure Mode and Effect Analysis}
+\small
+\renewcommand{\arraystretch}{1.15}
 
 \wss{Include your FMEA table here. This is the most important part of this document.}
 \wss{The safety requirements in the table do not have to have the prefix SR.
@@ -274,6 +285,35 @@ requirements.}
 \wss{If no safety requirement can be devised, other mitigation strategies can be
 entered in the table, including strategies involving providing additional
 documentation, and/or test cases.}
+
+\begin{longtable}{
+  >{\raggedright\arraybackslash}p{0.11\fw}
+  >{\raggedright\arraybackslash}p{0.13\fw}
+  >{\raggedright\arraybackslash}p{0.17\fw}
+  >{\raggedright\arraybackslash}p{0.15\fw}
+  >{\raggedright\arraybackslash}p{0.27\fw}
+  >{\raggedright\arraybackslash}p{0.10\fw}
+  >{\raggedright\arraybackslash}p{0.07\fw}}
+\caption{Failure Mode and Effect Analysis}\label{tab:fmea}\\
+\toprule
+\textbf{Component} & \textbf{Failure Mode} & \textbf{Effects of Failure} & \textbf{Causes of Failure} & \textbf{Recommended Action} & \textbf{SR} & \textbf{Ref} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Component} & \textbf{Failure Mode} & \textbf{Effects of Failure} & \textbf{Causes of Failure} & \textbf{Recommended Action} & \textbf{SR} & \textbf{Ref} \\
+\midrule
+\endhead
+\midrule
+\multicolumn{7}{r}{\emph{Continued on next page}} \\
+\endfoot
+\bottomrule
+\endlastfoot
+
+Component & Failure mode & Effects & Causes & Recommended action & SR & H1 \\
+\addlinespace
+
+\end{longtable}
+\end{landscape}
 
 \section{Safety and Security Requirements}
 
