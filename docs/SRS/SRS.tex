@@ -99,6 +99,8 @@
 
 \newcommand{\maintFrac}{5\%}
 \newcommand{\deployTime}{30 minutes}
+\newcommand{\unschedDowntime}{$\sim10$ minutes}
+\newcommand{\uptimePercent}{99.9\%}
 
 \usepackage{fullpage}
 
@@ -1930,9 +1932,9 @@ Student (Priya), Instructor (Dr. Reyes)
     \textbf{Fit Criterion}: The hosted portion shall build and run successfully on at least one host. Clients shall run on all browsers at their stated versions or a backwards-compatible future version.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_ReliabilityAvailability}:] \textbf{Reliability and Availability}\\
-    The system shall be available with at least 99.9\% uptime ($\sim10$ minutes of unscheduled downtime per week).\\
+    The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
     \textbf{Rationale}: The system being inaccessible can result in missed deadlines, data loss, and overall frustration. This can impact adoption, perception, and erode trust.\\
-    \textbf{Fit Criterion}: The system responds to a periodic probe with a success response at least 99.9\% of the time.
+    \textbf{Fit Criterion}: The system responds to a periodic probe with a success response at least \uptimePercent{} of the time.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Privacy}:] \textbf{Privacy}\\
     The system shall collect personally identifiable information (PII) only to the extent which is necessary for facilitating the functions of the system and in accordance with applicable regulations.\\
