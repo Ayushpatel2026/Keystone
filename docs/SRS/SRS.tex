@@ -771,10 +771,6 @@ Date 2 & 1.1 & Notes\\
         interests, skills, experience, linkedln link) that supervisors can see before meeting
         a team. (\stkES, \stkIS)
 
-      % \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Matching}]
-      %   Teams and projects shall be matched based on stated preferences, skills,
-      %   and interests. This matching shall be optional and able to be turned off.
-        
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamValidity}]
         The instructor and TA's can get accurate, up-to-date, and validated
         team composition data (e.g., all students are in exactly one team). (\stkSEI)
@@ -817,30 +813,94 @@ Date 2 & 1.1 & Notes\\
   numbers.}
 
 % ==============================================================
-  \section{User Personas}
-  \plt{Create 2-5 realistic personas.
-  Personas are fictional characters that represent the different user types that
-  might use your software.  They are used to help understand the users'
-  needs, experiences, behaviors and goals.  They are not real people, but they
-  should be based on real data collected from user research.}
+\section{User Personas}
 
-  \subsection{Persona 1}
-  \begin{itemize}
-    \item Name:
-    \item Description:
-    \item Goals:
-    \item Frustrations:
-    \item Technical Ability:
-  \end{itemize}
+\subsection{Persona 1: Priya, Capstone Student}
+\begin{itemize}
+  \item Name: Priya Nair
+  \item Description: Software engineering level IV student. She formed a
+    team of friends over the summer and had a few project ideas before the term
+    started. She reads project listings between classes, often on her phone.
+  \item Goals: Land a project that matches her team's interests and skills.
+    Also know what is expected from the supervisor, due-dates, and if the team is on
+    track. Keep communication with the supervisor coherent.
+  \item Frustrations: Vague one-paragraph project descriptions (sometimes even a few sentences), not knowing
+    whether a project is still open or already taken, and needing many open
+    software applications to find deadlines, meeting details, and contacts. She worries about
+    ending up with no project before the deadline for project selection.
+  \item Technical Ability: Ability is medium. She is comfortable with GitLab, JSON, and
+    web tools, but still wants the process to be intuitive as it will reduce stress.
+  \item Based on: \stkS~\ref{S_Vague}, \stkS~\ref{S_Uncertainty},
+    \stkS~\ref{S_Status}, \stkS~\ref{S_ManyTabs}, \stkS~\ref{S_OnePlace}
+\end{itemize}
 
-  \subsection{Persona 2}
-  \begin{itemize}
-    \item Name:
-    \item Description:
-    \item Goals:
-    \item Frustrations:
-    \item Technical Ability:
-  \end{itemize}
+\subsection{Persona 2: Marcus, External Supervisor}
+\begin{itemize}
+  \item Name: Marcus Tremblay
+  \item Description: Senior engineer at a local company who proposed a capstone
+    project for the first time. He has a full-time job and supervises the team in his
+    spare time. He has no university login and is not familiar with course
+    details.
+  \item Goals: Submit a well-scoped proposal with minimal effort. Understand
+    what the course expects of a team much earlier in the process. Learn about his team's skills before
+    committing (not just meeting them, maybe have access to their linkedin profiles). Be reminded of tasks via 
+    email rather than having to remember to check a
+    platform everytime.
+  \item Frustrations: Open-ended proposal boxes that make expectations
+    unclear, no information about students before meeting them, a lot of back 
+    and forth between course instrcutor to look for course information,
+    and searching through email CC lists to find who to reply to.
+  \item Technical Ability: Ability is medium to high. He is comfortable with new
+    applications, but has little patience for extra accounts or checking
+    multiple sites.
+  \item Based on: \stkES~\ref{ES_Template}, \stkES~\ref{ES_NoStudentInfo},
+    \stkES~\ref{ES_ManyLogins}, \stkES~\ref{ES_NotifyNotRemember},
+    \stkES~\ref{ES_WhoToEmail}
+\end{itemize}
+
+\subsection{Persona 3: Dr. Malik, Internal Supervisor}
+\begin{itemize}
+  \item Name: Dr. Hassan Malik
+  \item Description: Professor who submits proposals yearly and supervises several
+    teams, often across more than one capstone course (SE, CS, Tron). He
+    attends lectures when he can and helps with presentations and Expo posters,
+    but is not involved in running the course.
+  \item Goals: Know the schedule and requirements of each course his teams are
+    in. Know who his team members and TAs are without having to search through many platforms. Give end-of-term feedback
+    without a lot of effort.
+  \item Frustrations: The three courses have different timelines that are not
+    well coordinated, and there is no standard procedure for how a group finds
+    a supervisor. He is unsure when project approval happens and often forgets
+    to send reports.
+  \item Technical Ability: Ability is medium. He uses email and standard web tools
+    daily, but wants a simple interface.
+  \item Based on: \stkIS~\ref{IS_Schedule}, \stkIS~\ref{IS_MultiCourse},
+    \stkIS~\ref{IS_Procedure}, \stkIS~\ref{IS_KnowTA},
+    \stkIS~\ref{IS_Reports}
+\end{itemize}
+
+\subsection{Persona 4: Dr. Reyes, Course Instructor}
+\begin{itemize}
+  \item Name: Dr. Daniel Reyes
+  \item Description: Professor who runs the capstone course. Each year he
+    recruits supervisors, collects proposals, approves projects, and records
+    team details. Today this involves several forms, a spreadsheet, scripts, and
+    merge requests.
+  \item Goals: Spend his time on decisions such as project viability and
+    approval, rather than administration. Have accurate, valid team and project
+    data produced automatically. Know which projects were not selected so he
+    can follow up with their supervisors.
+  \item Frustrations: Sending the same feedback to multiple groups, manually
+    maintaining team data, and having to recruit supervisors to have enough
+    projects. He does not want automation that makes approval decisions, and
+    does not want strict standards that discourage good projects.
+  \item Technical Ability: Ability is high. He is comfortable with scripts, GitLab, and
+    CI, and values students being exposed to them.
+  \item Based on: \stkSEI~\ref{I_CurrentProcess}, \stkSEI~\ref{I_TeamJSON},
+    \stkSEI~\ref{I_Decisions}, \stkSEI~\ref{I_Unselected},
+    \stkSEI~\ref{I_Automate}, \stkSEI~\ref{I_RepeatFeedback}
+\end{itemize}
+
 
 % ==============================================================
   \section{Use Cases}
