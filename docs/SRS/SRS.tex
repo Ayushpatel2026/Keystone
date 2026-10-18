@@ -1564,6 +1564,13 @@ Student (Priya), Instructor (Dr. Reyes)
   between them.  It also includes a data dictionary that defines the meaning of
   each attribute.}
 
+  This section defines what information \projname{} must manage to support capstone project
+  proposals, project discovery, team formation, communication, approval workflows, and 
+  course administration. It describes major data entities, their attributes, the meaning of 
+  each attribute, and the relationships between them. These data requirements are a proposed
+  logical data model based on the functional requirements describing how database technologies
+  will store critical data.
+
   \subsection{Major Data Entities}
 
   \plt{What information must exist for the system to accomplish its goals?}
@@ -1571,32 +1578,259 @@ Student (Priya), Instructor (Dr. Reyes)
   \plt{For each entity, provide a short explanation.}
 
   \begin{itemize}
-    \item User
-    \item Song
-    \item Session
-    \item Report
+    \item \textbf{User}: An individual registered in \projname{} including students, supervisors,
+    instructors, TAs, and administrators.
+    \item \textbf{Course}: A McMaster capstone course supported by Keystone (such as SE, CS, TRON) 
+    and includes settings for a capstone course that enables features and implements team formation/
+    project selection rules.
+    \item \textbf{Student Profile}: Contains information about a student's background including bio, 
+    program, interests, project preferences, skills, experience, work style, and LinkedIn.
+    \item \textbf{Team}: A groups of students participating in the same capstone project together.
+    \item \textbf{Team Profile}: Contains the collective groups' member bios, collective skills, 
+    project interests, goals, and work style.
+    \item \textbf{Project}: A supervisor-proposed or student-proposed capstone project that can be 
+    described using a title, problem statement/background, objectives, skills/requirements, team 
+    deliverables, project impact, team capacity details, level of current completion, relevant course 
+    (SE, TRON, CS), industry, information regarding confidentiality and IP concerns, and additional project terms. 
+    \item \textbf{Project Application}: Records a student teams interest in supervisor's project including
+    a decision from both parties.
+    \item \textbf{Thread}: Discussion containing a post or replies associated with a project proposal, team formation,
+    or project application.
+    \item \textbf{Notification}: Contains information communicated by email related to project updates,
+    decisions, discussion activity, urgent deadlines, and outstanding tasks requiring action. 
+    \item \textbf{Checklist Item}: Contains a required action and its completion status.
+    \item \textbf{Course Resource}: Can be a course outline, timeline, guidelines, FAQ, past capstone
+    example, or any other course related content that the instructor may post.
   \end{itemize}
+
+  \subsubsection{Entity Relationships}
+  \begin{longtable}{|p{2cm}|p{2cm}|p{2.5cm}|p{8cm}|}
+    \toprule
+    \textbf{Entity 1} & \textbf{Entity 2} & \textbf{Multiplicity} & \textbf{Description}\\
+    \midrule
+    User & Course & N : M & A supervisor or TA participates in many courses (Restrictions for students are programmatic)\\ \hline
+    User & Student Profile & 1 : 0..1 & A student may have one student profile associated with their account\\ \hline
+    User & Team & N : 0..1 & A student belongs to at most one team\\ \hline
+    User & Project & 1 : N & A user may supervise or manage multiple projects (Restrictions for students are programmatic)\\ \hline
+    User & Notification & 1 : N & A user may receive multiple notifications\\ \hline
+    User & Checklist Item & 1 : N & A user may have many checklist items to handle\\ \hline
+    User & Threads & N : M & A user may have be part of many threads and a thread can contain multiple users\\ \hline
+    Team & Team Profile & 1 : 0..1 & A may have at most one shared team profile\\ \hline
+    Team & Project & N : 0..1 & A student team may have at most one project while a project could have multiple teams.\\ \hline
+    Team & Project Application & 1 : N & A student team may submit multiple project applications.\\ \hline
+    Project & Project Application & 1 : N & A project may have many project applications but each application belongs to a single project.\\ \hline
+    Project & Thread & 1 : N & A project may have many project applications but each application belongs to a single project.\\ \hline
+    Course & Project & 1 : N & Many projects belong to one course\\ \hline
+    Course & Course Resource & 1 : N & A course may have many course resources\\ \hline
+    \caption{Data Dictionary} \label{tab:EntityRelationships}
+  \end{longtable}
 
   \subsection{Data Dictionary}
 
   \plt{For each entity, define all important attributes.}
 
-  \begin{longtable}{p{0.20\textwidth} p{0.20\textwidth} p{0.45\textwidth}}
-    \toprule
-    Attribute & Type & Description\\
-    \midrule
-    user\_id & UUID & Unique identifier\\
-    email & String & User email address\\
-    \bottomrule
-    \caption{Data Dictionary} \label{tab:DataDictionary}
+  The following data dictionary defines attributes of each data entity in \projname{}. The data
+  types are conceptual and do not prescribe a particular database implementation. Optional attributes may remain
+  empty depending on the user's role, course configuration, or project workflow. This Data Dictionary is subject
+  to change during implementation.
+
+  \begingroup
+  \small
+  \setlength{\tabcolsep}{5pt}
+  \renewcommand{\arraystretch}{1.25}
+
+  \begin{longtable}{|
+      p{0.23\textwidth}|
+      p{0.20\textwidth}|
+      p{0.45\textwidth}|
+  }
+      \caption{Data Dictionary}
+      \label{tab:DataDictionary}\\
+      \hline
+
+      \textbf{Attribute} & \textbf{Type} & \textbf{Description}\\ \hline \endfirsthead \hline 
+      \textbf{Attribute} & \textbf{Type} & \textbf{Description}\\ \hline \endhead
+
+      % USER
+      \multicolumn{3}{|l|}{\textbf{User}}\\ \hline
+      user\_id & ID & Unique ID for each user \\ \hline
+      name & String & Full name of the user \\ \hline
+      email & String & Email of the user \\ \hline
+      user\_name & String & MAC ID if signin through SSO or other Auth ID \\ \hline
+      role & Enum & STUDENT, SUPERVISOR, INSTRUCTOR, TA \\ \hline
+      account\_status & Enum & Statuses such as ACTIVE, DISABLED, PENDING \\ \hline
+
+      % Course
+      \multicolumn{3}{|l|}{\textbf{Crouse}}\\ \hline
+      course\_id & ID & Unique ID for each course \\ \hline
+      course\_code & String & McMaster Capstone Course Code \\ \hline
+      course\_name & String & Name of the Capstone Course \\ \hline
+      program & Enum & SE, TRON, CS \\ \hline
+      disabled\_features & Collection\textless Enum\textgreater & List of features labelled by an enum \\ \hline
+      capstone\_rules & Collection\textless String\textgreater & List of given additional per course rules \\ \hline
+      approval\_mode & Enum & Determines where project approvals are handled (custom or not) INTERNAL, EXTERNAL, INTEGRATION \\ \hline
+      threads & Collection\textless Thread\textgreater & Allow instructors to communicate important information to all supervisors and students in the course. \\ \hline
+      resource & Collection\textless CourseResource\textgreater & Instructors can post course outline, timeline, guidelines, FAQ, past capstone examples, or any other course related content. \\ \hline
+
+      % Student Profile
+      \multicolumn{3}{|l|}{\textbf{StudentProfile}}\\ \hline
+      student\_profile\_id & ID & Unique ID for each student's profile \\ \hline
+      biography & String & Student Introduction and Background \\ \hline
+      program & Enum & SE, TRON, CS \\ \hline
+      skills & Collection\textless String\textgreater & List of skills student has to offer \\ \hline
+      interests & Collection\textless String\textgreater & List of subjects and areas of interest \\ \hline
+      experience & String & Section on academic, project-based, or professional experience \\ \hline
+      project\_preferences & Collection\textless Project\textgreater & Preferred projects (references) from currently available list. \\ \hline
+      work\_style & String & Description of how the student prefers to work. \\ \hline
+      linkedin\_url & String & Link to student's LinkedIn page. \\ \hline
+      seeking\_team & Boolean & Displays whether the user is seeking a team. \\ \hline
+
+      % Team
+      \multicolumn{3}{|l|}{\textbf{Team}}\\ \hline
+      team\_id & ID & Unique identifier for each team. \\ \hline
+      team\_name & String & Name of the Team. \\ \hline
+      course & Course & Name of the Team. \\ \hline
+      members & Collection\textless User\textgreater & Reference to all team members in the team. \\ \hline
+      member\_roles & Collection\textless Enum\textgreater & All roles of team members. \\ \hline
+      poc & User & Reference to the point of contact on the team. \\ \hline
+      project & Project & Which project they have selected, if applicable. \\ \hline
+      status & ENUM & Which stage in project and team selection or approval they are in. \\ \hline
+
+      % Team Profile
+      \multicolumn{3}{|l|}{\textbf{TeamProfile}}\\ \hline
+      team\_profile\_id & ID & Unique identifier for each team profile. \\ \hline
+      team & Team & Reference to the team that the profile belongs to. \\ \hline
+      biographies & Collection\textless String\textgreater & Biographies of each member on the team. \\ \hline
+      skills & Collection\textless String\textgreater & Combined technical skills of the team. \\ \hline
+      interests & Collection\textless String\textgreater & Combined interests of the team. \\ \hline
+      goals & String & General goals working through the capstone project. \\ \hline
+      work\_style & String & The way of working that the team will adopt. \\ \hline
+
+      % Project (After it has been confirmed)
+      \multicolumn{3}{|l|}{\textbf{Project}}\\ \hline
+      project\_id & ID & Unique identifier for each project. \\ \hline
+      title & string & Title of the project. \\ \hline
+      supervisor & User & A reference to the supervisor \\ \hline
+      proposer & User & A reference to the person who proposed the project \\ \hline
+      course & Course & A reference to the course that the project belongs to \\ \hline
+      background & String & Main problem statement and background information for the project \\ \hline
+      objectives & String & Objectives of the project. \\ \hline
+      requirements & Collection\textless String\textgreater & List of skills and experience needed for the project \\ \hline
+      deliverables & String & What deliverables need to be met for the completion of the project \\ \hline
+      impact & String & What deliverables need to be met for the completion of the project \\ \hline
+      proposed\_solution & String & Potential solution that the team can choose to implement \\ \hline
+      completion\_status & String & What work has already been done on the project \\ \hline
+      industry & String & Industry or area on which the work is done \\ \hline
+      team\_capacity & Integer & Maximum number of teams that can work on the project \\ \hline
+      additional & String & Additional Notes or terms for the project \\ \hline
+      confidentiality & String & Confidentiality details. \\ \hline
+      ip & String & IP agreements \\ \hline
+      status & Enum & Status of the project whether it is taken, available, unavailable. \\ \hline
+      threads & Collection\textless Thread\textgreater & Communication medium on the project. \\ \hline
+
+      % Project Application
+      \multicolumn{3}{|l|}{\textbf{ProjectApplication}}\\ \hline
+      application\_id & ID & Unique identifier for each project application. \\ \hline
+      team & Team & Reference to the team that the project application belongs to. \\ \hline
+      project & Project & Reference to the Project that the application is for. \\ \hline
+      submission\_date & DateTime & When the application was submitted. \\ \hline
+      status & Enum & Status of the application including if PENDING, ACCEPTED, DENIED, or WITHDRAWN. \\ \hline
+      agreement & Enum & Checks that both team, supervisor, and instructor in agreement of terms. \\ \hline
+      threads & Collection\textless Thread\textgreater & Communication medium on the application. \\ \hline
+
+      % Thread
+      \multicolumn{3}{|l|}{\textbf{Thread}}\\ \hline
+      thread\_id & ID & Unique identifier for each thread. \\ \hline
+      author & User & Reference to the user who started the thread with a post. \\ \hline
+      subject & String & Reference to the subject or title of the thread. \\ \hline
+      content & String & The main content of the thread written by the author. \\ \hline
+      post\_date & DateTime & Creation date of the thread. \\ \hline
+      replies & Collection\textless (String (Author), DateTime, String (Content))\textgreater & Full discussion and details within the thread. \\ \hline
+
+      % Notification
+      \multicolumn{3}{|l|}{\textbf{Notification}}\\ \hline
+      notification\_id & ID & Unique identifier for each notification. \\ \hline
+      recipient & User & Reference to the user receiving the notification. \\ \hline
+      type & Enum & Type of Notification like Project, Application, Thread, Due date, etc. \\ \hline
+      content & String & Information going to the recipient. \\ \hline
+      date & DateTime & Date that the notification was sent. \\ \hline
+
+      % Checklist
+      \multicolumn{3}{|l|}{\textbf{Checklist}}\\ \hline
+      item\_id & ID & Unique identifier for each checklist item. \\ \hline
+      user & User & Reference to the user that has the checklist item. \\ \hline
+      description & String & Content of the checklist item. \\ \hline
+      status & Enum & Completion status of checklist item including TODO, INPROGRESS, DONE. \\ \hline
+      date & DateTime & Date checklist item was published. \\ \hline
+      completion\_date & DateTime & Date checklist item was completed. \\ \hline
+
+      % Course Resource
+      \multicolumn{3}{|l|}{\textbf{CourseResource}}\\ \hline
+      resource\_id & ID & Unique identifier for each course resource. \\ \hline
+      course & Course & Reference to the course that has the resource belongs to. \\ \hline
+      publisher & User & Reference to the user who is publishing the course resource. \\ \hline
+      title & String & Title for the resource. \\ \hline
+      type & Enum & Type of resource that the user is posting. \\ \hline
+      content & Object & Content including information, documents, attachments, calendars, etc. \\ \hline
+      date & DateTime & Date the resource was published. \\ \hline
+
   \end{longtable}
+
+  \endgroup
+
 
   \subsection{Privacy and Data Retention}
 
   \plt{Discuss storage, retention, deletion, privacy controls,
     consent, encryption, and compliance requirements.}
+  The following are requirements how the system will manage data to ensure security and privacy in its lifecycle.
 
-  TODO
+  \subsubsection{Storage}
+  \begin{enumerate}
+    \item The system shall securely store its data in a centrally managed backend system accessible by authorized actors
+    \item The system shall store data based on the Data Entity definitions in Sections 7.1 and 7.2
+    \item The system shall maintain accuracy and consistency of stored information ensuring it is up-to-date based on real-time actions
+    \item The system shall backup all data every 2 weeks to reduce the risk of data loss from system failures or deletions
+  \end{enumerate}
+
+  \subsubsection{Data Retention and Deletion}
+  \begin{enumerate}
+    \item The system shall retain instructor and course related data to be used the following year until the instructor has taken action to make the deletions.
+    \item The system shall allow restricted deletion of any data only by authorized administrators that are managing the application with access to the database.
+    \item The system shall allow authorized users to delete content that they created or are specifically managing on the application including their own personal information as well as make edits.
+    \item The system shall automatically delete student information at the end of the capstone period
+    \item The system shall only retain completed project information past the capstone period if the team has consented
+  \end{enumerate}
+
+  \subsubsection{Privacy Controls}
+  \begin{enumerate}
+    \item The system shall implement Role-Based Access Control to allow users to perform read, write, delete, and modify actions based on their role (e.g. Students may not modify other projects that do not belong to them while instructors can edit any project in their course)
+  \end{enumerate}
+
+  \subsubsection{Consent}
+  \begin{enumerate}
+    \item The system shall inform users about all information including personal data that is being retained and used for recommendations
+    \item The system shall not disclose any data to unauthorized external parties
+    \item The system shall provide a Privacy Notice providing users with information related to data collection, use, storage, and retention
+    \item The system shall allow consent withdrawal
+  \end{enumerate}
+
+  \subsubsection{Encryption}
+  \begin{enumerate}
+    \item The system shall utilize standard and secure network protocols HTTP with TLS to establish secure communication within \projname{}
+    \item The system shall utilize McMaster SSO for McMaster student and staff authentication
+    \item The system shall encrypt personal information and any confidential data at rest
+    \item The system shall use another trusted identity provider to authenticate external supervisors
+    \item The system shall not retain or store any user passwords in plaintext but use securely managed access and refresh tokens to maintain sessions
+  \end{enumerate}
+
+  \subsubsection{Compliance}
+  \begin{enumerate}
+    \item The system shall comply with applicable privacy legislation related to collection, use, disclosure, and protection of personal information found under Ontario's Freedom of Information and Protection of Privacy Act (FIPPA).
+    \item The system shall also adhere to data privacy policies applicable to McMaster and the related faculties
+    \item The system shall ensure secure authentication and communication with APIs and third party services
+    \item Unauthorized access, data breaches, data loss or disclosure shall be documented and sent to the relevant parties and the University
+  \end{enumerate}
 
 % ==============================================================
   \section{Non-Functional Requirements}
