@@ -1931,7 +1931,7 @@ Student (Priya), Instructor (Dr. Reyes)
     \textbf{Rationale}: Web browsers provide an abstraction layer that isolates functionality from the underlying operating system environment, making OS-support a concern for browser developers. Similarly, Docker provides an abstraction layer over the underlying operating system and a sandboxed environment for executing code.\\
     \textbf{Fit Criterion}: The hosted portion shall build and run successfully on at least one host. Clients shall run on all browsers at their stated versions or a backwards-compatible future version.
 
-    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_ReliabilityAvailability}:] \textbf{Reliability and Availability}\\
+    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Availability}:] \textbf{Availability}\\
     The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
     \textbf{Rationale}: The system being inaccessible can result in missed deadlines, data loss, and overall frustration. This can impact adoption, perception, and erode trust.\\
     \textbf{Fit Criterion}: The system responds to a periodic probe with a success response at least \uptimePercent{} of the time.
