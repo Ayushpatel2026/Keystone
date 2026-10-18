@@ -118,7 +118,7 @@
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
 Oct 13th 2026 & 1.0 & Introduction and System Overview\\
-Date 2 & 1.1 & Notes\\
+Oct 18th 2026 & 1.1 & Use Cases and User Personas\\
 \bottomrule
   \end{tabularx}
 
@@ -820,7 +820,7 @@ Date 2 & 1.1 & Notes\\
   \item Name: Priya Nair
   \item Description: Software engineering level IV student. She formed a
     team of friends over the summer and had a few project ideas before the term
-    started. She reads project listings between classes, often on her phone.
+    started.
   \item Goals: Land a project that matches her team's interests and skills.
     Also know what is expected from the supervisor, due-dates, and if the team is on
     track. Keep communication with the supervisor coherent.
@@ -848,11 +848,10 @@ Date 2 & 1.1 & Notes\\
     platform everytime.
   \item Frustrations: Open-ended proposal boxes that make expectations
     unclear, no information about students before meeting them, a lot of back 
-    and forth between course instrcutor to look for course information,
+    and forth between with course instructor to get course information
     and searching through email CC lists to find who to reply to.
   \item Technical Ability: Ability is medium to high. He is comfortable with new
-    applications, but has little patience for extra accounts or checking
-    multiple sites.
+    applications, but has little patience for keeping track of multiple platforms.
   \item Based on: \stkES~\ref{ES_Template}, \stkES~\ref{ES_NoStudentInfo},
     \stkES~\ref{ES_ManyLogins}, \stkES~\ref{ES_NotifyNotRemember},
     \stkES~\ref{ES_WhoToEmail}
@@ -862,9 +861,8 @@ Date 2 & 1.1 & Notes\\
 \begin{itemize}
   \item Name: Dr. Hassan Malik
   \item Description: Professor who submits proposals yearly and supervises several
-    teams, often across more than one capstone course (SE, CS, Tron). He
-    attends lectures when he can and helps with presentations and Expo posters,
-    but is not involved in running the course.
+    teams, often across more than one capstone course (SE, CS, Tron). He also helps 
+    with presentations and Expo posters when he has time, but is not involved in running the course.
   \item Goals: Know the schedule and requirements of each course his teams are
     in. Know who his team members and TAs are without having to search through many platforms. Give end-of-term feedback
     without a lot of effort.
@@ -1039,7 +1037,7 @@ Student (Priya)
 
 % ---------------- UC 4 ----------------
 \refstepcounter{ucnum} \label{UC_SelectProject}
-\subsection{\ucref{UC_SelectProject}: Select a Project for a Team}
+\subsection{\ucref{UC_SelectProject}: Team applying for a project}
 
 \textbf{Primary Actor}
 
@@ -1057,7 +1055,7 @@ Student (Priya)
     team.
   \item The system checks that the project is still open.
   \item The system assigns the project to the team and changes its status to
-    ``taken''.
+    ``taken'' and updates the interest count so everyone can see there's one group of interest for the project.
   \item The system notifies the project's supervisor and the instructor.
   \item The system shows the student a confirmation with the supervisor's
     contact.
@@ -1100,7 +1098,7 @@ Student (Priya)
   \item The system shows the process for student-initiated projects, the
     proposal template, and guidance on appropriate scope.
   \item The team fills in the template and names a prospective supervisor
-    (or requests help finding one).
+    (or requests help finding one and publish their project to the list of student-initiated projects).
   \item The team submits the proposal.
   \item The system notifies the instructor and the prospective supervisor.
   \item The proposal proceeds through the review process
