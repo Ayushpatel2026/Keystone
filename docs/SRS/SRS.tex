@@ -101,6 +101,9 @@
 \newcommand{\deployTime}{30 minutes}
 \newcommand{\unschedDowntime}{$\sim10$ minutes}
 \newcommand{\uptimePercent}{99.9\%}
+\newcommand{\tailLatency}{5.0 seconds}
+\newcommand{\concurrentUsers}{400}
+\newcommand{\tailPercentile}{99.9th}
 
 \usepackage{fullpage}
 
@@ -1945,6 +1948,11 @@ Student (Priya), Instructor (Dr. Reyes)
     The system shall be deployable by an IT professional by following the deployment guide with no assistance in under \deployTime{}.\\
     \textbf{Rationale}: Issues during deployment can increase downtime which results in frustration with the platform.\\
     \textbf{Fit Criterion}: A technically competent individual outside of the main development team is able to complete the task described in Section~4.2.2 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan} within the time constraint.
+
+    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Performance}:] \textbf{Performance.}
+    The system shall respond to all requests with a \tailPercentile{} percentile latency of \tailLatency{} under a load of \concurrentUsers{} users.\\
+    \textbf{Rationale}: The system is expected to be used by approximately \concurrentUsers{} staff, students, and external supervisors. A slow experience can hurt adoption and a failure to handle load can lead to service degradation.\\
+    \textbf{Fit Criterion}: A representative group of requests are sent to the server at a rate of \concurrentUsers{} sets of requests / second and the tail latency is recorded. 
 
     % \item Other NFRs that might be discussed include verifiability,
     % understandability, reusability, performance, reliability and availability, security, and accessibility.  You may have to add other NFRs.
