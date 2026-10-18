@@ -3,6 +3,7 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage[round]{natbib}
 
 \hypersetup{
     colorlinks=true,       % false: boxed links; true: colored links
@@ -36,9 +37,7 @@
 \toprule
 \textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
 \midrule
-Date1 & Name(s) & Description of changes\\
-Date2 & Name(s) & Description of changes\\
-... & ... & ...\\
+Oct 18th & Ayush Patel & Introduction, Scope, System Boundary and Assumptions\\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -57,10 +56,66 @@ Date2 & Name(s) & Description of changes\\
 
 \wss{You can include your definition of what a hazard is here.}
 
+Keystone is a capstone project discovery and management platform intended to support the lifecycle of a capstone
+project, from project proposal and discovery through team formation, project approval, and the management of
+project information. The platform is intended to serve students, project supervisors, course instructors, and
+teaching assistants (TAs).
+
+Although Keystone is not intended to control physical equipment or perform safety-critical operations, failures can
+still cause harm. Examples include unauthorized disclosure of confidential project and student information,
+invalid team assignments, lost or inconsistent project updates, and misleading approval or notification status.
+These failures could delay academic activities, create unnecessary work, and damage trust.
+
+We define a hazard as an unsafe system condition that, in combination with particular environmental circumstances, can
+contribute to an undesirable outcome. Hazard analysis examines how system failures and interactions can produce such
+conditions and identifies measures to eliminate or control them \citep{IppolitoAndWallace1995,Leveson2011}.
+
+This document identifies potential hazards associated with Keystone, analyzes the ways in which system components may
+fail, and proposes mitigations that can be translated into verifiable safety and security requirements.
+
 \section{Scope and Purpose of Hazard Analysis}
 
 \wss{You should say what \textbf{loss} could be incurred because of the
 hazards.}
+
+The scope includes functional failures, integration failures, security and privacy weaknesses, usability and
+accessibility issues, and foreseeable user errors. It also considers failures at the boundaries between Keystone
+and external services.
+
+This hazard analysis covers the following categories of loss:
+
+\begin{itemize}
+    \item \textbf{Disruption of academic activities:}
+    Failure to discover projects, form eligible teams, obtain
+    approvals, or maintain accurate project records may delay
+    project selection and interfere with course milestones.
+
+    \item \textbf{Unauthorized disclosure or misuse of
+    information:}
+    Confidential project proposals, intellectual property
+    concerns, contact information, student profiles, and
+    team records may be exposed to people who are not
+    authorized to access them.
+
+    \item \textbf{Incorrect academic or administrative
+    decisions:}
+    Inaccurate project descriptions, invalid team assignments,
+    incorrect course rules, or misleading approval statuses
+    may cause students, supervisors, or instructors to make
+    decisions based on incorrect information.
+
+    \item \textbf{Loss or corruption of project
+    information:}
+    Failed updates, integration errors, or inconsistent
+    records may cause project details, supervisor
+    information, repository links, or selected documentation
+    requirements to become unavailable or outdated.
+
+    \item \textbf{Loss of trust and adoption:}
+    Unreliable notifications, unclear workflows, inaccessible
+    interfaces, or inappropriate disclosure of information
+    may frustrate users and reduce confidence in the platform.
+\end{itemize}
 
 \section{System Boundaries and Components}
 
@@ -70,12 +125,124 @@ ones.  For projects that involve hardware, the components will typically include
 each individual piece of hardware.  If your software will have a database, or an
 important library, these are also potential components.}
 
+
+\subsection{System Boundary}
+
+Keystone is the system under analysis. Its boundary includes the application logic, persistent data, user-facing
+functionality, and integrations implemented or configured specifically for the platform.
+
+External services are not assumed to be under Keystone's direct control. Nevertheless, their interfaces and the
+consequences of their failure are included in the analysis because Keystone depends on them to provide its intended
+functionality.
+
+The following external entities and services are relevant:
+
+\begin{itemize}
+    \item \textbf{McMaster single sign-on (SSO):}
+    Provides authentication for users accessing Keystone
+    through their McMaster credentials.
+
+    \item \textbf{External authentication provider:}
+    Supports authentication for users who do not have a
+    McMaster account.
+
+    \item \textbf{Email service:}
+    Delivers notifications concerning project submissions,
+    approvals, supervisor confirmations, and other events.
+\end{itemize}
+
+\subsection{Major Components}
+
+The following components define the principal areas in which failures will be investigated. They are meant to
+be functional boundaries for hazard identification, rather than a complete software architecture.
+
+\begin{enumerate}
+    \item \textbf{Authentication component:}
+    Manages user sign-in through McMaster SSO and an external authentication provider.
+    It is responsible for establishing the identity associated
+    with a user session. Authentication failures may allow
+    unauthorized access or prevent legitimate users from
+    accessing the platform.
+
+    \item \textbf{Role-Based Access Control (RBAC) and
+    user management component:}
+    Maintains user accounts, roles, and permissions. It determines which resources users may view or modify.
+    Relevant roles include students, supervisors, TAs, and course instructors. Incorrect permissions may expose
+    restricted information or allow unauthorized changes.
+
+    \item \textbf{Course management component:}
+    Maintains course configurations, course membership,instructor and TA assignments, course-specific rules and
+    configurations,and relevant deadlines or course information. It must accommodate differences between Software
+    Engineering (SE), Computer Science (CS), and Mechatronics (TRON) courses.
+
+    \item \textbf{Project management component:}
+    Manages project proposals, descriptions, supervisors, contact details, project categories, confidentiality
+    information, intellectual property (IP) concerns, repository links, and project status throughout the
+    project lifecycle.
+
+    \item \textbf{Project approval component:}
+    Supports project proposal review, team project approval, and the recording of approval decisions. It must
+    distinguish between submission, review, approval, and other workflow states so that users are not misled
+    about whether a project or team has been approved.
+
+    \item \textbf{Student and team formation component:}
+    Manages student profiles, team membership, project interests, and any supported team or project
+    recommendations. It must respect course eligibility rules and team-size constraints.
+
+    \item \textbf{Notification component:}
+    Generates and sends notifications associated with relevant workflow events via the email service.
+    Failures may result in missing, delayed, duplicated, or incorrectly addressed messages.
+
+    \item \textbf{Persistence and data management component:}
+    Stores and retrieves the platform's persistent records.
+    It maintains the consistency of related information,
+    including project records, team membership, course
+    configuration, approval states, and user permissions.
+
+    \item \textbf{Recommendation component:}
+    Ranks or filters projects and potential
+    team matches based on available information and user
+    preferences. Incorrect recommendations may hide
+    relevant opportunities or mislead users about their
+    suitability for a project.
+\end{enumerate}
+
 \section{Critical Assumptions}
 
 \wss{These assumptions that are made about the software or system.  You should
 minimize the number of assumptions that remove potential hazards.  For instance,
 you could assume a part will never fail, but it is generally better to include
 this potential failure mode.}
+
+
+\begin{enumerate}
+    \item \textbf{Instructor authority:}
+        Course instructors remain responsible for final project
+        approval, the interpretation of course rules, and
+        exceptional team-formation decisions. Keystone supports
+        these decisions but does not replace the instructor's
+        judgment regarding project feasibility, scope, or
+        academic suitability.
+    \item \textbf{Authentication provider availability:}
+        McMaster SSO and any external authentication provider
+        are external dependencies and may become unavailable.
+        Keystone cannot guarantee their continuous operation
+        but must handle authentication failures safely.
+    \item \textbf{Accuracy of user-supplied information:}
+        Students and supervisors may submit incomplete,
+        incorrect, misleading, or outdated information.
+        The platform can validate information according to
+        defined rules, but it cannot guarantee the truth of
+        every project description, supervisor commitment, or
+        user-provided statement.
+    \item \textbf{Feature configuration:}
+        Optional features may be disabled by course instructors
+        to support different capstone courses or future
+        deployments. Disabling a feature must not leave
+        dependent workflows in an invalid state or expose
+        information that would otherwise be restricted.
+\end{enumerate}
+
 
 \section{Failure Mode and Effect Analysis}
 
@@ -153,5 +320,8 @@ whether material was generated by a human or an AI system.}
     appreciable risks of this form), list at least 2 other types of risk in
     software products. Why are they important to consider?
 \end{enumerate}
+
+\bibliographystyle {plainnat}
+\bibliography {../../refs/References}
 
 \end{document}
