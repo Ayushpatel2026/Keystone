@@ -84,6 +84,9 @@
 \newcommand{\lthelcnum}{LC\thelcnum}
 \newcommand{\lcref}[1]{LC\ref{#1}}
 
+\newcounter{dprnum} % Data Privacy Requirement Number
+\newcommand{\dprref}[1]{DPR\ref{#1}}
+
 % Stakeholder tags: clickable, jump to the appendix subsection
 \newcounter{sn}
 \newcounter{esn}
@@ -119,6 +122,7 @@
 \midrule
 Oct 13th 2026 & 1.0 & Introduction and System Overview\\
 Oct 18th 2026 & 1.1 & Use Cases and User Personas\\
+Oct 18th 2026 & 1.1 & Data Requirements\\
 \bottomrule
   \end{tabularx}
 
@@ -1578,11 +1582,17 @@ Student (Priya), Instructor (Dr. Reyes)
   \plt{For each entity, provide a short explanation.}
 
   \begin{itemize}
-    \item \textbf{User}: An individual registered in \projname{} including students, supervisors,
-    instructors, TAs, and administrators.
+    \item \textbf{User (Parent)}: An individual registered in \projname{} including students, supervisors,
+    instructors, and TAs.
+    \item \textbf{Student (Child of User)}: Students are users that will be selecting a project and a team for the capstone course.
+    \item \textbf{Supervisor (Child of User)}: Supervisors are users that manage one or more capstone teams on their project(s) and
+    they are able to propose projects themselves which students may work on.
+    \item \textbf{Instructor (Child of User)}: Instructors are users who manage one or more capstone course(s) and provide
+    feedback and resources to help students succeed in the course.
+    \item \textbf{TAs (Child of User)}: TAs assist instructors in course and team management including providing feedback.
     \item \textbf{Course}: A McMaster capstone course supported by Keystone (such as SE, CS, TRON) 
     and includes settings for a capstone course that enables features and implements team formation/
-    project selection rules.
+    project selection rules. It contains member and enrollment information.
     \item \textbf{Student Profile}: Contains information about a student's background including bio, 
     program, interests, project preferences, skills, experience, work style, and LinkedIn.
     \item \textbf{Team}: A groups of students participating in the same capstone project together.
@@ -1598,7 +1608,7 @@ Student (Priya), Instructor (Dr. Reyes)
     or project application.
     \item \textbf{Notification}: Contains information communicated by email related to project updates,
     decisions, discussion activity, urgent deadlines, and outstanding tasks requiring action. 
-    \item \textbf{Checklist Item}: Contains a required action and its completion status.
+    \item \textbf{Checklist}: Contains a checklist for the user with checklist items for completion.
     \item \textbf{Course Resource}: Can be a course outline, timeline, guidelines, FAQ, past capstone
     example, or any other course related content that the instructor may post.
   \end{itemize}
@@ -1608,12 +1618,16 @@ Student (Priya), Instructor (Dr. Reyes)
     \toprule
     \textbf{Entity 1} & \textbf{Entity 2} & \textbf{Multiplicity} & \textbf{Description}\\
     \midrule
-    User & Course & N : M & A supervisor or TA participates in many courses (Restrictions for students are programmatic)\\ \hline
-    User & Student Profile & 1 : 0..1 & A student may have one student profile associated with their account\\ \hline
-    User & Team & N : 0..1 & A student belongs to at most one team\\ \hline
-    User & Project & 1 : N & A user may supervise or manage multiple projects (Restrictions for students are programmatic)\\ \hline
+    Student & Course & N : 1 & A student may be in exactly one course \\ \hline
+    Instructor & Course & N : M & An instructor manages one or more courses \\ \hline
+    TA & Course & N : M & A TA assists in one or more courses \\ \hline
+    Student & Student Profile & 1 : 0..1 & A student may have one student profile associated with their account\\ \hline
+    Student & Team & N : 0..1 & A student belongs to at most one team\\ \hline
+    Instructor & Project & 1 : N & An instructor has access to all his courses' projects\\ \hline
+    TA & Project & 1 : N & A TA may have access to multiple projects they are managing\\ \hline
+    Supervisor & Project & 1 : N & A supervisor may supervise multiple projects\\ \hline
     User & Notification & 1 : N & A user may receive multiple notifications\\ \hline
-    User & Checklist Item & 1 : N & A user may have many checklist items to handle\\ \hline
+    User & Checklist & 1 : N & A user may have multiple checklists to handle\\ \hline
     User & Threads & N : M & A user may have be part of many threads and a thread can contain multiple users\\ \hline
     Team & Team Profile & 1 : 0..1 & A may have at most one shared team profile\\ \hline
     Team & Project & N : 0..1 & A student team may have at most one project while a project could have multiple teams.\\ \hline
@@ -1652,20 +1666,35 @@ Student (Priya), Instructor (Dr. Reyes)
       \textbf{Attribute} & \textbf{Type} & \textbf{Description}\\ \hline \endhead
 
       % USER
-      \multicolumn{3}{|l|}{\textbf{User}}\\ \hline
+      \multicolumn{3}{|l|}{\textbf{User (Parent)}}\\ \hline
       user\_id & ID & Unique ID for each user \\ \hline
       name & String & Full name of the user \\ \hline
       email & String & Email of the user \\ \hline
       user\_name & String & MAC ID if signin through SSO or other Auth ID \\ \hline
-      role & Enum & STUDENT, SUPERVISOR, INSTRUCTOR, TA \\ \hline
       account\_status & Enum & Statuses such as ACTIVE, DISABLED, PENDING \\ \hline
+      is\_admin & Boolean & Determines if user is an admin as they may have higher privileges \\ \hline
+
+      % USER: STUDENT
+      \multicolumn{3}{|l|}{\textbf{Student (Child of User)}}\\ \hline
+
+      % USER: Instructor
+      \multicolumn{3}{|l|}{\textbf{Instructor (Child of User)}}\\ \hline
+
+      % USER: TA
+      \multicolumn{3}{|l|}{\textbf{TA (Child of User)}}\\ \hline
+
+      % USER: Supervisor
+      \multicolumn{3}{|l|}{\textbf{Supervisor (Child of User)}}\\ \hline
 
       % Course
-      \multicolumn{3}{|l|}{\textbf{Crouse}}\\ \hline
+      \multicolumn{3}{|l|}{\textbf{Course}}\\ \hline
       course\_id & ID & Unique ID for each course \\ \hline
       course\_code & String & McMaster Capstone Course Code \\ \hline
       course\_name & String & Name of the Capstone Course \\ \hline
       program & Enum & SE, TRON, CS \\ \hline
+      instructors & Collection\textless Instructor\textgreater & List of Instructors in charge of the course. \\ \hline
+      tas & Collection\textless TA\textgreater & List of TAs assisting in the course. \\ \hline
+      enrollment\_list & Collection\textless Student\textgreater & List of enrolled students and managing Instructors/TAs. \\ \hline
       disabled\_features & Collection\textless Enum\textgreater & List of features labelled by an enum \\ \hline
       capstone\_rules & Collection\textless String\textgreater & List of given additional per course rules \\ \hline
       approval\_mode & Enum & Determines where project approvals are handled (custom or not) INTERNAL, EXTERNAL, INTEGRATION \\ \hline
@@ -1690,9 +1719,9 @@ Student (Priya), Instructor (Dr. Reyes)
       team\_id & ID & Unique identifier for each team. \\ \hline
       team\_name & String & Name of the Team. \\ \hline
       course & Course & Name of the Team. \\ \hline
-      members & Collection\textless User\textgreater & Reference to all team members in the team. \\ \hline
+      members & Collection\textless Student\textgreater & Reference to all team members in the team. \\ \hline
       member\_roles & Collection\textless Enum\textgreater & All roles of team members. \\ \hline
-      poc & User & Reference to the point of contact on the team. \\ \hline
+      poc & Student & Reference to the point of contact on the team. \\ \hline
       project & Project & Which project they have selected, if applicable. \\ \hline
       status & ENUM & Which stage in project and team selection or approval they are in. \\ \hline
 
@@ -1710,7 +1739,7 @@ Student (Priya), Instructor (Dr. Reyes)
       \multicolumn{3}{|l|}{\textbf{Project}}\\ \hline
       project\_id & ID & Unique identifier for each project. \\ \hline
       title & string & Title of the project. \\ \hline
-      supervisor & User & A reference to the supervisor \\ \hline
+      supervisor & Supervisor & A reference to the supervisor \\ \hline
       proposer & User & A reference to the person who proposed the project \\ \hline
       course & Course & A reference to the course that the project belongs to \\ \hline
       background & String & Main problem statement and background information for the project \\ \hline
@@ -1721,7 +1750,7 @@ Student (Priya), Instructor (Dr. Reyes)
       proposed\_solution & String & Potential solution that the team can choose to implement \\ \hline
       completion\_status & String & What work has already been done on the project \\ \hline
       industry & String & Industry or area on which the work is done \\ \hline
-      team\_capacity & Integer & Maximum number of teams that can work on the project \\ \hline
+      supervisor\_capacity & Integer & Maximum number of teams that can work on the project \\ \hline
       additional & String & Additional Notes or terms for the project \\ \hline
       confidentiality & String & Confidentiality details. \\ \hline
       ip & String & IP agreements \\ \hline
@@ -1757,18 +1786,15 @@ Student (Priya), Instructor (Dr. Reyes)
 
       % Checklist
       \multicolumn{3}{|l|}{\textbf{Checklist}}\\ \hline
-      item\_id & ID & Unique identifier for each checklist item. \\ \hline
-      user & User & Reference to the user that has the checklist item. \\ \hline
-      description & String & Content of the checklist item. \\ \hline
-      status & Enum & Completion status of checklist item including TODO, INPROGRESS, DONE. \\ \hline
-      date & DateTime & Date checklist item was published. \\ \hline
-      completion\_date & DateTime & Date checklist item was completed. \\ \hline
+      checklist\_id & ID & Unique identifier for each checklist. \\ \hline
+      user & User & Reference to the user that has the checklist. \\ \hline
+      content & Collection\textless (String (name), DateTime (date), DateTime (completion\_date), Enum (status: TODO, INPROGRESS, DONE))\textgreater & Items in the checklist. \\ \hline
 
       % Course Resource
       \multicolumn{3}{|l|}{\textbf{CourseResource}}\\ \hline
       resource\_id & ID & Unique identifier for each course resource. \\ \hline
       course & Course & Reference to the course that has the resource belongs to. \\ \hline
-      publisher & User & Reference to the user who is publishing the course resource. \\ \hline
+      publisher & Instructor/TA & Reference to the Instructor or TA who is publishing the course resource. \\ \hline
       title & String & Title for the resource. \\ \hline
       type & Enum & Type of resource that the user is posting. \\ \hline
       content & Object & Content including information, documents, attachments, calendars, etc. \\ \hline
@@ -1787,49 +1813,49 @@ Student (Priya), Instructor (Dr. Reyes)
 
   \subsubsection{Storage}
   \begin{enumerate}
-    \item The system shall securely store its data in a centrally managed backend system accessible by authorized actors
-    \item The system shall store data based on the Data Entity definitions in Sections 7.1 and 7.2
-    \item The system shall maintain accuracy and consistency of stored information ensuring it is up-to-date based on real-time actions
-    \item The system shall backup all data every 2 weeks to reduce the risk of data loss from system failures or deletions
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label1}:] The system shall securely store its data in a centrally managed backend system accessible by authorized actors
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label2}:] The system shall store data based on the Data Entity definitions in Sections 7.1 and 7.2
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label3}:] The system shall maintain accuracy and consistency of stored information ensuring it is up-to-date based on real-time actions
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label4}:] The system shall backup all data every 2 weeks to reduce the risk of data loss from system failures or deletions
   \end{enumerate}
 
   \subsubsection{Data Retention and Deletion}
   \begin{enumerate}
-    \item The system shall retain instructor and course related data to be used the following year until the instructor has taken action to make the deletions.
-    \item The system shall allow restricted deletion of any data only by authorized administrators that are managing the application with access to the database.
-    \item The system shall allow authorized users to delete content that they created or are specifically managing on the application including their own personal information as well as make edits.
-    \item The system shall automatically delete student information at the end of the capstone period
-    \item The system shall only retain completed project information past the capstone period if the team has consented
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label5}:] The system shall retain instructor and course related data to be used the following year until the instructor has taken action to make the deletions.
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label6}:] The system shall allow restricted deletion of any data only by authorized administrators that are managing the application with access to the database.
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label7}:] The system shall allow authorized users to delete content that they created or are specifically managing on the application including their own personal information as well as make edits.
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label8}:] The system shall automatically delete student information at the end of the capstone period
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label9}:] The system shall only retain completed project information past the capstone period if the team has consented
   \end{enumerate}
 
   \subsubsection{Privacy Controls}
   \begin{enumerate}
-    \item The system shall implement Role-Based Access Control to allow users to perform read, write, delete, and modify actions based on their role (e.g. Students may not modify other projects that do not belong to them while instructors can edit any project in their course)
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label10}:] The system shall implement Role-Based Access Control to allow users to perform read, write, delete, and modify actions based on their role (e.g. Students may not modify other projects that do not belong to them while instructors can edit any project in their course)
   \end{enumerate}
 
   \subsubsection{Consent}
   \begin{enumerate}
-    \item The system shall inform users about all information including personal data that is being retained and used for recommendations
-    \item The system shall not disclose any data to unauthorized external parties
-    \item The system shall provide a Privacy Notice providing users with information related to data collection, use, storage, and retention
-    \item The system shall allow consent withdrawal
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label11}:] The system shall inform users about all information including personal data that is being retained and used for recommendations
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label12}:] The system shall not disclose any data to unauthorized external parties
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label13}:] The system shall provide a Privacy Notice providing users with information related to data collection, use, storage, and retention
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label14}:] The system shall allow consent withdrawal
   \end{enumerate}
 
   \subsubsection{Encryption}
   \begin{enumerate}
-    \item The system shall utilize standard and secure network protocols HTTP with TLS to establish secure communication within \projname{}
-    \item The system shall utilize McMaster SSO for McMaster student and staff authentication
-    \item The system shall encrypt personal information and any confidential data at rest
-    \item The system shall use another trusted identity provider to authenticate external supervisors
-    \item The system shall not retain or store any user passwords in plaintext but use securely managed access and refresh tokens to maintain sessions
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label15}:] The system shall utilize standard and secure network protocols HTTP with TLS to establish secure communication within \projname{}
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label16}:] The system shall utilize McMaster SSO for McMaster student and staff authentication
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label17}:] The system shall encrypt personal information and any confidential data at rest
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label18}:] The system shall use another trusted identity provider to authenticate external supervisors
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label19}:] The system shall not retain or store any user passwords in plaintext but use securely managed access and refresh tokens to maintain sessions
   \end{enumerate}
 
   \subsubsection{Compliance}
   \begin{enumerate}
-    \item The system shall comply with applicable privacy legislation related to collection, use, disclosure, and protection of personal information found under Ontario's Freedom of Information and Protection of Privacy Act (FIPPA).
-    \item The system shall also adhere to data privacy policies applicable to McMaster and the related faculties
-    \item The system shall ensure secure authentication and communication with APIs and third party services
-    \item Unauthorized access, data breaches, data loss or disclosure shall be documented and sent to the relevant parties and the University
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label20}:] The system shall comply with applicable privacy legislation related to collection, use, disclosure, and protection of personal information found under Ontario's Freedom of Information and Protection of Privacy Act (FIPPA).
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label21}:] The system shall also adhere to data privacy policies applicable to McMaster and the related faculties
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label22}:] The system shall ensure secure authentication and communication with APIs and third party services
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label23}:] Unauthorized access, data breaches, data loss or disclosure shall be documented and sent to the relevant parties and the University
   \end{enumerate}
 
 % ==============================================================
