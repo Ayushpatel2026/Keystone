@@ -387,7 +387,7 @@ Two students attempt to join the last slot of a group simultaneously, neither re
 Both students believe they have joined the group, team size limit may be exceeded due to the data race & 
 Database allows both operations to run concurrently without a locking mechanism & 
 Ensure that data entries that are part of a single operation are not modified externally for the total duration of the operation & 
-\ref{SSR-8} & 
+\ref{SSR-11} & 
 H6-1 \\
 
 \addlinespace
@@ -466,6 +466,9 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-10} The system shall assign new users zero privileges when their identity cannot be assigned automatically or verified.\\
     \textbf{Rationale}: No assumptions can be made about new users. They may be students who are not enrolled in a capstone course, malicious actors attempting to extract user information, individuals posing as supervisors to get free labour, etc. Ensuring no unverified users get access to the platform mitigates those risks.
+
+    \item \label{SSR-11} The system shall ensure that operations on sets or aggregations of multiple data entries do not operate on stale data at any point during an operation.\\
+    \textbf{Rationale}: Concurrent operations which rely on aggregations of data entries may introduce a data race, resulting in an invalid state after the operation. For example, two students attempting to join the same team which only has one available slot can end up exceeding the team size limit, if the mechanism is not implemented correctly.
 \end{enumerate}
 
 \section{Roadmap}
