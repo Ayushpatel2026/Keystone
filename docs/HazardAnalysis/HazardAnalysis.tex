@@ -339,8 +339,7 @@ User is assigned the wrong role  &
 Student able to act as a course instructor, supervisor as an IT technician, etc. & 
 System inferring roles from an unreliable source & 
 Default to zero privileges if automatic assignment fails, provide instructor with ability to modify roles, and record all actions in an audit log & 
-% \ref{SSR-9} 
-& 
+\ref{SSR-9} & 
 H2-1 \\
 
 \addlinespace
@@ -461,6 +460,9 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-8} All system actions which involve multiple dependent reads and writes, with at least one write, shall be atomic.\\
     \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.
+
+    \item \label{SSR-9} The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.\\
+    \textbf{Rationale}: Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.
 \end{enumerate}
 
 \section{Roadmap}
