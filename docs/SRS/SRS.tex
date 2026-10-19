@@ -1473,7 +1473,7 @@ Student (Priya), Instructor (Dr. Reyes)
               \fitcrit{Each project in the catalog clearly displays the availability status and the supervisor capacity. Even if labels are not updated in real-time, the core application should respond to user actions appropriately based on status (i.e. taken projects cannot be requested).}
 
               % ---------- Student Profile ----------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label7}:] The system shall allow students to create and update their profiles providing background information including bio, program, interests, project preferences, skills, experience, work style, and LinkedIn.
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label7}:] The system shall allow students to create and update their profiles providing background information including bio, program, interests, project preferences, skills, experience, work style, and LinkedIn that are viewable by all users within the course.
               \rationale{Informative profiles allows students to discover other students with similar skills and interests when forming teams. It also allows supervisors to briefly evaluate interested students before interviewing them.}
               \fitcrit{Students can create, save, update, and visit their profiles. These profiles should also be viewable by other students and supervisors.}
 
@@ -1490,7 +1490,7 @@ Student (Priya), Instructor (Dr. Reyes)
               \rationale{Students who do not have a team or simply want to join a team instead of creating one will have a catalog of other teams and other students seeking others with similar interests.}
               \fitcrit{A student can indicate whether they are looking for a team and they can discover other teams/students looking for additional members.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label11}:] The system shall allow student teams to create and update a shared team profile including the member bios, collective skills, project interests, goals, and work style.
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label11}:] The system shall allow student teams to create and update a shared team profile including the member bios, collective skills, project interests, goals, and work style that are viewable by all users within the course.
               \rationale{Team profiles help supervisors evaluate the overal team's interests and whether the team's goals and skills align with the project in a consolidated way without having to go through each team member's profile.}
               \fitcrit{Authorized team members can create and modify their team profile based on their team members' profiles. Other users can view these profiles.}
 
@@ -1641,7 +1641,7 @@ Student (Priya), Instructor (Dr. Reyes)
     project interests, goals, and work style.
     \item \textbf{Project}: A supervisor-proposed or student-proposed capstone project that can be 
     described using a title, problem statement/background, objectives, skills/requirements, team 
-    deliverables, project impact, team capacity details, level of current completion, relevant course 
+    deliverables, project impact, supervisor capacity details, level of current completion, relevant course 
     (SE, TRON, CS), industry, information regarding confidentiality and IP concerns, and additional project terms. 
     \item \textbf{Project Application}: Records a student teams interest in supervisor's project including
     a decision from both parties.
@@ -2068,9 +2068,38 @@ Student (Priya), Instructor (Dr. Reyes)
   \begin{longtable}{p{0.15\textwidth} p{0.15\textwidth} p{0.20\textwidth} p{0.20\textwidth}}
 
     \toprule
-    Stakeholder Req & Use Case & Functional Req \\
+    Functional Req & Stakeholder Req & Use Case \\
     \midrule
-    \srref{SR_Label1} & \ucref{UC_Label1} & \rref{FR_Label1} \\
+    \rref{FR_Label1} & \srref{SR_ProposalTemplate} & \ucref{UC_SubmitProposal} \\ \hline
+    \rref{FR_Label2} & \srref{SR_OptionalFields} & \ucref{UC_SubmitProposal} \\ \hline
+    \rref{FR_Label3} & \srref{SR_StudentProposals} & \ucref{UC_ProposeOwnProject} \\ \hline
+    \rref{FR_Label4} & \srref{SR_HumanApproval} & \ucref{UC_ReviewProposal} \\ \hline
+    \rref{FR_Label5} & \srref{SR_BrowseProjects}, \srref{SR_SinglePlace} & \ucref{UC_BrowseProjects} \\ \hline
+    \rref{FR_Label6} & \srref{SR_BrowseProjects}, \srref{SR_ProjectStatus} & \ucref{UC_BrowseProjects} \\ \hline
+    \rref{FR_Label7} & \srref{SR_StudentProfiles} & -- \\ \hline
+    \rref{FR_Label8} & \srref{SR_SinglePlace} & -- \\ \hline
+    \rref{FR_Label9} & \srref{SR_TeamValidity} & \ucref{UC_ValidateTeams} \\ \hline
+    \rref{FR_Label10} & \srref{SR_SinglePlace} & -- \\ \hline
+    \rref{FR_Label11} & \srref{SR_StudentProfiles}, \srref{SR_TeamContacts} & \ucref{UC_TeamProfile}, \ucref{UC_ViewTeam} \\ \hline
+    \rref{FR_Label12} & -- & -- \\ \hline
+    \rref{FR_Label13} & \srref{SR_SinglePlace} & \ucref{UC_SelectProject} \\ \hline
+    \rref{FR_Label14} & \srref{SR_SinglePlace} & \ucref{UC_SelectProject} \\ \hline
+    \rref{FR_Label15} & \srref{SR_ReviewDialogue}, \srref{SR_SinglePlace} & \ucref{UC_ReviewProposal} \\ \hline
+    \rref{FR_Label16} & \srref{SR_StatusNotify} & \ucref{UC_NotifyChecklist} \\ \hline
+    \rref{FR_Label17} & \srref{SR_ReviewDialogue}, \srref{SR_HumanApproval} & \ucref{UC_ApproveTeamProject} \\ \hline
+    \rref{FR_Label18} & \srref{SR_HumanApproval}, \srref{SR_ReviewDialogue} & \ucref{UC_ApproveTeamProject} \\ \hline
+    \rref{FR_Label19} & \srref{SR_HumanApproval} & -- \\ \hline
+    \rref{FR_Label20} & \srref{SR_TeamSubmissionChecks} & \ucref{UC_ApproveTeamProject} \\ \hline
+    \rref{FR_Label21} & \srref{SR_ReviewDialogue} & -- \\ \hline
+    \rref{FR_Label22} & \srref{SR_SinglePlace}, \srref{SR_TeamValidity} & -- \\ \hline
+    \rref{FR_Label23} & \srref{SR_ProposalGuidance}, \srref{SR_CourseInfoEarly}, \srref{SR_CrossCourseTimelines} & \ucref{UC_SubmitProposal}, \ucref{UC_ViewTimelines} \\ \hline
+    \rref{FR_Label24} & \srref{SR_Checklist} & \ucref{UC_NotifyChecklist} \\ \hline
+    \rref{FR_Label25} & \srref{SR_PushNotify}, \srref{SR_Checklist} & \ucref{UC_NotifyChecklist} \\ \hline
+    \rref{FR_Label26} & \srref{SR_UnselectedProjects}, \srref{SR_TeamValidity} & \ucref{UC_ValidateTeams}, \ucref{UC_FollowUpUnselected} \\ \hline
+    \rref{FR_Label27} & \srref{SR_ReduceAdmin}, \srref{SR_TeamValidity} & \ucref{UC_ValidateTeams} \\ \hline
+    \rref{FR_Label28} & -- & -- \\ \hline
+    \rref{FR_Label29} & -- & -- \\ \hline
+    \rref{FR_Label30} & -- & -- \\ \hline
     \bottomrule
 
     \caption{Traceability Between Stakeholder Requirements, Use Cases, and
