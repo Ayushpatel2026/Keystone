@@ -1937,7 +1937,7 @@ Student (Priya), Instructor (Dr. Reyes)
     % possible operating environments.}
     The system shall be accessible on Firefox (v158), Safari (v27), and any Chromium-based (v156) web browser running on a desktop-sized or mobile-sized screen. The hosted component of the system shall run on any machine that supports Docker (Engine version v29).\\
     \textbf{Rationale}: Web browsers provide an abstraction layer that isolates functionality from the underlying operating system environment, making OS-support a concern for browser developers. Similarly, Docker provides an abstraction layer over the underlying operating system and a sandboxed environment for executing code.\\
-    \textbf{Fit Criterion}: The hosted portion shall build and run successfully on at least one host. Clients shall run on all browsers at their stated versions or a backwards-compatible future version.
+    \textbf{Fit Criterion}: All target browsers shall be tested using an automated web testing tool such as Playwright or Selenium and complete all tests successfully. This is described in-depth in Section~4.2.3 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan}.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Availability}:] \textbf{Availability.}
     The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
