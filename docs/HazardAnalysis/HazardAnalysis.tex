@@ -387,7 +387,7 @@ Two students attempt to join the last slot of a group simultaneously, neither re
 Both students believe they have joined the group, team size limit may be exceeded due to the data race & 
 Database allows both operations to run concurrently without a locking mechanism & 
 Ensure that operations which depend on more than one record are able to lock all relevant records for the duration of the operation & 
-\ref{SNFR-1} & 
+\ref{SFR-8} & 
 H6-1 \\
 
 \addlinespace
@@ -459,16 +459,14 @@ rationale design process how and why to fake it.)}
 
     \item \label{SFR-7} The platform shall provide multiple ways to sort the list of projects.\\
     \textbf{Rationale}: While a recommendation engine is proposed, it may be flawed or operate on outdated data. To ensure users don't miss a project that they may favour, providing multiple ways to sort the list can bring different projects to the top.
+
+    \item \label{SFR-8} All system actions which involve multiple dependent reads and writes, with at least one write, shall be atomic.\\
+    \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.
 \end{enumerate}
 
 \subsection{Safety and Security Non-Functional Requirements}
 
-\begin{enumerate}[label=\textbf{SNFR-1}]
-    \item \label{SNFR-1} All system actions involving multiple steps shall be atomic.\\
-    \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.
-
-    
-\end{enumerate}
+N/A.
 
 \section{Roadmap}
 
