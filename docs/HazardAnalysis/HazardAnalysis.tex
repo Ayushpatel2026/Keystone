@@ -315,7 +315,7 @@ SSO or external provider unavailable &
 Users cannot access platform, leads to missed deadlines & 
 External service outage, network failure & 
 Display error, log failure, raise warning to IT department and/or instructors & 
-\ref{SFR-1} & 
+\ref{SSR-1} & 
 H1-1 \\
 
 \addlinespace
@@ -327,7 +327,7 @@ User session is stolen &
 Attacker can act as the user, read sensitive data, perform unapproved actions & 
 Compromised device, unencrypted user traffic, compromised external service & 
 Re-verify user for important actions & 
-\ref{SFR-2} & 
+\ref{SSR-2} & 
 H1-2 \\
 
 \addlinespace
@@ -339,7 +339,7 @@ User is assigned the wrong role  &
 Student able to act as a course instructor, supervisor as an IT technician, etc. & 
 System inferring roles from an unreliable source & 
 Default to zero privileges if automatic assignment fails, provide instructor with ability to modify roles, and record all actions in an audit log & 
-\ref{SFR-2} & 
+\ref{SSR-2} & 
 H2-1 \\
 
 \addlinespace
@@ -351,7 +351,7 @@ Disabling a feature leaves dependent workflows in an invalid state &
 Other components fail unnecessarily and system rejects normal actions & 
 Component state does not account for all possible configurations & 
 Map component dependencies, ensure each component checks the state of all dependencies before an action is taken & 
-\ref{SFR-3} & 
+\ref{SSR-3} & 
 H3-1 \\
 
 \addlinespace
@@ -363,7 +363,7 @@ Project displays outdated information &
 Teams operate based on false information, contacting individuals which may no longer be involved with the course & 
 Instructor, supervisor, or even students forget to update their information & 
 Display a timestamp for when any displayed records were last updated & 
-\ref{SFR-4} & 
+\ref{SSR-4} & 
 H4-1 \\
 
 \addlinespace
@@ -375,7 +375,7 @@ Approving a team for a project fails to inform other interested teams that the p
 Teams believe the project is still open and wait for a response that will never arrive & 
 Component fails after completing the first approval and before updating rejected teams of new project status & 
 Ensure all compound actions are atomic, potentially by using a database which supports atomic transactions and making the database the single source of truth & 
-\ref{SNFR-1} & 
+\ref{SSR-1} & 
 H5-1 \\
 
 \addlinespace
@@ -387,7 +387,7 @@ Two students attempt to join the last slot of a group simultaneously, neither re
 Both students believe they have joined the group, team size limit may be exceeded due to the data race & 
 Database allows both operations to run concurrently without a locking mechanism & 
 Ensure that operations which depend on more than one record are able to lock all relevant records for the duration of the operation & 
-\ref{SFR-8} & 
+\ref{SSR-8} & 
 H6-1 \\
 
 \addlinespace
@@ -399,7 +399,7 @@ Important notification is not delivered &
 User misses important deadline, fails to respond to time sensitive matter & 
 Notification component fails in the process of sending a notification, queued notification is lost & 
 Ensure that queued notifications remain available until delivery is verified to have completed (using a durable queue, for example) & 
-\ref{SFR-5} & 
+\ref{SSR-5} & 
 H7-1 \\
 
 \addlinespace
@@ -411,7 +411,7 @@ Data is lost or corrupted &
 User data is lost, system fails to operate as expected, audit log lost & 
 Hardware degradation, accidental deletion, migration failures & 
 Regular, automated backups which are verified to be able to restore platform to a previous, working state & 
-\ref{SFR-5} & 
+\ref{SSR-5} & 
 H8-1 \\
 
 \addlinespace
@@ -423,7 +423,7 @@ Irrelevant projects ranked highly &
 Users miss projects that interest them, due to the assumption that lower projects are not worth looking into & 
 Recommendation algorithm performs badly, inputs are outdated & 
 Provide multiple ways to sort project list & 
-\ref{SFR-6} & 
+\ref{SSR-6} & 
 H9-1 \\
 
 \addlinespace
@@ -436,37 +436,31 @@ H9-1 \\
 \wss{Newly discovered requirements.  These should also be added to the SRS.  (A
 rationale design process how and why to fake it.)}
 
-\subsection{Safety and Security Functional Requirements}
-
-\begin{enumerate}[label=\textbf{SFR-\arabic*}]
-    \item \label{SFR-1} The system shall log all failures caused by external providers and notify operators and/or course instructors when a spike in errors is detected.\\
+\begin{enumerate}[label=\textbf{SSR-\arabic*}]
+    \item \label{SSR-1} The system shall log all failures caused by external providers and notify operators and/or course instructors when a spike in errors is detected.\\
     \textbf{Rationale}: Outages caused by external providers prevent users from using the platform and require immediate attention to restore in a timely manner.
 
-    \item \label{SFR-2} The system shall record all user actions with the time, a user identifier, and their privilege level at the time of the action, in an append-only audit log.\\
+    \item \label{SSR-2} The system shall record all user actions with the time, a user identifier, and their privilege level at the time of the action, in an append-only audit log.\\
     \textbf{Rationale}: Accounts may get compromised and any actions taken may need to be reviewed and reversed.
 
-    \item \label{SFR-3} The system shall verify that components are enabled when handling a request involving them.\\
+    \item \label{SSR-3} The system shall verify that components are enabled when handling a request involving them.\\
     \textbf{Rationale}: The platform will allow certain features to be disabled. No actions shall be performed on a disabled component.
 
-    \item \label{SFR-4} The system shall display a timestamp for any displayed records when they were last updated.\\
+    \item \label{SSR-4} The system shall display a timestamp for any displayed records when they were last updated.\\
     \textbf{Rationale}: Providing users with a timestamp can allow them to judge whether the information they are reading is up-to-date and can contact instructors or supervisors when that is not the case.
 
-    \item \label{SFR-5} All pending notifications shall be stored durably until delivery is verified.\\
+    \item \label{SSR-5} All pending notifications shall be stored durably until delivery is verified.\\
     \textbf{Rationale}: Lost notifications mean that users are not alerted of potentially time-sensitive matters and this can result in missed deadlines and loss of time.
 
-    \item \label{SFR-6} The platform shall provide a mechanism for automatically creating regular backups which can restore the platform to a previous state.\\
+    \item \label{SSR-6} The platform shall provide a mechanism for automatically creating regular backups which can restore the platform to a previous state.\\
     \textbf{Rationale}: Data loss incidents are not uncommon and can be caused by faulty hardware, accidental changes, and many others. Storing a set of backups ensures that any data loss is minimized to a backup period timespan.
 
-    \item \label{SFR-7} The platform shall provide multiple ways to sort the list of projects.\\
+    \item \label{SSR-7} The platform shall provide multiple ways to sort the list of projects.\\
     \textbf{Rationale}: While a recommendation engine is proposed, it may be flawed or operate on outdated data. To ensure users don't miss a project that they may favour, providing multiple ways to sort the list can bring different projects to the top.
 
-    \item \label{SFR-8} All system actions which involve multiple dependent reads and writes, with at least one write, shall be atomic.\\
+    \item \label{SSR-8} All system actions which involve multiple dependent reads and writes, with at least one write, shall be atomic.\\
     \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.
 \end{enumerate}
-
-\subsection{Safety and Security Non-Functional Requirements}
-
-N/A.
 
 \section{Roadmap}
 
