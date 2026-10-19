@@ -463,7 +463,7 @@ rationale design process how and why to fake it.)}
 
 \subsection{Safety and Security Non-Functional Requirements}
 
-\begin{enumerate}[label=\textbf{SNFR-\arabic*}]
+\begin{enumerate}[label=\textbf{SNFR-1}]
     \item \label{SNFR-1} All system actions involving multiple steps shall be atomic.\\
     \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.
 
