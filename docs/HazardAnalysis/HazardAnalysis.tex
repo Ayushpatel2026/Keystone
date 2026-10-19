@@ -3,6 +3,7 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{graphicx}
 \usepackage[round]{natbib}
 
 \hypersetup{
@@ -130,10 +131,17 @@ important library, these are also potential components.}
 
 Keystone is the system under analysis. Its boundary includes the application logic, persistent data, user-facing
 functionality, and integrations implemented or configured specifically for the platform.
+See Figure~\ref{fig:systemcontext}
 
 External services are not assumed to be under Keystone's direct control. Nevertheless, their interfaces and the
 consequences of their failure are included in the analysis because Keystone depends on them to provide its intended
 functionality.
+
+\begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{Keystone_SystemContext}
+    \caption{System and boundary context diagram for Keystone}\label{fig:systemcontext}
+\end{figure}
 
 The following external entities and services are relevant:
 
@@ -149,6 +157,14 @@ The following external entities and services are relevant:
     \item \textbf{Email service:}
     Delivers notifications concerning project submissions,
     approvals, supervisor confirmations, and other events.
+
+    \item \textbf{External approval system:}
+    A course-specific system outside Keystone where a course approves team projects, for
+    example the GitLab merge request process used by the Software Engineering course. It is
+    not under Keystone's control. In \emph{external} approval mode, the instructor or a TA
+    records the approval outcome in Keystone by hand. In \emph{integrated} mode, an approval
+    adapter (a Keystone component) reads the approval state through the external approval system's interface and
+    updates Keystone's records.
 \end{itemize}
 
 \subsection{Major Components}
@@ -171,8 +187,8 @@ be functional boundaries for hazard identification, rather than a complete softw
     restricted information or allow unauthorized changes.
 
     \item \textbf{Course management component:}
-    Maintains course configurations, course membership,instructor and TA assignments, course-specific rules and
-    configurations,and relevant deadlines or course information. It must accommodate differences between Software
+    Maintains course configurations, course membership, instructor and TA assignments, course-specific rules and
+    configurations, and relevant deadlines or course information. It must accommodate differences between Software
     Engineering (SE), Computer Science (CS), and Mechatronics (TRON) courses.
 
     \item \textbf{Project management component:}
@@ -198,6 +214,10 @@ be functional boundaries for hazard identification, rather than a complete softw
     It maintains the consistency of related information,
     including project records, team membership, course
     configuration, approval states, and user permissions.
+
+    \item \textbf{Approval adapter (integrated mode):}
+    Reads approval state from an external approval system and updates Keystone's records.
+    Failures may leave Keystone showing a state that differs from the external system.
 
     \item \textbf{Recommendation component:}
     Ranks or filters projects and potential
