@@ -327,7 +327,7 @@ User session is stolen &
 Attacker can act as the user, read sensitive data, perform unapproved actions & 
 Compromised device, unencrypted user traffic, compromised external service & 
 Re-verify user for important actions & 
-\ref{SSR-2} & 
+\ref{SSR-9} & 
 H1-2 \\
 
 \addlinespace
@@ -339,7 +339,7 @@ User is assigned the wrong role  &
 Student able to act as a course instructor, supervisor as an IT technician, etc. & 
 System inferring roles from an unreliable source & 
 Default to zero privileges if automatic assignment fails, provide instructor with ability to modify roles, and record all actions in an audit log & 
-\ref{SSR-9} & 
+\ref{SSR-2}, \ref{SSR-10} & 
 H2-1 \\
 
 \addlinespace
@@ -375,7 +375,7 @@ Approving a team for a project fails to inform other interested teams that the p
 Teams believe the project is still open and wait for a response that will never arrive & 
 Component fails after completing the first approval and before updating rejected teams of new project status & 
 Ensure all compound actions are atomic, potentially by using a database which supports atomic transactions and making the database the single source of truth & 
-\ref{SSR-1} & 
+\ref{SSR-8} & 
 H5-1 \\
 
 \addlinespace
@@ -386,7 +386,7 @@ Student and team formation &
 Two students attempt to join the last slot of a group simultaneously, neither receives a fail message & 
 Both students believe they have joined the group, team size limit may be exceeded due to the data race & 
 Database allows both operations to run concurrently without a locking mechanism & 
-Ensure that operations which depend on more than one record are able to lock all relevant records for the duration of the operation & 
+Ensure that data entries that are part of a single operation are not modified externally for the total duration of the operation & 
 \ref{SSR-8} & 
 H6-1 \\
 
@@ -437,7 +437,7 @@ H9-1 \\
 rationale design process how and why to fake it.)}
 
 \begin{enumerate}[label=\textbf{SSR-\arabic*}]
-    \item \label{SSR-1} The system shall log all failures caused by external providers and notify operators and/or course instructors when a spike in errors is detected.\\
+    \item \label{SSR-1} The system shall log all errors caused by external providers and notify university IT professionals and/or course instructors when they are detected.\\
     \textbf{Rationale}: Outages caused by external providers prevent users from using the platform and require immediate attention to restore in a timely manner.
 
     \item \label{SSR-2} The system shall record all user actions with the time, a user identifier, and their privilege level at the time of the action, in an append-only audit log.\\
@@ -463,6 +463,9 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-9} The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.\\
     \textbf{Rationale}: Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.
+
+    \item \label{SSR-10} The system shall assign new users zero privileges when their identity cannot be assigned automatically or verified.\\
+    \textbf{Rationale}: No assumptions can be made about new users. They may be students who are not enrolled in a capstone course, malicious actors attempting to extract user information, individuals posing as supervisors to get free labour, etc. Ensuring no unverified users get access to the platform mitigates those risks.
 \end{enumerate}
 
 \section{Roadmap}
