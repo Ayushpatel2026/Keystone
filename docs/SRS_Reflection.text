@@ -186,3 +186,63 @@ Ahmed:
   One way to synchronize code styles is to specify it up-front using descriptive language and a set of rules. Another way would be to select the most experienced individual for each technology and have them be responsible for reviewing all code which uses that technology and only approve changes when they meet the standard. The team will move forward with the latter approach, with technology leader selection being something that emerges rather than being decided on prematurely.
 
 \end{enumerate}
+
+Andrew:
+\begin{enumerate}
+  \item What went well while writing this deliverable?
+  What went well in this deliverable was the fact that we had done this before in many software courses so it was not new to
+  us. At the same time, we held very thorough interviews before the SRS which made writing this document significantly easier.
+
+  \item What pain points did you experience during this deliverable, and how did
+  you resolve them?
+  During the deliverable, a pain point was aligning with team members since we were very busy during the milestone. As a
+  result of the misalignment in schedules, we had to wait for each other to finish pre-requisites to other sections before
+  we could start working on them. We resolved this through excellent communication on Teams and planning how we can finish
+  the deliverables. Another pain point was formalizing our requirements. It was difficult to turn our stakeholders' many
+  requests into a formal SRS. This was resolved by categorizing requests and finding overlaps between requests to ensure
+  there were no redundancies and we could obtain full coverage on what was asked.
+
+  \item How many of your requirements were inspired by speaking to your
+  client(s) or their proxies (e.g. your peers, stakeholders, potential users)?
+
+  As per the traceability matrix, nearly all our functional requirements can be traced back to a request from our stakeholders
+  during our interviews with them. These stakeholders included a capstone instructor, a student, and an external supervisor 
+  so far. Since we are designing the application for the target audience of the system, the requirements were centered
+  around what these groups are looking for to make the capstone experience smoother. Every functional requirement formally 
+  articulated what the potential users were looking for. A requirement such as FR28 relating to McMaster SSO or external auth
+  is one of the exceptions but is valid since it indirectly serves stakeholders by allowing their information to remain secure.
+
+  \item Which of the courses you have taken, or are currently taking, will help
+  your team to be successful with your capstone project.
+  3RA3, 4HC3, and 4A03 were all very useful courses for this type of document. In each of these courses, we were also working
+  on a big project that required us to formalize our requirements into a document while keeping in mind system design. We also 
+  evaluated the needs of our stakeholders giving us lots of practice before the capstone's SRS.
+
+  \item What knowledge and skills will the team collectively need to acquire to
+  successfully complete this capstone project?  Examples of possible knowledge
+  to acquire include domain specific knowledge from the domain of your
+  application, or software engineering knowledge, mechatronics knowledge or
+  computer science knowledge.  Skills may be related to technology, or writing,
+  or presentation, or team management, etc.  You should look to identify at
+  least one item for each team member.
+  For domain specific knowledge, we need to understand in detail how each course works and how to create an abstract solution
+  that can integrate all three course processes. We will still have to obtain knowledge on how the remaining instructors
+  for CS and TRON run their courses and how it may conflict with what we obtained from Dr. Smith. We will need a better 
+  understanding of how to create scalable usable systems that are compatible with McMaster's current infrastructure 
+  particularly with respect to the capstone course. This includes where we will deploy and what storage solutions we will use.
+  We will try to figure out the algorithms and APIs that will work for our solution including how to integrate with Gitlab. 
+  Finally, we need to understand how we can present our results, work, and demonstration.
+
+  \item For each of the knowledge areas and skills identified in the previous
+  question, what are at least two approaches to acquiring the knowledge or
+  mastering the skill?  Of the identified approaches, which will each team
+  member pursue, and why did they make this choice?
+  Course Process (Ayush leads while remaining in attendance): Interview CS/Tron Prof, Finding similarities and conflicts
+  between stakeholders.
+  APIs (Waqar while rest of team helps): Read documentation, Follow tutorials.
+  Presentation (Ahmed taking lead while rest of team helps): Research on how capstones presented, determining how our final
+  product should look from UI/UX perspective.
+  Infrastructure Compatibility and Deployment (Andrew while rest of team supports): Further discussions with professors will
+  help with this, Researching deployment practices and scalable systems. 
+
+\end{enumerate}
