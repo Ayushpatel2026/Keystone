@@ -356,7 +356,7 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     teams to consider.\\
     Student-proposed project & A project proposed by a student team rather than by a supervisor.\\
     Project status & The position of a project in its lifecycle, for example proposed, listed, taken,
-    or approved. \\
+    or approved. See Figure~\ref{fig:lifecycle} \\
     Student profile & A student's skills, experience, interests, work style, and project preferences, visible to
     other students and to supervisors.\\
     Team profile & A description of a team's members and shared goals, project interests, and work style.\\
@@ -1069,24 +1069,23 @@ Student (Priya)
 \textbf{Preconditions}
 \begin{itemize}
   \item The student is a member of a registered team.
-  \item The selected project is approved and has status ``open''.
+  \item The project that the student's team is interested in has status ``open''.
 \end{itemize}
 
 \textbf{Main Success Scenario}
 \begin{enumerate}
-  \item The student opens an open project and chooses to select it for their
-    team.
+  \item The student selects an open project and expresses their their team's interest in that project.
   \item The system checks that the project is still open.
-  \item The system assigns the project to the team and changes its status to
-    ``taken'' and updates the interest count so everyone can see there's a group interested in the project.
-  \item The system notifies the project's supervisor and let's them discuss the project with the team.
+  \item The system updates the status of the project to "Applied" and updates the interest count so
+  everyone can see there's a group interested in the project.
+  \item The system notifies the project's supervisor and lets them discuss the project with the team.
   \item The system shows the student a confirmation with the supervisor's
     contact.
 \end{enumerate}
 
 \textbf{Alternative Flows}
 \begin{itemize}
-  \item 2a. Another team selected the project first: the system tells the
+  \item 2a. The project's capacity is 0: the system tells the
     student the project is no longer available and shows the team's other
     preferences and open projects.
   \item 3a. The team drops the project later: the status returns to ``open''
@@ -1095,7 +1094,7 @@ Student (Priya)
 
 \textbf{Postconditions}
 \begin{itemize}
-  \item The project is assigned to exactly one team, and its status is
+  \item The project is assigned to exactly the number of teams as specified by the supervisor, and its status is
     visible to all stakeholders.
 \end{itemize}
 
@@ -1438,10 +1437,12 @@ Student (Priya), Instructor (Dr. Reyes)
 
   \plt{Use SHALL statements. Requirements must be atomic, testable, and traceable.}
 
+
+
   \noindent \begin{itemize}
 
               % ---------- Project Proposal ----------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label1}:] The system shall allow supervisors to create and submit project proposals using a structured template including a title, problem statement/background, objectives, skills/requirements, team deliverables, project impact, team capacity details, level of current completion, hardware/non-hardware, industry, information regarding confidentiality and IP concerns, and additional project terms. 
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label1}:] The system shall allow supervisors to create and submit project proposals using a structured template including a title, problem statement/background, objectives, skills/requirements, team deliverables, project impact, supervisor capacity details, level of current completion, hardware/non-hardware, industry, information regarding confidentiality and IP concerns, and additional project terms.
               \rationale{Standardizing proposals reduces inconsistencies in project descriptions helping sudents understand exactly what the project is about and allowing supervisors to clearly highlight their expections.}
               \fitcrit{Supervisors can successfully fill out the defined fields with the appropriate information and submit a proposal for review.}
 
@@ -1462,9 +1463,9 @@ Student (Priya), Instructor (Dr. Reyes)
               \rationale{Students should be able to find projects and compare the varying opportunities with their team's skills and interests.}
               \fitcrit{Users can view all the projects that were approved by the professor, search by title or keywords, and filter by the varying project fields. The filter and search options should also only return the relevant projects.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label6}:] The system shall display the current availability status of each project in the catalog (open, taken, dropped, approved) and the maximum number of teams it can take.
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label6}:] The system shall display the current availability status of each project in the catalog (open or full) and the maximum number of teams it can take. See Figure~\ref{fig:lifecycle}.
               \rationale{It is critical for students and supervisors to have clear visibility which projects are still available for selection. This gives students the ability to still request available projects if they have been rejected from others and supervisors to properly advertise their status.}
-              \fitcrit{Each project in the catalog clearly displays the availability status and the team capacity. Even if labels are not updated in real-time, the core application should respond to user actions appropriately based on status (i.e. taken projects cannot be requested).}
+              \fitcrit{Each project in the catalog clearly displays the availability status and the supervisor capacity. Even if labels are not updated in real-time, the core application should respond to user actions appropriately based on status (i.e. taken projects cannot be requested).}
 
               % ---------- Student Profile ----------
               \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label7}:] The system shall allow students to create and update their profiles providing background information including bio, program, interests, project preferences, skills, experience, work style, and LinkedIn.
@@ -1497,7 +1498,7 @@ Student (Priya), Instructor (Dr. Reyes)
               \rationale{A centralized application process allows supervisors to identify interested teams and communicate without relying on back-and-forth email chains.}
               \fitcrit{A student can submit an application expressing their interest to the project that can be reviewed by the supervisor.}
               
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label14}:] The system shall allow supervisors to accept or decline requests from student teams to work on their proposed projects, and record when both parties agree to the working arrangement.
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label14}:] The system shall allow supervisors to accept or decline requests from student teams to work on their proposed projects, and record when both parties agree to the working arrangement. See Figure~\ref{fig:lifecycle}
               \rationale{This reduces confusion by explicitely recording when both parties have understood each other's terms and have formally agreed to work with each other.}
               \fitcrit{Both the supervisor and students can record a decision to confirm or deny the terms of the project. An agreement is marked after both parties accept.}
 
@@ -1512,7 +1513,7 @@ Student (Priya), Instructor (Dr. Reyes)
               \fitcrit{Any changes to a project's status, decisions from either a student/supervisor, and thread updates, the system sends an email identifying the event to all relevant and authorized users. Students also get notifications for new project listing.}
 
               % ---------- Project and Team Approvals ---------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label17}:] The system shall allow student teams to submit (or re-submit after modification given instructor feedback) their selected project and team information for instructor approval when in-platform approval is enabled.
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label17}:] The system shall allow student teams to submit (or re-submit after modification given instructor feedback) their selected project and team information for instructor approval when in-platform approval is enabled. See Figure~\ref{fig:lifecycle}.
               \rationale{A centralized submission allows students to provide all capstone project related details for instructors to approve without relying on external tools.}
               \fitcrit{Student teams can submit their project and team information through in-platform approval process that can be reviewed by instructors.}
               
@@ -1528,7 +1529,7 @@ Student (Priya), Instructor (Dr. Reyes)
               \rationale{To reduce instructor workload, repeated feadback and routine checks based on course constriaints should be done automatically.}
               \fitcrit{The system will prevent project submissions if any of the requirements above are not met, otherwise, the project can be submitted.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label21}:] The system shall allow users to submit changes to previously approved team and project information that will still require the instructor to review before confirming.
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label21}:] The system shall allow users to submit changes to previously approved team and project information that will still require the instructor to review before confirming. See Figure~\ref{fig:lifecycle}.
               \rationale{Details about projects may change later and require updates.}
               \fitcrit{Student teams can propose changes to approved project or team record. The orginal approval remains in effect until the instructor accepts the new changes.}
 
@@ -1627,6 +1628,34 @@ Student (Priya), Instructor (Dr. Reyes)
     \item \textbf{Course Resource}: Can be a course outline, timeline, guidelines, FAQ, past capstone
     example, or any other course related content that the instructor may post.
   \end{itemize}
+
+  \subsection{Project and Team Status Lifecycle}\label{sec:lifecycle}
+
+  Figure~\ref{fig:lifecycle} shows the statuses a project and the teams working on it pass through,
+  and the events that change them. The left side is the lifecycle of a project proposal and its listing
+  (one per project). The right side is the lifecycle of each team that works on a project (one per team,
+  so a project with capacity greater than one has several). The states in the figure are the allowed
+  values of the project status and team-project status in the data dictionary.
+
+  \begin{figure}[h!]
+    \centering
+    \includegraphics[width=\textwidth]{ProjectLifecycleStateDiagram}
+    \caption{Project and team status lifecycle}\label{fig:lifecycle}
+  \end{figure}
+
+  \textbf{Capacity.} Let $C$ be the supervisor's capacity for the project and $A$ the number of teams
+  that have reached agreement (the state \emph{Agreed}) or are further along. A listed project is
+  \emph{Open} while $A<C$ and \emph{Full} when $A=C$. A team's application does not use a slot.
+  A slot is used when both the supervisor and the team have accepted. It is released when the team
+  withdraws, is declined, or its project is rejected. Releasing a slot, or raising $C$, makes a Full project Open.
+
+  \textbf{Review.} Proposals and team projects are each reviewed by the course instructor, who can approve,
+  request changes (the proposer or team then resubmits), or reject. In an \emph{external} approval mode the
+  instructor or TA records the outcome instead of the platform running the review (see \rref{FR_Label19}).
+
+  \textbf{Changes after approval.} A team may submit a change to an approved project. The project
+  stays \emph{Approved}, and the original approval remains in effect, until the instructor accepts or rejects the
+  change. Accepting it updates the record.
 
   \subsubsection{Entity Relationships}
   \begin{longtable}{|p{2cm}|p{2cm}|p{2.5cm}|p{8cm}|}
