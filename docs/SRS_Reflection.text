@@ -1,5 +1,5 @@
+Waqar:
 \begin{enumerate}
-  \item Waqar
   \item What went well while writing this deliverable?
   During this deliverable, distributing work was very straightforward as there
   was a lot of work, but it was separable by section. It was all work we have
@@ -66,5 +66,79 @@
   and build a small prototype to see if I can integrate with the current process. The second thing I can do is 
   follow tutorials or examples of similar integrations to see how manageable it is. I can pursue this knowledge 
   as well.
+
+\end{enumerate}
+
+Ayush:
+\begin{enumerate}
+  \item What went well while writing this deliverable?
+  All the work in this section was something we had seen before in previous courses, especially in 3RA3.
+  This made it easy for us to know exactly what was expected for each section. We had a lot of experience coming up
+  with functional and non function requirements, use cases and scenarios. We even have experience doing requirements
+  traceability matrices. This made it quite intuitive to write this document.
+
+  \item What pain points did you experience during this deliverable, and how did
+  you resolve them?
+  Everyone was quite busy because we had many assignments and midterms due at the same
+  time as this deliverable, which made it hard to prioritize and work
+  on the SRS. Also, many of the parts of this document build on top of one another and they all must stay consistent,
+  which made it hard to parallelize and split up the work. We often had to wait for one part to be done before the next
+  can be started. For example, the introduction and scope sections must be well defined before we can start writing
+  the use cases and the scenarios, and those blocked the functional and non-functional requirements.
+
+  \item How many of your requirements were inspired by speaking to your
+  client(s) or their proxies (e.g. your peers, stakeholders, potential users)?
+  All of our requirements came from speaking with stakeholders and people who have dealt
+  with this problem before (including ourselves as students). We have spoken with a few students, Dr. Smith,
+  an external industry supervisor, as well as a McMaster faculty supervisor. Our discussions with these
+  stakeholders has guided all of our requirements and all of our decisions. Many of the requirements about
+  modularity, removing repetitive approvals and knowing which projects have not been taken came directly from Dr. Smith.
+
+  Requirements regarding a template for student proposed projects, visibility into project status and help with team
+  formation came diectly from our conversations with a student.
+
+  Requirements about having access to more information about the course processes, expectations and timelines, and
+  knowing more about the students, and the requirements about notifications came directly from talking to industry
+  supervisors.
+
+  \item Which of the courses you have taken, or are currently taking, will help
+  your team to be successful with your capstone project.
+
+  As mentioned above, SFWRENG 3RA3, our requirements course, has been the most helpful in completing this SRS as well
+  as thinking about the bigger picture of the project. What we learned in that course has helped us focus on users,
+  making sure that we are building something that actually solves problems that they have.
+
+  Another course that has been helpful for us is SFWRENG 4HC3. In this course, we learned about to interview
+  stakeholders to get the most value out of interviews. We learned about the different types of interviews and
+  we actually conducted many semi-structured interviews for this document. Additionally, since our project
+  will most likely consist of a web applications, what we learn in this course about interface design will be quite
+  beneficial to this project.
+
+
+  \item What knowledge and skills will the team collectively need to acquire to
+  successfully complete this capstone project?  Examples of possible knowledge
+  to acquire include domain specific knowledge from the domain of your
+  application, or software engineering knowledge, mechatronics knowledge or
+  computer science knowledge.  Skills may be related to technology, or writing,
+  or presentation, or team management, etc.  You should look to identify at
+  least one item for each team member.
+
+  In terms of domain specific knowledge, we will need to acquire knowledge about how different capstone courses work
+  and all the processes involved. There is a lot that goes on behind the scenes of a successful capstone course
+  and every course does something different. Given that our platform should be extensible to other capstone courses at
+  McMaster and even other universities, we need to know more about how these different capstone courses operate. We
+  need to know how they come up with project ideas, how do they do team formation, how do the instructors approve projects.
+  Knowing these things will allow us to make our design as abstract as possible so it can be extended to different
+  courses.
+
+  \item For each of the knowledge areas and skills identified in the previous
+  question, what are at least two approaches to acquiring the knowledge or
+  mastering the skill?  Of the identified approaches, which will each team
+  member pursue, and why did they make this choice?
+
+  To gain more domain specific knowledge, we will interview the relevant stakeholders, including the instructors and
+  students of these courses. For example, in CAS, we still need to interview Dr. Moradi and Dr. Wassyng about their
+  capstone process. Another way to get more domain knowledge is to research online how other instutitions do things like
+  project management and effective team formation.
 
 \end{enumerate}
