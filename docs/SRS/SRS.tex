@@ -97,15 +97,17 @@
 \newcommand{\stkIS}{\hyperref[app:stk_intsup]{IS}}
 \newcommand{\stkSEI}{\hyperref[app:stk_instr]{SEI}}
 
-\newcommand{\maintFrac}{5\%}
-\newcommand{\changeEffort}{2 hours} % 40 hours * maintFrac
+\newcommand{\maintFrac}{20\%}
+\newcommand{\changeEffort}{8 hours} % 40 hours * maintFrac
+
+\newcommand{\usabilityTestTime}{5 minutes}
 
 \newcommand{\deployTime}{30 minutes}
 
-\newcommand{\uptimePercent}{99.9\%}
-\newcommand{\unschedDowntime}{$\sim10$ minutes} % (1-uptimePercent/100) * 168 hours (or convert to minutes)
+\newcommand{\uptimePercent}{99\%}
+\newcommand{\unschedDowntime}{$\sim1.7$ hours} % (1-uptimePercent/100) * 168 hours (or convert to minutes)
 
-\newcommand{\tailPercentile}{99.9th}
+\newcommand{\tailPercentile}{95th}
 \newcommand{\tailLatency}{5.0 seconds}
 \newcommand{\concurrentUsers}{400}
 
@@ -1910,7 +1912,7 @@ Student (Priya), Instructor (Dr. Reyes)
     % usability achieved by the software shall be described following the
     % procedure given in Section~X of the Verification and Validation Plan.  Include a link to the VnV plan.}
     A first-time user shall be able to access the platform and complete their primary tasks
-    without the use of external documentation or assistance.\\
+    within \usabilityTestTime{}.\\
     \textbf{Rationale}: While students, instructors, and TAs are enrolled in/operate within the Computing and Software (CAS) department in the university and often possess advanced tech literacy, no assumptions can be made about external supervisors beyond basic web browsing abilities, as described in the user characteristics section (Section~\ref{SecUserCharacteristics}). Having to spend time learning to use the platform can introduce
     unnecessary friction which can hurt adoption. Many existing web applications that perform similar functions are able to provide an intuitive experience requiring no prior knowledge.\\
     \textbf{Fit Criterion}: A first-time user shall be able to complete the procedure as described in
@@ -1940,7 +1942,7 @@ Student (Priya), Instructor (Dr. Reyes)
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Availability}:] \textbf{Availability.}
     The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
     \textbf{Rationale}: The system being inaccessible can result in missed deadlines, data loss, and overall frustration. This can impact adoption, perception, and erode trust.\\
-    \textbf{Fit Criterion}: The system responds to a periodic probe with a success response at least \uptimePercent{} of the time.
+    \textbf{Fit Criterion}: The system responds to a periodic health check, which runs every minute, with success responses accounting for at least \uptimePercent{} over a 30-day period. Scheduled maintenance windows are excluded from the measurement.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Access}:] \textbf{Access.}
     The system shall restrict access only to students, TAs, and instructors directly enrolled in the capstone courses, and to potential supervisors approved by an instructor. All users are only able to access data that they are approved to view. Non-approved users are unable to read or write any data.\\
@@ -1953,9 +1955,29 @@ Student (Priya), Instructor (Dr. Reyes)
     \textbf{Fit Criterion}: A technically competent individual outside of the main development team is able to complete the task described in Section~4.2.2 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan} within the time constraint.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Performance}:] \textbf{Performance.}
-    The system shall respond to all requests with a \tailPercentile{} percentile latency of \tailLatency{} under a load of \concurrentUsers{} users.\\
+    The system shall respond with a \tailPercentile{} percentile latency of \tailLatency{} under a load of \concurrentUsers{} users.\\
     \textbf{Rationale}: The system is expected to be used by approximately \concurrentUsers{} staff, students, and external supervisors. A slow experience can hurt adoption and a failure to handle load can lead to service degradation.\\
     \textbf{Fit Criterion}: A representative group of requests are sent to the server at a rate of \concurrentUsers{} sets of requests / second and the tail latency is recorded. 
+
+    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accessibility}:] \textbf{Accessibility.}
+    The system shall conform to the WCAG 2.0 Level AA standard.\\
+    \textbf{Rationale}: The system will be a public-facing site which operates within Ontario's jurisdiction and must, at least, conform to the minimum standard set by AODA.\\
+    \textbf{Fit Criterion}: An automated audit using an industry standard tool (such as Axe or Lighthouse) running on all user interfaces, reporting no critical violations.
+
+    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Auditability}:] \textbf{Auditability.}
+    All user actions shall be auditable including metadata such as when the actions where taken, what action was taken, the user, and their privilege level at the time of the action.\\
+    \textbf{Rationale}: User actions must be auditable to ensure any discrepancies about events such as team enrolment, project approvals, and other critical events are tracable.\\
+    \textbf{Fit Criterion}: A full sequence of audit logs can be composed together to provide a 100\% accurate image of the system's state.
+
+    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_ModularityConfigurability}:] \textbf{Modularity and Configurability.}
+    All major features can be disabled on a live system with no code changes.\\
+    \textbf{Rationale}: The need to toggle major features was established during stakeholder interviews. The platform needs to be flexibile to fit the working style of a variety of instructors.\\
+    \textbf{Fit Criterion}: Every major feature can be disabled on a live system with no code changes.
+
+    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_PrivacyDataProtection}:] \textbf{Privacy and Data Protection.}
+    The system shall only collect essential personal data, ensure data is encrypted in-transit and at rest, and passwords are never stored in plaintext.\\
+    \textbf{Rationale}: The platform stores personal data to facilitate basic operations and is subject to regulations imposed by Ontario's FIPPA.\\
+    \textbf{Fit Criterion}: The system refuses to respond to all requests made over an unencrypted connection.
 
     % \item Other NFRs that might be discussed include verifiability,
     % understandability, reusability, performance, reliability and availability, security, and accessibility.  You may have to add other NFRs.
