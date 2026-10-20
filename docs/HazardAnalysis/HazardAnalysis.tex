@@ -366,6 +366,28 @@ Display a timestamp for when any displayed records were last updated &
 H4-1 \\
 
 \addlinespace
+\addlinespace
+
+& 
+Confidential project or IP exposed & 
+Potential monetary loss, loss of trust, exposed vulnerabilities & 
+Project visibility rules not being enforced across a project & 
+Ensure that visibility restrictions are enforced & 
+\ref{SSR-13} & 
+H4-2 \\
+
+\addlinespace
+\addlinespace
+
+& 
+Project description misrepresents project & 
+Team cannot move forward with project, time wasted & 
+Project proposal prompt not asking for critical information  & 
+Ensure project proposal prompt includes required fields on critical information & 
+\ref{SSR-14} & 
+H4-3 \\
+
+\addlinespace
 \hline
 \addlinespace
 
@@ -471,6 +493,12 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-12} The system shall notify the user of pending actions when disabling a component fails.\\
     \textbf{Rationale}: It may be possible to disable certain components but require additional actions to be taken, such as responding to pending project approvals.
+
+    \item \label{SSR-13} The system shall enforce visibility restrictions across all points of communication.\\
+    \textbf{Rationale}: Exposing IP or confidential information can lead to damages and loss of trust. 
+
+    \item \label{SSR-14} The system shall display project proposal prompts which cover all necessary information relevant to a project's viability as a capstone project.\\
+    \textbf{Rationale}: Prompting only an open-ended description provides supervisors with no information on what students and instructors are looking for in a capstone-level project.
 \end{enumerate}
 
 \section{Roadmap}
