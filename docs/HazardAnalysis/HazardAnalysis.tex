@@ -319,10 +319,9 @@ Display error, log failure, raise warning to IT department and/or instructors &
 H1-1 \\
 
 \addlinespace
-\hline
 \addlinespace
 
-Authentication & 
+& 
 User session is stolen & 
 Attacker can act as the user, read sensitive data, perform unapproved actions & 
 Compromised device, unencrypted user traffic, compromised external service & 
@@ -350,8 +349,8 @@ Course management &
 Disabling a feature leaves dependent workflows in an invalid state & 
 Other components fail unnecessarily and system rejects normal actions & 
 Component state does not account for all possible configurations & 
-Map component dependencies, ensure each component checks the state of all dependencies before an action is taken & 
-\ref{SSR-3} & 
+Reject disable request, advise user on actions needed before feature can be disabled & 
+\ref{SSR-3}, \ref{SSR-12} & 
 H3-1 \\
 
 \addlinespace
@@ -443,8 +442,8 @@ rationale design process how and why to fake it.)}
     \item \label{SSR-2} The system shall record all user actions with the time, a user identifier, and their privilege level at the time of the action, in an append-only audit log.\\
     \textbf{Rationale}: Accounts may get compromised and any actions taken may need to be reviewed and reversed.
 
-    \item \label{SSR-3} The system shall verify that components are enabled when handling a request involving them.\\
-    \textbf{Rationale}: The platform will allow certain features to be disabled. No actions shall be performed on a disabled component.
+    \item \label{SSR-3} The system shall reject all component disable requests if there are pending actions within the component or a risk of exposing data.\\
+    \textbf{Rationale}: Disabling features may potentially leave the system in a partially invalid state. Examples include: disabling the project approvals component strands pending project approval requests, disabling the RBAC feature risks exposing records.
 
     \item \label{SSR-4} The system shall display a timestamp for any displayed records when they were last updated.\\
     \textbf{Rationale}: Providing users with a timestamp can allow them to judge whether the information they are reading is up-to-date and can contact instructors or supervisors when that is not the case.
