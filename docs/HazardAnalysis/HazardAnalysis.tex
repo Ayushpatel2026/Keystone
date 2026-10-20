@@ -742,6 +742,36 @@ Ayush:
 
 \end{enumerate}
 
+Ahmed:
+\begin{enumerate}
+    \item What went well while writing this deliverable?
+
+    Discovering new requirements which would have been, at best, implicit, really highlighted the value of a hazard analysis. Additionally, it also revealed that some hazards, such as storing invalid states, span multiple components and may require adjusting whole system architecture to completely mitigate.
+
+    \item What pain points did you experience during this deliverable, and how
+    did you resolve them?
+
+    It was difficult accounting for all hazards, because of the complexity of the system as represented by its current requirements. The system needs to be modular, secure, maintain data integrity, provide administrator controls, among many others, which, not only have potential hazards within each component, but also raise potential hazards between components. For example, any networked component which does not reject unsecured connections compromises the entire system.
+
+    \item Which of your listed risks had your team thought of before this
+    deliverable, and which did you think of while doing this deliverable? For
+    the latter ones (ones you thought of while doing the Hazard Analysis), how
+    did they come about?
+
+    Data security was a clear risk since the platform's most essential data to store and display is sensitive information such as student information, project ideas which may be intellectual property, etc.
+    
+    A non-obvious risk which was only raised during the hazard analysis was the data integrity hazard. Two students attempting to join the same team at the same time can end up corrupting the state of the system if not enough care is taken.
+
+    \item Other than the risk of physical harm (some projects may not have any
+    appreciable risks of this form), list at least 2 other types of risk in
+    software products. Why are they important to consider?
+
+    Data corruption risk is very real and plagues many production applications and can arise due to improper data handling. Data corruption is important to pay attention to because it's often silent and can be unrecoverable if the system does not have any recoverability mechanisms, which require prior planning.
+
+    Another important risk to consider in software products is the user interface aspect. User interfaces which are not intuitive, require manuals or training to understand, or do not account for accessibility requirements, often discourage users from the platform and on a large scale, this can lead to the platform failing completely.
+
+\end{enumerate}
+
 \bibliographystyle {plainnat}
 \bibliography {../../refs/References}
 
