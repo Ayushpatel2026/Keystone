@@ -44,6 +44,7 @@
 \midrule
 Oct 18th & Ayush Patel & Introduction, Scope, System Boundary and Assumptions\\
 Oct 19th & Ahmed Rashrash & FMEA Table, Safety and Security Requirements\\
+Oct 19th & Ayush Patel & Roadmap for Safety Req Implementation \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -51,6 +52,9 @@ Oct 19th & Ahmed Rashrash & FMEA Table, Safety and Security Requirements\\
 ~\newpage
 
 \tableofcontents
+
+\listoffigures
+\listoftables
 
 ~\newpage
 
@@ -411,6 +415,15 @@ Ensure that data entries that are part of a single operation are not modified ex
 \ref{SSR-11} & 
 H6-1 \\
 
+Student and team formation &
+Decline or rejection is communicated bluntly, or students feel publicly ranked &
+Stress, feeling unfairly treated, students stop using the platform &
+Free-text decline messages, visible statuses with no guidance &
+Use respectful message templates with an optional reason, and show no public ranking of students or teams &
+\ref{SSR-15} &
+H6-2 \\
+
+
 \addlinespace
 \hline
 \addlinespace
@@ -434,6 +447,14 @@ Hardware degradation, accidental deletion, migration failures &
 Regular, automated backups which are verified to be able to restore platform to a previous, working state & 
 \ref{SSR-6} & 
 H8-1 \\
+
+Personal data kept longer than needed &
+Privacy breach, loss of trust, legal exposure &
+No retention policy, deletion not implemented &
+Define a retention period and delete personal data on request and at the end of the course cycle &
+\ref{SSR-16} &
+H8-2 \\
+
 
 \addlinespace
 \hline
@@ -513,12 +534,88 @@ rationale design process how and why to fake it.)}
     \item \label{SSR-14} The system shall display project proposal prompts which cover all necessary information relevant to a project's viability as a capstone project.\\
     \textbf{Rationale}: Prompting only an open-ended description provides supervisors with no information on what students and instructors are looking for in a capstone-level project.\\
     \textbf{Traces To}: FR1, FR2
+
+    \item \label{SSR-15} The system shall present decline and rejection decisions with respectful message templates and shall not publish rankings of students or teams.\\
+    \textbf{Rationale}: Blunt or public decisions cause stress and a sense of unfair treatment, and may stop students from using the platform.\\
+    \textbf{Traces To}: FR14, FR18
+
+    \item \label{SSR-16} The system shall delete personal data on request and at the end of a course cycle, and shall collect only the data that a feature needs.\\
+    \textbf{Rationale}: Keeping personal data longer than needed increases the harm of a breach.\\
+    \textbf{Traces To}: NFR11
+
 \end{enumerate}
 
 \section{Roadmap}
 
 \wss{Which safety requirements will be implemented as part of the capstone timeline?
 Which requirements will be implemented in the future?}
+
+The safety and security requirements follow the phases of the development plan in the SRS. A requirement is
+implemented in the same phase as the feature it protects, so that no feature is released without the
+protection that its hazards call for. Requirements that protect features outside the course timeline, or that
+depend on parts of the system that are faked for the demo, are future work.
+
+\subsection{Phase 1: Core Workflow (implemented in the course)}
+
+Phase~1 covers proposal submission and approval, browsing projects with a visible status and team selection,
+team project submission and review, and the validated team composition export.
+
+\begin{itemize}
+    \item \ref{SSR-14}: the proposal template asks for the information that makes a project viable as a capstone
+    project (H4-3).
+    \item \ref{SSR-13}: server-side visibility checks for proposals and projects, tested for each role (H4-2).
+    \item \ref{SSR-10}: new accounts have no privileges until their role is assigned (H2-1).
+    \item \ref{SSR-2}: an append-only audit log for approval decisions, status changes, and role changes (H2-1).
+    Logging every user action is future work.
+    \item \ref{SSR-4}: last-updated time shown on project records (H4-1).
+    \item \ref{SSR-7}: several ways to sort and filter the project list when browsing (H9-1). Ranked recommendations
+    themselves are future work.
+    \item \ref{SSR-8}, \ref{SSR-11}: database transactions and locking for team selection, approvals, and team
+    membership (H5-1, H6-1).
+    \item \ref{SSR-1}: logging of errors from external providers (H1-1). Notifying instructors by email is added with
+    notifications in Phase~2.
+    \item \ref{SSR-6}: automated database backups by the hosting provider, and a restore test before release
+    (H8-1).
+    \item \ref{SSR-15}: decline and rejection message templates, with no public rankings (H6-2).
+\end{itemize}
+
+\subsection{Phase 2: Communication and Visibility (implemented in the course)}
+
+Phase~2 adds notifications and the checklist, team profiles and contact details, the course schedule, and
+identifying unselected projects.
+
+\begin{itemize}
+    \item \ref{SSR-5}: pending notifications are stored in the database until delivery is confirmed, with retries
+    (H7-1).
+    \item \ref{SSR-1}: alerts to the instructor when an external provider fails (H1-1).
+    \item \ref{SSR-13}: visibility checks are extended to team profiles, contact details, and unselected projects
+    (H4-2).
+\end{itemize}
+
+\subsection{Phase 3: Extended Features (implemented if time allows)}
+
+\begin{itemize}
+    \item \ref{SSR-14}: the proposal prompts are extended to student-initiated proposals, with the guidelines and
+    examples that this phase adds (H4-3).
+    \item \ref{SSR-8}, \ref{SSR-11}: the same locking and transactions are applied to supervisor capacity limits
+    (H5-1, H6-1).
+\end{itemize}
+
+\subsection{Future Work (not implemented, or faked for the demo)}
+
+\begin{itemize}
+    \item \ref{SSR-3}, \ref{SSR-12}: rules for disabling components apply once features can be switched on and off for
+    each course (modularity and other courses). Until then the hazard (H3-1) cannot occur.
+    \item \ref{SSR-9}: re-verification for critical actions with email codes or MFA depends on real authentication
+    (McMaster accounts and external accounts), which is simplified for the demo. In the course the system only asks
+    for confirmation before destructive actions.
+    \item \ref{SSR-7}: ranking and explaining recommendations, with matching of teams to projects (H9-1).
+    \item \ref{SSR-2}: full action logging, and tamper-evident logs.
+    \item \ref{SSR-1}: notifying university IT of provider outages.
+    \item \ref{SSR-16}: deletion on request and at the end of a course cycle (H8-2).
+    \item Hazards of any integration with an external approval system (stale or failed synchronization) need
+    requirements of their own when it is built.
+\end{itemize}
 
 \newpage{}
 
@@ -530,39 +627,18 @@ Used Claude Sonnet 5.5 for the following,
   \noindent \begin{itemize}
     \item Asked it what are the common security risks apps face that collect profile data to come up with some ideas and reinforce some of my own.
     \item Used it to get more research into how data breaches can happen as well as data leaks.
-    \item To draft a template for the FMEA table.
+    \item To draft a latex template for the FMEA table.
     \item Used it to check both documents against the checklist and rubric and
           asked it to flag anything that was missing and any grammar issues
   \end{itemize}
 
-\subsection{AI Tools Used}
 
-\wss{Give the name of the AI tool(s) used and the version.}
+\subsection*{Verification of AI-Generated Content}
+The team reviewed every AI-assisted passage before including it. References were checked against the
+publisher or standards body listing. The FMEA rows, requirements and roadmap were checked by the team against
+the SRS, including each FR and NFR number in the ``Traces To'' lines. The team is responsible for the accuracy,
+completeness, and consistency of this document.
 
-\subsection{How and Where Used}
-
-\wss{Explain what the tool(s) were used for.  Examples include: brainstorming,
-explaining a technical concept, reviewing the document, generating or modifying
-text, generating or modifying diagrams, identifying errors or omissions or
-inconsistencies.}
-
-\wss{For each of the uses, identify which parts of the document were affected.}
-
-\wss{You do not need to report every interaction, but you should disclose the 
-uses that materially contributed to your work}
-
-\subsection{Verification of AI-Generated Content}
-
-\wss{\begin{itemize}
-    \item Describe how the team checked AI-generated or AI-assisted material
-    before including it in the document.
-    \item In particular, verify factual claims, technical assertions,
-    requirements, calculations, references, and other information for which an
-    AI system may produce incorrect or fabricated results.
-    \item \textbf{The team is responsible for the accuracy, completeness,
-consistency, and appropriateness of the submitted document, regardless of
-whether material was generated by a human or an AI system.}
-\end{itemize}}
 
 \newpage{}
 
