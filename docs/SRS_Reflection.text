@@ -142,3 +142,47 @@ Ayush:
   project management and effective team formation.
 
 \end{enumerate}
+
+Ahmed:
+\begin{enumerate}
+  \item What went well while writing this deliverable?
+  
+  All group members had lots of experience writing SRS documents through courses like 3RA3 and 3A04. No stone was left unturned, and the document was very comprehensive covering stakeholder, functional, non-functional, and data requirements. Speaking with stakeholders was very insightful, inspiring most of the requirements written.
+
+  \item What pain points did you experience during this deliverable, and how did
+  you resolve them?
+  
+  The way the IEEE template covered requirements in a different manner than the standard Volare-style template. Some adjustments were needed to adopt the previous way of writing non-functional requirements to the IEEE style. Swapping the specifically the NFR section template from IEEE to Volare was considered, but it was determined to have likely introduced many duplicate requirements.
+
+  \item How many of your requirements were inspired by speaking to your
+  client(s) or their proxies (e.g. your peers, stakeholders, potential users)?
+
+  The majority of requirements were inspired by stakeholder interviews. Some were added as a result of other design processes (such as the Hazard Analysis) and from industry standard practices from experiences in the workforce.
+
+  \item Which of the courses you have taken, or are currently taking, will help
+  your team to be successful with your capstone project.
+
+  SFWRENG 3RA3 is the primary course which taught the necessary skills for writing a comprehensive SRS. SFWRENG 3A04 provided additional practice which reinforced good habits, such as, ensuring NFRs are measurable and centering functional requirements around use-cases. SFWRENG 3DB3 will provide foundational database skills, essential to a data-centered platform like this project is.
+
+  \item What knowledge and skills will the team collectively need to acquire to
+  successfully complete this capstone project?  Examples of possible knowledge
+  to acquire include domain specific knowledge from the domain of your
+  application, or software engineering knowledge, mechatronics knowledge or
+  computer science knowledge.  Skills may be related to technology, or writing,
+  or presentation, or team management, etc.  You should look to identify at
+  least one item for each team member.
+
+  Domain knowledge in how capstone courses are run will be an ongoing pursuit for the duration of the project, ensuring a refined final product. It's foundational to the project, and missing the mark will result in a product that does not get adopted for the target use cases.
+  
+  Additionally, code styles have the tendency to clash, which means each team member will need to learn the proper conventions for documentation, technology features used/avoided, and drawing interface boundaries, which are different to each part of the technology stack.
+
+  \item For each of the knowledge areas and skills identified in the previous
+  question, what are at least two approaches to acquiring the knowledge or
+  mastering the skill?  Of the identified approaches, which will each team
+  member pursue, and why did they make this choice?
+
+  Domain knowledge on capstone courses will be expanded on by meeting with McMaster capstone instructors throughout the course of developement. Another approach would be to get information from regulatory and institutional bodies which are responsible for standardizing capstone courses. Meeting with McMaster capstone instructors provides first-hand insight into the process which a set of standards and regulations cannot provide, and is the approach that will be taken.
+
+  One way to synchronize code styles is to specify it up-front using descriptive language and a set of rules. Another way would be to select the most experienced individual for each technology and have them be responsible for reviewing all code which uses that technology and only approve changes when they meet the standard. The team will move forward with the latter approach, with technology leader selection being something that emerges rather than being decided on prematurely.
+
+\end{enumerate}
