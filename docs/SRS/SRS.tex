@@ -2379,6 +2379,82 @@ Professor who runs the course.
   organized as a prioritized list of requirements, or it could show the
   requirements that will be implemented for ``phase 1'', ``phase 2'', etc.}
 
+  \section{Development Plan}
+
+Requirements are grouped into phases. Phase 1 creates the smallest end-to-end
+path through the lifecycle (see Figure~\ref{fig:lifecycle}), so that a project can be proposed, approved, listed, selected, and finally approved for a
+team. Priority within a phase follows the instructor's biggest pain point(repetitive review of team submissions) 
+and then the dependencies between features.
+
+\subsection{Phase 1: Core Workflow (implemented in the course)}
+\begin{itemize}
+  \item Supervisor proposal submission with a structured template, and
+    instructor approval before a project is listed
+    (\ucref{UC_SubmitProposal}, \ucref{UC_ReviewProposal};
+    \ref{SR_ProposalTemplate}, \ref{SR_OptionalFields}, \ref{SR_HumanApproval}).
+  \item Browsing projects with a visible status, and team selection
+    (\ucref{UC_BrowseProjects}, \ucref{UC_SelectProject};
+    \ref{SR_BrowseProjects}, \ref{SR_ProjectStatus}).
+  \item Team project submission with automated checks, and instructor review
+    with iterative feedback (\ucref{UC_ApproveTeamProject};
+    \ref{SR_TeamSubmissionChecks}, \ref{SR_ReviewDialogue}). This is the
+    highest-value feature for the instructor, so it is part of the first
+    working version.
+  \item Validated team composition export
+    (\ucref{UC_ValidateTeams}; \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin}).
+\end{itemize}
+
+\subsection{Phase 2: Communication and Visibility (implemented in the course)}
+\begin{itemize}
+  \item Email notifications for status changes and tasks, and a checklist of
+    required actions (\ucref{UC_NotifyChecklist}; \ref{SR_StatusNotify},
+    \ref{SR_PushNotify}, \ref{SR_Checklist}).
+  \item Team profiles visible to supervisors, and team contact details
+    (\ucref{UC_TeamProfile}, \ucref{UC_ViewTeam}; \ref{SR_StudentProfiles},
+    \ref{SR_TeamContacts}).
+  \item Course schedule and timelines (\ucref{UC_ViewTimelines};
+    \ref{SR_CrossCourseTimelines}).
+  \item Identifying unselected projects
+    (\ucref{UC_FollowUpUnselected}; \ref{SR_UnselectedProjects}).
+\end{itemize}
+
+\subsection{Phase 3: Extended Features (implemented if time allows)}
+\begin{itemize}
+  \item Student-initiated project proposals
+    (\ucref{UC_ProposeOwnProject}; \ref{SR_StudentProposals}). Phase 1 already
+    provides most of the approval flow, so this mainly adds a proposal path
+    and supervisor-finding.
+  \item Guidelines, FAQ, examples of past projects, and early access to course
+    information (\ref{SR_ProposalGuidance}, \ref{SR_CourseInfoEarly}). This
+    is mostly content, so it can be added without changing the core system.
+  \item Supervisor capacity limits (a count of teams per supervisor) and
+    related checks.
+\end{itemize}
+
+\subsection{Future Work (not implemented, or faked for the demo)}
+\begin{itemize}
+  \item (\ref{SR_SinglePlace}) a single place for all capstone coordination,
+    is addressed in part by the above, but full replacement of external tools
+    (e.g., email, calendar, meeting tools) is future work.
+  \item Meeting notes, searchable communication history, and suggested
+    meeting schedules are not in the current requirements. They would be added
+    after the core system is stable.
+  \item Matching teams to projects by skills and interests is future work. It
+    is optional and the instructor wants it to be switchable.
+  \item Support for other capstone courses or universities (modularity) is a
+    design goal, but a second deployment is future work.
+\end{itemize}
+
+\subsection{Faked or Simplified for the Course}
+\begin{itemize}
+  \item Email delivery may use a test mailbox or log messages instead of
+    reaching real inboxes during demos.
+  \item Authentication may use a simplified sign-in for the demo, with real
+    integration with university accounts as future work.
+  \item Data may be seeded with example projects, teams, and supervisors
+    instead of imported from the existing forms and spreadsheets.
+\end{itemize}
+
   \subsection{Appendix C: Values of Auxiliary Constants}
 
   \plt{Show the values of the symbolic parameters introduced in the report.}
