@@ -459,46 +459,60 @@ rationale design process how and why to fake it.)}
 
 \begin{enumerate}[label=\textbf{SSR-\arabic*}]
     \item \label{SSR-1} The system shall log all errors caused by external providers and notify university IT professionals and/or course instructors when they are detected.\\
-    \textbf{Rationale}: Outages caused by external providers prevent users from using the platform and require immediate attention to restore in a timely manner.
+    \textbf{Rationale}: Outages caused by external providers prevent users from using the platform and require immediate attention to restore in a timely manner.\\
+    \textbf{Traces To}: FR31
 
     \item \label{SSR-2} The system shall record all user actions with the time, a user identifier, and their privilege level at the time of the action, in an append-only audit log.\\
-    \textbf{Rationale}: Accounts may get compromised and any actions taken may need to be reviewed and reversed.
+    \textbf{Rationale}: Accounts may get compromised and any actions taken may need to be reviewed and reversed.\\
+    \textbf{Traces To}: NFR9, FR29, FR30
 
-    \item \label{SSR-3} The system shall reject all component disable requests if there are pending actions within the component or a risk of exposing data.\\
-    \textbf{Rationale}: Disabling features may potentially leave the system in a partially invalid state. Examples include: disabling the project approvals component strands pending project approval requests, disabling the RBAC feature risks exposing records.
+    \item \label{SSR-3} The system shall reject all component disable requests if there are pending actions within the component.\\
+    \textbf{Rationale}: Disabling features may potentially leave the system in a partially invalid state. For example, disabling the project approvals component strands pending project approval requests.\\
+    \textbf{Traces To}: FR32
 
     \item \label{SSR-4} The system shall display a timestamp for any displayed records when they were last updated.\\
-    \textbf{Rationale}: Providing users with a timestamp can allow them to judge whether the information they are reading is up-to-date and can contact instructors or supervisors when that is not the case.
+    \textbf{Rationale}: Providing users with a timestamp can allow them to judge whether the information they are reading is up-to-date and can contact instructors or supervisors when that is not the case.\\
+    \textbf{Traces To}: FR33
 
     \item \label{SSR-5} All pending notifications shall be stored durably until delivery is verified.\\
-    \textbf{Rationale}: Lost notifications mean that users are not alerted of potentially time-sensitive matters and this can result in missed deadlines and loss of time.
+    \textbf{Rationale}: Lost notifications mean that users are not alerted of potentially time-sensitive matters and this can result in missed deadlines and loss of time.\\
+    \textbf{Traces To}: FR34
 
     \item \label{SSR-6} The platform shall provide a mechanism for automatically creating regular backups which can restore the platform to a previous state.\\
-    \textbf{Rationale}: Data loss incidents are not uncommon and can be caused by faulty hardware, accidental changes, and many others. Storing a set of backups ensures that any data loss is minimized to a backup period timespan.
+    \textbf{Rationale}: Data loss incidents are not uncommon and can be caused by faulty hardware, accidental changes, and many others. Storing a set of backups ensures that any data loss is minimized to a backup period timespan.\\
+    \textbf{Traces To}: NFR12
 
-    \item \label{SSR-7} The platform shall provide multiple ways to sort the list of projects.\\
-    \textbf{Rationale}: While a recommendation engine is proposed, it may be flawed or operate on outdated data. To ensure users don't miss a project that they may favour, providing multiple ways to sort the list can bring different projects to the top.
+    \item \label{SSR-7} The platform shall provide multiple ways to find, filter, and browse the list of projects.\\
+    \textbf{Rationale}: While a recommendation engine is proposed, it may be flawed or operate on outdated data. To ensure users don't miss a project that they may favour, providing multiple ways to display the list can bring different projects to the top.\\
+    \textbf{Traces To}: FR5
 
     \item \label{SSR-8} All system actions which involve multiple dependent reads and writes, with at least one write, shall be atomic.\\
-    \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.
+    \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.\\
+    \textbf{Traces To}: NFR13
 
     \item \label{SSR-9} The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.\\
-    \textbf{Rationale}: Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.
+    \textbf{Rationale}: Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.\\
+    \textbf{Traces To}: FR35
 
     \item \label{SSR-10} The system shall assign new users zero privileges when their identity cannot be assigned automatically or verified.\\
-    \textbf{Rationale}: No assumptions can be made about new users. They may be students who are not enrolled in a capstone course, malicious actors attempting to extract user information, individuals posing as supervisors to get free labour, etc. Ensuring no unverified users get access to the platform mitigates those risks.
+    \textbf{Rationale}: No assumptions can be made about new users. They may be students who are not enrolled in a capstone course, malicious actors attempting to extract user information, individuals posing as supervisors to get free labour, etc. Ensuring no unverified users get access to the platform mitigates those risks.\\
+    \textbf{Traces To}: FR28, FR29, FR30, NFR5
 
     \item \label{SSR-11} The system shall ensure that operations on sets or aggregations of multiple data entries do not operate on stale data at any point during an operation.\\
-    \textbf{Rationale}: Concurrent operations which rely on aggregations of data entries may introduce a data race, resulting in an invalid state after the operation. For example, two students attempting to join the same team which only has one available slot can end up exceeding the team size limit, if the mechanism is not implemented correctly.
+    \textbf{Rationale}: Concurrent operations which rely on aggregations of data entries may introduce a data race, resulting in an invalid state after the operation. For example, two students attempting to join the same team which only has one available slot can end up exceeding the team size limit, if the mechanism is not implemented correctly.\\
+    \textbf{Traces To}: NFR13
 
     \item \label{SSR-12} The system shall notify the user of pending actions when disabling a component fails.\\
-    \textbf{Rationale}: It may be possible to disable certain components but require additional actions to be taken, such as responding to pending project approvals.
+    \textbf{Rationale}: It may be possible to disable certain components but require additional actions to be taken, such as responding to pending project approvals.\\
+    \textbf{Traces To}: FR32
 
     \item \label{SSR-13} The system shall enforce visibility restrictions across all points of communication.\\
-    \textbf{Rationale}: Exposing IP or confidential information can lead to damages and loss of trust. 
+    \textbf{Rationale}: Exposing IP or confidential information can lead to damages and loss of trust.\\
+    \textbf{Traces To}: FR29
 
     \item \label{SSR-14} The system shall display project proposal prompts which cover all necessary information relevant to a project's viability as a capstone project.\\
-    \textbf{Rationale}: Prompting only an open-ended description provides supervisors with no information on what students and instructors are looking for in a capstone-level project.
+    \textbf{Rationale}: Prompting only an open-ended description provides supervisors with no information on what students and instructors are looking for in a capstone-level project.\\
+    \textbf{Traces To}: FR1, FR2
 \end{enumerate}
 
 \section{Roadmap}

@@ -1571,6 +1571,25 @@ Student (Priya), Instructor (Dr. Reyes)
               \rationale{Different capstone courses involve different participants, and access permissions must reflect each users' responsibilities.}
               \fitcrit{An authorized administrator can view and update a user's course association and permitted course role.}
 
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label31}:] The system shall log all errors caused by external providers and notify university IT professionals and/or course instructors when they are detected.
+              \rationale{External providers may cause service disruptions and knowing when disruptions happen allows measuring their impact (missed deadlines, for example).}
+              \fitcrit{An authorized administrator can read a log displaying external provider errors exclusively.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label32}:] The system shall reject all component disable requests if there are pending actions within the component and notify the user of pending actions.
+              \rationale{Disabling features may potentially leave the system in a partially invalid state. For example, disabling the project approvals component strands pending project approval requests.}
+              \fitcrit{The user interface displays an error message when attempting to disable the project approval component with at least one record present, and the pending records are displayed.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label33}:] The system shall display a timestamp for any displayed records when they were last updated.
+              \rationale{Providing users with a timestamp can allow them to judge whether the information they are reading is up-to-date and can contact instructors or supervisors when that is not the case.}
+              \fitcrit{Any user authorized to read project proposals and user profiles is able to view a timestamp on all pages.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label34}:] The system shall store pending notifications durably until delivery is verified.
+              \rationale{Lost notifications mean that users are not alerted of potentially time-sensitive matters and this can result in missed deadlines and loss of time.}
+              \fitcrit{The system being abruptly closed before being able to send a notification sends it after starting back up.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label35}:] The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.
+              \rationale{Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.}
+              \fitcrit{The system prompts user to re-enter credentials after requesting to delete a project they proposed.}
   \end{itemize}
 
   \plt{The requirements are given labels so that they can be referenced in other
@@ -1995,19 +2014,29 @@ Student (Priya), Instructor (Dr. Reyes)
     \textbf{Fit Criterion}: An automated audit using an industry standard tool (such as Axe or Lighthouse) running on all user interfaces, reporting no critical violations.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Auditability}:] \textbf{Auditability.}
-    All user actions shall be auditable including metadata such as when the actions where taken, what action was taken, the user, and their privilege level at the time of the action.\\
+    All user actions shall be audited including metadata such as when the actions where taken, what action was taken, the user, and their privilege level at the time of the action, in a tamper-resistant log.\\
     \textbf{Rationale}: User actions must be auditable to ensure any discrepancies about events such as team enrolment, project approvals, and other critical events are tracable.\\
-    \textbf{Fit Criterion}: A full sequence of audit logs can be composed together to provide a 100\% accurate image of the system's state.
+    \textbf{Fit Criterion}: A full sequence of audit logs can be composed together to provide a 100\% accurate image of the system's state and the log cannot be modified from the interface or filesystem.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_ModularityConfigurability}:] \textbf{Modularity and Configurability.}
-    All major features can be disabled on a live system with no code changes.\\
-    \textbf{Rationale}: The need to toggle major features was established during stakeholder interviews. The platform needs to be flexibile to fit the working style of a variety of instructors.\\
+    All major features, with the exception of the RBAC component, can be disabled on a live system with no code changes.\\
+    \textbf{Rationale}: The need to toggle major features was established during stakeholder interviews. The platform needs to be flexibile to fit the working style of a variety of instructors. RBAC ensures visibility rules are enforced and this is essential for protecting sensitive information.\\
     \textbf{Fit Criterion}: Every major feature can be disabled on a live system with no code changes.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_PrivacyDataProtection}:] \textbf{Privacy and Data Protection.}
     The system shall only collect essential personal data, ensure data is encrypted in-transit and at rest, and passwords are never stored in plaintext.\\
     \textbf{Rationale}: The platform stores personal data to facilitate basic operations and is subject to regulations imposed by Ontario's FIPPA.\\
     \textbf{Fit Criterion}: The system refuses to respond to all requests made over an unencrypted connection.
+
+    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Recoverability}:] \textbf{Recoverability.}
+    The system must be recoverable after an incident to a previous state within the 24 hours before the incident.\\
+    \textbf{Rationale}: The system might experience a data loss incident. It must be recoverable with minimal losses.\\
+    \textbf{Fit Criterion}: The system can be restored to a previous state using the interface.
+
+    \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Integrity}:] \textbf{Integrity.}
+    All data operations involving multiple data entities must concurrency-safe.\\
+    \textbf{Rationale}: Many data operations will be executing at any given time and the system must ensure all data operations must not operate on stale or corrupt data.\\
+    \textbf{Fit Criterion}: The system remains in a correct state after a series of concurrent data modification operations.
 
     % \item Other NFRs that might be discussed include verifiability,
     % understandability, reusability, performance, reliability and availability, security, and accessibility.  You may have to add other NFRs.
