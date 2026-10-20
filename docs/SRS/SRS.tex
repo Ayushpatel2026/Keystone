@@ -2526,7 +2526,23 @@ and then the dependencies between features.
 
   \plt{The value of FRACTION, for the Maintainability NFR would be given here.}
 
-  TODO
+  The following auxiliary constants show the values of symbolic parameters introduced within the NFRs Section \ref{sec:non-functional-requirements}. 
+
+  \begin{longtable}{|p{3.2cm}|p{2.5cm}|p{5cm}|p{2cm}|}
+    \hline
+    \textbf{Constant} & \textbf{Value} & \textbf{Description} & \textbf{NFR Reference} \\ \hline
+    Maintenance Effort & \maintFrac & Maintenance effort as a fraction of total development effort. & \nfrref{NFR_Maintainability} \\ \hline
+    Change Effort & \changeEffort & Cost for weekly maintenance effort based on development effort. & \nfrref{NFR_Maintainability} \\ \hline
+    Usability Test Time & \usabilityTestTime & Time for first-time users to complete their primary tasks. & \nfrref{NFR_Usability} \\ \hline
+    Deploy Time & \deployTime & Deployment time by IT professional with a deployment guide and no assistance. & \nfrref{NFR_Installability} \\ \hline
+    Uptime Percent & \uptimePercent & Minimum required system uptime. & \nfrref{NFR_Availability} \\ \hline
+    Unscheduled Downtime & \unschedDowntime & Maximum unscheduled hours of downtime per week. & \nfrref{NFR_Availability} \\ \hline
+    Tail Percentile & \tailPercentile & Percentile used to evaluate response latency. & \nfrref{NFR_Performance} \\ \hline
+    Tail Latency & \tailLatency & Maximum response latency at the specified percentile. & \nfrref{NFR_Performance} \\ \hline
+    Concurrent Users & \concurrentUsers & Number of concurrent users during performance testing. & \nfrref{NFR_Performance} \\ \hline
+    \caption{Auxiliary Constants}
+    \label{tab:AuxiliaryConstants}
+\end{longtable}
 
   \subsection{Appendix D: Generative AI Disclosure}
 
