@@ -2139,7 +2139,7 @@ Student (Priya), Instructor (Dr. Reyes)
       Instructor, and TA entities to represent shared information while distinguishing role-specific attributes.
       This was especially necessary when restricting entity relations (e.g. only Students belong to a team)
       \item \textbf{Entity Choices:} They come directly from the functional and stakeholder requirements as they determine all 
-      of the objects needed to 
+      of the objects needed to represent the required actors and features in the system.
       \item \textbf{Course Configuration:} Course-specific settings and rules are associated with the Course entity to support 
       different capstone workflows without requiring structural changes to the data model.
       \item \textbf{Data Integrity:} Relationships and constraints were established to prevent invalid team memberships, 
@@ -2157,22 +2157,56 @@ Student (Priya), Instructor (Dr. Reyes)
   system does not require training an AI model to fulfill its primary functionality.
 
   \section{Likely Changes}
-  \plt{Give the likely changes, with traceability to the entity that is likely to change.}
-  \noindent \begin{itemize}
+\plt{Give the likely changes, with traceability to the entity that is likely to change.}
 
-              \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_meaningfulLabel}:] Changes 
+\noindent \begin{itemize}
 
-  \end{itemize}
+    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Users}:]
+    \textbf{User Model.}
+    There is an attribute is\_admin, however in the future, we might find it favourable to create a child Admin
+    that inherits and has more complex attributes. This may also create new attributes for User or any other child entities.
+    We may also discover more roles are required for security purposes or other potential actors outside our main stakeholders
+    such as maintainers.
+    \textit{Affected Entities:} User, Student, Instructor, Supervisor, TA.
+    \textit{Related Requirements:} \rref{FR_Label28}, \rref{FR_Label29}, \rref{FR_Label30}.
+
+    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_TeamCourseRestrictions}:]
+    \textbf{Course and Team Restrictions.}
+    As we have more meetings with our stakeholders, particularly the instructors, we will discover different rules and
+    restrictions that need to be implmented beyond team sizes and program combinations.
+    \textit{Affected Entities:} Student, Team, Course.
+    \textit{Related Requirements:} \rref{FR_Label9}, \rref{FR_Label22}.
+
+    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_ProposalTemplates}:]
+    \textbf{Proposal Templates.}
+    We may discover more information and fields that we need to add to our template to ensure that it is comprehensive
+    and meets the requirements of the course as per the instructor.
+    \textit{Affected Entity:} Project.
+    \textit{Related Requirements:} \rref{FR_Label1}, \rref{FR_Label2}, \rref{FR_Label3}.
+
+    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_ApprovalWorkflows}:]
+    \textbf{Approval Workflows and Status Lifecycles.}
+    We could discover other steps and states required that are more complex to account for different scenarios as we better
+    understand how the course opperates.
+    \textit{Affected Entities:} Project, Project Application, Course.
+    \textit{Related Requirements:} \rref{FR_Label17}, \rref{FR_Label18}, \rref{FR_Label19}, \rref{FR_Label22}.
+
+    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Recommendations}:]
+    \textbf{Recommendations.}
+    This could either get more complicated with AI recommendations or possibly less depending on how the the changes in scope
+    for the project. With changes to how recommendations work, data model items may need to change to accomodate it.
+    \textit{Affected Entities:} Student Profile, Team Profile, Project.
+    \textit{Related Requirement:} \rref{FR_Label12}.
+
+\end{itemize}
+
+  \plt{Give the unlikely changes.  The design can assume that the changes listed will not occur.}
 
   \section{Unlikely Changes}
 
-  \noindent \begin{itemize}
-
-              \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_meaningfulLabel}:] \plt{Give
-              the unlikely changes.  The design can assume that the changes listed will
-              not occur.}
-
-  \end{itemize}
+  % \noindent \begin{itemize}
+    
+  % \end{itemize}
 
   \newpage{}
 
