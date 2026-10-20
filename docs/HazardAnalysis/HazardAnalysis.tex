@@ -468,6 +468,9 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-11} The system shall ensure that operations on sets or aggregations of multiple data entries do not operate on stale data at any point during an operation.\\
     \textbf{Rationale}: Concurrent operations which rely on aggregations of data entries may introduce a data race, resulting in an invalid state after the operation. For example, two students attempting to join the same team which only has one available slot can end up exceeding the team size limit, if the mechanism is not implemented correctly.
+
+    \item \label{SSR-12} The system shall notify the user of pending actions when disabling a component fails.\\
+    \textbf{Rationale}: It may be possible to disable certain components but require additional actions to be taken, such as responding to pending project approvals.
 \end{enumerate}
 
 \section{Roadmap}
