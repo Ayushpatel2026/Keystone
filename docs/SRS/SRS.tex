@@ -244,6 +244,7 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
   is proposed until it is approved.
 
   \subsection{Scope}
+  \label{sec:scope}
   \plt{Briefly describe:
     \begin{itemize}
       \item Problem being solved
@@ -1434,6 +1435,7 @@ Student (Priya), Instructor (Dr. Reyes)
 
 % ==============================================================
   \section{Functional Requirements}
+  \label{sec:functional-requirements}
   \plt{Functional requirements describe what the system should do.  They are typically
   expressed as a set of conditions or capabilities that the system must have.  These
   requirements are usually derived from the stakeholder requirements and use cases.}
@@ -1600,6 +1602,7 @@ Student (Priya), Instructor (Dr. Reyes)
 
 % ==============================================================
   \section{Data Requirements}
+  \label{sec:data-requirements}
 
   \plt{The Data Requirements section describes what information the system must manage.
   It includes the major data entities, their attributes, and the relationships
@@ -1926,6 +1929,7 @@ Student (Priya), Instructor (Dr. Reyes)
 
 % ==============================================================
   \section{Non-Functional Requirements}
+  \label{sec:non-functional-requirements}
 
   \plt{You may have to add other NFRs.}
 
@@ -2047,6 +2051,7 @@ Student (Priya), Instructor (Dr. Reyes)
   \end{itemize}
 
   \section{Requirements Traceability Matrices}
+  \label{sec:traceability-matrices}
 
   \plt{The Requirements Traceability Matrix (RTM) is a table that shows the
   relationship between different types of requirements. It is used to ensure that
@@ -2091,16 +2096,71 @@ Student (Priya), Instructor (Dr. Reyes)
   \plt{Provide a rationale for the decisions made in the documentation.  Rationale
   should be provided for scope decisions, functional requirements, nonfunctioanl
   requirements, data requirements, and AI requirements.  You don't need a
-  rationale for everything, ust the major decisions that are not obvious.  You
+  rationale for everything, ust the major decisions that are not obvious. You
   should have traceability to the entities in the document that you are
   referencing.}
 
-  \section{Likely Changes}
+  \subsection{Scope}
 
+  The scope was decided based on an estimate of what stakeholders need and what would be considered nice-to-have features, as described in Section~\ref{sec:scope}.
+
+  Keystone focuses on project proposals, discovery, team formation, visibility, and project approvals rather than 
+  the entire capstone lifecycle. Features such as automated project evaluations, AI-features, full course management, 
+  post-approval supervision, meeting scheduling, messaging, and intellectual property dispute resolution were excluded to 
+  keep the project scope manageable and most were not desirable implementations for the stakeholders or were simply 
+  overkill for this project. Also, too much automation was undesirable by stakeholders as instructors prefer to be in 
+  control of approving projects and manually providing feedback.
+
+
+  \subsection{Functional Requirements}
+
+  Each functional requirement's rationale can be found underneath the corresponding requirement in Section~\ref
+  {sec:functional-requirements}. The functional requirements were generally derived from stakeholder 
+  requirements, as demonstrated in Section~\ref{sec:traceability-matrices}. Therefore, the core functionality of 
+  the system is determined by the needs of its users. Functional requirements without direct stakeholder 
+  traceability primarily address underlying system and security needs necessary to provide a reliable platform.
+
+  \subsection{Non-Functional Requirements}
+
+  Each non-functional requirement's rationale can be found underneath the corresponding requirement in 
+  Section~\ref{sec:non-functional-requirements}. These requirements establish the quality standards necessary for 
+  Keystone to serve its stakeholders effectively. Requirements such as access, availability, accessibility, and 
+  usability ensure that stakeholders can use the system efficiently and without significant challenges. While 
+  functional requirements define the system's capabilities, non-functional requirements provide measurable goals 
+  for its quality, robustness, and performance.
+
+  \subsection{Data Requirements}
+
+  The data requirements in Section~\ref{sec:data-requirements} were established to support the functional 
+  requirements while maintaining consistent and accurate information across the platform.
+
+  \begin{itemize}
+      \item \textbf{User Child Entities:} A parent User entity was defined with child Student, Supervisor, 
+      Instructor, and TA entities to represent shared information while distinguishing role-specific attributes.
+      This was especially necessary when restricting entity relations (e.g. only Students belong to a team)
+      \item \textbf{Entity Choices:} They come directly from the functional and stakeholder requirements as they determine all 
+      of the objects needed to 
+      \item \textbf{Course Configuration:} Course-specific settings and rules are associated with the Course entity to support 
+      different capstone workflows without requiring structural changes to the data model.
+      \item \textbf{Data Integrity:} Relationships and constraints were established to prevent invalid team memberships, 
+      duplicate project assignments, and inconsistent records.
+      \item \textbf{Data Privacy and Retention:} These requirements were designed to ensure that a user's sensitive information
+      such as email and any data about their project remains secure in our backends and in compliance with Privacy Protection
+      policies. Keeping data encrypted can do this and RBAC keeps everyone's access adhering to the principle of least privilege.
+
+  \end{itemize}
+
+  \subsection{AI Requirements}
+  \label{rat:ai-requirements}
+
+  Implementing an AI-based solution is primarily outside the core project scope and is instead considered a stretch goal. The 
+  system does not require training an AI model to fulfill its primary functionality.
+
+  \section{Likely Changes}
+  \plt{Give the likely changes, with traceability to the entity that is likely to change.}
   \noindent \begin{itemize}
 
-              \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_meaningfulLabel}:] \plt{Give
-              the likely changes, with traceability to the entity that is likely to change.}
+              \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_meaningfulLabel}:] Changes 
 
   \end{itemize}
 
