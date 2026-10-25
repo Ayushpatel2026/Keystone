@@ -111,6 +111,11 @@ jobs:
           # pdflatex finds lmodern.sty but not the fonts it maps to, failing
           # with "Font rm-lmr7 at 600 not found".
           sudo updmap-sys >/dev/null
+          
+          if ! command -v bibtex >/dev/null; then
+            sudo update-alternatives --install /usr/bin/bibtex bibtex /usr/bin/bibtex.original 100
+          fi
+          bibtex --version | head -1
 
           pdflatex --version | head -1
           pandoc --version | head -1
