@@ -15,8 +15,7 @@ define COMPILE_TEX
 endef
 
 # Define the bibtex command
-BIBTEX_CMD = [ -f $(basename $(notdir $1)).aux ] && bibtex $(basename $(notdir $1)) || echo "No bibtex references found" || { echo "Error: bibtex failed for $1"; exit 1; }
-
+BIBTEX_CMD = if grep -qs '\\citation' $(basename $(notdir $1)).aux; then bibtex $(basename $(notdir $1)) || { echo "Error: bibtex failed for $1"; exit 1; }; else echo "No bibtex references found"; fi
 # Define the compile step for bibtex
 define COMPILE_BIBTEX
 	cd $(dir $1) && $(BIBTEX_CMD)
