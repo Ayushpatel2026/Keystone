@@ -31,6 +31,7 @@
         Sept 28th 2026 & Ahmed Rashrash        & Added reflection information                      \\
         Sept 28th 2026 & Andrew Habib          & Added reflection information                      \\
         Sept 28th 2026 & Ayush Patel           & Minor Formatting and Proofreading changes         \\
+        Oct 25th 2026  & Ayush Patel           & Updated Problem Statement and Goals               \\
         \bottomrule
     \end{tabularx}
 \end{table}
@@ -52,11 +53,13 @@
     want to do it.  The problem statement should be written in a way that is
     understandable to a non-technical audience.}
 
-Capstone team and project selection at McMaster is currently fragmented across
-multiple disconnected tools, including Teams, GitLab, MS Forms, and email. This
-fragmentation creates administrative overhead, frustration, and a lack of
-transparency for everyone involved. Beyond the fragmentation itself, the
-information within these tools is often unreliable.
+Capstone team and project selection at McMaster, across the Software
+Engineering (SE), Computer Science (CS), and Mechatronics (TRON) capstone
+courses, is currently fragmented across multiple disconnected tools, including
+Teams, Avenue to Learn, GitLab, MS Forms, and email. This fragmentation creates
+administrative overhead, frustration, and a lack of transparency for everyone
+involved. Beyond the fragmentation itself, the information within these tools
+is often unreliable.
 
 Project descriptions vary widely in accuracy and level of detail, making it
 difficult for students to compare opportunities and understand what a project
@@ -75,6 +78,18 @@ similar skills, work styles, and interest in the same projects. Team formation
 currently happens informally, through personal networks or chance, rather than
 through any structured process.
 
+Supervisors face related difficulties. They receive little guidance on what a
+capstone project should look like before proposing one, project ideas
+proposed by students are not visible to them, and they know little about the
+students and teams who contact them. There is also no shared record of which
+teams and supervisors have agreed to work together.
+
+Instructors, in turn, have no view across the capstone courses, so they cannot
+tell which proposed projects went unselected and follow up with those
+supervisors. Reviewing team submissions involves giving the same feedback to
+many teams, and team and project information often changes after approval
+without the official records being updated.
+
 Together, this lack of transparency, unreliable information, and absence of
 structured team formation lead to wasted time, mismatched teams, and added
 administrative overhead for course instructors and TAs.
@@ -86,10 +101,14 @@ administrative overhead for course instructors and TAs.
 
 \textbf{Inputs:}
 \begin{itemize}
-    \item Project proposals and descriptions submitted by supervisors
+    \item Project proposals and descriptions submitted by supervisors and students
     \item Student profiles
+    \item Team information, including team membership
     \item Student expressions of interests and applications to projects
-    \item Administrative decisions (approvals, status changes, etc.)
+    \item Course configuration and information (e.g., team formation rules, schedules, guidelines)
+    \item Instructor decisions and approval outcomes recorded by instructors or TAs (approvals,
+          requests for changes, status changes)
+    \item Changes to previously approved team and project information
 \end{itemize}
 
 \textbf{Outputs:}
@@ -97,7 +116,11 @@ administrative overhead for course instructors and TAs.
     \item A searchable and filterable catalog of available projects
     \item Project status and availability information
     \item Confirmed project--team assignments
+    \item Records of agreement between supervisors and teams
     \item Visibility into other students seeking teammates
+    \item Notifications of events requiring a user's attention
+    \item A list of projects that were not selected
+    \item A validated record of team and project information
 \end{itemize}
 
 \subsection{Stakeholders}
@@ -115,12 +138,13 @@ administrative overhead for course instructors and TAs.
           teams they are willing to take on, and manage student interest without
           relying on ad hoc email communication.
 
-    \item \textbf{Capstone Course Instructor} --- Oversees the capstone
-          process as a whole. Needs visibility into which projects and teams exist,
-          the ability to track progress across the cohort, and administrative
-          control to resolve issues.
+    \item \textbf{Capstone Course Instructors} --- Oversee the capstone
+          process for their course. Need visibility into which projects and teams
+          exist across the capstone courses and their status from proposal through
+          approval, including later changes to team and project information, and
+          administrative control to resolve issues.
 
-    \item \textbf{Capstone Course TAs} --- Support the coordinator in
+    \item \textbf{Capstone Course TA's} --- Support the instructors in
           administering the process. Need efficient tools to help manage
           day-to-day tasks such as verifying project submissions, tracking
           applications, and assisting students and supervisors.
@@ -142,33 +166,43 @@ not require any specialized hardware.
 
 The primary goal of the platform is to provide a centralized and structured
 system for managing the capstone project process. The platform will improve the
-experience for students, academic supervisors, industry sponsors, and
-administrators by making project information easier to access, manage, and
-coordinate.
+experience for students, supervisors, instructors and TA's by making project information
+easier to access, manage, and coordinate.
 
 \subsection{Core Goals}
 
 \begin{enumerate}
-    \item \textbf{Centralized Capstone Project Management:}
-          Provide a single platform where capstone projects can be submitted, viewed, managed, and tracked throughout their lifecycle.
+    \item \textbf{Centralized and Consistent Project Information:}
+        Provide a single platform where capstone projects, whether proposed by
+        supervisors or by students, can be submitted, viewed, managed, and
+        tracked from proposal through team assignment and any later changes.
+        Projects are described in a consistent submission format in which a
+        defined set of required information, such as objectives, requirements,
+        required skills, and expected deliverables, must be provided.
 
     \item \textbf{Project Discovery:}
           Allow students to search and filter available projects based on factors such as skills, technologies, project type, industry, supervisor, and availability.
 
-    \item \textbf{Student Profiles:}
-          Allow students to create profiles containing relevant information such as skills, interests, experience, and project preferences.
-
-    \item \textbf{Team Formation:}
-          Allow students to indicate their intent to form or join a team, and provide visibility into other students seeking teammates for the same or similar projects.
+    \item \textbf{Student Profiles and Team Formation:}
+        Allow students to create profiles containing relevant information such as skills, interests, experience,
+        and project preferences, and to indicate their intent to form or join a team.
+        Provide visibility into other students seeking teammates for the same or similar projects, and allow
+        supervisors to view the profiles of interested students and teams.
 
     \item \textbf{Project Interest and Application Management:}
           Provide students with the ability to express interest in projects and allow supervisors as well as sponsors to review and manage interested students.
 
-    \item \textbf{Standardized Project Submissions:}
-          Provide a consistent project submission format that ensures important information, such as objectives, requirements, required skills, and expected deliverables, is clearly presented.
+    \item \textbf{Course Information and Guidance:}
+          Provide supervisors and students with timely information about the capstone courses,
+          such as expectations, timelines, and examples of past projects, so that projects can be
+          proposed and selected with a clear understanding of what is expected.
 
-    \item \textbf{Administrative Management:}
-          Provide administrators with tools to manage users, projects, project availability, and project assignments.
+    \item \textbf{Instructor Oversight and Administration:}
+          Provide instructors and TAs with tools to manage users, projects, project availability,
+          and project assignments, with visibility into projects, teams, and their status across
+          capstone courses, including projects that were not selected. Support instructors in approving projects
+          and teams and in keeping team and project records accurate.
+
 \end{enumerate}
 
 \subsection{Stretch Goals}
@@ -181,10 +215,12 @@ resources are available.
           Recommend potential teammates with respect to their skills, interests, and project preferences.
 
     \item \textbf{Intelligent Project Recommendations:}
-          Create a recommendation system that makes suggestions and evaluates compatibility between projects and students based on the student's skills, interests, and preferences.
+          Create a recommendation system that suggests suitable projects to students based on the overlap
+          between the student's skills, interests, and preferences and a project's requirements,
+          such that suggestions are demonstrably more relevant than random ones.
 
     \item \textbf{Analytics Dashboard:}
-          Provide administrators with statistics regarding project demand, student engagement, applications, and project availability.
+          Provide instructors and TA's with statistics regarding project demand, student engagement, applications, and project availability.
 \end{enumerate}
 
 \section{Custom Documents (CDs)}
