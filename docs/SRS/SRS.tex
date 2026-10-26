@@ -305,9 +305,10 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     with the course instructor. Courses may carry out approval inside the platform or in an external process.
     \item It does not resolve intellectual property (IP), confidentiality, or non-disclosure
     questions between students and supervisors.
-    \item It does not find supervisors for student-proposed projects. Student-proposed projects are
-    visible to all users of the platform, but \projname{} provides no matching or request mechanism
-    for supervisors.
+    \item It does not automatically match supervisors to student-proposed projects. Teams may name a
+    supervisor on their proposal or contact one themselves, and supervisors can browse the list of
+    student-proposed projects, but \projname{} does not recommend, assign, or maintain an opt-in list
+    of supervisors for them.
     \item It does not schedule meetings or provide direct messaging between users. Meetings take place
     outside the platform, and discussion is limited to comment threads on posts and applications.
     \item It does not handle supervision after a project begins, such as feedback requests to
@@ -759,8 +760,9 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StudentProposals}]
         Student teams shall have a documented process for proposing their
-        own project and finding a supervisor for it - including a template and
-        guidance on how to calibrate the scope. (\stkS, \stkIS)
+        own project, including a template and guidance on how to calibrate the scope.
+        Student-proposed projects shall be visible to supervisors so that teams and supervisors
+        can find each other without the system matching them. (\stkS, \stkIS)
 
       % ---------- Project discovery and selection ----------
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_BrowseProjects}]
@@ -1124,20 +1126,21 @@ Student (Priya)
   \item The student chooses to propose their own project.
   \item The system shows the process for student-initiated projects, the
     proposal template, and guidance on appropriate scope.
-  \item The team fills in the template and names a prospective supervisor
-    (or requests help finding one and publish their project to the list of student-initiated projects).
+  \item The team fills in the template. The team may name a prospective supervisor they have
+    already contacted.
   \item The team submits the proposal.
-  \item The system notifies the instructor and the prospective supervisor if they have opted in for potential projects.
+  \item The system notifies the instructor and, if one was named, the prospective supervisor.
   \item The proposal proceeds through the review process
     (see \ucref{UC_ReviewProposal}).
 \end{enumerate}
 
 \textbf{Alternative Flows}
 \begin{itemize}
-  \item 3a. The team has no supervisor: the system shows supervisors who have
-    indicated they are open to student projects, or notifies the instructor.
-  \item 5a. The prospective supervisor declines: the team is notified and may
-    choose another supervisor.
+   \item 3a. The team has no supervisor: the proposal is published to the list of student-proposed
+    projects, where supervisors can view it and start a comment thread with the team. The system
+    does not recommend supervisors to the team.
+  \item 5a. The named supervisor declines: the team is notified and may name another supervisor
+    or publish the proposal to the student-proposed list.
 \end{itemize}
 
 \textbf{Postconditions}
@@ -2599,9 +2602,10 @@ and then the dependencies between features.
 \subsection{Phase 3: Extended Features (implemented if time allows)}
 \begin{itemize}
   \item Student-initiated project proposals
-    (\ucref{UC_ProposeOwnProject}; \ref{SR_StudentProposals}). Phase 1 already
-    provides most of the approval flow, so this mainly adds a proposal path
-    and supervisor-finding.
+  (\ucref{UC_ProposeOwnProject}; \ref{SR_StudentProposals}). Phase 1 already
+    provides most of the approval flow, so this mainly adds a proposal path, a
+    student-proposed project list that supervisors can browse, and an optional field
+    for naming a supervisor.
   \item Guidelines, FAQ, examples of past projects, and early access to course
     information (\ref{SR_ProposalGuidance}, \ref{SR_CourseInfoEarly}). This
     is mostly content, so it can be added without changing the core system.
