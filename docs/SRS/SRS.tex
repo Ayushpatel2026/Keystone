@@ -362,8 +362,10 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     Project proposal & A description of a project submitted by a supervisor, or a student, for
     teams to consider.\\
     Student-proposed project & A project proposed by a student team rather than by a supervisor.\\
-    Project status & The position of a project in its lifecycle, for example proposed, listed, taken,
-    or approved. See Figure~\ref{fig:lifecycle} \\
+    Project status & The position of a project proposal or listing in its lifecycle, for example Draft,
+    Open, Full, or Closed. See Figure~\ref{fig:lifecycle}. \\
+    Team-project status & The position of one team's relationship to a project, for example Applied,
+    Agreed, or Approved. Each team on a project has its own. See Figure~\ref{fig:lifecycle}. \\
     Student profile & A student's skills, experience, interests, work style, and project preferences, visible to
     other students and to supervisors.\\
     Team profile & A description of a team's members and shared goals, project interests, and work style.\\
@@ -771,8 +773,9 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
         place and see which projects are availible versus already assigned to a team. (\stkS)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ProjectStatus}]
-        All stakeholders should be able to see the status of all project
-        (e.g., open, taken, dropped, approved) at any time. (\stkS, \stkES, \stkSEI)
+        All stakeholders should be able to see the status of all projects
+        (e.g., open, full, closed) and the stage each team has reached on a project (e.g., applied,
+        agreed, approved) at any time. (\stkS, \stkES, \stkSEI)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StatusNotify}]
         Stakeholders shall be notified when the status of a project they care
@@ -1001,25 +1004,26 @@ Instructor (Dr. Reyes)
   \item The instructor opens the list of proposals awaiting review.
   \item The system shows the instructor a proposal with all the filled out fields.
   \item The instructor assesses the proposal against the approval criteria he has deteremined.
-  \item The instructor approves the proposal.
-  \item The system changes the status to ``approved'' and notifies the
+  \item The instructor approves the proposal by listing it.
+  \item The system changes the status from ``Proposal submitted'' to ``Open'' and notifies the
     proposer.
 \end{enumerate}
 
 \textbf{Alternative Flows}
 \begin{itemize}
   \item 4a. The proposal needs changes: the instructor writes feedback and
-    requests revision. The system notifies the proposer, who can respond and
-    resubmit. The flow returns to step 2.
+    requests revision. The system sets the status to ``Proposal changes requested'' and notifies
+    the proposer, who can respond and resubmit; resubmitting sets the status back to ``Proposal
+    submitted''. The flow returns to step 2.
   \item 4b. The proposal does not have enough substance and cannot be fixed:
-    the instructor rejects it with a reason, and the system notifies the
-    proposer.
+    the instructor rejects it with a reason, the system sets the status to ``Proposal rejected'',
+    and notifies the proposer.
 \end{itemize}
 
 \textbf{Postconditions}
 \begin{itemize}
-  \item The proposal has the status ``approved'', ``revision requested'', or
-    ``rejected'', and the full feedback history is saved.
+  \item The proposal has the status ``Open'', ``Proposal changes requested'', or
+    ``Proposal rejected'', and the full feedback history is saved.
 \end{itemize}
 
 \textbf{Related Requirements:} \ref{SR_HumanApproval},
@@ -1036,14 +1040,14 @@ Student (Priya)
 \textbf{Preconditions}
 \begin{itemize}
   \item The student is registered in the course.
-  \item At least one project is approved.
+  \item At least one project is listed (status ``Open'' or ``Full'').
 \end{itemize}
 
 \textbf{Main Success Scenario}
 \begin{enumerate}
   \item The student opens the project list.
-  \item The system shows all approved projects with their title, field of
-    study, summary, and status (open, taken, dropped).
+  \item The system shows all listed projects with their title, field of
+    study, summary, and status (``Open'' or ``Full'').
   \item The student filters the list (e.g., by field of study or status).
   \item The student opens a project to read its full description, deliverables,
     and supervisor.
@@ -1084,8 +1088,9 @@ Student (Priya)
 \begin{enumerate}
   \item The student selects an open project and expresses their their team's interest in that project.
   \item The system checks that the project is still open.
-  \item The system updates the status of the project to "Applied" and updates the interest count so
-  everyone can see there's a group interested in the project.
+  \item The system records the team's application with the team-project status ``Applied'' and
+    updates the interest count so everyone can see there is a group interested in the project.
+    The project stays ``Open'': an application uses no supervisor slot, so other teams can still apply.
   \item The system notifies the project's supervisor and lets them discuss the project with the team.
   \item The system shows the student a confirmation with the supervisor's
     contact.
@@ -1093,17 +1098,20 @@ Student (Priya)
 
 \textbf{Alternative Flows}
 \begin{itemize}
-  \item 2a. The project's capacity is 0: the system tells the
+  \item 2a. The project is not ``Open'' (it is ``Full'' or ``Closed''): the system tells the
     student the project is no longer available and shows the team's other
     preferences and open projects.
-  \item 3a. The team drops the project later: the status returns to ``open''
-    and interested parties are notified.
+  \item 3a. The supervisor declines, or the team withdraws, at any point before approval: the
+    team's status becomes ``Declined or withdrawn'' and interested parties are notified. If a slot
+    had been reserved (the team had reached ``Agreed''), it is released and a ``Full'' project
+    becomes ``Open'' again.
 \end{itemize}
 
 \textbf{Postconditions}
 \begin{itemize}
-  \item The project is assigned to exactly the number of teams as specified by the supervisor, and its status is
-    visible to all stakeholders.
+  \item The team has an application with the status ``Applied'' and the project's status is
+    unchanged. The supervisor and team then accept (``Agreement pending'', then ``Agreed''), which
+    uses a slot; the project becomes ``Full'' only when all of its slots are used.
 \end{itemize}
 
 \textbf{Related Requirements:} \ref{SR_ProjectStatus}, \ref{SR_StatusNotify},
@@ -1280,8 +1288,8 @@ Instructor (Dr. Reyes), Teaching Assistant
 
 \textbf{Main Success Scenario}
 \begin{enumerate}
-  \item The instructor opens the project list and filters for projects that
-    were not selected.
+  \item The instructor opens the project list and filters for ``Closed'' projects with no approved
+    team (unselected projects).
   \item The system lists those projects with their supervisors and contact
     details.
   \item The instructor selects the projects and sends a message (e.g., a
@@ -1392,8 +1400,8 @@ Student (Priya), Instructor (Dr. Reyes)
 \textbf{Preconditions}
 \begin{itemize}
   \item A team has been formed.
-  \item A supervisor has agreed to work with the team on a project, either an
-    approved project from the list or a student-initiated one.
+  \item The team and supervisor have both accepted (team-project status ``Agreed''), on a
+    listed project or a student-initiated one.
 \end{itemize}
 
 \textbf{Main Success Scenario}
@@ -1402,14 +1410,15 @@ Student (Priya), Instructor (Dr. Reyes)
   \item The system shows the required items: team members, supervisor,
     project, required documents, and a valid project repository.
   \item The student fills in the form and attaches the required documents.
-  \item The student submits the team project for approval.
+  \item The student submits the team project for approval; the status becomes ``Team project
+    submitted''.
   \item The system runs automated checks (e.g., all required fields and
     documents are present, the repository exists and is set up correctly, the
     instructor is added as a collaborator, every member is on exactly one team).
-  \item The system sends the instructor the submission with the results of the
-    checks.
+  \item The system forwards the submission, with the results of the checks, to the instructor; the
+    status becomes ``Team project under review''.
   \item The instructor reviews the submission and approves it.
-  \item The system changes the status to ``approved'' and notifies the team and
+  \item The system changes the team's status to ``Approved'' and notifies the team and
     supervisor.
 \end{enumerate}
 
@@ -1419,19 +1428,18 @@ Student (Priya), Instructor (Dr. Reyes)
     is missing or invalid, with standard guidance for fixing it, and does not
     forward the submission to the instructor until the issues are fixed. This
     replaces the repetitive comments the instructor writes today.
-  \item 7a. The instructor finds problems the checks cannot catch (e.g., scope
-    is too small): the instructor writes feedback and requests revision. The
-    system notifies the team, who can respond and resubmit. The flow returns to
-    step 5.
-  \item 7b. The instructor rejects the submission with a reason: the system
+  \item 7a. The
+    system sets the status to ``Team project changes requested'' and notifies the team, who can
+    respond and resubmit (status ``Team project submitted''). The flow returns to step 5.
+  \item 7b. The instructor rejects the submission with a reason: the system sets the status to
+    ``Team project rejected'', releases the team's slot (a ``Full'' project becomes ``Open''), and
     notifies the team and supervisor.
 \end{itemize}
 
 \textbf{Postconditions}
 \begin{itemize}
-  \item The team is recorded as approved for its project, the project status
-    becomes ``taken'', and the data feeds the team composition export (see
-    \ucref{UC_ValidateTeams}).
+  \item The team's status is ``Approved'', and the data feeds the team composition export (see
+    \ucref{UC_ValidateTeams}). The project's own status (``Open'' or ``Full'') is unchanged.
 \end{itemize}
 
 \textbf{Related Requirements:} \ref{SR_HumanApproval},
@@ -1664,8 +1672,17 @@ Student (Priya), Instructor (Dr. Reyes)
   Figure~\ref{fig:lifecycle} shows the statuses a project and the teams working on it pass through,
   and the events that change them. The left side is the lifecycle of a project proposal and its listing
   (one per project). The right side is the lifecycle of each team that works on a project (one per team,
-  so a project with capacity greater than one has several). The states in the figure are the allowed
-  values of the project status and team-project status in the data dictionary.
+  so a project with capacity greater than one has several). The states in the figure are the only allowed values of the project status and the team-project
+  status in the data dictionary, and every other section uses these names exactly.
+  \begin{itemize}
+    \item \textbf{Project status:} Draft, Proposal submitted, Proposal changes requested, Proposal
+    rejected, Proposal withdrawn, Open, Full, and Closed.
+    \item \textbf{Team-project status:} Applied, Agreement pending, Agreed, Team project submitted,
+    Team project under review, Team project changes requested, Team project rejected, Approved,
+    Approved (change under review), and Declined or withdrawn.
+  \end{itemize}
+  A team's approval does not change the project's status. A listed project is Open or Full
+  depending only on capacity.
 
   \begin{figure}[h!]
     \centering
@@ -1684,9 +1701,10 @@ Student (Priya), Instructor (Dr. Reyes)
   request changes (the proposer or team then resubmits), or reject. In an \emph{external} approval mode the
   instructor or TA records the outcome instead of the platform running the review (see \rref{FR_Label19}).
 
-  \textbf{Changes after approval.} A team may submit a change to an approved project. The project
-  stays \emph{Approved}, and the original approval remains in effect, until the instructor accepts or rejects the
-  change. Accepting it updates the record.
+  \textbf{Changes after approval.} A team may submit a change to an approved project. The team's status
+  stays \emph{Approved} (shown as \emph{Approved, change under review}), and the original approval
+  remains in effect, until the instructor accepts or rejects the change. Either outcome returns the
+  team to \emph{Approved}; accepting the change also updates the record.
 
   \subsubsection{Entity Relationships}
   \begin{longtable}{|p{2cm}|p{2cm}|p{2.5cm}|p{8cm}|}
@@ -1798,7 +1816,7 @@ Student (Priya), Instructor (Dr. Reyes)
       member\_roles & Collection\textless Enum\textgreater & All roles of team members. \\ \hline
       poc & Student & Reference to the point of contact on the team. \\ \hline
       project & Project & Which project they have selected, if applicable. \\ \hline
-      status & ENUM & Which stage in project and team selection or approval they are in. \\ \hline
+      status & Enum & The team-project status of the team's current application or project (see Section~\ref{sec:lifecycle}). \\ \hline
 
       % Team Profile
       \multicolumn{3}{|l|}{\textbf{TeamProfile}}\\ \hline
@@ -1829,7 +1847,7 @@ Student (Priya), Instructor (Dr. Reyes)
       additional & String & Additional Notes or terms for the project \\ \hline
       confidentiality & String & Confidentiality details. \\ \hline
       ip & String & IP agreements \\ \hline
-      status & Enum & Status of the project whether it is taken, available, unavailable. \\ \hline
+      status & Enum & Project status: DRAFT, PROPOSAL\_SUBMITTED, PROPOSAL\_CHANGES\_REQUESTED, PROPOSAL\_REJECTED, PROPOSAL\_WITHDRAWN, OPEN, FULL, or CLOSED (see Section~\ref{sec:lifecycle}). \\ \hline
       threads & Collection\textless Thread\textgreater & Communication medium on the project. \\ \hline
 
       % Project Application
@@ -1838,8 +1856,9 @@ Student (Priya), Instructor (Dr. Reyes)
       team & Team & Reference to the team that the project application belongs to. \\ \hline
       project & Project & Reference to the Project that the application is for. \\ \hline
       submission\_date & DateTime & When the application was submitted. \\ \hline
-      status & Enum & Status of the application including if PENDING, ACCEPTED, DENIED, or WITHDRAWN. \\ \hline
-      agreement & Enum & Checks that both team, supervisor, and instructor in agreement of terms. \\ \hline
+      status & Enum & Team-project status: APPLIED, AGREEMENT\_PENDING, AGREED, SUBMITTED, UNDER\_REVIEW, CHANGES\_REQUESTED, REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
+      supervisor\_accepted & Boolean & Whether the supervisor has accepted working with the team. \\ \hline
+      team\_accepted & Boolean & Whether the team has accepted working with the supervisor. AGREEMENT\_PENDING means exactly one of the two is true; AGREED means both are. \\ \hline
       threads & Collection\textless Thread\textgreater & Communication medium on the application. \\ \hline
 
       % Thread
