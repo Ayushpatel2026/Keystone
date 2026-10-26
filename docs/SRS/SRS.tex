@@ -1672,10 +1672,11 @@ Student (Priya), Instructor (Dr. Reyes)
     \caption{Project and team status lifecycle}\label{fig:lifecycle}
   \end{figure}
 
-  \textbf{Capacity.} Let $C$ be the supervisor's capacity for the project and $A$ the number of teams
-  that have reached agreement (the state \emph{Agreed}) or are further along. A listed project is
-  \emph{Open} while $A<C$ and \emph{Full} when $A=C$. A team's application does not use a slot.
-  A slot is used when both the supervisor and the team have accepted. It is released when the team
+  \textbf{Capacity.} Let $C$ be the supervisor's capacity for the project and $R$ the number of slots reserved
+  for a project. $R$ represents the number of teams that the supervisor has accepted that have not declined or withdrawn their
+  application or have not been rejected by the instructor. A listed project is
+  \emph{Open} while $R<C$ and \emph{Full} when $R==C$. A team's application does not use a slot.
+  A slot is used when the supervisor agrees to work with a team. It is released when the team
   withdraws, is declined, or its project is rejected. Releasing a slot, or raising $C$, makes a Full project Open.
 
   \textbf{Review.} Proposals and team projects are each reviewed by the course instructor, who can approve,

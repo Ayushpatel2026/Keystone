@@ -438,63 +438,102 @@ in a small, targeted demo rather than a full system.
     \begin{tabular}{|p{0.3\textwidth}|p{0.3\textwidth}|p{0.40\textwidth}|}
         \hline
         \textbf{Main Risk(s)}                            & \textbf{How it threatens success}               & \textbf{What will be demonstrated in the PoC} \\ \hline
-
-        Project availability or group assignment states may become inconsistent
-        between students and supervisors. A group can request several projects,
-        and each project can accept one or more teams (at most the capacity),
-        so the underlying data model must correctly track capacity, requests,
-        and acceptances. & To exhibit success, the platform must correctly
-        display project availability and overall state. If the data model
-        cannot properly enforce rules and constraints based on the current
-        application state, the platform would show incorrect availability and
-        create the same confusion it is meant to remove. & Using sample data, a
-        group requests several projects while supervisors can accept one or
-        more requests without exceeding the project capacity. Once a group is
-        accepted, their remaining project requests are withdrawn. The accepted
-        project's remaining capacity updates (unavailable when full). After
-        each action, the student and supervisor views should show a synched
-        status. The demo should also show that invalid actions are rejected
-        (accepting requests from a group placed elsewhere, or sending a request
-        for a filled project). \\ \hline
-
+        Project availability and team assignment state may become inconsistent
+        across the project lifecycle and the team-on-project lifecycle defined
+        in the SRS. A team can apply to several projects and a project can
+        accept several teams (up to its capacity), and a single action in one
+        lifecycle has effects on other records. A supervisor accepting a team
+        reserves a slot, which can make the project full and close its other
+        pending applications. A team agreeing to one project withdraws its other
+        applications and releases any slots reserved for it elsewhere. A
+        decline, withdrawal, or rejection releases a slot only if one was
+        reserved. & The platform exists to show accurate availability and
+        status. If these linked effects are not applied together, a project
+        could appear full when a slot is free (or open when it is not), a team
+        could hold slots on several projects, or a supervisor and a team could
+        see different statuses. This would recreate the confusion the platform
+        is meant to remove. & Using seeded data, a scripted series of actions
+        covers the full application, reservation, agreement, and release paths
+        across several teams and projects. After every action, the data is
+        checked against a set of consistency rules, and the student and
+        supervisor views show a synchronized status. Invalid actions are
+        rejected without changing any state. \\ \hline
     \end{tabular}
     \caption{Main project risks and proof of concept demonstrations.}
     \label{tab:poc-plan}
 \end{table}
 
-\textbf{Note:} Team formation is not in the scope of this PoC as it is similar in logic to project selection.
+\textbf{Scope of the PoC:} The PoC uses seeded students, teams, supervisors, and
+projects, and has no authentication or role-based access control. Anyone using
+the demo can perform any action (e.g., by choosing who they are acting as), but
+the system still enforces the state rules described below. Team formation,
+project proposal and listing, notifications, discussion threads, and
+post-approval changes are excluded. Team formation is similar in logic to
+project selection, and the rest do not contribute to the risk above. The
+instructor's review of a team's project is reduced to a simple approve or
+reject action, and reapplying after a rejection is not covered.
 
 \subsection{Proof of Concept Plan}
 
 To address the high-priority risk above, the following PoC plan will be
-demonstrated:
+demonstrated, using projects of different capacities (e.g.\ two projects
+accepting one team and one accepting two) and several teams:
 
 \begin{enumerate}
-    \item A supervisor creates a project with a set number of teams they will
-          accept (e.g.\ one project accepting one team and another accepting two).
-    \item A student group browses available projects and requests several of them.
-    \item A supervisor accepts a group's request, up to the project's team limit.
-    \item Once a group is accepted, its other requests are withdrawn and it
-          cannot be accepted by any other project.
-    \item Once a project reaches its team limit, it is marked unavailable to
-          other groups.
-    \item Once refreshed, the student and supervisor views should display a synchronized status after each
-          action (e.g. pending, accepted, declined, withdrawn)
-    \item Stale views might exist for a short period of time and if invalid actions from stale views are attempted by users, they are rejected by the system
-          (e.g. accepting a group placed on another project or sending a request to a project that has been filled)
+    \item Teams apply to several open projects. An application does not use a
+          slot.
+    \item A supervisor accepts a team's application. A slot is reserved for that
+          team and the number of reserved slots on the project increases. If the
+          project's capacity is reached, the project becomes full and its other
+          pending applications are closed. A supervisor cannot accept a team if
+          no capacity remains.
+    \item A second supervisor accepts the same team on another project, so the
+          team holds a reserved slot on both projects.
+    \item The team accepts one of the projects, so an agreement is reached. The
+          team's other applications are withdrawn and the slot reserved on its
+          other project is released, returning that project to open if previously full.
+    \item Teams that either decline after a supervisor's acceptance, withdraw after an agreement,
+          or are rejected by the instructor each release their slot, allowing a full project to
+          become open again.
+    \item The instructor approves an agreed team's project (or rejects it, as in
+          the previous step).
+    \item After each action, the student and supervisor views display a
+          synchronized status (e.g.\ applied, accepted, agreed, declined,
+          withdrawn, closed), and the consistency rules in
+          Section~\ref{sec:poc-success} are checked automatically.
+    \item Views may be briefly out of date. Invalid actions taken from a stale
+          view (e.g.\ accepting a team whose application was withdrawn, applying
+          to a project that has become full, or submitting the same action
+          twice) are rejected with an error message and leave the state
+          unchanged.
 \end{enumerate}
 
+\textbf{Concurrency.} Each action is carried out by the server as a single
+transaction that checks the state rules and applies all resulting changes
+together, so a supervisor's capacity check and slot reservation cannot be
+separated. Correctness is enforced on the server rather than by refreshing
+views, so automatic refreshing is a usability improvement for the final system
+and is not part of the PoC. Stress testing with simultaneous requests is left
+to the final system's verification and validation.
+
+
 \subsection{Success Criteria}
+\label{sec:poc-success}
+After every action in the PoC plan, the following hold:
 \begin{itemize}
-    \item Data model yields the correct state after each action
-          \begin{itemize}
-              \item Student group obtains at most one project and no others are
-                    able join a full project
-              \item Project never exceeds its team capacity limit
-              \item Views may be briefly out-of-date, but actions taken from an
-                    out-of-date view that is no longer valid must be rejected
-                    by the system.
-          \end{itemize}
+    \item The number of reserved slots on a project equals the number of teams
+          that have been accepted by its supervisor and have not declined,
+          withdrawn, or been rejected.
+    \item The number of reserved slots never exceeds the project's capacity.
+    \item A project is open exactly when its reserved slots are fewer than its
+          capacity, and full otherwise.
+    \item A team that has reached an agreement has exactly one project and holds
+          no reserved slots on any other project.
+    \item A full project has no pending applications, and a team with an
+          agreement has no pending applications.
+    \item Student and supervisor views show the same status once refreshed, and
+          every invalid action from a stale view is rejected without changing
+          state.
 \end{itemize}
 
 \subsection{Mitigation Strategy}
