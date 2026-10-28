@@ -111,6 +111,7 @@
 \newcommand{\tailPercentile}{95th}
 \newcommand{\tailLatency}{5.0 seconds}
 \newcommand{\concurrentUsers}{400}
+\newcommand{\thinkTime}{10 seconds}
 
 \usepackage{fullpage}
 
@@ -2016,9 +2017,9 @@ Student (Priya), Instructor (Dr. Reyes)
     \textbf{Fit Criterion}: A technically competent individual outside of the main development team is able to complete the task described in Section~4.2.2 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan} within the time constraint.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Performance}:] \textbf{Performance.}
-    The system shall respond with a \tailPercentile{} percentile latency of \tailLatency{} under a load of \concurrentUsers{} users.\\
-    \textbf{Rationale}: The system is expected to be used by approximately \concurrentUsers{} staff, students, and external supervisors. A slow experience can hurt adoption and a failure to handle load can lead to service degradation.\\
-    \textbf{Fit Criterion}: A representative group of requests are sent to the server at a rate of \concurrentUsers{} sets of requests / second and the tail latency is recorded. 
+    The system shall respond to user requests with a \tailPercentile{} percentile latency of at most \tailLatency{} while serving \concurrentUsers{} peak concurrent users.\\
+    \textbf{Rationale}: Use is concentrated at the start of the academic year, when projects are proposed and teams are formed (see System Context). The system is expected to have up to \concurrentUsers{} staff, students, and external supervisors active at the same time during this period. A slow experience can hurt adoption, and a failure to handle load can lead to service degradation.\\
+    \textbf{Fit Criterion}: A load test simulates \concurrentUsers{} concurrent users for a sustained period. Each simulated user repeatedly performs a representative mix of tasks (e.g., browsing the project catalog, viewing a project, applying to a project, replying to a thread) with a \thinkTime{} pause between actions. The latency of every request is recorded, and the \tailPercentile{} percentile is at most \tailLatency{}. The resulting request rate is measured and reported with the test results, rather than fixed in advance.
 
     \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accessibility}:] \textbf{Accessibility.}
     The system shall conform to the WCAG 2.0 Level AA standard.\\
@@ -2660,7 +2661,8 @@ and then the dependencies between features.
     Unscheduled Downtime & \unschedDowntime & Maximum unscheduled hours of downtime per week. & \nfrref{NFR_Availability} \\ \hline
     Tail Percentile & \tailPercentile & Percentile used to evaluate response latency. & \nfrref{NFR_Performance} \\ \hline
     Tail Latency & \tailLatency & Maximum response latency at the specified percentile. & \nfrref{NFR_Performance} \\ \hline
-    Concurrent Users & \concurrentUsers & Number of concurrent users during performance testing. & \nfrref{NFR_Performance} \\ \hline
+    Concurrent Users & \concurrentUsers & Peak number of concurrent users simulated during performance testing. & \nfrref{NFR_Performance} \\ \hline
+    User Think Time & \thinkTime & Pause between actions for each simulated user during performance testing. & \nfrref{NFR_Performance} \\ \hline
     \caption{Auxiliary Constants}
     \label{tab:AuxiliaryConstants}
 \end{longtable}
