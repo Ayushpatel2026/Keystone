@@ -1103,15 +1103,16 @@ Student (Priya)
     preferences and open projects.
   \item 3a. The supervisor declines, or the team withdraws, at any point before approval: the
     team's status becomes ``Declined or withdrawn'' and interested parties are notified. If a slot
-    had been reserved (the team had reached ``Agreed''), it is released and a ``Full'' project
+    had been reserved (the supervisor had accepted), it is released and a ``Full'' project
     becomes ``Open'' again.
 \end{itemize}
 
 \textbf{Postconditions}
 \begin{itemize}
   \item The team has an application with the status ``Applied'' and the project's status is
-    unchanged. The supervisor and team then accept (``Agreement pending'', then ``Agreed''), which
-    uses a slot; the project becomes ``Full'' only when all of its slots are used.
+    unchanged. Either side may then accept (``Supervisor Accepts'' or ``Team Accepts - Supervisor
+    Pending''), and the team is ``Agreed'' once both have. A slot is reserved when the supervisor
+    accepts, and the project becomes ``Full'' only when all of its slots are reserved.
 \end{itemize}
 
 \textbf{Related Requirements:} \ref{SR_ProjectStatus}, \ref{SR_StatusNotify},
@@ -1677,9 +1678,9 @@ Student (Priya), Instructor (Dr. Reyes)
   \begin{itemize}
     \item \textbf{Project status:} Draft, Proposal submitted, Proposal changes requested, Proposal
     rejected, Proposal withdrawn, Open, Full, and Closed.
-    \item \textbf{Team-project status:} Applied, Agreement pending, Agreed, Team project submitted,
-    Team project under review, Team project changes requested, Team project rejected, Approved,
-    Approved (change under review), and Declined or withdrawn.
+    \item \textbf{Team-project status:} Applied, Supervisor Accepts, Team Accepts - Supervisor Pending,
+    Agreed, Team project submitted, Team project under review, Team project changes requested,
+    Team project rejected, Approved, Approved (change under review), and Declined or withdrawn.
   \end{itemize}
   A team's approval does not change the project's status. A listed project is Open or Full
   depending only on capacity.
@@ -1690,12 +1691,15 @@ Student (Priya), Instructor (Dr. Reyes)
     \caption{Project and team status lifecycle}\label{fig:lifecycle}
   \end{figure}
 
-  \textbf{Capacity.} Let $C$ be the supervisor's capacity for the project and $R$ the number of slots reserved
-  for a project. $R$ represents the number of teams that the supervisor has accepted that have not declined or withdrawn their
-  application or have not been rejected by the instructor. A listed project is
-  \emph{Open} while $R<C$ and \emph{Full} when $R==C$. A team's application does not use a slot.
-  A slot is used when the supervisor agrees to work with a team. It is released when the team
-  withdraws, is declined, or its project is rejected. Releasing a slot, or raising $C$, makes a Full project Open.
+  \textbf{Capacity.} Let $C$ be the supervisor's capacity for the project and $R$ the number of
+  slots reserved. A listed project is \emph{Open} while $R<C$ and \emph{Full} when $R=C$. A team's
+  application, and a team's acceptance on its own, do not use a slot. A slot is reserved when the
+  supervisor accepts a team (the state \emph{Supervisor Accepts}, or \emph{Agreed} when the team had
+  already accepted), and $R$ increases by one. A reserved slot is released, only if one was
+  reserved, when that team is declined or withdraws, when its team project is rejected, or when it
+  dissolves after approval. Releasing a slot, or raising $C$, makes a Full project Open. A project
+  becomes \emph{Closed} when the selection period ends, whether it is Open or Full. A Closed project
+  with no approved team is \emph{unselected} (see \ucref{UC_FollowUpUnselected}).
 
   \textbf{Review.} Proposals and team projects are each reviewed by the course instructor, who can approve,
   request changes (the proposer or team then resubmits), or reject. In an \emph{external} approval mode the
@@ -1856,9 +1860,9 @@ Student (Priya), Instructor (Dr. Reyes)
       team & Team & Reference to the team that the project application belongs to. \\ \hline
       project & Project & Reference to the Project that the application is for. \\ \hline
       submission\_date & DateTime & When the application was submitted. \\ \hline
-      status & Enum & Team-project status: APPLIED, AGREEMENT\_PENDING, AGREED, SUBMITTED, UNDER\_REVIEW, CHANGES\_REQUESTED, REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
-      supervisor\_accepted & Boolean & Whether the supervisor has accepted working with the team. \\ \hline
-      team\_accepted & Boolean & Whether the team has accepted working with the supervisor. AGREEMENT\_PENDING means exactly one of the two is true; AGREED means both are. \\ \hline
+      status & Enum & Team-project status: APPLIED, SUPERVISOR\_ACCEPTS, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING, AGREED, SUBMITTED, UNDER\_REVIEW, CHANGES\_REQUESTED, REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
+      supervisor\_accepted & Boolean & Whether the supervisor has accepted the team. True means a slot is reserved for the team, until the team is declined, withdraws, is rejected, or dissolves. \\ \hline
+      team\_accepted & Boolean & Whether the team has accepted the supervisor. SUPERVISOR\_ACCEPTS means only the supervisor has accepted, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING means only the team has, and AGREED means both have. \\ \hline
       threads & Collection\textless Thread\textgreater & Communication medium on the application. \\ \hline
 
       % Thread
