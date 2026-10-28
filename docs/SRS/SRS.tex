@@ -278,7 +278,7 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     \item lets students and teams create structured profiles of their skills, experience, interests, and work style
     that other students and supervisors can view, indicate whether they are looking for a team,
     and find teammates interested in the same projects;
-    \item suggests compatible teammates and suitable projects to students, based on their profiles and preferences
+    \item as a stretch goal, suggests compatible teammates and suitable projects to students, based on their profiles and preferences
     \item lets student teams express interest in supervisor-proposed projects;
     \item supports communication between all users regarding project proposals, team formations, applications and
     and approvals, ensuring discussions are organized and accessible to relevant parties;
@@ -534,8 +534,8 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     \item \textbf{Easier team formation.} Students can describe their skills, experience, work style, and
     project preferences in a structured profile, find teammates with compatible profiles and preferences,
     and propose projects of their own for others to join.
-    \item \textbf{Informed matching.} Students receive suggestions of compatible teammates and suitable
-    projects based on their profiles and preferences.
+    \item \textbf{Informed matching (stretch goal).} Students receive suggestions of compatible
+    teammates and suitable projects based on their profiles and preferences.
     \item \textbf{Informed supervisors.} Supervisors can see student-proposed projects and the skills and
     experience of the students and teams interested in their projects.
     \item \textbf{Efficient communication during selection.} Questions and answers about a project or
@@ -717,6 +717,8 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     installation. An internet connection is required.
     \item \textbf{Modular features.} Each major feature shall be able to be enabled or disabled
     independently for each course, so that a course can use only the parts that fit its process.
+    The design shall support this from the start. The instructor-facing toggles are delivered in
+    Phase 3 (see Appendix B).
     \item \textbf{Independent of any one approval tool.} \projname{} shall not depend on a specific
     external tool, such as the GitLab merge request process used by the Software Engineering course,
     to function. It shall support courses that carry out approval in the platform, courses that carry
@@ -1508,7 +1510,7 @@ Student (Priya), Instructor (Dr. Reyes)
               \rationale{Team profiles help supervisors evaluate the overal team's interests and whether the team's goals and skills align with the project in a consolidated way without having to go through each team member's profile.}
               \fitcrit{Authorized team members can create and modify their team profile based on their team members' profiles. Other users can view these profiles.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label12}:] The system shall recommend other available students/teams and capstone projects based on shared skills, interests, experience, and project preferences.
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label12}:] The system should recommend other available students/teams and capstone projects based on shared skills, interests, experience, and project preferences. This is a stretch goal and is not required for this release.
               \rationale{Recommendations help student obtain the desired experience from the capstone course and work on projects that match their interests while pairing with like-minded students.}
               \fitcrit{Students can receive teammate and project recommendations after their profile is complete based on highest similarities.}
 
@@ -2585,14 +2587,12 @@ Professor who runs the course.
   organized as a prioritized list of requirements, or it could show the
   requirements that will be implemented for ``phase 1'', ``phase 2'', etc.}
 
-  \section{Development Plan}
-
 Requirements are grouped into phases. Phase 1 creates the smallest end-to-end
 path through the lifecycle (see Figure~\ref{fig:lifecycle}), so that a project can be proposed, approved, listed, selected, and finally approved for a
 team. Priority within a phase follows the instructor's biggest pain point(repetitive review of team submissions) 
 and then the dependencies between features.
 
-\subsection{Phase 1: Core Workflow (implemented in the course)}
+\subsubsection{Phase 1: Core Workflow (implemented in the course)}
 \begin{itemize}
   \item Supervisor proposal submission with a structured template, and
     instructor approval before a project is listed
@@ -2608,37 +2608,49 @@ and then the dependencies between features.
     working version.
   \item Validated team composition export
     (\ucref{UC_ValidateTeams}; \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin}).
+  \item Team formation: creating and joining teams, assigning a point of contact, and validating
+    membership against the course rules (\rref{FR_Label8}, \rref{FR_Label9}). UC4 and UC12 both
+    require a registered team.
+  \item Supervisor capacity: capturing capacity in the proposal template, deriving Open and Full
+    from slots reserved (Section~\ref{sec:lifecycle}), and displaying them (\rref{FR_Label1},
+    \rref{FR_Label6}).
+  \item Supervisor and team acceptance, which reserves a slot and records agreement
+    (\rref{FR_Label14}). UC12 starts from the Agreed state.
 \end{itemize}
 
-\subsection{Phase 2: Communication and Visibility (implemented in the course)}
+\subsubsection{Phase 2: Communication and Visibility (implemented in the course)}
 \begin{itemize}
   \item Email notifications for status changes and tasks, and a checklist of
     required actions (\ucref{UC_NotifyChecklist}; \ref{SR_StatusNotify},
     \ref{SR_PushNotify}, \ref{SR_Checklist}).
-  \item Team profiles visible to supervisors, and team contact details
+   \item Student and team profiles, seeking-a-team status, and team contact details
     (\ucref{UC_TeamProfile}, \ucref{UC_ViewTeam}; \ref{SR_StudentProfiles},
-    \ref{SR_TeamContacts}).
-  \item Course schedule and timelines (\ucref{UC_ViewTimelines};
-    \ref{SR_CrossCourseTimelines}).
+    \ref{SR_TeamContacts}; \rref{FR_Label7}, \rref{FR_Label10}, \rref{FR_Label11}).
+  \item Comment threads on projects, teams, and applications (\rref{FR_Label15}).
+  \item Course schedule and timelines, guidelines, FAQ, examples of past projects, and early
+    access to course information (\ucref{UC_ViewTimelines}; \ref{SR_CrossCourseTimelines},
+    \ref{SR_ProposalGuidance}, \ref{SR_CourseInfoEarly}; \rref{FR_Label23}). The guidelines
+    content moved here from Phase 3 because \rref{FR_Label23} covers both and has one phase.
   \item Identifying unselected projects
     (\ucref{UC_FollowUpUnselected}; \ref{SR_UnselectedProjects}).
 \end{itemize}
 
-\subsection{Phase 3: Extended Features (implemented if time allows)}
+\subsubsection{Phase 3: Extended Features (implemented if time allows)}
 \begin{itemize}
   \item Student-initiated project proposals
   (\ucref{UC_ProposeOwnProject}; \ref{SR_StudentProposals}). Phase 1 already
     provides most of the approval flow, so this mainly adds a proposal path, a
     student-proposed project list that supervisors can browse, and an optional field
     for naming a supervisor.
-  \item Guidelines, FAQ, examples of past projects, and early access to course
-    information (\ref{SR_ProposalGuidance}, \ref{SR_CourseInfoEarly}). This
-    is mostly content, so it can be added without changing the core system.
-  \item Supervisor capacity limits (a count of teams per supervisor) and
-    related checks.
+  \item Submitting changes to approved team and project information (\rref{FR_Label21}).
+  \item Instructor-facing feature toggles and the checks that block disabling a feature with
+    pending records (\rref{FR_Label22}, \rref{FR_Label32}). The design supports toggling from
+    the start (see System Constraints). Until this phase, all features are enabled.
+  \item Re-verification for critical actions and logging of external provider errors
+    (\rref{FR_Label35}, \rref{FR_Label31}).
 \end{itemize}
 
-\subsection{Future Work (not implemented, or faked for the demo)}
+\subsubsection{Future Work (not implemented, or faked for the demo)}
 \begin{itemize}
   \item (\ref{SR_SinglePlace}) a single place for all capstone coordination,
     is addressed in part by the above, but full replacement of external tools
@@ -2646,21 +2658,62 @@ and then the dependencies between features.
   \item Meeting notes, searchable communication history, and suggested
     meeting schedules are not in the current requirements. They would be added
     after the core system is stable.
-  \item Matching teams to projects by skills and interests is future work. It
-    is optional and the instructor wants it to be switchable.
+  \item Recommending teammates and projects from profile data (\rref{FR_Label12}) is a stretch
+    goal and is not part of this release. The instructor wants it to be switchable. Until then,
+    students browse the catalog and the student and team lists themselves.
+  \item The approval adapter for external systems (the automatic half of \rref{FR_Label19}) and
+    real McMaster SSO integration (the full form of \rref{FR_Label28}).
   \item Support for other capstone courses or universities (modularity) is a
     design goal, but a second deployment is future work.
 \end{itemize}
 
-\subsection{Faked or Simplified for the Course}
+\subsubsection{Faked or Simplified for the Course}
 \begin{itemize}
   \item Email delivery may use a test mailbox or log messages instead of
     reaching real inboxes during demos.
-  \item Authentication may use a simplified sign-in for the demo, with real
+  \item Authentication uses a simplified sign-in for the demo (\rref{FR_Label28}), with real
     integration with university accounts as future work.
+  \item Approvals are recorded manually by the instructor or TA (\rref{FR_Label19}). No
+    external system is synchronized.
   \item Data may be seeded with example projects, teams, and supervisors
     instead of imported from the existing forms and spreadsheets.
 \end{itemize}
+
+\subsubsection{Phase Allocation of Functional Requirements}
+Each functional requirement has exactly one phase in which a requirement is only partly built in
+its phase, the note says what the demo does instead.
+
+\begin{longtable}{p{0.12\textwidth} p{0.14\textwidth} p{0.6\textwidth}}
+  \toprule
+  FR & Phase & Note \\
+  \midrule
+  \rref{FR_Label1}--\rref{FR_Label2} & 1 & Proposal template and required fields. \\ \hline
+  \rref{FR_Label3} & 3 & Student-proposed projects. \\ \hline
+  \rref{FR_Label4}--\rref{FR_Label6} & 1 & Proposal review, catalog, and Open/Full status. \\ \hline
+  \rref{FR_Label7} & 2 & Student profiles. \\ \hline
+  \rref{FR_Label8}--\rref{FR_Label9} & 1 & Team formation and validation. \\ \hline
+  \rref{FR_Label10}--\rref{FR_Label11} & 2 & Seeking a team and team profiles. \\ \hline
+  \rref{FR_Label12} & Future & Stretch goal. Browsing replaces it. \\ \hline
+  \rref{FR_Label13}--\rref{FR_Label14} & 1 & Applying and supervisor/team acceptance. \\ \hline
+  \rref{FR_Label15}--\rref{FR_Label16} & 2 & Threads and email notifications. \\ \hline
+  \rref{FR_Label17}--\rref{FR_Label18} & 1 & Team project submission and review. \\ \hline
+  \rref{FR_Label19} & 1 & Manual recording only. The adapter is Future Work. \\ \hline
+  \rref{FR_Label20} & 1 & Automated submission checks. \\ \hline
+  \rref{FR_Label21} & 3 & Changes after approval. \\ \hline
+  \rref{FR_Label22} & 3 & Feature toggles. All features are enabled until then. \\ \hline
+  \rref{FR_Label23}--\rref{FR_Label25} & 2 & Course resources, checklist, and reminders. \\ \hline
+  \rref{FR_Label26} & 2 & Instructor and TA visibility. \\ \hline
+  \rref{FR_Label27} & 1 & Validated export. \\ \hline
+  \rref{FR_Label28} & 1 & Simplified sign-in. Real SSO is Future Work. \\ \hline
+  \rref{FR_Label29} & 1 & Role-based access. \\ \hline
+  \rref{FR_Label30} & 2 & Role management. Users are seeded in Phase 1. \\ \hline
+  \rref{FR_Label31} & 3 & External error logging. \\ \hline
+  \rref{FR_Label32} & 3 & Blocks disabling a feature with pending records. \\ \hline
+  \rref{FR_Label33}--\rref{FR_Label34} & 2 & Timestamps and durable notifications. \\ \hline
+  \rref{FR_Label35} & 3 & Re-verification. \\ \hline
+  \bottomrule
+  \caption{Phase Allocation of Functional Requirements}
+\end{longtable}
 
   \subsection{Appendix C: Values of Auxiliary Constants}
 
