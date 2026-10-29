@@ -67,12 +67,12 @@ Oct 19th & Ayush Patel & Roadmap for Safety Req Implementation \\
 
 \wss{You can include your definition of what a hazard is here.}
 
-Keystone is a capstone project discovery and management platform intended to support the lifecycle of a capstone
+\projname{} is a capstone project discovery and management platform intended to support the lifecycle of a capstone
 project, from project proposal and discovery through team formation, project approval, and the management of
 project information. The platform is intended to serve students, project supervisors, course instructors, and
 teaching assistants (TAs).
 
-Although Keystone is not intended to control physical equipment or perform safety-critical operations, failures can
+Although \projname{} is not intended to control physical equipment or perform safety-critical operations, failures can
 still cause harm. Examples include unauthorized disclosure of confidential project and student information,
 invalid team assignments, lost or inconsistent project updates, and misleading approval or notification status.
 These failures could delay academic activities, create unnecessary work, and damage trust.
@@ -81,7 +81,7 @@ We define a hazard as an unsafe system condition that, in combination with parti
 contribute to an undesirable outcome. Hazard analysis examines how system failures and interactions can produce such
 conditions and identifies measures to eliminate or control them \citep{IppolitoAndWallace1995,Leveson2011}.
 
-This document identifies potential hazards associated with Keystone, analyzes the ways in which system components may
+This document identifies potential hazards associated with \projname{}, analyzes the ways in which system components may
 fail, and proposes mitigations that can be translated into verifiable safety and security requirements.
 
 \section{Scope and Purpose of Hazard Analysis}
@@ -90,7 +90,7 @@ fail, and proposes mitigations that can be translated into verifiable safety and
 hazards.}
 
 The scope includes functional failures, integration failures, security and privacy weaknesses, usability and
-accessibility issues, and foreseeable user errors. It also considers failures at the boundaries between Keystone
+accessibility issues, and foreseeable user errors. It also considers failures at the boundaries between \projname{}
 and external services.
 
 This hazard analysis covers the following categories of loss:
@@ -139,25 +139,25 @@ important library, these are also potential components.}
 
 \subsection{System Boundary}
 
-Keystone is the system under analysis. Its boundary includes the application logic, persistent data, user-facing
+\projname{} is the system under analysis. Its boundary includes the application logic, persistent data, user-facing
 functionality, and integrations implemented or configured specifically for the platform.
 See Figure~\ref{fig:systemcontext}
 
-External services are not assumed to be under Keystone's direct control. Nevertheless, their interfaces and the
-consequences of their failure are included in the analysis because Keystone depends on them to provide its intended
+External services are not assumed to be under \projname{}'s direct control. Nevertheless, their interfaces and the
+consequences of their failure are included in the analysis because \projname{} depends on them to provide its intended
 functionality.
 
 \begin{figure}[h!]
     \centering
     \includegraphics[width=\textwidth]{Keystone_SystemContext}
-    \caption{System and boundary context diagram for Keystone}\label{fig:systemcontext}
+    \caption{System and boundary context diagram for \projname{}}\label{fig:systemcontext}
 \end{figure}
 
 The following external entities and services are relevant:
 
 \begin{itemize}
     \item \textbf{McMaster single sign-on (SSO):}
-    Provides authentication for users accessing Keystone
+    Provides authentication for users accessing \projname{}
     through their McMaster credentials.
 
     \item \textbf{External authentication provider:}
@@ -169,12 +169,16 @@ The following external entities and services are relevant:
     approvals, supervisor confirmations, and other events.
 
     \item \textbf{External approval system:}
-    A course-specific system outside Keystone where a course approves team projects, for
+    A course-specific system outside \projname{} where a course approves team projects, for
     example the GitLab merge request process used by the Software Engineering course. It is
-    not under Keystone's control. In \emph{external} approval mode, the instructor or a TA
-    records the approval outcome in Keystone by hand. In \emph{integrated} mode, an approval
-    adapter (a Keystone component) reads the approval state through the external approval system's interface and
-    updates Keystone's records.
+    not under \projname{}'s control. In \emph{external} approval mode, the instructor or a TA
+    records the approval outcome in \projname{} by hand. In \emph{integrated} mode, an approval
+    adapter (a \projname{} component) reads the approval state through the external approval system's interface and
+    updates \projname{}'s records.
+
+    \item \textbf{Avenue to Learn:}
+    McMaster's learning management system. \projname{} reads a course's enrollment list from it, for courses that have an
+    Avenue site. It is not under \projname{}'s control and may be unavailable, out of date, or incomplete.
 \end{itemize}
 
 \subsection{Major Components}
@@ -226,8 +230,8 @@ be functional boundaries for hazard identification, rather than a complete softw
     configuration, approval states, and user permissions.
 
     \item \textbf{Approval adapter (integrated mode):}
-    Reads approval state from an external approval system and updates Keystone's records.
-    Failures may leave Keystone showing a state that differs from the external system.
+    Reads approval state from an external approval system and updates \projname{}'s records.
+    Failures may leave \projname{} showing a state that differs from the external system.
 
     \item \textbf{Recommendation component:}
     Ranks or filters projects and potential
@@ -249,14 +253,14 @@ this potential failure mode.}
     \item \textbf{Instructor authority:}
         Course instructors remain responsible for final project
         approval, the interpretation of course rules, and
-        exceptional team-formation decisions. Keystone supports
+        exceptional team-formation decisions. \projname{} supports
         these decisions but does not replace the instructor's
         judgment regarding project feasibility, scope, or
         academic suitability.
     \item \textbf{Authentication provider availability:}
         McMaster SSO and any external authentication provider
         are external dependencies and may become unavailable.
-        Keystone cannot guarantee their continuous operation
+        \projname{} cannot guarantee their continuous operation
         but must handle authentication failures safely.
     \item \textbf{Accuracy of user-supplied information:}
         Students and supervisors may submit incomplete,
@@ -271,6 +275,10 @@ this potential failure mode.}
         deployments. Disabling a feature must not leave
         dependent workflows in an invalid state or expose
         information that would otherwise be restricted.
+    \item \textbf{Enrollment data availability and accuracy:}
+        Avenue to Learn is an external dependency, and not every course has an Avenue site. Its enrollment data may be
+        unavailable, out of date, or incomplete. \projname{} cannot guarantee that an imported list is correct, so course
+        staff remain responsible for confirming imports and for adding students who are missing.
 \end{enumerate}
 
 \setlength{\tabcolsep}{4pt}
@@ -456,7 +464,6 @@ Define a retention period and delete personal data on request and at the end of 
 \ref{SSR-16} &
 H8-2 \\
 
-
 \addlinespace
 \hline
 \addlinespace
@@ -468,6 +475,51 @@ Recommendation algorithm performs badly, inputs are outdated &
 Provide multiple ways to sort project list & 
 \ref{SSR-7} & 
 H9-1 \\
+
+\addlinespace
+\hline
+\addlinespace
+
+Enrollment import &
+Avenue unavailable or the import fails &
+Course cannot be populated with its students, team validation cannot run, team formation and approval are delayed &
+Avenue outage, change to Avenue access, or the course has no Avenue site &
+Leave existing enrollment unchanged, tell the user, and offer file upload &
+\ref{SSR-18} &
+H10-1 \\
+
+\addlinespace
+\addlinespace
+
+&
+Import produces a wrong list (missing, duplicate, or mismatched students) &
+Students wrongly blocked from or admitted to the course, invalid team validation results &
+Stale or partial data from Avenue, malformed identifiers &
+Check student identifiers, detect duplicates, and show an import preview for the user to review and confirm before applying changes. &
+\ref{SSR-17}, \ref{SSR-20} &
+H10-2 \\
+
+\addlinespace
+\addlinespace
+
+&
+Student missing from the import is removed from a team automatically &
+Team becomes undersized or invalid in the middle of approval, student loses their place without notice &
+Import treated as the single source of truth and applied without review &
+Flag absent students for review and never remove them automatically &
+\ref{SSR-19} &
+H10-3 \\
+
+\addlinespace
+\addlinespace
+
+&
+Student who joins late cannot be added &
+Student has no team and no way to use the platform, and team formation is delayed &
+The import is the only way to add students &
+Let course staff add students from an additional file import &
+\ref{SSR-18} &
+H10-4 \\
 
 \addlinespace
 
@@ -544,6 +596,22 @@ rationale design process how and why to fake it.)}
     \textbf{Rationale}: Keeping personal data longer than needed increases the harm of a breach.\\
     \textbf{Traces To}: NFR11
 
+    \item \label{SSR-17} The system shall show a preview of any enrollment import and shall apply it only after course staff confirm it.\\
+    \textbf{Rationale}: An unchecked import could wrongly add or exclude students and give misleading team validation results.\\
+    \textbf{Traces To}: FR36
+
+    \item \label{SSR-18} If an enrollment import fails or does not include a student, the system shall leave existing enrollment unchanged, tell the user, and let course staff add students from a file or manually.\\
+    \textbf{Rationale}: Avenue may be unavailable, may not exist for a course, or may lack late-joining students, and course staff must still be able to populate the course.\\
+    \textbf{Traces To}: FR31, FR36, FR37
+
+    \item \label{SSR-19} The system shall not remove a student from a course or team because the student is absent from an enrollment import, and shall flag such students for confirmation by course staff.\\
+    \textbf{Rationale}: Automatic removal could leave a team undersized or invalid in the middle of approval.\\
+    \textbf{Traces To}: FR38
+
+    \item \label{SSR-20} The system shall check imported enrollment for duplicate and malformed student entries and show any problems in the preview before the import can be confirmed.\\
+    \textbf{Rationale}: Stale or partial data from an external source can corrupt enrollment records.\\
+    \textbf{Traces To}: FR36
+
 \end{enumerate}
 
 \section{Roadmap}
@@ -578,6 +646,8 @@ team project submission and review, and the validated team composition export.
     \item \ref{SSR-6}: automated database backups by the hosting provider, and a restore test before release
     (H8-1).
     \item \ref{SSR-15}: decline and rejection message templates, with no public rankings (H6-2).
+    \item \ref{SSR-17}, \ref{SSR-18}, \ref{SSR-19}, \ref{SSR-20}: preview and confirmation, fallbacks, flagging, and
+    checks for imported enrollment (H10-1 to H10-4). Enrollment import is part of Phase~1 in the SRS.
 \end{itemize}
 
 \subsection{Phase 2: Communication and Visibility (implemented in the course)}
