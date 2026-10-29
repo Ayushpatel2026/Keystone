@@ -45,6 +45,7 @@
 \usepackage{afterpage}
 \usepackage{parskip}
 \usepackage{enumerate}
+\usepackage{enumitem}
 
 \usepackage[round]{natbib}
 
@@ -2136,12 +2137,12 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsection{Look and Feel Requirements}
   \subsubsection{Appearance Requirements}
-  \begin{enumerate}[{LF-A}1.]
+  \begin{enumerate}[label=LF-A\arabic*, ref=LF-A\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Style Requirements}
-  \begin{enumerate}[{LF-S}1.]
+  \begin{enumerate}[label=LF-S\arabic*, ref=LF-S\arabic*]
     \item ..
   \end{enumerate}
 
@@ -2149,8 +2150,8 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Usability and Humanity Requirements}
   \subsubsection{Ease of Use Requirements}
 
-  \begin{enumerate}[{UH-EOU}1.]
-    \item A first-time user shall be able to access the platform and complete their primary tasks
+  \begin{enumerate}[label=UH-EOU\arabic*, ref=UH-EOU\arabic*]
+    \item\label{UH-EOU1} A first-time user shall be able to access the platform and complete their primary tasks
     within \usabilityTestTime{}.\\
     \textbf{Rationale}: No assumptions about users can be made beyond basic web browsing abilities, as described in the user characteristics section (Section~\ref{SecUserCharacteristics}). Many existing web applications that perform similar functions are able to provide an intuitive experience requiring no prior knowledge.\\
     \textbf{Fit Criterion}: A first-time user shall be able to complete the procedure as described in
@@ -2159,23 +2160,23 @@ Instructor (Dr. Reyes), Teaching Assistant
   \end{enumerate}
 
   \subsubsection{Personalization and Internationalization Requirements}
-  \begin{enumerate}[{UH-PI}1.]
+  \begin{enumerate}[label=UH-PI\arabic*, ref=UH-PI\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Learning Requirements}
-  \begin{enumerate}[{UH-L}1.]
+  \begin{enumerate}[label=UH-L\arabic*, ref=UH-L\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Understandability and Politeness Requirements}
-  \begin{enumerate}[{UH-UP}1.]
+  \begin{enumerate}[label=UH-UP\arabic*, ref=UH-UP\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Accessibility Requirements}
-  \begin{enumerate}[{UH-A}1.]
-    \item The system shall conform to the WCAG 2.0 Level AA standard.\\
+  \begin{enumerate}[label=UH-A\arabic*, ref=UH-A\arabic*]
+    \item\label{UH-A1} The system shall conform to the WCAG 2.0 Level AA standard.\\
     \textbf{Rationale}: The system will be a public-facing site which operates within Ontario's jurisdiction and must, at least, conform to the minimum standard set by AODA.\\
     \textbf{Fit Criterion}: An automated audit using an industry standard tool (such as Axe or Lighthouse) running on all user interfaces, reporting no critical violations.
 
@@ -2183,26 +2184,26 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsection{Performance Requirements}
   \subsubsection{Speed and Latency Requirements}
-  \begin{enumerate}[{PR-SL}1.]
-    \item The system shall respond to user requests with a \tailPercentile{} percentile latency of at most \tailLatency{} while serving \concurrentUsers{} peak concurrent users.\\
+  \begin{enumerate}[label=PR-SL\arabic*, ref=PR-SL\arabic*]
+    \item\label{PR-SL1} The system shall respond to user requests with a \tailPercentile{} percentile latency of at most \tailLatency{}.\\
     \textbf{Rationale}: Use is concentrated at the start of the academic year, when projects are proposed and teams are formed (see System Context). The system is expected to have up to \concurrentUsers{} staff, students, and external supervisors active at the same time during this period. A slow experience can hurt adoption, and a failure to handle load can lead to service degradation.\\
     \textbf{Fit Criterion}: A load test simulates \concurrentUsers{} concurrent users for a sustained period. Each simulated user repeatedly performs a representative mix of tasks (e.g., browsing the project catalog, viewing a project, applying to a project, replying to a thread) with a \thinkTime{} pause between actions. The latency of every request is recorded, and the \tailPercentile{} percentile is at most \tailLatency{}. The resulting request rate is measured and reported with the test results, rather than fixed in advance.
 
   \end{enumerate}
 
   \subsubsection{Safety-Critical Requirements}
-  \begin{enumerate}[{PR-SC}1.]
+  \begin{enumerate}[label=PR-SC\arabic*, ref=PR-SC\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Precision or Accuracy Requirements}
-  \begin{enumerate}[{PR-PA}1.]
+  \begin{enumerate}[label=PR-PA\arabic*, ref=PR-PA\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Robustness or Fault-Tolerance Requirements}
-  \begin{enumerate}[{PR-RFT}1.]
-    \item The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
+  \begin{enumerate}[label=PR-RFT\arabic*, ref=PR-RFT\arabic*]
+    \item\label{PR-RFT1} The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
     \textbf{Rationale}: The system being inaccessible can result in missed deadlines, data loss, and overall frustration. This can impact adoption, perception, and erode trust.\\
     \textbf{Fit Criterion}: The system responds to a periodic health check, which runs every minute, with success responses accounting for at least \uptimePercent{} over a 30-day period. Scheduled maintenance windows are excluded from the measurement.
 
@@ -2212,69 +2213,71 @@ Instructor (Dr. Reyes), Teaching Assistant
   \end{enumerate}
 
   \subsubsection{Capacity Requirements}
-  \begin{enumerate}[{PR-C}1.]
-    \item ..
+  \begin{enumerate}[label=PR-C\arabic*, ref=PR-C\arabic*]
+    \item\label{PR-C1} The system shall be capable of handling at least \concurrentUsers{} concurrent users without any degradation to performance.\\
+    \textbf{Rationale}: Users will be accessing similar resources concurrently, especially at the start of a year. System degradation can prevent users from performing essential tasks.\\
+    \textbf{Fit Criterion}: The system shall meet the thresholds specified in \ref{PR-SL1} with \concurrentUsers{} simulated users.
   \end{enumerate}
 
   \subsubsection{Scalability or Extensibility Requirements}
-  \begin{enumerate}[{PR-SE}1.]
+  \begin{enumerate}[label=PR-SE\arabic*, ref=PR-SE\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Longevity Requirements}
-  \begin{enumerate}[{PR-L}1.]
+  \begin{enumerate}[label=PR-L\arabic*, ref=PR-L\arabic*]
     \item ..
   \end{enumerate}
 
   \subsection{Operational and Environmental Requirements}
   \subsubsection{Expected Physical Environment}
-  \begin{enumerate}[{OE-EPE}1.]
+  \begin{enumerate}[label=OE-EPE\arabic*, ref=OE-EPE\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Wider Environment Requirements}
-  \begin{enumerate}[{OE-WE}1.]
+  \begin{enumerate}[label=OE-WE\arabic*, ref=OE-WE\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Requirements for Interfacing with Adjacent Systems}
-  \begin{enumerate}[{OE-IAS}1.]
-    \item The system shall be accessible on Firefox (v158), Safari (v27), and any Chromium-based (v156) web browser running on a desktop-sized or mobile-sized screen. The hosted component of the system shall run on any machine that supports Docker (Engine version v29).\\
+  \begin{enumerate}[label=OE-IAS\arabic*, ref=OE-IAS\arabic*]
+    \item\label{OE-IAS1} The system shall be accessible on Firefox (v158), Safari (v27), and any Chromium-based (v156) web browser running on a desktop-sized or mobile-sized screen. The hosted component of the system shall run on any machine that supports Docker (Engine version v29).\\
     \textbf{Rationale}: Web browsers provide an abstraction layer that isolates functionality from the underlying operating system environment, making OS-support a concern for browser developers. Similarly, Docker provides an abstraction layer over the underlying operating system and a sandboxed environment for executing code.\\
     \textbf{Fit Criterion}: All target browsers shall be tested using an automated web testing tool such as Playwright or Selenium and complete all tests successfully. This is described in-depth in Section~4.2.3 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan}.
 
   \end{enumerate}
 
   \subsubsection{Productization Requirements}
-  \begin{enumerate}[{OE-P}1.]
-    \item The system shall be deployable by an IT professional by following the deployment guide with no assistance in under \deployTime{}.\\
+  \begin{enumerate}[label=OE-P\arabic*, ref=OE-P\arabic*]
+    \item\label{OE-P1} The system shall be deployable by an IT professional by following the deployment guide with no assistance in under \deployTime{}.\\
     \textbf{Rationale}: Issues during deployment can increase downtime which results in frustration with the platform.\\
     \textbf{Fit Criterion}: A technically competent individual outside of the main development team is able to complete the task described in Section~4.2.2 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan} within the time constraint.
 
   \end{enumerate}
 
   \subsubsection{Release Requirements}
-  \begin{enumerate}[{OE-R}1.]
+  \begin{enumerate}[label=OE-R\arabic*, ref=OE-R\arabic*]
     \item ..
   \end{enumerate}
 
 
   \subsection{Maintainability and Support Requirements}
   \subsubsection{Maintenance Requirements}
-  \begin{enumerate}[{MS-M}1.]
-    \item The effort required to make likely changes, which can be found in Section~\ref{LC_LikelyChanges}, shall be less than \maintFrac{} of the original development time.\\
+  \begin{enumerate}[label=MS-M\arabic*, ref=MS-M\arabic*]
+    \item\label{MS-M1} The effort required to make likely changes, which can be found in Section~\ref{LC_LikelyChanges}, shall be less than \maintFrac{} of the original development time.\\
     \textbf{Rationale}: A system which is difficult to maintain will eventually reach an unusable state when environments change (e.g.: hardware changes or software updates introduce/expose bugs, vulnerabilities are discovered, privacy regulations change, etc.) and fixes/updates are too costly to perform.\\
     \textbf{Fit Criterion}: Based on a development effort of 40 hours / week, maintenance cost shall not exceed \changeEffort{} / week.
   \end{enumerate}
 
   \subsubsection{Supportability Requirements}
-  \begin{enumerate}[{MS-S}1.]
+  \begin{enumerate}[label=MS-S\arabic*, ref=MS-S\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Adaptability Requirements}
-  \begin{enumerate}[{MS-A}1.]
-    \item All major features, with the exception of the RBAC component, can be disabled on a live system with no code changes.\\
+  \begin{enumerate}[label=MS-A\arabic*, ref=MS-A\arabic*]
+    \item\label{MS-A} All major features, with the exception of the RBAC component, can be disabled on a live system with no code changes.\\
     \textbf{Rationale}: The need to toggle major features was established during stakeholder interviews. The platform needs to be flexibile to fit the working style of a variety of instructors. RBAC ensures visibility rules are enforced and this is essential for protecting sensitive information.\\
     \textbf{Fit Criterion}: Every major feature can be disabled on a live system with no code changes.
   \end{enumerate}
@@ -2282,57 +2285,57 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsection{Security Requirements}
   \subsubsection{Access Requirements}
-  \begin{enumerate}[{SEC-AC}1.]
-    \item The system shall restrict access only to students, TAs, and instructors directly enrolled in the capstone courses, and to potential supervisors approved by an instructor. All users are only able to access data that they are approved to view. Non-approved users are unable to read or write any data.\\
+  \begin{enumerate}[label=SEC-AC\arabic*, ref=SEC-AC\arabic*]
+    \item\label{SEC-AC} The system shall restrict access only to students, TAs, and instructors directly enrolled in the capstone courses, and to potential supervisors approved by an instructor. All users are only able to access data that they are approved to view. Non-approved users are unable to read or write any data.\\
     \textbf{Rationale}: The system stores sensitive user and course data which is a primary target of cyber attacks.\\
     \textbf{Fit Criterion}: Unauthenticated users receive an error response when making requests which are not authentication-related. Authenticated users receive an error response when requesting or modifying data they are not authorized to view or modify.
 
   \end{enumerate}
 
   \subsubsection{Integrity Requirements}
-  \begin{enumerate}[{SEC-INT}1.]
-    \item All data operations involving multiple data entities must concurrency-safe.\\
+  \begin{enumerate}[label=SEC-INT\arabic*, ref=SEC-INT\arabic*]
+    \item\label{SEC-INT1} All data operations involving multiple data entities must concurrency-safe.\\
     \textbf{Rationale}: Many data operations will be executing at any given time and the system must ensure all data operations must not operate on stale or corrupt data.\\
     \textbf{Fit Criterion}: The system remains in a correct state after a series of concurrent data modification operations.
 
   \end{enumerate}
 
   \subsubsection{Privacy Requirements}
-  \begin{enumerate}[{SEC-P}1.]
-    \item The system shall only collect essential personal data, ensure data is encrypted in-transit and at rest, and passwords are never stored in plaintext.\\
+  \begin{enumerate}[label=SEC-P\arabic*, ref=SEC-P\arabic*]
+    \item\label{SEC-P1} The system shall only collect essential personal data, ensure data is encrypted in-transit and at rest, and passwords are never stored in plaintext.\\
     \textbf{Rationale}: The platform stores personal data to facilitate basic operations and is subject to regulations imposed by Ontario's FIPPA.\\
     \textbf{Fit Criterion}: The system refuses to respond to all requests made over an unencrypted connection.
   \end{enumerate}
 
   \subsubsection{Audit Requirements}
-  \begin{enumerate}[{SEC-AU}1.]
-    \item All user actions shall be audited including metadata such as when the actions where taken, what action was taken, the user, and their privilege level at the time of the action, in a tamper-resistant log.\\
+  \begin{enumerate}[label=SEC-AU\arabic*, ref=SEC-AU\arabic*]
+    \item\label{SEC-AU1} All user actions shall be audited including metadata such as when the actions where taken, what action was taken, the user, and their privilege level at the time of the action, in a tamper-resistant log.\\
     \textbf{Rationale}: User actions must be auditable to ensure any discrepancies about events such as team enrolment, project approvals, and other critical events are tracable.\\
     \textbf{Fit Criterion}: A full sequence of audit logs can be composed together to provide a 100\% accurate image of the system's state and the log cannot be modified from the interface or filesystem.
 
   \end{enumerate}
 
   \subsubsection{Immunity Requirements}
-  \begin{enumerate}[{SEC-IMM}1.]
+  \begin{enumerate}[label=SEC-IMM\arabic*, ref=SEC-IMM\arabic*]
     \item ..
   \end{enumerate}
 
 
   \subsection{Cultural Requirements}
   \subsubsection{Cultural Requirements}
-  \begin{enumerate}[{CUL-C}1.]
+  \begin{enumerate}[label=CUL-C\arabic*, ref=CUL-C\arabic*]
     \item ..
   \end{enumerate}
 
 
   \subsection{Compliance Requirements}
   \subsubsection{Legal Requirements}
-  \begin{enumerate}[{COMP-L}1.]
+  \begin{enumerate}[label=COMP-L\arabic*, ref=COMP-L\arabic*]
     \item ..
   \end{enumerate}
 
   \subsubsection{Standards Compliance Requirements}
-  \begin{enumerate}[{COMP-SC}1.]
+  \begin{enumerate}[label=COMP-SC\arabic*, ref=COMP-SC\arabic*]
     \item ..
   \end{enumerate}
 
