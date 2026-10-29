@@ -30,8 +30,7 @@
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+2026-10-29 & 1.0 & General Information\\
 \bottomrule
 \end{tabularx}
 
@@ -89,49 +88,57 @@ This document ... \wss{provide an introductory blurb and roadmap of the
 
 \subsection{Summary}
 
-\wss{Say what software is being tested.  Give its name and a brief overview of
-  its general functions.}
+The software under test is \projname{}, a web-based capstone project management system for the Software Engineering (SE), Computer Science (CS), and Mechatronics (TRON) capstone courses. \projname{} covers the lifecycle from project proposal to team project approval. Its main functions are:
+\begin{itemize}
+  \item structured project proposals by supervisors and student teams, with instructor review before a project is listed;
+  \item a searchable project catalog showing project status and supervisor capacity;
+  \item student and team profiles, team formation under course-specific rules, and teammate and project recommendations;
+  \item team applications to projects, supervisor and team acceptance, and comment threads attached to projects and applications;
+  \item team project submission with automated checks, and approval by instructors and TAs, either in the platform or recorded from an external process;
+  \item course enrollment import from Avenue to Learn or file upload, validated team composition export, and email notifications and checklists;
+  \item role-based access control, authentication through McMaster SSO or another trusted provider, and audit logging.
+\end{itemize}
+The requirements being verified are listed in the SRS \citep{SRS}.
 
 \subsection{Objectives}
 
-\wss{State what is intended to be accomplished.  The objective will be around
-  the qualities that are most important for your project.  You might have
-  something like: ``build confidence in the software correctness,''
-  ``demonstrate adequate usability.'' etc.  You won't list all of the qualities,
-  just those that are most important.}
 
-\wss{You should also list the objectives that are out of scope.  You don't have 
-the resources to do everything, so what will you be leaving out.  For instance, 
-if you are not going to verify the quality of usability, state this.  It is also 
-worthwhile to justify why the objectives are left out.}
+The objectives are ordered by priority, based on the risks identified in the SRS: errors in the approval workflow affect course records, errors in access control expose student data, and a hard-to-use platform will not be adopted by supervisors.
 
-\wss{The objectives are important because they highlight that you are aware of 
-limitations in your resources for verification and validation.  You can't do everything, 
-so what are you going to prioritize?  As an example, if your system depends on an 
-external library, you can explicitly state that you will assume that external library 
-has already been verified by its implementation team.}
+\textbf{In scope.}
+\begin{enumerate}
+  \item \textbf{Functional correctness.} Build confidence that the functional requirements (\rref{FR_Label1} to \rref{FR_Label40} in the SRS) are met, especially the project and team-project status lifecycle, supervisor capacity (slot reservation and release), team formation rules, submission validation, and enrollment import.
+  \item \textbf{Access control and privacy.} Demonstrate that users can only see and change what their role and course permit, and that data is protected in transit and at rest (NFR Access, NFR Privacy and Data Protection, DPR10 to DPR19).
+    \item \textbf{Usability.} Demonstrate that first-time users in the main roles (students, TAs, and professors) can complete their primary tasks within the usability time limit, and find the platform intuitive and easy to use (NFR Usability).
+  \item \textbf{Performance and installability.} Demonstrate that the system meets its latency target under the specified load, and that an IT professional can deploy it from the deployment guide within the time limit (NFR Performance, NFR Installability).
+  \item \textbf{Portability and accessibility.} Demonstrate that the system works on the target browsers and in Docker, and passes an automated accessibility audit (NFR Portability, NFR Accessibility).
+\end{enumerate}
+
+\textbf{Out of scope.}
+\begin{itemize}
+  \item \textbf{Quality of recommendations.} We will test that recommendations are produced and displayed (\rref{FR_Label12}), but not whether they are good matches. Recommendation quality is a stretch goal in the SRS, and judging it would need a study with real students.
+  \item \textbf{External systems.} We assume that McMaster SSO, Avenue to Learn, the email service, and third-party libraries have been verified by their developers. We test our handling of their failures (for example, an unavailable Avenue), not their correct operation. Following the SRS Development Plan, email delivery and authentication may be simulated during the course.
+  \item \textbf{Availability over time.} The availability criterion is measured over a long window (see the SRS), which cannot be observed within the course timeline. We will verify that the health check works and that the system meets the target over the period that the demo allows.
+  \item \textbf{Maintainability.} We will review the likely changes in the SRS against the design, but will not measure the actual effort of making changes.
+  \item \textbf{Features not implemented.} Requirements that the SRS Development Plan marks as future work, or as Phase 3 and not completed, will not be tested.
+  \item \textbf{Formal verification.} We do not plan formal proofs.
+  \item \textbf{Industry sponsors.} The usability test does not include external supervisors from industry, who have no McMaster account and are the least familiar with the course. Professors in the test represent internal supervisors and instructors. Findings about external supervisors will need follow-up testing if one becomes available.
+\end{itemize}
 
 \subsection{Custom Documents}
 
-\wss{Summarize the CDs (Custom Documents) that were tackled by this project.  CDs 
-can include usability testing, code walkthroughs, user documentation, formal
-proof, GenderMag personas, Design Thinking, etc.  CDs should have already
-been approved by the course instructor as included in your problem statement.
-You can use a pull request to update your CDs (in TeamComposition.csv or
-Repos.csv) if your plan changes as a result of the VnV planning exercise.}
+This project's Custom Document is a usability testing report. It records the results of the usability test described in Section~\ref{sec:usability-tests} and supports the Usability NFR in the SRS. In the test, we observe TAs, students, and professors using \projname{} to complete the primary tasks of their roles, to judge whether the platform is intuitive and easy to use without training. The report covers the participants and their roles, the tasks given, completion times, problems and points of confusion observed, and the changes made as a result.
 
 \subsection{Relevant Documentation}
 
-\wss{Reference relevant documentation.  This will definitely include your SRS
-  and your other project documents (design documents, like MG, MIS, etc).  You
-  can include these even before they are written, since by the time the project
-  is done, they will be written.  You can create BibTeX entries for your
-  documents and within those entries include a hyperlink to the documents.}
-
-\citet{SRS}
-
-\wss{Don't just list the other documents.  You should explain why they are relevant and 
-how they relate to your VnV efforts.}
+The following documents define what is verified and how the verification is organized.
+\begin{itemize}
+  \item \textbf{Software Requirements Specification (SRS)} \citep{SRS}. This is the main source for this plan. System tests are derived from its functional requirements, nonfunctional requirements and fit criteria, use cases, and data requirements. The SRS defines the symbolic constants (such as the number of concurrent users and the latency limit) that the nonfunctional tests use, and its traceability matrices will be extended to link each requirement to the tests in this document.
+  \item \textbf{Hazard Analysis} \citep{HazardAnalysis}. It identifies hazards such as failures of the external approval system and access control failures, and the safety and security requirements that follow from them. Tests are added for each of these requirements.
+  \item \textbf{Problem Statement and Goals} \citep{ProblemStatement}. It records the problems and goals that validation checks against. Validation with stakeholders asks whether the system solves these problems, not only whether it meets the SRS.
+  \item \textbf{Development Plan} \citep{DevelopmentPlan}. It defines the tools and workflow (such as version control, continuous integration, and linting) that the automated testing in this plan relies on.
+  \item \textbf{Module Guide (MG) and Module Interface Specification (MIS)} \citep{MG, MIS}. These will define the modules and interfaces that the unit tests in this plan target. The unit test sections will be completed after the design is finished.
+\end{itemize}
 
 \section{Plan}
 
