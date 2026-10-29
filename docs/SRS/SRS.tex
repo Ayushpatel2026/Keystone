@@ -2171,8 +2171,8 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Learning Requirements}
   \begin{enumerate}[label=UH-L\arabic*, ref=UH-L\arabic*]
-    \item A first time user shall be able to learn how to perform their primary tasks outlined in Section~\ref{sec:use-cases} with no training or assistance. \\
-    \item \textbf{Rationale}: \\
+    \item\label{UH-L1} A first time user shall be able to learn how to perform their primary tasks outlined in Section~\ref{sec:use-cases} with no training or assistance. \\
+    \textbf{Rationale}: Requiring an upfront, unnecessary time investment to learn how to use the platform can add friction and reduce adoption.\\
     \textbf{Fit Criterion}: User testing outlined in \ref{UH-EOU1} is satisfied with no assistance, prior training, or external learning material.
   \end{enumerate}
 
@@ -2374,7 +2374,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   %   \item ..
   % \end{enumerate}
   Not applicable.
-  
+
   %%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%
   
   % \noindent \begin{itemize}
@@ -2503,51 +2503,51 @@ Instructor (Dr. Reyes), Teaching Assistant
     Functional Requirements} \label{tab:SR2UC2FRtm}
   \end{longtable}
 
-  \begin{longtable}{p{0.20\textwidth} p{0.20\textwidth}}
+    \begin{longtable}{p{0.12\textwidth} p{0.45\textwidth}}
 
     \toprule
     Functional Req & Nonfunctional Req \\
     \midrule
-    \rref{FR_Label1} & \nfrref{NFR_Usability}, \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label2} & \nfrref{NFR_Usability}, \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label3} & \nfrref{NFR_Usability}, \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label4} & \nfrref{NFR_Access}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label5} & \nfrref{NFR_Usability}, \nfrref{NFR_Performance} \\ \hline
-    \rref{FR_Label6} & \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label7} & \nfrref{NFR_Access}, \nfrref{NFR_PrivacyDataProtection} \\ \hline
-    \rref{FR_Label8} & \nfrref{NFR_Integrity}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label9} & \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label10} & \nfrref{NFR_Usability} \\ \hline
-    \rref{FR_Label11} & \nfrref{NFR_Usability}, \nfrref{NFR_Access} \\ \hline
-    \rref{FR_Label12} & \nfrref{NFR_Maintainability} \\ \hline
-    \rref{FR_Label13} & \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label14} & \nfrref{NFR_Integrity}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label15} & \nfrref{NFR_Access}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label16} & \nfrref{NFR_Availability} \\ \hline
-    \rref{FR_Label17} & \nfrref{NFR_Integrity}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label18} & \nfrref{NFR_Access}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label19} & \nfrref{NFR_ModularityConfigurability}, \nfrref{NFR_Integrity}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label20} & \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label21} & \nfrref{NFR_Integrity}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label22} & \nfrref{NFR_ModularityConfigurability}, \nfrref{NFR_Access} \\ \hline
-    \rref{FR_Label23} & \nfrref{NFR_Usability}, \nfrref{NFR_Access} \\ \hline
-    \rref{FR_Label24} & \nfrref{NFR_Usability}, \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label25} & \nfrref{NFR_Integrity}, \nfrref{NFR_Availability} \\ \hline
-    \rref{FR_Label26} & \nfrref{NFR_Access}, \nfrref{NFR_PrivacyDataProtection} \\ \hline
-    \rref{FR_Label27} & \nfrref{NFR_Access}, \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label28} & \nfrref{NFR_Access}, \nfrref{NFR_PrivacyDataProtection} \\ \hline
-    \rref{FR_Label29} & \nfrref{NFR_Access}, \nfrref{NFR_PrivacyDataProtection} \\ \hline
-    \rref{FR_Label30} & \nfrref{NFR_Access}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label31} & \nfrref{NFR_Availability}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label32} & \nfrref{NFR_ModularityConfigurability}, \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label33} & \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label34} & \nfrref{NFR_Recoverability}, \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label35} & \nfrref{NFR_Access}, \nfrref{NFR_PrivacyDataProtection} \\ \hline
-    \rref{FR_Label36} & \nfrref{NFR_Integrity}, \nfrref{NFR_PrivacyDataProtection}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label37} & \nfrref{NFR_Usability}, \nfrref{NFR_Integrity} \\ \hline
-    \rref{FR_Label38} & \nfrref{NFR_Integrity}, \nfrref{NFR_Auditability} \\ \hline
-    \rref{FR_Label39} & \nfrref{NFR_Access} \\ \hline
-    \rref{FR_Label40} & \nfrref{NFR_Access}, \nfrref{NFR_Integrity} \\ \hline
+    \rref{FR_Label1} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label2} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label3} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label4} & \ref{SEC-AC2}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label5} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{PR-SL1}, \ref{PR-C1} \\ \hline
+    \rref{FR_Label6} & \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label7} & \ref{SEC-AC2}, \ref{SEC-P1}, \ref{SEC-P3} \\ \hline
+    \rref{FR_Label8} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label9} & \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label10} & \ref{UH-EOU1}, \ref{UH-L1} \\ \hline
+    \rref{FR_Label11} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-AC2} \\ \hline
+    \rref{FR_Label12} & \ref{MS-M1} \\ \hline
+    \rref{FR_Label13} & \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label14} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label15} & \ref{SEC-AC2}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label16} & \ref{PR-RFT1} \\ \hline
+    \rref{FR_Label17} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label18} & \ref{SEC-AC2}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label19} & \ref{MS-A1}, \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label20} & \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label21} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label22} & \ref{MS-A1}, \ref{SEC-AC2} \\ \hline
+    \rref{FR_Label23} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-AC2} \\ \hline
+    \rref{FR_Label24} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label25} & \ref{SEC-INT1}, \ref{PR-RFT1} \\ \hline
+    \rref{FR_Label26} & \ref{SEC-AC2}, \ref{SEC-P1} \\ \hline
+    \rref{FR_Label27} & \ref{SEC-AC2}, \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label28} & \ref{SEC-AC1}, \ref{SEC-P2}, \ref{SEC-P4} \\ \hline
+    \rref{FR_Label29} & \ref{SEC-AC2}, \ref{SEC-P1} \\ \hline
+    \rref{FR_Label30} & \ref{SEC-AC2}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label31} & \ref{PR-RFT1}, \ref{SEC-AU1}, \ref{SEC-AU2} \\ \hline
+    \rref{FR_Label32} & \ref{MS-A1}, \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label33} & \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label34} & \ref{PR-RFT2}, \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label35} & \ref{SEC-AC1}, \ref{SEC-P4} \\ \hline
+    \rref{FR_Label36} & \ref{SEC-INT1}, \ref{SEC-P1}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label37} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label38} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
+    \rref{FR_Label39} & \ref{SEC-AC2} \\ \hline
+    \rref{FR_Label40} & \ref{SEC-AC2}, \ref{SEC-INT1} \\ \hline
     \bottomrule
     \caption{Traceability Between Functional and Nonfunctional Requirements}
     \label{tab:FR2Rtm}
