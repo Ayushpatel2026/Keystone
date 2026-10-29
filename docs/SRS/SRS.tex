@@ -93,10 +93,12 @@
 \newcounter{esn}
 \newcounter{isn}
 \newcounter{instn}
+\newcounter{tin}
 \newcommand{\stkS}{\hyperref[app:stk_student]{S}}
 \newcommand{\stkES}{\hyperref[app:stk_extsup]{ES}}
 \newcommand{\stkIS}{\hyperref[app:stk_intsup]{IS}}
 \newcommand{\stkSEI}{\hyperref[app:stk_instr]{SEI}}
+\newcommand{\stkTI}{\hyperref[app:stk_tron]{TI}}
 
 \newcommand{\maintFrac}{20\%}
 \newcommand{\changeEffort}{8 hours} % 40 hours * maintFrac
@@ -445,7 +447,8 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
   submit their chosen project and team for instructor approval through a course-specific process.
   No single place shows the state of the whole process.
 
-  \textbf{Problems.} The following problems were identified through interviews with stakeholders and general observation.
+  \textbf{Problems.} The following problems were identified through interviews with stakeholders (see
+  \nameref{app:interviews}) and general observation.
   \begin{itemize}
     \item \textbf{Project descriptions are inconsistent and do not set expectations.} Proposals vary
     widely in the level of detail, and very short descriptions put students off. Some of the things
@@ -2361,9 +2364,28 @@ Student (Priya), Instructor (Dr. Reyes)
   \subsubsection{Stakeholder Interview Notes}
   \label{app:interviews}
 
-The notes below were taken during stakeholder interviews. Each note is numbered
-with its stakeholder tag (S, ES, IS, I) so that stakeholder requirements can
-reference the specific note(s) they came from.
+  The notes below were taken during stakeholder interviews. Each note is numbered
+  with its stakeholder tag (S, ES, IS, SEI, TI) so that stakeholder requirements can
+  reference the specific note(s) they came from. Each role was covered by a small number of interviews, summarized
+  in Table~\ref{tab:interviews}, so the broad claims in this document should be validated as more stakeholders are
+  consulted.
+
+  \begin{table}[h!]
+    \centering
+    \begin{tabular}{lll}
+      \toprule
+      \textbf{Role} & \textbf{Tag} & \textbf{Interviews}\\
+      \midrule
+      Student & S & 1 interview, with 1 student\\
+      External supervisor & ES & 1 joint interview, with 2 supervisors\\
+      Internal supervisor & IS & 1 interview, with 1 professor\\
+      SE course instructor & SEI & 1 interview\\
+      TRON course instructor & TI & 1 interview\\
+      CS course instructor & -- & Not yet interviewed\\
+      \bottomrule
+    \end{tabular}
+    \caption{Stakeholder interviews}\label{tab:interviews}
+  \end{table}
 
 % ==================== STUDENT ====================
 \paragraph{Student (S)} \label{app:stk_student}
@@ -2606,6 +2628,51 @@ Professor who runs the course.
     Algorithmic matching of teams to projects could be interesting, with a way
     to turn it off. Overhead must be worth it; this could be offset by moving
     other things (e.g., meetings) from Teams or Zoom onto this platform.
+\end{itemize}
+
+% ==================== TRON INSTRUCTOR ====================
+\paragraph{Tron Instructor (TI)} \label{app:stk_tron}
+Professor who runs the Mechatronics capstone course.
+\noindent \begin{itemize}
+    \item[TI\refstepcounter{tin}\thetin \label{TI_Course}]
+    The TRON course was separated from the SE course because of growing class size. The TRON and CS courses run very
+    differently, and he runs his course more flexibly than the SE course. He emphasizes personal responsibility and
+    meets with each team informally every week.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_Tools}]
+    Most of the course runs on Microsoft Teams, with a private channel per team that the instructor and TAs can access,
+    plus general channels and shared files (lectures, IP information, example videos, rubrics). Avenue holds grades,
+    submissions, and a list of deliverables. Deliverables are due at the end of the week and are accepted without
+    penalty until the following Tuesday.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_Similar}]
+    The beginning of the capstone courses is the most common part between them, and the courses have a similar number
+    of deliverables.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_Approval}]
+    Projects are approved on Teams. A project is approved when its team receives a group number.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_Roster}]
+    He receives the list of students in the capstone courses, manually marks off those who are in a group, and contacts
+    the rest. He tries not to force students into groups, so some students are delayed in getting a group. One student
+    joined a group very late, and the situation was handed to the undergraduate advisor.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_Populate}]
+    Teams channels must be created and populated from Avenue or added manually, and students are removed if they are
+    not on Avenue. Populating a platform with student information is not trivial. Having an Avenue course is optional;
+    an instructor requests one and it is then created.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_CrossProgram}]
+    SE students on TRON projects are treated as TRON students, and their grades are sent to the SE instructor. TRON
+    students cannot join software-only projects. ECE students on TRON projects must be graded by an ECE professor to
+    show their involvement. Cross-discipline capstones, such as iBioMed, need additional considerations and
+    involvement from professors, and accreditation is a concern.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_Projects}]
+    Projects are collected over the summer through the SE instructor and his contacts, and are kept in a LaTeX
+    document. Many TRON projects are student-proposed, and student-proposed projects are often high quality and
+    people-centred.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_StudentOwned}]
+    The capstone is student-centred. Students own the project even if stakeholders are involved, and the only rule is
+    that students must be able to talk about it (presentations, EXPO). Supervisor-only deliverables are secondary and
+    should not overwhelm students. He sends the supervisors a list of the previous year's deliverables.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_Meetings}]
+    Teams meet in person during class time.
+    \item[TI\refstepcounter{tin}\thetin \label{TI_OpenQuestion}]
+    Open question: how involved the platform will be in the capstone process.
 \end{itemize}
 
   \subsection{Appendix B: Development Plan}
