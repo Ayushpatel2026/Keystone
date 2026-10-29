@@ -2140,7 +2140,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Look and Feel Requirements}
   \subsubsection{Appearance Requirements}
   \begin{enumerate}[label=LF-A\arabic*, ref=LF-A\arabic*]
-    \item\label{LF-A1} User interface layouts must display correctly on desktop, tablet, and mobile screens.\newline
+    \item\label{NFR_ScreenSize} User interface layouts must display correctly on desktop, tablet, and mobile screens.\newline
     \textbf{Rationale}: Users will access the platform through phones, computers, tablets, and layouts which do not display correctly may prevent users from performing primary actions.\newline
     \textbf{Fit Criterion}: An automated tool such as Playwright renders every page at widths 1920px, 1024px, 430px and reports no horizontal overflows, clipped controls, or controls smaller than a 40px square.
   \end{enumerate}
@@ -2155,7 +2155,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsubsection{Ease of Use Requirements}
 
   \begin{enumerate}[label=UH-EOU\arabic*, ref=UH-EOU\arabic*]
-    \item\label{UH-EOU1} \usabilityTestSuccessPerc{} of first-time users shall be able to access the platform and complete their primary tasks outlined in Section~\ref{sec:use-cases}
+    \item\label{NFR_UsabilityFirstSuccess} \usabilityTestSuccessPerc{} of first-time users shall be able to access the platform and complete their primary tasks outlined in Section~\ref{sec:use-cases}
     within \usabilityTestTime{}.\\
     \textbf{Rationale}: No assumptions about users can be made beyond basic web browsing abilities, as described in the user characteristics section (Section~\ref{SecUserCharacteristics}). Many existing web applications that perform similar functions are able to provide an intuitive experience requiring no prior knowledge.\\
     \textbf{Fit Criterion}: A first-time user shall be able to complete the procedure as described in
@@ -2172,9 +2172,9 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Learning Requirements}
   \begin{enumerate}[label=UH-L\arabic*, ref=UH-L\arabic*]
-    \item\label{UH-L1} A first time user shall be able to learn how to perform their primary tasks outlined in Section~\ref{sec:use-cases} with no training or assistance. \\
+    \item\label{NFR_LearnUnassisted} A first time user shall be able to learn how to perform their primary tasks outlined in Section~\ref{sec:use-cases} with no training or assistance. \\
     \textbf{Rationale}: Requiring an upfront, unnecessary time investment to learn how to use the platform can add friction and reduce adoption.\\
-    \textbf{Fit Criterion}: User testing outlined in \ref{UH-EOU1} is satisfied with no assistance, prior training, or external learning material.
+    \textbf{Fit Criterion}: User testing outlined in \ref{NFR_UsabilityFirstSuccess} is satisfied with no assistance, prior training, or external learning material.
   \end{enumerate}
 
   \subsubsection{Understandability and Politeness Requirements}
@@ -2185,7 +2185,7 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Accessibility Requirements}
   \begin{enumerate}[label=UH-A\arabic*, ref=UH-A\arabic*]
-    \item\label{UH-A1} The system shall conform to the WCAG 2.0 Level AA standard.\\
+    \item\label{NFR_AccessibilityWCAG} The system shall conform to the WCAG 2.0 Level AA standard.\\
     \textbf{Rationale}: The system will be classified as a public-facing site which operates within Ontario's jurisdiction and must, at least, conform to the minimum standard set by AODA.\\
     \textbf{Fit Criterion}: An automated audit using an industry standard tool (such as Axe or Lighthouse) running on all user interfaces, reporting no critical violations.
 
@@ -2194,7 +2194,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Performance Requirements}
   \subsubsection{Speed and Latency Requirements}
   \begin{enumerate}[label=PR-SL\arabic*, ref=PR-SL\arabic*]
-    \item\label{PR-SL1} The system shall respond to user requests with a \tailPercentile{} percentile latency of at most \tailLatency{}.\\
+    \item\label{NFR_PerfTail} The system shall respond to user requests with a \tailPercentile{} percentile latency of at most \tailLatency{}.\\
     \textbf{Rationale}: Use is concentrated at the start of the academic year, when projects are proposed and teams are formed (see System Context). The system is expected to have up to \concurrentUsers{} staff, students, and external supervisors active at the same time during this period. A slow experience can hurt adoption, and a failure to handle load can lead to service degradation.\\
     \textbf{Fit Criterion}: A load test simulates \concurrentUsers{} concurrent users for a sustained period. Each simulated user repeatedly performs a representative mix of tasks (e.g., browsing the project catalog, viewing a project, applying to a project, replying to a thread) with a \thinkTime{} pause between actions. The latency of every request is recorded, and the \tailPercentile{} percentile is at most \tailLatency{}. The resulting request rate is measured and reported with the test results, rather than fixed in advance.
 
@@ -2214,20 +2214,20 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Robustness or Fault-Tolerance Requirements}
   \begin{enumerate}[label=PR-RFT\arabic*, ref=PR-RFT\arabic*]
-    \item\label{PR-RFT1} The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
+    \item\label{NFR_Uptime} The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
     \textbf{Rationale}: The system being inaccessible can result in missed deadlines, data loss, and overall frustration. This can impact adoption, perception, and erode trust.\\
     \textbf{Fit Criterion}: The system responds to a periodic health check, which runs every minute, with success responses accounting for at least \uptimePercent{} over any 7-day period. Scheduled maintenance windows are excluded from the measurement.
 
-    \item\label{PR-RFT2} The system shall be recoverable after an incident to a previous state within the 24 hours before the incident.\\
+    \item\label{NFR_Recoverable} The system shall be recoverable after an incident to a previous state within the 24 hours before the incident.\\
     \textbf{Rationale}: The system might experience a data loss incident. It must be recoverable with minimal losses.\\
     \textbf{Fit Criterion}: The system can be restored to a previous state using the interface.
   \end{enumerate}
 
   \subsubsection{Capacity Requirements}
   \begin{enumerate}[label=PR-C\arabic*, ref=PR-C\arabic*]
-    \item\label{PR-C1} The system shall be capable of handling at least \concurrentUsers{} concurrent users while meeting \ref{PR-SL1}.\\
+    \item\label{NFR_PeakUsers} The system shall be capable of handling at least \concurrentUsers{} concurrent users while meeting \ref{NFR_PerfTail}.\\
     \textbf{Rationale}: Users will be accessing similar resources concurrently, especially at the start of a year. System degradation can prevent users from performing essential tasks.\\
-    \textbf{Fit Criterion}: The system shall meet the thresholds specified in \ref{PR-SL1} with \concurrentUsers{} simulated users.
+    \textbf{Fit Criterion}: The system shall meet the thresholds specified in \ref{NFR_PerfTail} with \concurrentUsers{} simulated users.
   \end{enumerate}
 
   \subsubsection{Scalability or Extensibility Requirements}
@@ -2257,18 +2257,18 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Requirements for Interfacing with Adjacent Systems}
   \begin{enumerate}[label=OE-IAS\arabic*, ref=OE-IAS\arabic*]
-    \item\label{OE-IAS1} The system shall be accessible on the latest two major versions of Firefox, Safari, and Chrome.\\
+    \item\label{NFR_Browsers} The system shall be accessible on the latest two major versions of Firefox, Safari, and Chrome.\\
     \textbf{Rationale}: Web browsers provide an abstraction layer that isolates functionality from the underlying operating system environment, removing OS-support as a concern.\\
     \textbf{Fit Criterion}: All target browsers shall be tested using an automated web testing tool such as Playwright or Selenium and complete all tests successfully. This is described in-depth in Section~4.2.3 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan}.
 
-    \item\label{OE-IAS2} The hosted component of the system shall run on the latest two supported major versions of Docker.\\
+    \item\label{NFR_Container} The hosted component of the system shall run on the latest two supported major versions of Docker.\\
     \textbf{Rationale}: Similar to web browsers, Docker provides an abstraction layer over the underlying operating system and a sandboxed environment for executing code.\\
     \textbf{Fit Criterion}: The hosted component of the system successfully builds and starts as a Docker image.
   \end{enumerate}
 
   \subsubsection{Productization Requirements}
   \begin{enumerate}[label=OE-P\arabic*, ref=OE-P\arabic*]
-    \item\label{OE-P1} The system shall be deployable by an IT professional by following the deployment guide with no assistance in under \deployTime{}.\\
+    \item\label{NFR_DeployUnassisted} The system shall be deployable by an IT professional by following the deployment guide with no assistance in under \deployTime{}.\\
     \textbf{Rationale}: Issues during deployment can increase downtime which results in frustration with the platform.\\
     \textbf{Fit Criterion}: A technically competent individual outside of the main development team is able to complete the task described in Section~4.2.2 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan} within the time constraint.
 
@@ -2284,7 +2284,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Maintainability and Support Requirements}
   \subsubsection{Maintenance Requirements}
   \begin{enumerate}[label=MS-M\arabic*, ref=MS-M\arabic*]
-    \item\label{MS-M1} The effort required to make likely changes, which can be found in Section~\ref{LC_LikelyChanges}, shall be less than \maintFrac{} of the original development time.\\
+    \item\label{NFR_ChangeEffort} The effort required to make likely changes, which can be found in Section~\ref{LC_LikelyChanges}, shall be less than \maintFrac{} of the original development time.\\
     \textbf{Rationale}: A system which is difficult to maintain will eventually reach an unusable state when environments change (e.g.: hardware changes or software updates introduce/expose bugs, vulnerabilities are discovered, privacy regulations change, etc.) and fixes/updates are too costly to perform.\\
     \textbf{Fit Criterion}: Based on a development effort of 40 hours / week, maintenance cost shall not exceed \changeEffort{} / week.
   \end{enumerate}
@@ -2297,7 +2297,7 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Adaptability Requirements}
   \begin{enumerate}[label=MS-A\arabic*, ref=MS-A\arabic*]
-    \item\label{MS-A1} All major features, with the exception of the RBAC component, can be disabled on a live system with no code changes.\\
+    \item\label{NFR_LiveDisable} All major features, with the exception of the RBAC component, can be disabled on a live system with no code changes.\\
     \textbf{Rationale}: The need to toggle major features was established during stakeholder interviews. The platform needs to be flexible to fit the working style of a variety of instructors. RBAC ensures visibility rules are enforced and this is essential for protecting sensitive information.\\
     \textbf{Fit Criterion}: Every major feature can be disabled on a live system with no code changes.
   \end{enumerate}
@@ -2306,11 +2306,11 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Security Requirements}
   \subsubsection{Access Requirements}
   \begin{enumerate}[label=SEC-AC\arabic*, ref=SEC-AC\arabic*]
-    \item\label{SEC-AC1} The system shall require authentication before any other actions are possible.\\
+    \item\label{NFR_Authenticate} The system shall require authentication before any other actions are possible.\\
     \textbf{Rationale}: Authentication provides the system with a user's identity which ensures access rules are enforced.\\
     \textbf{Fit Criterion}: Unauthenticated users receive an error response when making requests which are not authentication-related. 
 
-    \item\label{SEC-AC2} The system shall restrict access only to students, TAs, and instructors directly enrolled in the capstone courses, and to potential supervisors approved by an instructor. All users are only able to access data that they are approved to view. Non-approved users are unable to read or write any data.\\
+    \item\label{NFR_Authorize} The system shall restrict access only to students, TAs, and instructors directly enrolled in the capstone courses, and to potential supervisors approved by an instructor. All users are only able to access data that they are approved to view. Non-approved users are unable to read or write any data.\\
     \textbf{Rationale}: The system stores sensitive user and course data which is a primary target of cyber attacks.\\
     \textbf{Fit Criterion}: Authenticated users receive an error response when requesting or modifying data they are not authorized to view or modify.
 
@@ -2318,7 +2318,7 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Integrity Requirements}
   \begin{enumerate}[label=SEC-INT\arabic*, ref=SEC-INT\arabic*]
-    \item\label{SEC-INT1} All data operations involving multiple data entities must be concurrency-safe.\\
+    \item\label{NFR_SequentialConsistent} All data operations involving multiple data entities must be concurrency-safe.\\
     \textbf{Rationale}: Many data operations will be executing at any given time and the system must ensure all data operations do not operate on stale or corrupt data.\\
     \textbf{Fit Criterion}: The system remains in a correct state after a set of concurrent data modification operations. A correct state is one which can be represented as the output of some sequence of a set of concurrent operations.
 
@@ -2326,30 +2326,30 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Privacy Requirements}
   \begin{enumerate}[label=SEC-P\arabic*, ref=SEC-P\arabic*]
-    \item\label{SEC-P1} The system shall only collect personal data when it is essential to the system's operations.\\
+    \item\label{NFR_EssentialPersonal} The system shall only collect personal data when it is essential to the system's operations.\\
     \textbf{Rationale}: The platform stores personal data to facilitate basic operations and is subject to regulations imposed by Ontario's FIPPA.\\
     \textbf{Fit Criterion}: All stored user data can be traced to a requirement in Section~\ref{sec:functional-requirements} or Section~\ref{sec:non-functional-requirements}.
 
-    \item\label{SEC-P2} The system shall ensure data is encrypted in-transit.\\
+    \item\label{NFR_EncryptTransit} The system shall ensure data is encrypted in-transit.\\
     \textbf{Rationale}: Communications can be intercepted by other peers in a network and internet service providers (ISPs) and hold sensitive data. Encryption ensures that data can only be read by the server and client.\\
     \textbf{Fit Criterion}: The system refuses to respond to all requests made over an unencrypted connection.
 
-    \item\label{SEC-P3} The system shall ensure data is encrypted at rest, with decryption protected by a cloud key management provider or a hardware security mechanism.\\
+    \item\label{NFR_EncryptRest} The system shall ensure data is encrypted at rest, with decryption protected by a cloud key management provider or a hardware security mechanism.\\
     \textbf{Rationale}: While physical access to server storage is unlikely, a system vulnerability in the host operating system, virtualization layer, filesystem, or in other dependent systems may allow attackers to read stored user data.\\
     \textbf{Fit Criterion}: Database content is not readable and not recoverable from a database fragment/part file without a decryption key.
 
-    \item\label{SEC-P4} All user passwords shall be stored in a cryptographically secure, salted, and irreversible format.\\
+    \item\label{NFR_PasswordHash} All user passwords shall be stored in a cryptographically secure, salted, and irreversible format.\\
     \textbf{Rationale}: Ensuring passwords are not recoverable protects users from data exposure events.\\
     \textbf{Fit Criterion}: Passwords are hashed using an industry standard algorithm such as Argon2id or bcrypt.
   \end{enumerate}
 
   \subsubsection{Audit Requirements}
   \begin{enumerate}[label=SEC-AU\arabic*, ref=SEC-AU\arabic*]
-    \item\label{SEC-AU1} All user actions shall be audited including metadata such as when the actions where taken, what action was taken, the user, and their privilege level at the time of the action.\\
+    \item\label{NFR_AuditLog} All user actions shall be audited including metadata such as when the actions where taken, what action was taken, the user, and their privilege level at the time of the action.\\
     \textbf{Rationale}: User actions must be auditable to ensure any discrepancies about events such as team enrolment, project approvals, and other critical events are tracable.\\
     \textbf{Fit Criterion}: A full sequence of audit logs can be composed together to provide a 100\% accurate image of the system's state.
 
-    \item\label{SEC-AU2} All logs shall be stored in tamper-resistant/tamper-evident storage.\\
+    \item\label{NFR_AuditTamper} All logs shall be stored in tamper-resistant/tamper-evident storage.\\
     \textbf{Rationale}: Audit logs may be the target of attackers aiming to remove any trace of their activities.\\
     \textbf{Fit Criterion}: Attempting to tamper with or remove audit log storage files raises an alert to system operators.
 
@@ -2373,9 +2373,9 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Compliance Requirements}
   \subsubsection{Legal Requirements}
   \begin{enumerate}[label=COMP-L\arabic*, ref=COMP-L\arabic*]
-    \item\label{COMP-L1} The system shall comply with AODA regulations, as specified in \ref{UH-A1}.
+    \item\label{NFR_ComplianceAODA} The system shall comply with AODA regulations, as specified in \ref{NFR_AccessibilityWCAG}.
     \textbf{Rationale}: The system will be hosted in Ontario and classified as a public-facing site. It must comply with the applicable accessibility regulations.
-    \textbf{Fit Criterion}: It meets the criterion set in \ref{UH-A1}.
+    \textbf{Fit Criterion}: It meets the criterion set in \ref{NFR_AccessibilityWCAG}.
   \end{enumerate}
 
   \subsubsection{Standards Compliance Requirements}
@@ -2517,46 +2517,46 @@ Instructor (Dr. Reyes), Teaching Assistant
     \toprule
     Functional Req & Nonfunctional Req \\
     \midrule
-    \rref{FR_Label1} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label2} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label3} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label4} & \ref{SEC-AC2}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label5} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{PR-SL1}, \ref{PR-C1} \\ \hline
-    \rref{FR_Label6} & \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label7} & \ref{SEC-AC2}, \ref{SEC-P1}, \ref{SEC-P3} \\ \hline
-    \rref{FR_Label8} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label9} & \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label10} & \ref{UH-EOU1}, \ref{UH-L1} \\ \hline
-    \rref{FR_Label11} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-AC2} \\ \hline
-    \rref{FR_Label12} & \ref{MS-M1} \\ \hline
-    \rref{FR_Label13} & \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label14} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label15} & \ref{SEC-AC2}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label16} & \ref{PR-RFT1} \\ \hline
-    \rref{FR_Label17} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label18} & \ref{SEC-AC2}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label19} & \ref{MS-A1}, \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label20} & \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label21} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label22} & \ref{MS-A1}, \ref{SEC-AC2} \\ \hline
-    \rref{FR_Label23} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-AC2} \\ \hline
-    \rref{FR_Label24} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label25} & \ref{SEC-INT1}, \ref{PR-RFT1} \\ \hline
-    \rref{FR_Label26} & \ref{SEC-AC2}, \ref{SEC-P1} \\ \hline
-    \rref{FR_Label27} & \ref{SEC-AC2}, \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label28} & \ref{SEC-AC1}, \ref{SEC-P2}, \ref{SEC-P4} \\ \hline
-    \rref{FR_Label29} & \ref{SEC-AC2}, \ref{SEC-P1} \\ \hline
-    \rref{FR_Label30} & \ref{SEC-AC2}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label31} & \ref{PR-RFT1}, \ref{SEC-AU1}, \ref{SEC-AU2} \\ \hline
-    \rref{FR_Label32} & \ref{MS-A1}, \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label33} & \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label34} & \ref{PR-RFT2}, \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label35} & \ref{SEC-AC1}, \ref{SEC-P4} \\ \hline
-    \rref{FR_Label36} & \ref{SEC-INT1}, \ref{SEC-P1}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label37} & \ref{UH-EOU1}, \ref{UH-L1}, \ref{SEC-INT1} \\ \hline
-    \rref{FR_Label38} & \ref{SEC-INT1}, \ref{SEC-AU1} \\ \hline
-    \rref{FR_Label39} & \ref{SEC-AC2} \\ \hline
-    \rref{FR_Label40} & \ref{SEC-AC2}, \ref{SEC-INT1} \\ \hline
+    \rref{FR_Label1} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label2} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label3} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label4} & \ref{NFR_Authorize}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label5} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_PerfTail}, \ref{NFR_PeakUsers} \\ \hline
+    \rref{FR_Label6} & \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label7} & \ref{NFR_Authorize}, \ref{NFR_EssentialPersonal}, \ref{NFR_EncryptRest} \\ \hline
+    \rref{FR_Label8} & \ref{NFR_SequentialConsistent}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label9} & \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label10} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted} \\ \hline
+    \rref{FR_Label11} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_Authorize} \\ \hline
+    \rref{FR_Label12} & \ref{NFR_ChangeEffort} \\ \hline
+    \rref{FR_Label13} & \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label14} & \ref{NFR_SequentialConsistent}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label15} & \ref{NFR_Authorize}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label16} & \ref{NFR_Uptime} \\ \hline
+    \rref{FR_Label17} & \ref{NFR_SequentialConsistent}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label18} & \ref{NFR_Authorize}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label19} & \ref{NFR_LiveDisable}, \ref{NFR_SequentialConsistent}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label20} & \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label21} & \ref{NFR_SequentialConsistent}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label22} & \ref{NFR_LiveDisable}, \ref{NFR_Authorize} \\ \hline
+    \rref{FR_Label23} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_Authorize} \\ \hline
+    \rref{FR_Label24} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label25} & \ref{NFR_SequentialConsistent}, \ref{NFR_Uptime} \\ \hline
+    \rref{FR_Label26} & \ref{NFR_Authorize}, \ref{NFR_EssentialPersonal} \\ \hline
+    \rref{FR_Label27} & \ref{NFR_Authorize}, \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label28} & \ref{NFR_Authenticate}, \ref{NFR_EncryptTransit}, \ref{NFR_PasswordHash} \\ \hline
+    \rref{FR_Label29} & \ref{NFR_Authorize}, \ref{NFR_EssentialPersonal} \\ \hline
+    \rref{FR_Label30} & \ref{NFR_Authorize}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label31} & \ref{NFR_Uptime}, \ref{NFR_AuditLog}, \ref{NFR_AuditTamper} \\ \hline
+    \rref{FR_Label32} & \ref{NFR_LiveDisable}, \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label33} & \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label34} & \ref{NFR_Recoverable}, \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label35} & \ref{NFR_Authenticate}, \ref{NFR_PasswordHash} \\ \hline
+    \rref{FR_Label36} & \ref{NFR_SequentialConsistent}, \ref{NFR_EssentialPersonal}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label37} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_SequentialConsistent} \\ \hline
+    \rref{FR_Label38} & \ref{NFR_SequentialConsistent}, \ref{NFR_AuditLog} \\ \hline
+    \rref{FR_Label39} & \ref{NFR_Authorize} \\ \hline
+    \rref{FR_Label40} & \ref{NFR_Authorize}, \ref{NFR_SequentialConsistent} \\ \hline
     \bottomrule
     \caption{Traceability Between Functional and Nonfunctional Requirements}
     \label{tab:FR2Rtm}
@@ -3126,17 +3126,17 @@ and then the dependencies between features.
   \begin{longtable}{|p{3.2cm}|p{2.5cm}|p{5cm}|p{2cm}|}
     \hline
     \textbf{Constant} & \textbf{Value} & \textbf{Description} & \textbf{NFR Reference} \\ \hline
-    Maintenance Effort & \maintFrac & Maintenance effort as a fraction of total development effort. & \ref{MS-M1} \\ \hline
-    Change Effort & \changeEffort & Cost for weekly maintenance effort based on development effort. & \ref{MS-M1} \\ \hline
-    Usability Success Percentage & \usabilityTestSuccessPerc & Percentage of first-time test participants who successfully complete their primary tasks. & \ref{UH-EOU1}, \ref{UH-L1} \\ \hline
-    Usability Test Time & \usabilityTestTime & Time for first-time users to complete their primary tasks. & \ref{UH-EOU1}, \ref{UH-L1} \\ \hline
-    Deploy Time & \deployTime & Deployment time by IT professional with a deployment guide and no assistance. & \ref{OE-P1} \\ \hline
-    Uptime Percent & \uptimePercent & Minimum required system uptime. & \ref{PR-RFT1} \\ \hline
-    Unscheduled Downtime & \unschedDowntime & Maximum unscheduled hours of downtime per week. & \ref{PR-RFT1} \\ \hline
-    Tail Percentile & \tailPercentile & Percentile used to evaluate response latency. & \ref{PR-SL1} \\ \hline
-    Tail Latency & \tailLatency & Maximum response latency at the specified percentile. & \ref{PR-SL1}, \ref{PR-C1} \\ \hline
-    Concurrent Users & \concurrentUsers & Peak number of concurrent users simulated during performance testing. & \ref{PR-SL1}, \ref{PR-C1} \\ \hline
-    User Think Time & \thinkTime & Pause between actions for each simulated user during performance testing. & \ref{PR-SL1} \\ \hline
+    Maintenance Effort & \maintFrac & Maintenance effort as a fraction of total development effort. & \ref{NFR_ChangeEffort} \\ \hline
+    Change Effort & \changeEffort & Cost for weekly maintenance effort based on development effort. & \ref{NFR_ChangeEffort} \\ \hline
+    Usability Success Percentage & \usabilityTestSuccessPerc & Percentage of first-time test participants who successfully complete their primary tasks. & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted} \\ \hline
+    Usability Test Time & \usabilityTestTime & Time for first-time users to complete their primary tasks. & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted} \\ \hline
+    Deploy Time & \deployTime & Deployment time by IT professional with a deployment guide and no assistance. & \ref{NFR_DeployUnassisted} \\ \hline
+    Uptime Percent & \uptimePercent & Minimum required system uptime. & \ref{NFR_Uptime} \\ \hline
+    Unscheduled Downtime & \unschedDowntime & Maximum unscheduled hours of downtime per week. & \ref{NFR_Uptime} \\ \hline
+    Tail Percentile & \tailPercentile & Percentile used to evaluate response latency. & \ref{NFR_PerfTail} \\ \hline
+    Tail Latency & \tailLatency & Maximum response latency at the specified percentile. & \ref{NFR_PerfTail}, \ref{NFR_PeakUsers} \\ \hline
+    Concurrent Users & \concurrentUsers & Peak number of concurrent users simulated during performance testing. & \ref{NFR_PerfTail}, \ref{NFR_PeakUsers} \\ \hline
+    User Think Time & \thinkTime & Pause between actions for each simulated user during performance testing. & \ref{NFR_PerfTail} \\ \hline
     \caption{Auxiliary Constants}
     \label{tab:AuxiliaryConstants}
 \end{longtable}
