@@ -538,7 +538,7 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-2} The system shall record all user actions with the time, a user identifier, and their privilege level at the time of the action, in an append-only audit log.\\
     \textbf{Rationale}: Accounts may get compromised and any actions taken may need to be reviewed and reversed.\\
-    \textbf{Traces To}: NFR9, FR29, FR30
+    \textbf{Traces To}: SEC-AU1, SEC-AU2, FR29, FR30
 
     \item \label{SSR-3} The system shall reject all component disable requests if there are pending actions within the component.\\
     \textbf{Rationale}: Disabling features may potentially leave the system in a partially invalid state. For example, disabling the project approvals component strands pending project approval requests.\\
@@ -554,7 +554,7 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-6} The platform shall provide a mechanism for automatically creating regular backups which can restore the platform to a previous state.\\
     \textbf{Rationale}: Data loss incidents are not uncommon and can be caused by faulty hardware, accidental changes, and many others. Storing a set of backups ensures that any data loss is minimized to a backup period timespan.\\
-    \textbf{Traces To}: NFR12
+    \textbf{Traces To}: PR-RFT2
 
     \item \label{SSR-7} The platform shall provide multiple ways to find, filter, and browse the list of projects.\\
     \textbf{Rationale}: While a recommendation engine is proposed, it may be flawed or operate on outdated data. To ensure users don't miss a project that they may favour, providing multiple ways to display the list can bring different projects to the top.\\
@@ -562,7 +562,7 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-8} All system actions which involve multiple dependent reads and writes, with at least one write, shall be atomic.\\
     \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.\\
-    \textbf{Traces To}: NFR13
+    \textbf{Traces To}: SEC-INT1
 
     \item \label{SSR-9} The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.\\
     \textbf{Rationale}: Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.\\
@@ -570,11 +570,11 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-10} The system shall assign new users zero privileges when their identity cannot be assigned automatically or verified.\\
     \textbf{Rationale}: No assumptions can be made about new users. They may be students who are not enrolled in a capstone course, malicious actors attempting to extract user information, individuals posing as supervisors to get free labour, etc. Ensuring no unverified users get access to the platform mitigates those risks.\\
-    \textbf{Traces To}: FR28, FR29, FR30, NFR5
+    \textbf{Traces To}: FR28, FR29, FR30, SEC-AC2
 
     \item \label{SSR-11} The system shall ensure that operations on sets or aggregations of multiple data entries do not operate on stale data at any point during an operation.\\
     \textbf{Rationale}: Concurrent operations which rely on aggregations of data entries may introduce a data race, resulting in an invalid state after the operation. For example, two students attempting to join the same team which only has one available slot can end up exceeding the team size limit, if the mechanism is not implemented correctly.\\
-    \textbf{Traces To}: NFR13
+    \textbf{Traces To}: SEC-INT1
 
     \item \label{SSR-12} The system shall notify the user of pending actions when disabling a component fails.\\
     \textbf{Rationale}: It may be possible to disable certain components but require additional actions to be taken, such as responding to pending project approvals.\\
@@ -594,7 +594,7 @@ rationale design process how and why to fake it.)}
 
     \item \label{SSR-16} The system shall delete personal data on request and at the end of a course cycle, and shall collect only the data that a feature needs.\\
     \textbf{Rationale}: Keeping personal data longer than needed increases the harm of a breach.\\
-    \textbf{Traces To}: NFR11
+    \textbf{Traces To}: SEC-P1
 
     \item \label{SSR-17} The system shall show a preview of any enrollment import and shall apply it only after course staff confirm it.\\
     \textbf{Rationale}: An unchecked import could wrongly add or exclude students and give misleading team validation results.\\
