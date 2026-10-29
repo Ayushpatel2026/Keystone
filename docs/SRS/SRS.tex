@@ -3126,16 +3126,17 @@ and then the dependencies between features.
   \begin{longtable}{|p{3.2cm}|p{2.5cm}|p{5cm}|p{2cm}|}
     \hline
     \textbf{Constant} & \textbf{Value} & \textbf{Description} & \textbf{NFR Reference} \\ \hline
-    Maintenance Effort & \maintFrac & Maintenance effort as a fraction of total development effort. & \nfrref{NFR_Maintainability} \\ \hline
-    Change Effort & \changeEffort & Cost for weekly maintenance effort based on development effort. & \nfrref{NFR_Maintainability} \\ \hline
-    Usability Test Time & \usabilityTestTime & Time for first-time users to complete their primary tasks. & \nfrref{NFR_Usability} \\ \hline
-    Deploy Time & \deployTime & Deployment time by IT professional with a deployment guide and no assistance. & \nfrref{NFR_Installability} \\ \hline
-    Uptime Percent & \uptimePercent & Minimum required system uptime. & \nfrref{NFR_Availability} \\ \hline
-    Unscheduled Downtime & \unschedDowntime & Maximum unscheduled hours of downtime per week. & \nfrref{NFR_Availability} \\ \hline
-    Tail Percentile & \tailPercentile & Percentile used to evaluate response latency. & \nfrref{NFR_Performance} \\ \hline
-    Tail Latency & \tailLatency & Maximum response latency at the specified percentile. & \nfrref{NFR_Performance} \\ \hline
-    Concurrent Users & \concurrentUsers & Peak number of concurrent users simulated during performance testing. & \nfrref{NFR_Performance} \\ \hline
-    User Think Time & \thinkTime & Pause between actions for each simulated user during performance testing. & \nfrref{NFR_Performance} \\ \hline
+    Maintenance Effort & \maintFrac & Maintenance effort as a fraction of total development effort. & \ref{MS-M1} \\ \hline
+    Change Effort & \changeEffort & Cost for weekly maintenance effort based on development effort. & \ref{MS-M1} \\ \hline
+    Usability Success Percentage & \usabilityTestSuccessPerc & Percentage of first-time test participants who successfully complete their primary tasks. & \ref{UH-EOU1}, \ref{UH-L1} \\ \hline
+    Usability Test Time & \usabilityTestTime & Time for first-time users to complete their primary tasks. & \ref{UH-EOU1}, \ref{UH-L1} \\ \hline
+    Deploy Time & \deployTime & Deployment time by IT professional with a deployment guide and no assistance. & \ref{OE-P1} \\ \hline
+    Uptime Percent & \uptimePercent & Minimum required system uptime. & \ref{PR-RFT1} \\ \hline
+    Unscheduled Downtime & \unschedDowntime & Maximum unscheduled hours of downtime per week. & \ref{PR-RFT1} \\ \hline
+    Tail Percentile & \tailPercentile & Percentile used to evaluate response latency. & \ref{PR-SL1} \\ \hline
+    Tail Latency & \tailLatency & Maximum response latency at the specified percentile. & \ref{PR-SL1}, \ref{PR-C1} \\ \hline
+    Concurrent Users & \concurrentUsers & Peak number of concurrent users simulated during performance testing. & \ref{PR-SL1}, \ref{PR-C1} \\ \hline
+    User Think Time & \thinkTime & Pause between actions for each simulated user during performance testing. & \ref{PR-SL1} \\ \hline
     \caption{Auxiliary Constants}
     \label{tab:AuxiliaryConstants}
 \end{longtable}
