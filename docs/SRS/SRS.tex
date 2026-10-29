@@ -143,8 +143,9 @@
 \midrule
 Oct 13th 2026 & 1.0 & Introduction and System Overview\\
 Oct 18th 2026 & 1.1 & Use Cases and User Personas\\
-Oct 18th 2026 & 1.1 & Data Requirements\\
-Oct 19th 2026 & 1.1 & Non-functional Requirements\\
+Oct 18th 2026 & 1.2 & Data Requirements\\
+Oct 19th 2026 & 1.3 & Non-functional Requirements\\
+Oct 28th 2026 & 1.4 & Add more requirements after peer review and interviews\\
 \bottomrule
   \end{tabularx}
 
@@ -295,8 +296,10 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     which supervisors' projects were not selected, so that those supervisors can be informed;
     \item provides guidance and automation to help students meet all requirements when submitting their projects for
     approval, and when submitting changes to their project information;
-    \item lets instructors approve, request changes to, or reject a team's project submission and later
+    \item lets instructors and TAs approve, request changes to, or reject a team's project submission and later
     changes to its information;
+    \item lets instructors and TAs populate a course with its enrolled students from Avenue to Learn (or by file upload),
+    and shows which enrolled students are not yet on a team;
     \item lets instructors configure which features are enabled and disabled for full flexibility
   \end{itemize}
 
@@ -305,7 +308,7 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     \item It does not judge whether a project is feasible, sufficiently complex, or appropriate
     for a capstone course; this remains the responsibility of the course instructor.
     \item It does not make approval decisions. Final approval of teams and projects always rests
-    with the course instructor. Courses may carry out approval inside the platform or in an external process.
+    with the course instructor and TAs. Courses may carry out approval inside the platform or in an external process.
     \item It does not resolve intellectual property (IP), confidentiality, or non-disclosure
     questions between students and supervisors.
     \item It does not automatically match supervisors to student-proposed projects. Teams may name a
@@ -319,7 +322,7 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
   \end{itemize}
 
   \textbf{Expected inputs.} Inputs are text-based project and profile information entered by users,
-  and project status changes made by authorized users.
+  course enrollment lists, course information, and project status changes made by authorized users.
 
   \textbf{Expected benefits.} Students can make more informed decisions on which projects to pursue,
   and find compatible teammates; supervisors know who is interested in their projects,
@@ -327,7 +330,6 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
   coordination and gain visibility into the whole process.
 
   \subsection{Stakeholders}
-
     \begin{itemize}
       \item \textbf{Customer:} Course instructors for the SE, CS, and TRON capstone courses
       (Dr.~Smith, Dr.~Moradi, and Dr.~Wassyng respectively). They decide which features their course
@@ -337,7 +339,11 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
           \item Capstone students, who browse projects, create profiles, form teams, and apply to projects.
           \item Project supervisors, who propose projects, manage their capacity, and review and confirm
           teams. Supervisors are either McMaster faculty or industry sponsors.
-          \item Course instructors and TAs, who manage users, projects, project status, and course configuration.
+          \item Course instructors, who configure their course, populate it with enrolled students, approve project
+          proposals, approve team projects, and manage users and project status.
+          \item TAs, who help instructors administer the course. TAs can populate enrolled students and course information,
+          view projects and teams, and participate in the team project approval process.
+          TAs do not take part in the approval of project proposals.
         \end{itemize}
       \item \textbf{Development Team:} Ayush Patel, Waqar Ul-Hassan, Ahmed Rashrash, and Andrew Habib.
     \end{itemize}
@@ -377,19 +383,21 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     Proposal approval & The course instructor's review of a supervisor's project proposal before it is
     listed for students. The instructor may list it as submitted, work with the supervisor to make changes, or
     reject it. \\
-    Team project approval & The course instructor's decision to approve a team's selected project
+    Team project approval & The course instructor or TA's decision to approve a team's selected project
     and membership \\
     Approval mode & How a course handles approval: in-platform, external, or integrated.\\
     Custom document & A deliverable, chosen by each team from a list, that suits the type of project
     (for example, a usability testing report).\\
-    TA & Teaching assistant assigned to a capstone team after its project is approved.\\
+    TA & Teaching assistant who supports a capstone course and is assigned to one or more teams. TAs can populate course
+    information and participate in team project approvals. A TA does not take part in project proposal approval. \\
     MacID & A McMaster University user account identifier.\\
+    Avenue to Learn (Avenue) & McMaster's learning management system. It holds course enrollment for courses that have
+    an Avenue site, which is optional. \\
+    Enrollment list & The list of students enrolled in a capstone course, imported from Avenue to Learn or uploaded from a
+    file. \\
     \bottomrule
     \caption{Definitions and Acronyms} \label{tab:DefinitionsAndAcronyms}
   \end{longtable}
-
-  % TODO: add ``Proposal approval'' (instructor review of supervisor proposals before the list is
-  % published) if Dr. Smith confirms that this is actually what he does
 
   \subsection{Characteristics of Intended Reader} \label{sec_IntendedReader}
 
@@ -485,8 +493,8 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     capstone project should deliver and to many questions to the instructor.
     \item \textbf{Instructors lack visibility across courses.} Instructors cannot see which projects
     students in other capstone courses selected, so they cannot tell which proposed projects were not
-    selected. Supervisors whose projects are not selected are not informed, which may discourage them from
-    proposing projects in future years.
+    selected. Supervisors whose projects are not selected are not informed, which is a possible
+    risk to future project proposals.
     \item \textbf{Instructor review is repetitive and time consuming.} Instructors review each team's submission manually and often
     give the same comments to many teams on simple items, such as missing information, wasting the instructor's time.
     When reviewing project proposals, changes to proposals that are agreed with supervisors by email must then be
@@ -494,11 +502,15 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     \item \textbf{Records drift after approval.} Team and project information changes after approval (for
     example, titles, supervisors, links, team composition, and TA assignments), but updating the official
     record takes extra steps, so it is often not updated and the instructor's records become out of date.
+    \item \textbf{Course enrollment is assembled by hand.} Instructors compare the list of enrolled students against
+    team lists by hand to find students who are not yet on a team, and getting enrolled students into a new platform or a
+    team workspace is not trivial. Enrollment data lives in Avenue to Learn, which not every course uses.
   \end{itemize}
 
   \textbf{Impact.} Students lose time early in a project of limited duration, teams end up
-  mismatched with their projects or with each other, supervisors may become reluctant to propose
-  projects in later years, and course instructors carry the administrative burden of the process.
+  mismatched with their projects or with each other, and course instructors and TAs carry the administrative burden of the
+  process. A possible further risk is that supervisors become reluctant to
+  propose projects in later years if their projects go unselected or their expectations are not met.
 
   \textbf{Desired improvement.} All participants share a single, accurate and current source of
   information about projects, supervisors' capacity, teams, and approval status; students can find
@@ -592,9 +604,8 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     For instance, saying ``material properties'' provides some information, but it
     stays away from the detail of listing every required properties.}
 
-
   The entities that interact with \projname{} are students, supervisors, course instructors, TAs,
-  authentication providers, an email service, and the integrated approval systems of courses that do not
+  authentication providers, an email service, Avenue to Learn, and the integrated approval systems of courses that do not
   carry out approval within \projname{}.
 
   \begin{itemize}
@@ -614,15 +625,18 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     \end{itemize}
     \item Course Instructor Responsibilities:
     \begin{itemize}
+      \item Populate the platform with course information, including the enrollment list, course process,
+      timeline, expectation information and examples of past projects.
       \item Configure the features, rules, and approval mode that apply to their course.
       \item Make final decisions on teams and projects, including project proposal and team project approvals,
       requests for changes, and rejection.
       \item Judge project feasibility and appropriateness for the course.
-      \item Provide the course process, timeline, and expectation information and the examples of past
-      projects shown to supervisors.
     \end{itemize}
     \item TA Responsibilities:
     \begin{itemize}
+      \item Populate the platform with course information, including the enrollment list, course process,
+      timeline, expectation information and examples of past projects.
+      \item Assist the instructor in team project approvals, requests for changes, and rejections.
       \item Update project and team status as directed by instructors, in courses where approval
       takes place outside \projname{}.
       \item Assist instructors in keeping records accurate.
@@ -640,6 +654,11 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
       \item In courses that use one, carry out approval of teams and projects and make the outcome available
       to \projname{}. Otherwise, instructors or TAs record the outcome in \projname{} manually.
     \end{itemize}
+    \item Avenue to Learn Responsibilities:
+    \begin{itemize}
+      \item For courses that have an Avenue site, provide the list of enrolled students (name, email or MacID,
+      program, and course) to \projname{}.
+    \end{itemize}
     \item \projname{} Responsibilities:
     \begin{itemize}
       \item Provide proposal templates, and check that required project, profile, and team information is
@@ -648,6 +667,8 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
       \item Apply the team formation rules configured for each course.
       \item Keep discussions attached to the project, post, or application they concern, and record
       whether a supervisor and a team have agreed to work together.
+      \item Import and check course enrollment lists, show a preview before applying them, and show which enrolled
+      students are not on a team.
       \item Restrict what each user can see and change according to their role.
       \item Record who made each change to a project or team, and when.
       \item Notify users of events that need their attention.
@@ -729,6 +750,9 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
     \item \textbf{Configurable course rules.} As \projname{} should be extensible to different capstone courses,
     course-specific rules, such as which programs may work together on which projects and the minimum and maximum
     team size, shall be set by the course instructor as configuration and shall not be fixed in the design.
+    \item \textbf{Configurable enrollment source.} \projname{} shall obtain a course's enrollment list from Avenue to
+    Learn where the course has an Avenue site, and shall also accept an uploaded file, since having an
+    Avenue site is optional.
   \end{itemize}
 
 % ==============================================================
@@ -785,13 +809,13 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
         about changes via email. (\stkS, \stkES)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_UnselectedProjects}]
-        The instructors and TA's will be able to identify which projects have not been
+        The instructors and TAs will be able to identify which projects have not been
         selected after project selection, in order to follow up with their supervisors. (\stkSEI)
 
       % ---------- Approval ----------
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_HumanApproval}]
-        Approval decisions shall be made by the instructor and not automated. Routine
-        checks and repeated feedback should be automated to reduce the instructors workload. (\stkSEI)
+        Approval decisions shall be made by the instructor and TAs and not automated. Routine
+        checks and repeated feedback should be automated to reduce their workload. (\stkSEI)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ReviewDialogue}]
         Students and the instructor shall be able to exchange feedback iteratively
@@ -805,7 +829,7 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
         a team. (\stkES, \stkIS)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamValidity}]
-        The instructor and TA's can get accurate, up-to-date, and validated
+        The instructor and TAs can get accurate, up-to-date, and validated
         team composition data (e.g., all students are in exactly one team). (\stkSEI)
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamSubmissionChecks}]
@@ -840,8 +864,21 @@ Oct 19th 2026 & 1.1 & Non-functional Requirements\\
 
       \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ReduceAdmin}]
         Administrative tasks including the generation of a list of approved projects, 
-        groups, selected projects, and supervisors will be automated. 
+        groups, selected projects, and supervisors will be automated.
         (\stkSEI, \stkES)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TAApproval}]
+        TAs shall be able to approve team projects in the same way as instructors, but shall not take part in the
+        approval of project proposals. (\stkSEI)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_CourseConfig}]
+        Instructors shall be able to choose which features their course uses and set their course's rules, so that a
+        course with a simpler process is not burdened by features it does not need. (\stkSEI, \stkTI)
+
+      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Enrollment}]
+        Instructors and TAs shall be able to populate a course with its enrolled students without entering each student
+        by hand, using Avenue to Learn or through file upload, and they shall be able to see which enrolled
+        students are not yet on a team. (\stkSEI, \stkTI)
 
   \end{itemize}
 
@@ -1399,7 +1436,7 @@ Any stakeholder (Priya, Marcus, Dr. Malik, Dr. Reyes)
 
 \textbf{Primary Actor}
 
-Student (Priya), Instructor (Dr. Reyes)
+Student (Priya), Instructor (Dr. Reyes), TA
 
 \textbf{Preconditions}
 \begin{itemize}
@@ -1419,9 +1456,9 @@ Student (Priya), Instructor (Dr. Reyes)
   \item The system runs automated checks (e.g., all required fields and
     documents are present, the repository exists and is set up correctly, the
     instructor is added as a collaborator, every member is on exactly one team).
-  \item The system forwards the submission, with the results of the checks, to the instructor; the
+  \item The system forwards the submission, with the results of the checks, to the instructor and TA; the
     status becomes ``Team project under review''.
-  \item The instructor reviews the submission and approves it.
+  \item The instructor or TA review the submission and approves it.
   \item The system changes the team's status to ``Approved'' and notifies the team and
     supervisor.
 \end{enumerate}
@@ -1432,10 +1469,11 @@ Student (Priya), Instructor (Dr. Reyes)
     is missing or invalid, with standard guidance for fixing it, and does not
     forward the submission to the instructor until the issues are fixed. This
     replaces the repetitive comments the instructor writes today.
-  \item 7a. The
-    system sets the status to ``Team project changes requested'' and notifies the team, who can
+  \item 7a. The reviewer finds problems the checks cannot catch (e.g., scope
+    is too small): the reviewer writes feedback and requests revision. The system sets the status to
+    ``Team project changes requested'' and notifies the team, who can
     respond and resubmit (status ``Team project submitted''). The flow returns to step 5.
-  \item 7b. The instructor rejects the submission with a reason: the system sets the status to
+  \item 7b. The reviewer rejects the submission with a reason: the system sets the status to
     ``Team project rejected'', releases the team's slot (a ``Full'' project becomes ``Open''), and
     notifies the team and supervisor.
 \end{itemize}
@@ -1449,6 +1487,49 @@ Student (Priya), Instructor (Dr. Reyes)
 \textbf{Related Requirements:} \ref{SR_HumanApproval},
 \ref{SR_ReviewDialogue}, \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin},
 \ref{SR_TeamSubmissionChecks}
+
+
+% ---------------- UC 13 ----------------
+\refstepcounter{ucnum} \label{UC_ImportEnrollment}
+\subsection{\ucref{UC_ImportEnrollment}: Import Course Enrollment}
+
+\textbf{Primary Actor}
+
+Instructor (Dr. Reyes), Teaching Assistant
+
+\textbf{Preconditions}
+\begin{itemize}
+  \item The course exists in the system and the actor is course staff for it.
+\end{itemize}
+
+\textbf{Main Success Scenario}
+\begin{enumerate}
+  \item The actor chooses to import the course's enrollment list from Avenue to Learn.
+  \item The system retrieves the list of enrolled students.
+  \item The system shows a preview listing the students to be added, the students already present, and any students
+    on the platform who are no longer in the list.
+  \item The actor reviews the preview and confirms the import.
+  \item The system adds the new students to the course and records the time of the import.
+  \item The system shows the enrolled students who are not yet on a team.
+\end{enumerate}
+
+\textbf{Alternative Flows}
+\begin{itemize}
+  \item 2a. Avenue is unavailable, the course has no Avenue site, or the retrieval fails: the system leaves the
+    existing enrollment unchanged, tells the actor, and offers file upload.
+  \item 3a. A student on a team is no longer in the list: the system flags the student for the actor's review and does
+    not remove the student from the team.
+  \item 4a. The actor needs to add a student who is not in the list (e.g., a student who joins late): the actor adds
+    the student manually.
+\end{itemize}
+
+\textbf{Postconditions}
+\begin{itemize}
+  \item The course's enrollment list is up to date and the time of the last import is recorded.
+\end{itemize}
+
+\textbf{Related Requirements:} \ref{SR_Enrollment}, \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin}
+
 
 % ==============================================================
   \section{Functional Requirements}
@@ -1539,9 +1620,9 @@ Student (Priya), Instructor (Dr. Reyes)
               \rationale{A centralized submission allows students to provide all capstone project related details for instructors to approve without relying on external tools.}
               \fitcrit{Student teams can submit their project and team information through in-platform approval process that can be reviewed by instructors.}
               
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label18}:] The system shall allow course instructors to approve, reject, or request modifications with feedback to submitted team-project applications when in-platform approval is enabled.
-              \rationale{Instructors must give the final says so it should not be an automated process.}
-              \fitcrit{An instructor can select an approval decision for the submitted team-project and provide feedback to improve project descriptions or identify missing items.}
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label18}:] The system shall allow course instructors and TAs to approve, reject, or request modifications with feedback to submitted team-project applications when in-platform approval is enabled.
+              \rationale{Instructors and TAs must have the final say on team project approval}
+              \fitcrit{An instructor or TA can select an approval decision for the submitted team-project and provide feedback to improve project descriptions or identify missing items.}
 
               \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label19}:] The system shall support recording capstone project and team approvals either manually by instructors or TAs associated with the project or automatically through an adapter.
               \rationale{Different capstone courses have different approval systems that they would prefer to keep in place so the system must account for this.}
@@ -1560,9 +1641,9 @@ Student (Priya), Instructor (Dr. Reyes)
               \rationale{Different capstone courses have different requirements and workflows, so instructors must be able to configure or customize the system to meet their course's needs.}
               \fitcrit{An instructor can successfully enable or disable a supported features and define constraints that match their course's workflow.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label23}:] The system shall allow course instructors to publish and maintain the course outline, course resources, FAQs, timelines, and past capstone examples for students and supervisors to view as reference.
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label23}:] The system shall allow course instructors and TAs to publish and maintain the course outline, course resources, FAQs, timelines, and past capstone examples for students and supervisors to view as reference.
               \rationale{Early access to course expectations reduces confusion about project scope, deliverables, deadlines, and responsibilities for both the student and supervisor.}
-              \fitcrit{An instructor can add, edit, and publish course resources where students or supervisors and retrieve published resources.}
+              \fitcrit{An instructor or TA can add, edit, and publish course resources where students or supervisors and retrieve published resources.}
 
               \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label24}:] The system shall provide users with a checklist of required actions and their completion status based on the course requirements.
               \rationale{Stakeholders need a concise way to identify outstanding responsiblities and monitor their progress in the capstone approval procedure. This helps them keep on top of tasks and prevents them from missing critical deadlines.}
@@ -1612,6 +1693,28 @@ Student (Priya), Instructor (Dr. Reyes)
               \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label35}:] The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.
               \rationale{Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.}
               \fitcrit{The system prompts user to re-enter credentials after requesting to delete a project they proposed.}
+
+              % ---------- Enrollment and TA Roles ---------
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label36}:] The system shall allow instructors and TAs to import a course's enrollment list from Avenue to Learn, show a preview of the students to be added and the differences from the current list, and apply the import only after the user confirms it.
+              \rationale{Populating a course with its students by hand is time consuming, and an unchecked import could wrongly add or exclude students.}
+              \fitcrit{An instructor or TA can import an enrollment list and see a preview. No change is applied to the course until the user confirms.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label37}:] The system shall allow instructors and TAs to add students to a course from an uploaded file or by manual entry, including students who join after the initial import.
+              \rationale{Having an Avenue site is optional, Avenue may be unavailable, and students sometimes join a course late.}
+              \fitcrit{In a course with no Avenue site, the enrollment list can be populated from a file or manually. A student can be added manually after an import.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label38}:] The system shall flag students who are in the course but absent from the latest enrollment list, and shall not remove them from the course or a team until an instructor or TA confirms.
+              \rationale{Removing students automatically could leave a team undersized or invalid in the middle of approval.}
+              \fitcrit{A student absent from the latest import is listed for review and remains on their team until course staff confirm the removal.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label39}:] The system shall show instructors and TAs the enrolled students who are not on a team.
+              \rationale{Instructors currently compare the class list against team lists by hand to find and contact students without a team.}
+              \fitcrit{The list contains exactly the enrolled students who are on no team, and it updates as teams change.}
+
+              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_Label40}:] The system shall allow instructors and TAs to assign a TA to each team, and shall show the assigned TA to the team's members and supervisor.
+              \rationale{Supervisors want to know their teams' TAs, and the assignment is currently kept in a manually edited file.}
+              \fitcrit{Course staff can assign a TA to a team. The team's members and supervisor see the assigned TA, or ``not yet assigned'' if there is none.}
+
   \end{itemize}
 
   \plt{The requirements are given labels so that they can be referenced in other
@@ -1647,10 +1750,12 @@ Student (Priya), Instructor (Dr. Reyes)
     they are able to propose projects themselves which students may work on.
     \item \textbf{Instructor (Child of User)}: Instructors are users who manage one or more capstone course(s) and provide
     feedback and resources to help students succeed in the course.
-    \item \textbf{TAs (Child of User)}: TAs assist instructors in course and team management including providing feedback.
+    \item \textbf{TAs (Child of User)}: TAs assist instructors in course and team management, including approving team
+    projects, and are assigned to teams.
     \item \textbf{Course}: A McMaster capstone course supported by Keystone (such as SE, CS, TRON) 
     and includes settings for a capstone course that enables features and implements team formation/
-    project selection rules. It contains member and enrollment information.
+    project selection rules. It contains member and enrollment information, including where the enrollment list comes
+    from.
     \item \textbf{Student Profile}: Contains information about a student's background including bio, 
     program, interests, project preferences, skills, experience, work style, and LinkedIn.
     \item \textbf{Team}: A groups of students participating in the same capstone project together.
@@ -1723,9 +1828,7 @@ Student (Priya), Instructor (Dr. Reyes)
     TA & Course & N : M & A TA assists in one or more courses \\ \hline
     Student & Student Profile & 1 : 0..1 & A student may have one student profile associated with their account\\ \hline
     Student & Team & N : 0..1 & A student belongs to at most one team\\ \hline
-    Instructor & Project & 1 : N & An instructor has access to all his courses' projects\\ \hline
-    TA & Project & 1 : N & A TA may have access to multiple projects they are managing\\ \hline
-    TA & Team & 1 : N & A TA may be assigned to multiple teams\\ \hline
+    TA & Team & 1 : N & A TA may be assigned to many teams. A team has at most one assigned TA \\ \hline
     Supervisor & Project & 1 : N & A supervisor may supervise multiple projects\\ \hline
     User & Notification & 1 : N & A user may receive multiple notifications\\ \hline
     User & Checklist & 1 : N & A user may have multiple checklists to handle\\ \hline
@@ -1781,6 +1884,7 @@ Student (Priya), Instructor (Dr. Reyes)
       mac\_id & String & Mac IDs for students \\ \hline
       student\_number & String & Unique ID for each user \\ \hline
       enrolled\_course & Course & Capstone course in which the student is enrolled. \\ \hline
+      enrollment\_status & Enum & ENROLLED, or FLAGGED if absent from the latest import \\ \hline
 
       % USER: Instructor
       \multicolumn{3}{|l|}{\textbf{Instructor (Child of User)}}\\ \hline
@@ -1814,6 +1918,8 @@ Student (Priya), Instructor (Dr. Reyes)
       approval\_mode & Enum & Determines where project approvals are handled (custom or not) INTERNAL, EXTERNAL, INTEGRATION \\ \hline
       threads & Collection\textless Thread\textgreater & Allow instructors to communicate important information to all supervisors and students in the course. \\ \hline
       resource & Collection\textless CourseResource\textgreater & Instructors can post course outline, timeline, guidelines, FAQ, past capstone examples, or any other course related content. \\ \hline
+      enrollment\_source & Enum & AVENUE or FILE; how the enrollment list is populated \\ \hline
+      last\_enrollment\_import & DateTime & When the enrollment list was last imported (empty if never) \\ \hline
 
       % Student Profile
       \multicolumn{3}{|l|}{\textbf{StudentProfile}}\\ \hline
@@ -1840,6 +1946,7 @@ Student (Priya), Instructor (Dr. Reyes)
       project & Project & Which project they have selected, if applicable. \\ \hline
       status & Enum & The team-project status of the team's current application or project (see Section~\ref{sec:lifecycle}). \\ \hline
       updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
+      ta & TA & Reference to the TA assigned to the team, if any. \\ \hline
 
       % Team Profile
       \multicolumn{3}{|l|}{\textbf{TeamProfile}}\\ \hline
@@ -1990,6 +2097,12 @@ Student (Priya), Instructor (Dr. Reyes)
     \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label21}:] The system shall also adhere to data privacy policies applicable to McMaster and the related faculties
     \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label22}:] The system shall ensure secure authentication and communication with APIs and third party services
     \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label23}:] Unauthorized access, data breaches, data loss or disclosure shall be documented and sent to the relevant parties and the University
+  \end{enumerate}
+
+  \subsubsection{Enrollment Data}
+  \begin{enumerate}
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label24}:] The system shall import only the enrollment fields it needs (name, email or MacID, program, and course) from Avenue to Learn or an uploaded file.
+    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label25}:] The system shall treat imported enrollment data as student information, subject to \dprref{DPR_Label8} and \dprref{DPR_Label20}.
   \end{enumerate}
 
 % ==============================================================
@@ -2152,11 +2265,11 @@ Student (Priya), Instructor (Dr. Reyes)
     \rref{FR_Label15} & \srref{SR_ReviewDialogue}, \srref{SR_SinglePlace} & \ucref{UC_ReviewProposal} \\ \hline
     \rref{FR_Label16} & \srref{SR_StatusNotify} & \ucref{UC_NotifyChecklist} \\ \hline
     \rref{FR_Label17} & \srref{SR_ReviewDialogue}, \srref{SR_HumanApproval} & \ucref{UC_ApproveTeamProject} \\ \hline
-    \rref{FR_Label18} & \srref{SR_HumanApproval}, \srref{SR_ReviewDialogue} & \ucref{UC_ApproveTeamProject} \\ \hline
+    \rref{FR_Label18} & \srref{SR_HumanApproval}, \srref{SR_ReviewDialogue}, \srref{SR_TAApproval} & \ucref{UC_ApproveTeamProject} \\ \hline
     \rref{FR_Label19} & \srref{SR_HumanApproval} & -- \\ \hline
     \rref{FR_Label20} & \srref{SR_TeamSubmissionChecks} & \ucref{UC_ApproveTeamProject} \\ \hline
     \rref{FR_Label21} & \srref{SR_ReviewDialogue} & -- \\ \hline
-    \rref{FR_Label22} & \srref{SR_SinglePlace}, \srref{SR_TeamValidity} & -- \\ \hline
+    \rref{FR_Label22} & \srref{SR_CourseConfig} & -- \\ \hline
     \rref{FR_Label23} & \srref{SR_ProposalGuidance}, \srref{SR_CourseInfoEarly}, \srref{SR_CrossCourseTimelines} & \ucref{UC_SubmitProposal}, \ucref{UC_ViewTimelines} \\ \hline
     \rref{FR_Label24} & \srref{SR_Checklist} & \ucref{UC_NotifyChecklist} \\ \hline
     \rref{FR_Label25} & \srref{SR_PushNotify}, \srref{SR_Checklist} & \ucref{UC_NotifyChecklist} \\ \hline
@@ -2170,6 +2283,12 @@ Student (Priya), Instructor (Dr. Reyes)
     \rref{FR_Label33} & -- & -- \\ \hline
     \rref{FR_Label34} & \srref{SR_PushNotify}, \srref{SR_StatusNotify} & \ucref{UC_NotifyChecklist} \\ \hline
     \rref{FR_Label35} & -- & -- \\ \hline
+    \rref{FR_Label36} & \srref{SR_Enrollment} & \ucref{UC_ImportEnrollment} \\ \hline
+    \rref{FR_Label37} & \srref{SR_Enrollment} & \ucref{UC_ImportEnrollment} \\ \hline
+    \rref{FR_Label38} & \srref{SR_Enrollment}, \srref{SR_TeamValidity} & \ucref{UC_ImportEnrollment} \\ \hline
+    \rref{FR_Label39} & \srref{SR_Enrollment}, \srref{SR_TeamValidity} & \ucref{UC_ImportEnrollment}, \ucref{UC_ValidateTeams} \\ \hline
+    \rref{FR_Label40} & \srref{SR_TeamContacts} & \ucref{UC_ViewTeam} \\ \hline
+
     \bottomrule
 
     \caption{Traceability Between Stakeholder Requirements, Use Cases, and
@@ -2216,6 +2335,11 @@ Student (Priya), Instructor (Dr. Reyes)
     \rref{FR_Label33} & \nfrref{NFR_Auditability} \\ \hline
     \rref{FR_Label34} & \nfrref{NFR_Recoverability}, \nfrref{NFR_Integrity} \\ \hline
     \rref{FR_Label35} & \nfrref{NFR_Access}, \nfrref{NFR_PrivacyDataProtection} \\ \hline
+    \rref{FR_Label36} & \nfrref{NFR_Integrity}, \nfrref{NFR_PrivacyDataProtection}, \nfrref{NFR_Auditability} \\ \hline
+    \rref{FR_Label37} & \nfrref{NFR_Usability}, \nfrref{NFR_Integrity} \\ \hline
+    \rref{FR_Label38} & \nfrref{NFR_Integrity}, \nfrref{NFR_Auditability} \\ \hline
+    \rref{FR_Label39} & \nfrref{NFR_Access} \\ \hline
+    \rref{FR_Label40} & \nfrref{NFR_Access}, \nfrref{NFR_Integrity} \\ \hline
     \bottomrule
     \caption{Traceability Between Functional and Nonfunctional Requirements}
     \label{tab:FR2Rtm}
@@ -2293,46 +2417,52 @@ Student (Priya), Instructor (Dr. Reyes)
 \plt{Give the likely changes, with traceability to the entity that is likely to change.}
 
 \noindent \begin{itemize}
+      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Users}:]
+      \textbf{Role Permissions.}
+      What each role may do may change. The TA role in particular was defined late and
+      may be refined as more instructors are interviewed, and additional roles may be needed for people outside the main
+      stakeholders, such as maintainers.
+      \textit{Affected Entities:} User, Student, Instructor, Supervisor, TA.
+      \textit{Related Requirements:} \rref{FR_Label28}, \rref{FR_Label29}, \rref{FR_Label30}.
 
-    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Users}:]
-    \textbf{User Model.}
-    There is an attribute is\_admin, however in the future, we might find it favourable to create a child Admin
-    that inherits and has more complex attributes. This may also create new attributes for User or any other child entities.
-    We may also discover more roles are required for security purposes or other potential actors outside our main stakeholders
-    such as maintainers.
-    \textit{Affected Entities:} User, Student, Instructor, Supervisor, TA.
-    \textit{Related Requirements:} \rref{FR_Label28}, \rref{FR_Label29}, \rref{FR_Label30}.
+      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_TeamCourseRestrictions}:]
+      \textbf{Course and Team Rules.}
+      The team formation and eligibility rules may change. The CS instructor has not yet been interviewed, so CS team
+      sizes and program restrictions are unconfirmed, and students from other departments (e.g., ECE or iBioMed students
+      on TRON projects) may need rules beyond team size and program combinations.
+      \textit{Affected Entities:} Student, Team, Course.
+      \textit{Related Requirements:} \rref{FR_Label9}, \rref{FR_Label22}.
 
-    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_TeamCourseRestrictions}:]
-    \textbf{Course and Team Restrictions.}
-    As we have more meetings with our stakeholders, particularly the instructors, we will discover different rules and
-    restrictions that need to be implmented beyond team sizes and program combinations.
-    \textit{Affected Entities:} Student, Team, Course.
-    \textit{Related Requirements:} \rref{FR_Label9}, \rref{FR_Label22}.
+      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_ProposalTemplates}:]
+      \textbf{Proposal Template Fields.}
+      The required and optional fields of the project proposal may change as instructors review the template. Courses may
+      need different fields (for example hardware information for TRON), and instructors want standards that do not
+      discourage supervisors from proposing projects.
+      \textit{Affected Entity:} Project.
+      \textit{Related Requirements:} \rref{FR_Label1}, \rref{FR_Label2}, \rref{FR_Label3}.
 
-    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_ProposalTemplates}:]
-    \textbf{Proposal Templates.}
-    We may discover more information and fields that we need to add to our template to ensure that it is comprehensive
-    and meets the requirements of the course as per the instructor.
-    \textit{Affected Entity:} Project.
-    \textit{Related Requirements:} \rref{FR_Label1}, \rref{FR_Label2}, \rref{FR_Label3}.
+      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_ApprovalWorkflows}:]
+      \textbf{Approval Process.}
+      How a course approves team projects may change. The TRON course approves a project when its team is given a group
+      number, and the CS process is unconfirmed, so a course may need different approval steps or approvers than the ones
+      specified here.
+      \textit{Affected Entities:} Project, Project Application, Course.
+      \textit{Related Requirements:} \rref{FR_Label17}, \rref{FR_Label18}, \rref{FR_Label19}, \rref{FR_Label22}.
 
-    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_ApprovalWorkflows}:]
-    \textbf{Approval Workflows and Status Lifecycles.}
-    We could discover other steps and states required that are more complex to account for different scenarios as we better
-    understand how the course opperates.
-    \textit{Affected Entities:} Project, Project Application, Course.
-    \textit{Related Requirements:} \rref{FR_Label17}, \rref{FR_Label18}, \rref{FR_Label19}, \rref{FR_Label22}.
+      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Recommendations}:]
+      \textbf{Recommendations.}
+      The recommendation requirement may be removed or made switchable if instructors judge that its benefit does not
+      justify the overhead, or expanded if stakeholders want matching on additional criteria such as skills. Feedback from
+      instructors and usability testing would trigger either change.
+      \textit{Affected Entities:} Student Profile, Team Profile, Project.
+      \textit{Related Requirement:} \rref{FR_Label12}.
 
-    \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Recommendations}:]
-    \textbf{Recommendations.}
-    This could either get more complicated with AI recommendations or possibly less depending on how the the changes in scope
-    for the project. With changes to how recommendations work, data model items may need to change to accomodate it.
-    
-    \textit{Affected Entities:} Student Profile, Team Profile, Project.
-    
-    \textit{Related Requirement:} \rref{FR_Label12}.
-
+      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Enrollment}:]
+      \textbf{Enrollment Source.}
+      How enrollment is obtained may change if access to Avenue to Learn data is restricted or changed, or if a course
+      (especially ones outside McMaster) use a different source of enrollment data.
+      \textit{Affected Entities:} Course, Student.
+      \textit{Related Requirements:} \rref{FR_Label36}, \rref{FR_Label37}, \rref{FR_Label38}.
 \end{itemize}
 
   \plt{Give the unlikely changes.  The design can assume that the changes listed will not occur.}
@@ -2344,8 +2474,8 @@ Student (Priya), Instructor (Dr. Reyes)
     \textbf{Core Stakeholder Roles.} The general stakeholder roles will not be changed since they are the primary users
     of the application (Students, Instructors, Supervisors, TAs).
     \item
-    \textbf{Human-centered approval.} Instructors explicitely stated that there are aspects where they do not desire 
-    automation and therefore, the manual approval and feedback system brainstormed will not change.
+    \textbf{Human-centered approval.} Instructors explicitly stated that there are aspects where they do not desire
+    automation and therefore, the manual approval and feedback system will not change.
     \item
     \textbf{Course Organization.} Course Organization where students, instructors, projects, and teams will remain with their 
     associated course and their respective roles/relationships in this environemnt will not change.
@@ -2571,7 +2701,7 @@ advises the instructors.
 
 % ==================== Software Engineering Instructor ====================
 \paragraph{Software Engineering Instructor (SEI)} \label{app:stk_instr}
-Professor who runs the course.
+Professor who runs the Software Engineering capstone course.
 
 \noindent \begin{itemize}
   \item[SEI\refstepcounter{instn}\theinstn \label{I_CurrentProcess}]
@@ -2694,6 +2824,9 @@ and then the dependencies between features.
 
 \subsection{Phase 1: Core Workflow (implemented in the course)}
 \begin{itemize}
+  \item Importing course enrollment from Avenue to Learn, with file upload as an alternative, and a list
+    of enrolled students who are not on a team (\ucref{UC_ImportEnrollment}; \ref{SR_Enrollment}). Team validation
+    (\ucref{UC_ValidateTeams}) needs to know who is enrolled, so this comes first.
   \item Supervisor proposal submission with a structured template, and
     instructor approval before a project is listed
     (\ucref{UC_SubmitProposal}, \ucref{UC_ReviewProposal};
@@ -2701,9 +2834,9 @@ and then the dependencies between features.
   \item Browsing projects with a visible status, and team selection
     (\ucref{UC_BrowseProjects}, \ucref{UC_SelectProject};
     \ref{SR_BrowseProjects}, \ref{SR_ProjectStatus}).
-  \item Team project submission with automated checks, and instructor review
+  \item Team project submission with automated checks, and instructor and TA review
     with iterative feedback (\ucref{UC_ApproveTeamProject};
-    \ref{SR_TeamSubmissionChecks}, \ref{SR_ReviewDialogue}). This is the
+    \ref{SR_TeamSubmissionChecks}, \ref{SR_ReviewDialogue}, \ref{SR_TAApproval}). This is the
     highest-value feature for the instructor, so it is part of the first
     working version.
   \item Validated team composition export
