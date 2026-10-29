@@ -1722,18 +1722,20 @@ Student (Priya), Instructor (Dr. Reyes)
     Student & Team & N : 0..1 & A student belongs to at most one team\\ \hline
     Instructor & Project & 1 : N & An instructor has access to all his courses' projects\\ \hline
     TA & Project & 1 : N & A TA may have access to multiple projects they are managing\\ \hline
+    TA & Team & 1 : N & A TA may be assigned to multiple teams\\ \hline
     Supervisor & Project & 1 : N & A supervisor may supervise multiple projects\\ \hline
     User & Notification & 1 : N & A user may receive multiple notifications\\ \hline
     User & Checklist & 1 : N & A user may have multiple checklists to handle\\ \hline
     User & Threads & N : M & A user may have be part of many threads and a thread can contain multiple users\\ \hline
+    User & AuditLog & 1 : N & A user may be responsible for multiple recorded actions\\ \hline
     Team & Team Profile & 1 : 0..1 & A may have at most one shared team profile\\ \hline
     Team & Project & N : 0..1 & A student team may have at most one project while a project could have multiple teams.\\ \hline
     Team & Project Application & 1 : N & A student team may submit multiple project applications.\\ \hline
     Project & Project Application & 1 : N & A project may have many project applications but each application belongs to a single project.\\ \hline
-    Project & Thread & 1 : N & A project may have many project applications but each application belongs to a single project.\\ \hline
+    Project & Thread & 1 : N & A project may have many threads but each thread belongs to a single application.\\ \hline
     Course & Project & 1 : N & Many projects belong to one course\\ \hline
     Course & Course Resource & 1 : N & A course may have many course resources\\ \hline
-    \caption{Data Dictionary} \label{tab:EntityRelationships}
+    \caption{Entity Relationships} \label{tab:EntityRelationships}
   \end{longtable}
 
   \subsection{Data Dictionary}
@@ -1751,9 +1753,9 @@ Student (Priya), Instructor (Dr. Reyes)
   \renewcommand{\arraystretch}{1.25}
 
   \begin{longtable}{|
-      p{0.23\textwidth}|
-      p{0.20\textwidth}|
-      p{0.45\textwidth}|
+      p{0.21\textwidth}|
+      p{0.29\textwidth}|
+      p{0.41\textwidth}|
   }
       \caption{Data Dictionary}
       \label{tab:DataDictionary}\\
@@ -1773,15 +1775,24 @@ Student (Priya), Instructor (Dr. Reyes)
 
       % USER: STUDENT
       \multicolumn{3}{|l|}{\textbf{Student (Child of User)}}\\ \hline
+      mac\_id & String & Mac IDs for students \\ \hline
+      student\_number & String & Unique ID for each user \\ \hline
+      enrolled\_course & Course & Capstone course in which the student is enrolled. \\ \hline
 
       % USER: Instructor
       \multicolumn{3}{|l|}{\textbf{Instructor (Child of User)}}\\ \hline
+      mac\_id & String & Mac IDs for instructors \\ \hline
+      managed\_courses & Collection\textless Course\textgreater & Courses that the instructor manages. \\ \hline
 
       % USER: TA
       \multicolumn{3}{|l|}{\textbf{TA (Child of User)}}\\ \hline
+      mac\_id & String & Mac IDs for TAs \\ \hline
+      assigned\_courses & Collection\textless Course\textgreater & Courses that the TA assists in. \\ \hline
+      assigned\_teams & Collection\textless Team\textgreater & Capstone teams assigned to the TA. \\ \hline
 
       % USER: Supervisor
       \multicolumn{3}{|l|}{\textbf{Supervisor (Child of User)}}\\ \hline
+      supervisor\_type & Enum & INTERNAL (McMaster faculty) or EXTERNAL (industry sponsor). \\ \hline
 
       % Course
       \multicolumn{3}{|l|}{\textbf{Course}}\\ \hline
@@ -1793,7 +1804,10 @@ Student (Priya), Instructor (Dr. Reyes)
       tas & Collection\textless TA\textgreater & List of TAs assisting in the course. \\ \hline
       enrollment\_list & Collection\textless Student\textgreater & List of enrolled students and managing Instructors/TAs. \\ \hline
       disabled\_features & Collection\textless Enum\textgreater & List of features labelled by an enum \\ \hline
-      capstone\_rules & Collection\textless String\textgreater & List of given additional per course rules \\ \hline
+      min\_team\_size & Integer & Minimum number of students allowed in a team team. \\ \hline
+      max\_team\_size & Integer & Maximum number of students allowed in a team team. \\ \hline
+      allowed\_combinations & Collection\textless Set\textless Enum\textgreater\textgreater & Permitted combinations of SE, CS, and TRON students. \\ \hline
+      capstone\_rules & Collection\textless String\textgreater & Additional descriptive course rules. \\ \hline
       approval\_mode & Enum & Determines where project approvals are handled (custom or not) INTERNAL, EXTERNAL, INTEGRATION \\ \hline
       threads & Collection\textless Thread\textgreater & Allow instructors to communicate important information to all supervisors and students in the course. \\ \hline
       resource & Collection\textless CourseResource\textgreater & Instructors can post course outline, timeline, guidelines, FAQ, past capstone examples, or any other course related content. \\ \hline
@@ -1810,17 +1824,19 @@ Student (Priya), Instructor (Dr. Reyes)
       work\_style & String & Description of how the student prefers to work. \\ \hline
       linkedin\_url & String & Link to student's LinkedIn page. \\ \hline
       seeking\_team & Boolean & Displays whether the user is seeking a team. \\ \hline
+      updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
       % Team
       \multicolumn{3}{|l|}{\textbf{Team}}\\ \hline
       team\_id & ID & Unique identifier for each team. \\ \hline
       team\_name & String & Name of the Team. \\ \hline
-      course & Course & Name of the Team. \\ \hline
+      course & Course & The course that the team is registered in. \\ \hline
       members & Collection\textless Student\textgreater & Reference to all team members in the team. \\ \hline
       member\_roles & Collection\textless Enum\textgreater & All roles of team members. \\ \hline
       poc & Student & Reference to the point of contact on the team. \\ \hline
       project & Project & Which project they have selected, if applicable. \\ \hline
       status & Enum & The team-project status of the team's current application or project (see Section~\ref{sec:lifecycle}). \\ \hline
+      updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
       % Team Profile
       \multicolumn{3}{|l|}{\textbf{TeamProfile}}\\ \hline
@@ -1831,28 +1847,30 @@ Student (Priya), Instructor (Dr. Reyes)
       interests & Collection\textless String\textgreater & Combined interests of the team. \\ \hline
       goals & String & General goals working through the capstone project. \\ \hline
       work\_style & String & The way of working that the team will adopt. \\ \hline
+      updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
       % Project (After it has been confirmed)
       \multicolumn{3}{|l|}{\textbf{Project}}\\ \hline
       project\_id & ID & Unique identifier for each project. \\ \hline
-      title & string & Title of the project. \\ \hline
-      supervisor & Supervisor & A reference to the supervisor \\ \hline
+      title & string & Title of the project (Required). \\ \hline
+      supervisor & Supervisor & A reference to the supervisor (Optional) \\ \hline
       proposer & User & A reference to the person who proposed the project \\ \hline
-      course & Course & A reference to the course that the project belongs to \\ \hline
-      background & String & Main problem statement and background information for the project \\ \hline
-      objectives & String & Objectives of the project. \\ \hline
-      requirements & Collection\textless String\textgreater & List of skills and experience needed for the project \\ \hline
-      deliverables & String & What deliverables need to be met for the completion of the project \\ \hline
-      impact & String & What deliverables need to be met for the completion of the project \\ \hline
-      proposed\_solution & String & Potential solution that the team can choose to implement \\ \hline
-      completion\_status & String & What work has already been done on the project \\ \hline
-      industry & String & Industry or area on which the work is done \\ \hline
-      supervisor\_capacity & Integer & Maximum number of teams that can work on the project \\ \hline
-      additional & String & Additional Notes or terms for the project \\ \hline
-      confidentiality & String & Confidentiality details. \\ \hline
-      ip & String & IP agreements \\ \hline
+      course & Course & A reference to the course that the project belongs to (Required) \\ \hline
+      background & String & Main problem statement and background information for the project (Required) \\ \hline
+      objectives & String & Objectives of the project. (Required) \\ \hline
+      requirements & Collection\textless String\textgreater & List of skills and experience needed for the project (Optional) \\ \hline
+      deliverables & String & What deliverables need to be met for the completion of the project (Optional) \\ \hline
+      impact & String & What deliverables need to be met for the completion of the project (Required) \\ \hline
+      proposed\_solution & String & Potential solution that the team can choose to implement (Optional) \\ \hline
+      completion\_status & String & What work has already been done on the project (Required) \\ \hline
+      industry & String & Industry or area on which the work is done (Required) \\ \hline
+      supervisor\_capacity & Integer & Maximum number of teams that can work on the project (Required) \\ \hline
+      additional & String & Additional Notes or terms for the project (Optional) \\ \hline
+      confidentiality & String & Confidentiality details. (Required) \\ \hline
+      ip & String & IP agreements (Required) \\ \hline
       status & Enum & Project status: DRAFT, PROPOSAL\_SUBMITTED, PROPOSAL\_CHANGES\_REQUESTED, PROPOSAL\_REJECTED, PROPOSAL\_WITHDRAWN, OPEN, FULL, or CLOSED (see Section~\ref{sec:lifecycle}). \\ \hline
       threads & Collection\textless Thread\textgreater & Communication medium on the project. \\ \hline
+      updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
       % Project Application
       \multicolumn{3}{|l|}{\textbf{ProjectApplication}}\\ \hline
@@ -1864,6 +1882,7 @@ Student (Priya), Instructor (Dr. Reyes)
       supervisor\_accepted & Boolean & Whether the supervisor has accepted the team. True means a slot is reserved for the team, until the team is declined, withdraws, is rejected, or dissolves. \\ \hline
       team\_accepted & Boolean & Whether the team has accepted the supervisor. SUPERVISOR\_ACCEPTS means only the supervisor has accepted, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING means only the team has, and AGREED means both have. \\ \hline
       threads & Collection\textless Thread\textgreater & Communication medium on the application. \\ \hline
+      updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
       % Thread
       \multicolumn{3}{|l|}{\textbf{Thread}}\\ \hline
@@ -1873,6 +1892,7 @@ Student (Priya), Instructor (Dr. Reyes)
       content & String & The main content of the thread written by the author. \\ \hline
       post\_date & DateTime & Creation date of the thread. \\ \hline
       replies & Collection\textless (String (Author), DateTime, String (Content))\textgreater & Full discussion and details within the thread. \\ \hline
+      updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
       % Notification
       \multicolumn{3}{|l|}{\textbf{Notification}}\\ \hline
@@ -1881,6 +1901,8 @@ Student (Priya), Instructor (Dr. Reyes)
       type & Enum & Type of Notification like Project, Application, Thread, Due date, etc. \\ \hline
       content & String & Information going to the recipient. \\ \hline
       date & DateTime & Date that the notification was sent. \\ \hline
+      delivery\_status & Enum & Current status: PENDING, SENT, or FAILED. \\ \hline
+      updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
       % Checklist
       \multicolumn{3}{|l|}{\textbf{Checklist}}\\ \hline
@@ -1897,6 +1919,17 @@ Student (Priya), Instructor (Dr. Reyes)
       type & Enum & Type of resource that the user is posting. \\ \hline
       content & Object & Content including information, documents, attachments, calendars, etc. \\ \hline
       date & DateTime & Date the resource was published. \\ \hline
+      updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
+
+      % Audit Log
+      \multicolumn{3}{|l|}{\textbf{AuditLog}}\\ \hline
+      log\_id & ID & Unique identifier for the audit entry. \\ \hline
+      actor & User (Optional) & User responsible for the action, if applicable. \\ \hline
+      action & Enum/String & Type of action performed. \\ \hline
+      entity\_type & String & Type of entity affected. \\ \hline
+      entity\_id & ID & Identifier of the affected record. \\ \hline
+      timestamp & DateTime & Date and time of the event. \\ \hline
+      change\_details & String & Relevant changes or error details, excluding sensitive information. \\ \hline
 
   \end{longtable}
 
