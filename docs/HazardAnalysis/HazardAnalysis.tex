@@ -10,6 +10,9 @@
 \usepackage{array}
 \usepackage{enumitem}
 \usepackage{parskip}
+\usepackage{xstring}
+
+\usepackage[margin=0.75in]{geometry}
 
 \hypersetup{
     colorlinks=true,       % false: boxed links; true: colored links
@@ -27,6 +30,29 @@
 
 \input{../Comments.text}
 \input{../Common.text}
+
+% ------------------------------------------------------------------
+% Descriptive identifiers (same convention as the SRS).
+% The descriptive name is the public-facing ID. Counters exist only so
+% that \refstepcounter can create a valid anchor for \label.
+% A break opportunity is allowed after each underscore so long IDs wrap
+% inside table cells.
+% ------------------------------------------------------------------
+\newcommand{\descriptiveid}[1]{{\StrSubstitute{#1}{_}{\textunderscore\allowbreak}[\idtmp]\texttt{\idtmp}}}
+\newcommand{\idref}[1]{\hyperref[#1]{\descriptiveid{#1}}}
+\newcommand{\idlabel}[1]{\descriptiveid{#1}}
+\newcommand{\reqitem}[2]{\refstepcounter{#1}\label{#2}\idlabel{#2}}
+
+\newcounter{ssrnum} % safety and security requirement ordering
+\newcounter{hnum}   % hazard ordering
+
+\newcommand{\ssrref}[1]{\idref{#1}}
+\newcommand{\hazref}[1]{\idref{#1}}
+
+% Link into the published SRS PDF. Works in a browser/PDF viewer and on
+% GitHub, unlike a relative-path link. Usage: \srsref{FR_AssignTA}
+\newcommand{\srsurl}{https://github.com/Ayushpatel2026/Keystone/raw/main/pdfs/SRS/SRS.pdf}
+\newcommand{\srsref}[1]{\href{\srsurl\#nameddest=#1}{\descriptiveid{#1}}}
 
 \begin{document}
 
@@ -46,6 +72,7 @@
 Oct 18th & Ayush Patel & Introduction, Scope, System Boundary and Assumptions\\
 Oct 19th & Ahmed Rashrash & FMEA Table, Safety and Security Requirements\\
 Oct 19th & Ayush Patel & Roadmap for Safety Req Implementation \\
+Oct 29th & Ayush Patel & Descriptive identifiers for hazards and SSRs, links into the SRS \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -84,7 +111,12 @@ conditions and identifies measures to eliminate or control them \citep{IppolitoA
 This document identifies potential hazards associated with \projname{}, analyzes the ways in which system components may
 fail, and proposes mitigations that can be translated into verifiable safety and security requirements.
 
-\section{Scope and Purpose of Hazard Analysis}
+    Hazards and safety and security requirements are identified by descriptive names. Hazard names (prefixed \texttt{H\textunderscore}) and
+    safety and security requirement names (prefixed \texttt{SSR\textunderscore}) link to their definitions in this document.
+    Names of requirements in the SRS (prefixed \texttt{FR\textunderscore}, \texttt{NFR\textunderscore}, and so on)
+    link to the corresponding requirement in the published SRS.
+
+    \section{Scope and Purpose of Hazard Analysis}
 
 \wss{You should say what \textbf{loss} could be incurred because of the
 hazards.}
@@ -301,13 +333,13 @@ entered in the table, including strategies involving providing additional
 documentation, and/or test cases.}
 
 \begin{longtable}{
-  >{\raggedright\arraybackslash}p{0.15\fw}
-  >{\raggedright\arraybackslash}p{0.13\fw}
-  >{\raggedright\arraybackslash}p{0.17\fw}
-  >{\raggedright\arraybackslash}p{0.15\fw}
-  >{\raggedright\arraybackslash}p{0.27\fw}
-  >{\raggedright\arraybackslash}p{0.07\fw}
-  >{\raggedright\arraybackslash}p{0.06\fw}}
+        >{\raggedright\arraybackslash}p{0.10\fw}
+        >{\raggedright\arraybackslash}p{0.13\fw}
+        >{\raggedright\arraybackslash}p{0.14\fw}
+        >{\raggedright\arraybackslash}p{0.12\fw}
+        >{\raggedright\arraybackslash}p{0.20\fw}
+        >{\raggedright\arraybackslash}p{0.16\fw}
+        >{\raggedright\arraybackslash}p{0.15\fw}}
 \caption{Failure Mode and Effect Analysis}\label{tab:fmea}\\
 \toprule
 \textbf{Component} & \textbf{Failure Mode} & \textbf{Effects of Failure} & \textbf{Causes of Failure} & \textbf{Recommended Action} & \textbf{SR} & \textbf{Ref} \\
@@ -323,158 +355,158 @@ documentation, and/or test cases.}
 \bottomrule
 \endlastfoot
 
-Authentication & 
-SSO or external provider unavailable & 
-Users cannot access platform, leads to missed deadlines & 
-External service outage, network failure & 
-Display error, log failure, raise warning to IT department and/or instructors & 
-\ref{SSR-1} & 
-H1-1 \\
+Authentication &
+SSO or external provider unavailable &
+Users cannot access platform, leads to missed deadlines &
+External service outage, network failure &
+Display error, log failure, raise warning to IT department and/or instructors &
+\ssrref{SSR_ExternalErrorLogging} &
+\reqitem{hnum}{H_AuthProviderOutage} \\
 
 \addlinespace
 \addlinespace
 
-& 
-User session is stolen & 
-Attacker can act as the user, read sensitive data, perform unapproved actions & 
-Compromised device, unencrypted user traffic, compromised external service & 
-Re-verify user for important actions & 
-\ref{SSR-9} & 
-H1-2 \\
-
-\addlinespace
-\hline
-\addlinespace
-
-RBAC and user management & 
-User is assigned the wrong role  & 
-Student able to act as a course instructor, supervisor as an IT technician, etc. & 
-System inferring roles from an unreliable source & 
-Default to zero privileges if automatic assignment fails, provide instructor with ability to modify roles, and record all actions in an audit log & 
-\ref{SSR-2}, \ref{SSR-10} & 
-H2-1 \\
+&
+User session is stolen &
+Attacker can act as the user, read sensitive data, perform unapproved actions &
+Compromised device, unencrypted user traffic, compromised external service &
+Re-verify user for important actions &
+\ssrref{SSR_ReverifyCriticalActions} &
+\reqitem{hnum}{H_SessionTheft} \\
 
 \addlinespace
 \hline
 \addlinespace
 
-Course management & 
-Disabling a feature leaves dependent workflows in an invalid state & 
-Other components fail unnecessarily and system rejects normal actions & 
-Component state does not account for all possible configurations & 
-Reject disable request, advise user on actions needed before feature can be disabled & 
-\ref{SSR-3}, \ref{SSR-12} & 
-H3-1 \\
+RBAC and user management &
+User is assigned the wrong role  &
+Student able to act as a course instructor, supervisor as an IT technician, etc. &
+System inferring roles from an unreliable source &
+Default to zero privileges if automatic assignment fails, provide instructor with ability to modify roles, and record all actions in an audit log &
+\ssrref{SSR_AuditLog}, \ssrref{SSR_ZeroDefaultPrivileges} &
+\reqitem{hnum}{H_WrongRole} \\
 
 \addlinespace
 \hline
 \addlinespace
 
-Project management & 
-Project displays outdated information & 
-Teams operate based on false information, contacting individuals which may no longer be involved with the course & 
-Instructor, supervisor, or even students forget to update their information & 
-Display a timestamp for when any displayed records were last updated & 
-\ref{SSR-4} & 
-H4-1 \\
-
-\addlinespace
-\addlinespace
-
-& 
-Confidential project or IP exposed & 
-Potential monetary loss, loss of trust, exposed vulnerabilities & 
-Project visibility rules not being enforced across a project & 
-Ensure that visibility restrictions are enforced & 
-\ref{SSR-13} & 
-H4-2 \\
-
-\addlinespace
-\addlinespace
-
-& 
-Project description misrepresents project & 
-Team cannot move forward with project, time wasted & 
-Project proposal prompt not asking for critical information  & 
-Ensure project proposal prompt includes required fields on critical information & 
-\ref{SSR-14} & 
-H4-3 \\
+Course management &
+Disabling a feature leaves dependent workflows in an invalid state &
+Other components fail unnecessarily and system rejects normal actions &
+Component state does not account for all possible configurations &
+Reject disable request, advise user on actions needed before feature can be disabled &
+\ssrref{SSR_RejectDisable}, \ssrref{SSR_NotifyPendingActions} &
+\reqitem{hnum}{H_DisableBreaksWorkflow} \\
 
 \addlinespace
 \hline
 \addlinespace
 
-Project approval & 
-Approving a team for a project fails to inform other interested teams that the project is closed & 
-Teams believe the project is still open and wait for a response that will never arrive & 
-Component fails after completing the first approval and before updating rejected teams of new project status & 
-Ensure all compound actions are atomic, potentially by using a database which supports atomic transactions and making the database the single source of truth & 
-\ref{SSR-8} & 
-H5-1 \\
+Project management &
+Project displays outdated information &
+Teams operate based on false information, contacting individuals which may no longer be involved with the course &
+Instructor, supervisor, or even students forget to update their information &
+Display a timestamp for when any displayed records were last updated &
+\ssrref{SSR_RecordTimestamps} &
+\reqitem{hnum}{H_OutdatedProject} \\
+
+\addlinespace
+\addlinespace
+
+&
+Confidential project or IP exposed &
+Potential monetary loss, loss of trust, exposed vulnerabilities &
+Project visibility rules not being enforced across a project &
+Ensure that visibility restrictions are enforced &
+\ssrref{SSR_EnforceVisibility} &
+\reqitem{hnum}{H_ConfidentialExposure} \\
+
+\addlinespace
+\addlinespace
+
+&
+Project description misrepresents project &
+Team cannot move forward with project, time wasted &
+Project proposal prompt not asking for critical information  &
+Ensure project proposal prompt includes required fields on critical information &
+\ssrref{SSR_ProposalPromptCoverage} &
+\reqitem{hnum}{H_MisleadingDescription} \\
 
 \addlinespace
 \hline
 \addlinespace
 
-Student and team formation & 
-Two students attempt to join the last slot of a group simultaneously, neither receives a fail message & 
-Both students believe they have joined the group, team size limit may be exceeded due to the data race & 
-Database allows both operations to run concurrently without a locking mechanism & 
-Ensure that data entries that are part of a single operation are not modified externally for the total duration of the operation & 
-\ref{SSR-11} & 
-H6-1 \\
+Project approval &
+Approving a team for a project fails to inform other interested teams that the project is closed &
+Teams believe the project is still open and wait for a response that will never arrive &
+Component fails after completing the first approval and before updating rejected teams of new project status &
+Ensure all compound actions are atomic, potentially by using a database which supports atomic transactions and making the database the single source of truth &
+\ssrref{SSR_AtomicActions} &
+\reqitem{hnum}{H_StaleProjectStatus} \\
+
+\addlinespace
+\hline
+\addlinespace
+
+Student and team formation &
+Two students attempt to join the last slot of a group simultaneously, neither receives a fail message &
+Both students believe they have joined the group, team size limit may be exceeded due to the data race &
+Database allows both operations to run concurrently without a locking mechanism &
+Ensure that data entries that are part of a single operation are not modified externally for the total duration of the operation &
+\ssrref{SSR_NoStaleReads} &
+\reqitem{hnum}{H_TeamSizeRace} \\
 
 Student and team formation &
 Decline or rejection is communicated bluntly, or students feel publicly ranked &
 Stress, feeling unfairly treated, students stop using the platform &
 Free-text decline messages, visible statuses with no guidance &
 Use respectful message templates with an optional reason, and show no public ranking of students or teams &
-\ref{SSR-15} &
-H6-2 \\
+\ssrref{SSR_RespectfulDeclines} &
+\reqitem{hnum}{H_BluntRejection} \\
 
 
 \addlinespace
 \hline
 \addlinespace
 
-Notification & 
-Important notification is not delivered & 
-User misses important deadline, fails to respond to time sensitive matter & 
-Notification component fails in the process of sending a notification, queued notification is lost & 
-Ensure that queued notifications remain available until delivery is verified to have completed & 
-\ref{SSR-5} & 
-H7-1 \\
+Notification &
+Important notification is not delivered &
+User misses important deadline, fails to respond to time sensitive matter &
+Notification component fails in the process of sending a notification, queued notification is lost &
+Ensure that queued notifications remain available until delivery is verified to have completed &
+\ssrref{SSR_DurableNotifications} &
+\reqitem{hnum}{H_LostNotification} \\
 
 \addlinespace
 \hline
 \addlinespace
 
-Persistence and data management & 
-Data is lost or corrupted & 
-User data is lost, system fails to operate as expected, audit log lost & 
-Hardware degradation, accidental deletion, migration failures & 
-Regular, automated backups which are verified to be able to restore platform to a previous, working state & 
-\ref{SSR-6} & 
-H8-1 \\
+Persistence and data management &
+Data is lost or corrupted &
+User data is lost, system fails to operate as expected, audit log lost &
+Hardware degradation, accidental deletion, migration failures &
+Regular, automated backups which are verified to be able to restore platform to a previous, working state &
+\ssrref{SSR_AutomatedBackups} &
+\reqitem{hnum}{H_DataLoss} \\
 
 Personal data kept longer than needed &
 Privacy breach, loss of trust, legal exposure &
 No retention policy, deletion not implemented &
 Define a retention period and delete personal data on request and at the end of the course cycle &
-\ref{SSR-16} &
-H8-2 \\
+\ssrref{SSR_PersonalDataDeletion} &
+\reqitem{hnum}{H_ExcessRetention} \\
 
 \addlinespace
 \hline
 \addlinespace
 
-Recommendation & 
-Irrelevant projects ranked highly & 
-Users miss projects that interest them, due to the assumption that lower projects are not worth looking into & 
-Recommendation algorithm performs badly, inputs are outdated & 
-Provide multiple ways to sort project list & 
-\ref{SSR-7} & 
-H9-1 \\
+Recommendation &
+Irrelevant projects ranked highly &
+Users miss projects that interest them, due to the assumption that lower projects are not worth looking into &
+Recommendation algorithm performs badly, inputs are outdated &
+Provide multiple ways to sort project list &
+\ssrref{SSR_MultipleBrowseViews} &
+\reqitem{hnum}{H_IrrelevantRanking} \\
 
 \addlinespace
 \hline
@@ -485,8 +517,8 @@ Avenue unavailable or the import fails &
 Course cannot be populated with its students, team validation cannot run, team formation and approval are delayed &
 Avenue outage, change to Avenue access, or the course has no Avenue site &
 Leave existing enrollment unchanged, tell the user, and offer file upload &
-\ref{SSR-18} &
-H10-1 \\
+\ssrref{SSR_EnrollmentFallback} &
+\reqitem{hnum}{H_ImportUnavailable} \\
 
 \addlinespace
 \addlinespace
@@ -496,8 +528,8 @@ Import produces a wrong list (missing, duplicate, or mismatched students) &
 Students wrongly blocked from or admitted to the course, invalid team validation results &
 Stale or partial data from Avenue, malformed identifiers &
 Check student identifiers, detect duplicates, and show an import preview for the user to review and confirm before applying changes. &
-\ref{SSR-17}, \ref{SSR-20} &
-H10-2 \\
+\ssrref{SSR_EnrollmentPreview}, \ssrref{SSR_EnrollmentValidation} &
+\reqitem{hnum}{H_ImportWrongList} \\
 
 \addlinespace
 \addlinespace
@@ -507,8 +539,8 @@ Student missing from the import is removed from a team automatically &
 Team becomes undersized or invalid in the middle of approval, student loses their place without notice &
 Import treated as the single source of truth and applied without review &
 Flag absent students for review and never remove them automatically &
-\ref{SSR-19} &
-H10-3 \\
+\ssrref{SSR_NoAutoRemoval} &
+\reqitem{hnum}{H_AutoRemovalFromTeam} \\
 
 \addlinespace
 \addlinespace
@@ -518,8 +550,8 @@ Student who joins late cannot be added &
 Student has no team and no way to use the platform, and team formation is delayed &
 The import is the only way to add students &
 Let course staff add students from an additional file import &
-\ref{SSR-18} &
-H10-4 \\
+\ssrref{SSR_EnrollmentFallback} &
+\reqitem{hnum}{H_LateStudent} \\
 
 \addlinespace
 
@@ -531,88 +563,88 @@ H10-4 \\
 \wss{Newly discovered requirements.  These should also be added to the SRS.  (A
 rationale design process how and why to fake it.)}
 
-\begin{enumerate}[label=\textbf{SSR-\arabic*}]
-    \item \label{SSR-1} The system shall log all errors caused by external providers and notify university IT professionals and/or course instructors when they are detected.\\
+\begin{itemize}
+    \item[]\reqitem{ssrnum}{SSR_ExternalErrorLogging} The system shall log all errors caused by external providers and notify university IT professionals and/or course instructors when they are detected.\\
     \textbf{Rationale}: Outages caused by external providers prevent users from using the platform and require immediate attention to restore in a timely manner.\\
-    \textbf{Traces To}: FR31
+    \textbf{Traces To}: \srsref{FR_LogExternalErrors}
 
-    \item \label{SSR-2} The system shall record all user actions with the time, a user identifier, and their privilege level at the time of the action, in an append-only audit log.\\
+    \item[]\reqitem{ssrnum}{SSR_AuditLog} The system shall record all user actions with the time, a user identifier, and their privilege level at the time of the action, in an append-only audit log.\\
     \textbf{Rationale}: Accounts may get compromised and any actions taken may need to be reviewed and reversed.\\
-    \textbf{Traces To}: SEC-AU1, SEC-AU2, FR29, FR30
+    \textbf{Traces To}: \srsref{NFR_AuditLog}, \srsref{NFR_AuditTamper}, \srsref{FR_AuthorizationRBAC}, \srsref{FR_UpdateRoles}
 
-    \item \label{SSR-3} The system shall reject all component disable requests if there are pending actions within the component.\\
+    \item[]\reqitem{ssrnum}{SSR_RejectDisable} The system shall reject all component disable requests if there are pending actions within the component.\\
     \textbf{Rationale}: Disabling features may potentially leave the system in a partially invalid state. For example, disabling the project approvals component strands pending project approval requests.\\
-    \textbf{Traces To}: FR32
+    \textbf{Traces To}: \srsref{FR_RejectComponentDisable}
 
-    \item \label{SSR-4} The system shall display a timestamp for any displayed records when they were last updated.\\
+    \item[]\reqitem{ssrnum}{SSR_RecordTimestamps} The system shall display a timestamp for any displayed records when they were last updated.\\
     \textbf{Rationale}: Providing users with a timestamp can allow them to judge whether the information they are reading is up-to-date and can contact instructors or supervisors when that is not the case.\\
-    \textbf{Traces To}: FR33
+    \textbf{Traces To}: \srsref{FR_DisplayTimestamps}
 
-    \item \label{SSR-5} All pending notifications shall be stored durably until delivery is verified.\\
+    \item[]\reqitem{ssrnum}{SSR_DurableNotifications} All pending notifications shall be stored durably until delivery is verified.\\
     \textbf{Rationale}: Lost notifications mean that users are not alerted of potentially time-sensitive matters and this can result in missed deadlines and loss of time.\\
-    \textbf{Traces To}: FR34
+    \textbf{Traces To}: \srsref{FR_DurableNotifications}
 
-    \item \label{SSR-6} The platform shall provide a mechanism for automatically creating regular backups which can restore the platform to a previous state.\\
+    \item[]\reqitem{ssrnum}{SSR_AutomatedBackups} The platform shall provide a mechanism for automatically creating regular backups which can restore the platform to a previous state.\\
     \textbf{Rationale}: Data loss incidents are not uncommon and can be caused by faulty hardware, accidental changes, and many others. Storing a set of backups ensures that any data loss is minimized to a backup period timespan.\\
-    \textbf{Traces To}: PR-RFT2
+    \textbf{Traces To}: \srsref{NFR_Recoverable}
 
-    \item \label{SSR-7} The platform shall provide multiple ways to find, filter, and browse the list of projects.\\
+    \item[]\reqitem{ssrnum}{SSR_MultipleBrowseViews} The platform shall provide multiple ways to find, filter, and browse the list of projects.\\
     \textbf{Rationale}: While a recommendation engine is proposed, it may be flawed or operate on outdated data. To ensure users don't miss a project that they may favour, providing multiple ways to display the list can bring different projects to the top.\\
-    \textbf{Traces To}: FR5
+    \textbf{Traces To}: \srsref{FR_ViewApprovedProjects}
 
-    \item \label{SSR-8} All system actions which involve multiple dependent reads and writes, with at least one write, shall be atomic.\\
+    \item[]\reqitem{ssrnum}{SSR_AtomicActions} All system actions which involve multiple dependent reads and writes, with at least one write, shall be atomic.\\
     \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.\\
-    \textbf{Traces To}: SEC-INT1
+    \textbf{Traces To}: \srsref{NFR_ConcurrencySafety}
 
-    \item \label{SSR-9} The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.\\
+    \item[]\reqitem{ssrnum}{SSR_ReverifyCriticalActions} The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.\\
     \textbf{Rationale}: Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.\\
-    \textbf{Traces To}: FR35
+    \textbf{Traces To}: \srsref{FR_ReverifyUsers}
 
-    \item \label{SSR-10} The system shall assign new users zero privileges when their identity cannot be assigned automatically or verified.\\
+    \item[]\reqitem{ssrnum}{SSR_ZeroDefaultPrivileges} The system shall assign new users zero privileges when their identity cannot be assigned automatically or verified.\\
     \textbf{Rationale}: No assumptions can be made about new users. They may be students who are not enrolled in a capstone course, malicious actors attempting to extract user information, individuals posing as supervisors to get free labour, etc. Ensuring no unverified users get access to the platform mitigates those risks.\\
-    \textbf{Traces To}: FR28, FR29, FR30, SEC-AC2
+    \textbf{Traces To}: \srsref{FR_MacSSO}, \srsref{FR_AuthorizationRBAC}, \srsref{FR_UpdateRoles}, \srsref{NFR_Authorize}
 
-    \item \label{SSR-11} The system shall ensure that operations on sets or aggregations of multiple data entries do not operate on stale data at any point during an operation.\\
+    \item[]\reqitem{ssrnum}{SSR_NoStaleReads} The system shall ensure that operations on sets or aggregations of multiple data entries do not operate on stale data at any point during an operation.\\
     \textbf{Rationale}: Concurrent operations which rely on aggregations of data entries may introduce a data race, resulting in an invalid state after the operation. For example, two students attempting to join the same team which only has one available slot can end up exceeding the team size limit, if the mechanism is not implemented correctly.\\
-    \textbf{Traces To}: SEC-INT1
+    \textbf{Traces To}: \srsref{NFR_ConcurrencySafety}
 
-    \item \label{SSR-12} The system shall notify the user of pending actions when disabling a component fails.\\
+    \item[]\reqitem{ssrnum}{SSR_NotifyPendingActions} The system shall notify the user of pending actions when disabling a component fails.\\
     \textbf{Rationale}: It may be possible to disable certain components but require additional actions to be taken, such as responding to pending project approvals.\\
-    \textbf{Traces To}: FR32
+    \textbf{Traces To}: \srsref{FR_RejectComponentDisable}
 
-    \item \label{SSR-13} The system shall enforce visibility restrictions across all points of communication.\\
+    \item[]\reqitem{ssrnum}{SSR_EnforceVisibility} The system shall enforce visibility restrictions across all points of communication.\\
     \textbf{Rationale}: Exposing IP or confidential information can lead to damages and loss of trust.\\
-    \textbf{Traces To}: FR29
+    \textbf{Traces To}: \srsref{FR_AuthorizationRBAC}
 
-    \item \label{SSR-14} The system shall display project proposal prompts which cover all necessary information relevant to a project's viability as a capstone project.\\
+    \item[]\reqitem{ssrnum}{SSR_ProposalPromptCoverage} The system shall display project proposal prompts which cover all necessary information relevant to a project's viability as a capstone project.\\
     \textbf{Rationale}: Prompting only an open-ended description provides supervisors with no information on what students and instructors are looking for in a capstone-level project.\\
-    \textbf{Traces To}: FR1, FR2
+    \textbf{Traces To}: \srsref{FR_SupervisorProposal}, \srsref{FR_ProposalOptionalFields}
 
-    \item \label{SSR-15} The system shall present decline and rejection decisions with respectful message templates and shall not publish rankings of students or teams.\\
+    \item[]\reqitem{ssrnum}{SSR_RespectfulDeclines} The system shall present decline and rejection decisions with respectful message templates and shall not publish rankings of students or teams.\\
     \textbf{Rationale}: Blunt or public decisions cause stress and a sense of unfair treatment, and may stop students from using the platform.\\
-    \textbf{Traces To}: FR14, FR18
+    \textbf{Traces To}: \srsref{FR_DeclineTeam}, \srsref{FR_ApprovalResponse}
 
-    \item \label{SSR-16} The system shall delete personal data on request and at the end of a course cycle, and shall collect only the data that a feature needs.\\
+    \item[]\reqitem{ssrnum}{SSR_PersonalDataDeletion} The system shall delete personal data on request and at the end of a course cycle, and shall collect only the data that a feature needs.\\
     \textbf{Rationale}: Keeping personal data longer than needed increases the harm of a breach.\\
-    \textbf{Traces To}: SEC-P1
+    \textbf{Traces To}: \srsref{NFR_EssentialPersonal}
 
-    \item \label{SSR-17} The system shall show a preview of any enrollment import and shall apply it only after course staff confirm it.\\
+    \item[]\reqitem{ssrnum}{SSR_EnrollmentPreview} The system shall show a preview of any enrollment import and shall apply it only after course staff confirm it.\\
     \textbf{Rationale}: An unchecked import could wrongly add or exclude students and give misleading team validation results.\\
-    \textbf{Traces To}: FR36
+    \textbf{Traces To}: \srsref{FR_ImportEnrollment}
 
-    \item \label{SSR-18} If an enrollment import fails or does not include a student, the system shall leave existing enrollment unchanged, tell the user, and let course staff add students from a file or manually.\\
+    \item[]\reqitem{ssrnum}{SSR_EnrollmentFallback} If an enrollment import fails or does not include a student, the system shall leave existing enrollment unchanged, tell the user, and let course staff add students from a file or manually.\\
     \textbf{Rationale}: Avenue may be unavailable, may not exist for a course, or may lack late-joining students, and course staff must still be able to populate the course.\\
-    \textbf{Traces To}: FR31, FR36, FR37
+    \textbf{Traces To}: \srsref{FR_LogExternalErrors}, \srsref{FR_ImportEnrollment}, \srsref{FR_UpdateEnrollment}
 
-    \item \label{SSR-19} The system shall not remove a student from a course or team because the student is absent from an enrollment import, and shall flag such students for confirmation by course staff.\\
+    \item[]\reqitem{ssrnum}{SSR_NoAutoRemoval} The system shall not remove a student from a course or team because the student is absent from an enrollment import, and shall flag such students for confirmation by course staff.\\
     \textbf{Rationale}: Automatic removal could leave a team undersized or invalid in the middle of approval.\\
-    \textbf{Traces To}: FR38
+    \textbf{Traces To}: \srsref{FR_EnrollmentDiscrepency}
 
-    \item \label{SSR-20} The system shall check imported enrollment for duplicate and malformed student entries and show any problems in the preview before the import can be confirmed.\\
+    \item[]\reqitem{ssrnum}{SSR_EnrollmentValidation} The system shall check imported enrollment for duplicate and malformed student entries and show any problems in the preview before the import can be confirmed.\\
     \textbf{Rationale}: Stale or partial data from an external source can corrupt enrollment records.\\
-    \textbf{Traces To}: FR36
+    \textbf{Traces To}: \srsref{FR_ImportEnrollment}
 
-\end{enumerate}
+\end{itemize}
 
 \section{Roadmap}
 
@@ -630,24 +662,24 @@ Phase~1 covers proposal submission and approval, browsing projects with a visibl
 team project submission and review, and the validated team composition export.
 
 \begin{itemize}
-    \item \ref{SSR-14}: the proposal template asks for the information that makes a project viable as a capstone
-    project (H4-3).
-    \item \ref{SSR-13}: server-side visibility checks for proposals and projects, tested for each role (H4-2).
-    \item \ref{SSR-10}: new accounts have no privileges until their role is assigned (H2-1).
-    \item \ref{SSR-2}: an append-only audit log for approval decisions, status changes, and role changes (H2-1).
+    \item \ssrref{SSR_ProposalPromptCoverage}: the proposal template asks for the information that makes a project viable as a capstone
+    project (\hazref{H_MisleadingDescription}).
+    \item \ssrref{SSR_EnforceVisibility}: server-side visibility checks for proposals and projects, tested for each role (\hazref{H_ConfidentialExposure}).
+    \item \ssrref{SSR_ZeroDefaultPrivileges}: new accounts have no privileges until their role is assigned (\hazref{H_WrongRole}).
+    \item \ssrref{SSR_AuditLog}: an append-only audit log for approval decisions, status changes, and role changes (\hazref{H_WrongRole}).
     Logging every user action is future work.
-    \item \ref{SSR-4}: last-updated time shown on project records (H4-1).
-    \item \ref{SSR-7}: several ways to sort and filter the project list when browsing (H9-1). Ranked recommendations
+    \item \ssrref{SSR_RecordTimestamps}: last-updated time shown on project records (\hazref{H_OutdatedProject}).
+    \item \ssrref{SSR_MultipleBrowseViews}: several ways to sort and filter the project list when browsing (\hazref{H_IrrelevantRanking}). Ranked recommendations
     themselves are future work.
-    \item \ref{SSR-8}, \ref{SSR-11}: database transactions and locking for team selection, approvals, and team
-    membership (H5-1, H6-1).
-    \item \ref{SSR-1}: logging of errors from external providers (H1-1). Notifying instructors by email is added with
+    \item \ssrref{SSR_AtomicActions}, \ssrref{SSR_NoStaleReads}: database transactions and locking for team selection, approvals, and team
+    membership (\hazref{H_StaleProjectStatus}, \hazref{H_TeamSizeRace}).
+    \item \ssrref{SSR_ExternalErrorLogging}: logging of errors from external providers (\hazref{H_AuthProviderOutage}). Notifying instructors by email is added with
     notifications in Phase~2.
-    \item \ref{SSR-6}: automated database backups by the hosting provider, and a restore test before release
-    (H8-1).
-    \item \ref{SSR-15}: decline and rejection message templates, with no public rankings (H6-2).
-    \item \ref{SSR-17}, \ref{SSR-18}, \ref{SSR-19}, \ref{SSR-20}: preview and confirmation, fallbacks, flagging, and
-    checks for imported enrollment (H10-1 to H10-4). Enrollment import is part of Phase~1 in the SRS.
+    \item \ssrref{SSR_AutomatedBackups}: automated database backups by the hosting provider, and a restore test before release
+    (\hazref{H_DataLoss}).
+    \item \ssrref{SSR_RespectfulDeclines}: decline and rejection message templates, with no public rankings (\hazref{H_BluntRejection}).
+    \item \ssrref{SSR_EnrollmentPreview}, \ssrref{SSR_EnrollmentFallback}, \ssrref{SSR_NoAutoRemoval}, \ssrref{SSR_EnrollmentValidation}: preview and confirmation, fallbacks, flagging, and
+    checks for imported enrollment (\hazref{H_ImportUnavailable} to \hazref{H_LateStudent}). Enrollment import is part of Phase~1 in the SRS.
 \end{itemize}
 
 \subsection{Phase 2: Communication and Visibility (implemented in the course)}
@@ -656,34 +688,34 @@ Phase~2 adds notifications and the checklist, team profiles and contact details,
 identifying unselected projects.
 
 \begin{itemize}
-    \item \ref{SSR-5}: pending notifications are stored in the database until delivery is confirmed, with retries
-    (H7-1).
-    \item \ref{SSR-1}: alerts to the instructor when an external provider fails (H1-1).
-    \item \ref{SSR-13}: visibility checks are extended to team profiles, contact details, and unselected projects
-    (H4-2).
+    \item \ssrref{SSR_DurableNotifications}: pending notifications are stored in the database until delivery is confirmed, with retries
+    (\hazref{H_LostNotification}).
+    \item \ssrref{SSR_ExternalErrorLogging}: alerts to the instructor when an external provider fails (\hazref{H_AuthProviderOutage}).
+    \item \ssrref{SSR_EnforceVisibility}: visibility checks are extended to team profiles, contact details, and unselected projects
+    (\hazref{H_ConfidentialExposure}).
 \end{itemize}
 
 \subsection{Phase 3: Extended Features (implemented if time allows)}
 
 \begin{itemize}
-    \item \ref{SSR-14}: the proposal prompts are extended to student-initiated proposals, with the guidelines and
-    examples that this phase adds (H4-3).
-    \item \ref{SSR-8}, \ref{SSR-11}: the same locking and transactions are applied to supervisor capacity limits
-    (H5-1, H6-1).
+    \item \ssrref{SSR_ProposalPromptCoverage}: the proposal prompts are extended to student-initiated proposals, with the guidelines and
+    examples that this phase adds (\hazref{H_MisleadingDescription}).
+    \item \ssrref{SSR_AtomicActions}, \ssrref{SSR_NoStaleReads}: the same locking and transactions are applied to supervisor capacity limits
+    (\hazref{H_StaleProjectStatus}, \hazref{H_TeamSizeRace}).
 \end{itemize}
 
 \subsection{Future Work (not implemented, or faked for the demo)}
 
 \begin{itemize}
-    \item \ref{SSR-3}, \ref{SSR-12}: rules for disabling components apply once features can be switched on and off for
-    each course (modularity and other courses). Until then the hazard (H3-1) cannot occur.
-    \item \ref{SSR-9}: re-verification for critical actions with email codes or MFA depends on real authentication
+    \item \ssrref{SSR_RejectDisable}, \ssrref{SSR_NotifyPendingActions}: rules for disabling components apply once features can be switched on and off for
+    each course (modularity and other courses). Until then the hazard (\hazref{H_DisableBreaksWorkflow}) cannot occur.
+    \item \ssrref{SSR_ReverifyCriticalActions}: re-verification for critical actions with email codes or MFA depends on real authentication
     (McMaster accounts and external accounts), which is simplified for the demo. In the course the system only asks
-    for confirmation before destructive actions.
-    \item \ref{SSR-7}: ranking and explaining recommendations, with matching of teams to projects (H9-1).
-    \item \ref{SSR-2}: full action logging, and tamper-evident logs.
-    \item \ref{SSR-1}: notifying university IT of provider outages.
-    \item \ref{SSR-16}: deletion on request and at the end of a course cycle (H8-2).
+    for confirmation before destructive actions (\hazref{H_SessionTheft}).
+    \item \ssrref{SSR_MultipleBrowseViews}: ranking and explaining recommendations, with matching of teams to projects (\hazref{H_IrrelevantRanking}).
+    \item \ssrref{SSR_AuditLog}: full action logging, and tamper-evident logs.
+    \item \ssrref{SSR_ExternalErrorLogging}: notifying university IT of provider outages.
+    \item \ssrref{SSR_PersonalDataDeletion}: deletion on request and at the end of a course cycle (\hazref{H_ExcessRetention}).
     \item Hazards of any integration with an external approval system (stale or failed synchronization) need
     requirements of their own when it is built.
 \end{itemize}
@@ -707,7 +739,7 @@ Used Claude Sonnet 5.5 for the following,
 \subsection*{Verification of AI-Generated Content}
 The team reviewed every AI-assisted passage before including it. References were checked against the
 publisher or standards body listing. The FMEA rows, requirements and roadmap were checked by the team against
-the SRS, including each FR and NFR number in the ``Traces To'' lines. The team is responsible for the accuracy,
+the SRS, including each requirement name in the ``Traces To'' lines. The team is responsible for the accuracy,
 completeness, and consistency of this document.
 
 
