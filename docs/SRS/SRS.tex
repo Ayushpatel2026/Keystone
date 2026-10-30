@@ -105,7 +105,6 @@
 \newcommand{\stkTI}{\hyperref[app:stk_tron]{TI}}
 
 \newcommand{\maintFrac}{20\%}
-\newcommand{\changeEffort}{8 hours} % 40 hours * maintFrac
 
 \newcommand{\usabilityTestTime}{5 minutes}
 \newcommand{\usabilityTestSuccessPerc}{75\%}
@@ -158,6 +157,7 @@ Oct 18th 2026 & 1.2 & Data Requirements\\
 Oct 19th 2026 & 1.3 & Non-functional Requirements\\
 Oct 28th 2026 & 1.4 & Add more requirements after peer review and interviews\\
 Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
+Oct 30th 2026 & 1.5 & Addressed conflicts in defintions and acronyms, added likely changes, and added more requirements after peer review and interviews\\
 \bottomrule
   \end{tabularx}
 
@@ -356,6 +356,8 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
           \item TAs, who help instructors administer the course. TAs can populate enrolled students and course information,
           view projects and teams, and participate in the team project approval process.
           TAs do not take part in the approval of project proposals.
+          Instructors and TAs may also hold the administrator permission, which lets them manage users' course
+          association and roles, read the external-provider error log, and delete data that other users cannot.
         \end{itemize}
       \item \textbf{Development Team:} Ayush Patel, Waqar Ul-Hassan, Ahmed Rashrash, and Andrew Habib.
     \end{itemize}
@@ -401,9 +403,8 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     Approval adapter & A component that reads the approval outcome of a team project from an external approval system and updates the team-project status. Integrated mode is only available for courses that have an adapter.\\
     Custom document & A deliverable, chosen by each team from a list, that suits the type of project
     (for example, a usability testing report).\\
-    TA & Teaching assistant for a capstone course (course TA). Can populate course information, view projects and teams, and take part in team project approval. A TA does not take part in project proposal approval.\\
-    Team TA & A course TA assigned to a specific team (\rref{FR_Label40}). A course TA need not be a team TA.\\
-    Administrator & A user with \texttt{is\_admin} set, who operates the deployed system: manages users' course association and roles, reads the external-provider error log, and may delete data not owned by them. Not a course role. May be university IT staff or an instructor.\\
+    TA & Teaching assistant who supports a capstone course. TAs can populate course information, view projects and teams, and take part in team project approval, and may be assigned to specific teams (\rref{FR_Label40}). A TA does not take part in project proposal approval.\\
+    Administrator & An instructor or TA with the administrator permission (\texttt{is\_admin} set), who can manage users' course association and roles, read the external-provider error log, and delete data that other users cannot. Not a separate role.\\
     MacID & A McMaster University user account identifier.\\
     Avenue to Learn (Avenue) & McMaster's learning management system. It holds course enrollment for courses that have
     an Avenue site, which is optional. \\
@@ -624,7 +625,7 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     stays away from the detail of listing every required properties.}
 
   The entities that interact with \projname{} are students, supervisors, course instructors, TAs,
-  authentication providers, an email service, Avenue to Learn, and the integrated approval systems of courses that do not
+  authentication providers, an email service, Avenue to Learn, and the external approval systems of courses that do not
   carry out approval within \projname{}.
 
   \begin{itemize}
@@ -650,6 +651,7 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
       \item Make final decisions on teams and projects, including project proposal and team project approvals,
       requests for changes, and rejection.
       \item Judge project feasibility and appropriateness for the course.
+      \item With the administrator permission: manage users' course association and assigned roles, review the log of external-provider errors, and carry out deletions that ordinary users cannot make.
     \end{itemize}
     \item TA Responsibilities:
     \begin{itemize}
@@ -659,6 +661,7 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
       \item Update project and team status as directed by instructors, in courses where approval
       takes place outside \projname{}.
       \item Assist instructors in keeping records accurate.
+      \item With the administrator permission: manage users' course association and assigned roles, review the log of external-provider errors, and carry out deletions that ordinary users cannot make.
     \end{itemize}
     \item Authentication Provider Responsibilities:
     \begin{itemize}
@@ -668,10 +671,11 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     \begin{itemize}
       \item Deliver the notifications generated by \projname{} to users' email addresses.
     \end{itemize}
-    \item Integrated Approval System Responsibilities:
+    \item External Approval System Responsibilities:
     \begin{itemize}
-      \item In courses that use one, carry out approval of teams and projects and make the outcome available
-      to \projname{}. Otherwise, instructors or TAs record the outcome in \projname{} manually.
+      \item In courses that carry out approval outside \projname{}, carry out approval of teams and projects.
+      In integrated mode, make the outcome available to an approval adapter, which updates \projname{}. In external mode,
+      instructors or TAs record the outcome in \projname{} manually.
     \end{itemize}
     \item Avenue to Learn Responsibilities:
     \begin{itemize}
@@ -739,7 +743,8 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     to configure it without developer help.
     \item \textbf{TAs} are graduate students who know the course's process. They
     help instructors with day-to-day administration and are comfortable using web applications and
-    technical tools.
+    technical tools. Instructors and TAs with the administrator permission also manage users and roles, review the
+    error log, and handle data deletion requests, and need no technical knowledge beyond using the web interface.
   \end{itemize}
 
   \subsection{System Constraints}
@@ -762,8 +767,8 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     independently for each course, so that a course can use only the parts that fit its process.
     \item \textbf{Independent of any one approval tool.} \projname{} shall not depend on a specific
     external tool, such as the GitLab merge request process used by the Software Engineering course,
-    to function. It shall support courses that carry out approval in the platform, courses that carry
-    it out elsewhere, and, where an adapter exists, courses that synchronize with an external process.
+    to function. It shall support courses that carry out approval in the platform (in-platform mode), courses that carry
+    it out elsewhere and record the outcome manually (external mode), and, where an approval adapter exists, courses that synchronize with an external process (integrated mode).
     \item \textbf{Users outside the university.} \projname{} shall support users who do not have a
     McMaster account (such as industry sponsors) alongside users who do. An external identity provider
     cannot confirm who a person is, so external supervisors have restricted access until an instructor
@@ -1787,7 +1792,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   logical data model based on the functional requirements describing how database technologies
   will store critical data.
 
-  \subsection{Major Data Entities}
+  \subsection{Major Data Entities}\label{sec:entities}
 
   \plt{What information must exist for the system to accomplish its goals?}
 
@@ -1802,7 +1807,10 @@ Instructor (Dr. Reyes), Teaching Assistant
     \item \textbf{Instructor (Child of User)}: Instructors are users who manage one or more capstone course(s) and provide
     feedback and resources to help students succeed in the course.
     \item \textbf{TAs (Child of User)}: TAs assist instructors in course and team management, including approving team
-    projects, and are assigned to teams.
+    projects, and may be assigned to teams.
+    \item \textbf{Administrator permission (\texttt{is\_admin} on an Instructor or TA)}: Lets the user manage users' course
+    association and roles (\rref{FR_Label30}), read the external-provider error log (\rref{FR_Label31}), and delete data
+    per \dprref{DPR_Label6}. It is a permission, not a separate role.
     \item \textbf{Course}: A McMaster capstone course supported by Keystone (such as SE, CS, TRON) 
     and includes settings for a capstone course that enables features and implements team formation/
     project selection rules. It contains member and enrollment information, including where the enrollment list comes
@@ -1815,7 +1823,7 @@ Instructor (Dr. Reyes), Teaching Assistant
     \item \textbf{Project}: A supervisor-proposed or student-proposed capstone project that can be 
     described using a title, problem statement/background, objectives, skills/requirements, team 
     deliverables, project impact, supervisor capacity details, level of current completion, hardware or non-hardware, relevant course
-    (SE, TRON, CS), industry, industry, information regarding confidentiality and IP concerns, and additional project terms. 
+    (SE, TRON, CS), industry, information regarding confidentiality and IP concerns, and additional project terms. 
     \item \textbf{Project Application}: Records a student teams interest in supervisor's project including
     a decision from both parties.
     \item \textbf{Thread}: Discussion containing a post or replies associated with a project proposal, team formation,
@@ -1879,7 +1887,7 @@ Instructor (Dr. Reyes), Teaching Assistant
     Student & Course & N : 1 & A student is enrolled in exactly one course \\ \hline
     Instructor & Course & N : M & An instructor manages one or more courses \\ \hline
     TA & Course & N : M & A TA assists in one or more courses \\ \hline
-    TA & Team & 1 : N & A course TA may be assigned as team TA to many teams. A team has at most one team TA \\ \hline
+    TA & Team & 1 : N & A TA may be assigned to many teams. A team has at most one assigned TA \\ \hline
     Student & Student Profile & 1 : 0..1 & A student may have one student profile associated with their account\\ \hline
     Student & Team & N : 0..1 & A student belongs to at most one team\\ \hline
     Supervisor & Project & 1 : N & A supervisor may supervise multiple projects\\ \hline
@@ -1892,13 +1900,13 @@ Instructor (Dr. Reyes), Teaching Assistant
     Team & Project Application & 1 : N & A student team may submit multiple project applications.\\ \hline
     Project & Project Application & 1 : N & A project may have many project applications but each application belongs to a single project.\\ \hline
     Project & Thread & 1 : N & A project may have many threads but each of those threads belongs to a single project.\\ \hline
-    Project Application & Thread & 1 : N & An application may have many threads but each of those threads belongs to a single application.\\ \hline
+    Project Application & Thread & 1 : 0..1 & An application has at most one discussion thread, created when the first post is made. Each such thread belongs to a single application.\\ \hline
     Course & Project & 1 : N & Many projects belong to one course\\ \hline
     Course & Course Resource & 1 : N & A course may have many course resources\\ \hline
     \caption{Entity Relationships} \label{tab:EntityRelationships}
   \end{longtable}
 
-  \subsection{Data Dictionary}
+  \subsection{Data Dictionary}\label{sec:dictionary}
 
   \plt{For each entity, define all important attributes.}
 
@@ -1931,7 +1939,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       email & String & Email of the user \\ \hline
       user\_name & String & MAC ID if signin through SSO or other Auth ID \\ \hline
       account\_status & Enum & Statuses such as ACTIVE, DISABLED, PENDING \\ \hline
-      is\_admin & Boolean & True if the user is an administrator (see Table~\ref{tab:DefinitionsAndAcronyms}). Never true for a Student; may be true for an instructor or university IT staff. Only an administrator can change it. \\ \hline
+      is\_admin & Boolean & True if the user holds the administrator permission (see Table~\ref{tab:DefinitionsAndAcronyms}). Only true for an instructor or TA. Only an administrator can change it. \\ \hline
 
       % USER: STUDENT
       \multicolumn{3}{|l|}{\textbf{Student (Child of User)}}\\ \hline
@@ -1942,12 +1950,12 @@ Instructor (Dr. Reyes), Teaching Assistant
 
       % USER: Instructor
       \multicolumn{3}{|l|}{\textbf{Instructor (Child of User)}}\\ \hline
-      mac\_id & String & Mac IDs for instructors \\ \hline
+      mac\_id & String & McMaster MacID. Equals \texttt{user\_name} for users who sign in through SSO; \texttt{user\_name} is authoritative. \\ \hline
       managed\_courses & Collection\textless Course\textgreater & Courses that the instructor manages. \\ \hline
 
       % USER: TA
       \multicolumn{3}{|l|}{\textbf{TA (Child of User)}}\\ \hline
-      mac\_id & String & Mac IDs for TAs \\ \hline
+      mac\_id & String & McMaster MacID. Equals \texttt{user\_name} for users who sign in through SSO; \texttt{user\_name} is authoritative. \\ \hline
       assigned\_courses & Collection\textless Course\textgreater & Courses that the TA assists in. \\ \hline
       assigned\_teams & Collection\textless Team\textgreater & Capstone teams assigned to the TA. \\ \hline
 
@@ -2048,7 +2056,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       status & Enum & Team-project status: APPLIED, SUPERVISOR\_ACCEPTS, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING, AGREED, TEAM\_PROJECT\_SUBMITTED, TEAM\_PROJECT\_UNDER\_REVIEW, TEAM\_PROJECT\_CHANGES\_REQUESTED, TEAM\_PROJECT\_REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
       supervisor\_accepted & Boolean & Whether the supervisor has accepted the team. True means a slot is reserved for the team, until the team is declined, withdraws, is rejected, or dissolves. \\ \hline
       team\_accepted & Boolean & Whether the team has accepted the supervisor. SUPERVISOR\_ACCEPTS means only the supervisor has accepted, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING means only the team has, and AGREED means both have. \\ \hline
-      threads & Collection\textless Thread\textgreater & Communication medium on the application. \\ \hline
+      thread & Thread & Discussion thread for the application (empty until the first post). \\ \hline
       updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
       % Thread
