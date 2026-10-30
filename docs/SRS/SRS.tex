@@ -1814,8 +1814,8 @@ Instructor (Dr. Reyes), Teaching Assistant
     project interests, goals, and work style.
     \item \textbf{Project}: A supervisor-proposed or student-proposed capstone project that can be 
     described using a title, problem statement/background, objectives, skills/requirements, team 
-    deliverables, project impact, supervisor capacity details, level of current completion, relevant course 
-    (SE, TRON, CS), industry, information regarding confidentiality and IP concerns, and additional project terms. 
+    deliverables, project impact, supervisor capacity details, level of current completion, hardware or non-hardware, relevant course
+    (SE, TRON, CS), industry, industry, information regarding confidentiality and IP concerns, and additional project terms. 
     \item \textbf{Project Application}: Records a student teams interest in supervisor's project including
     a decision from both parties.
     \item \textbf{Thread}: Discussion containing a post or replies associated with a project proposal, team formation,
@@ -1825,6 +1825,7 @@ Instructor (Dr. Reyes), Teaching Assistant
     \item \textbf{Checklist}: Contains a checklist for the user with checklist items for completion.
     \item \textbf{Course Resource}: Can be a course outline, timeline, guidelines, FAQ, past capstone
     example, or any other course related content that the instructor may post.
+    \item \textbf{Audit Log}: A record of each user action, including who took it, what it was, which record it affected, and when (see \nfrref{NFR_Auditability}).
   \end{itemize}
 
   \subsection{Project and Team Status Lifecycle}\label{sec:lifecycle}
@@ -1934,7 +1935,7 @@ Instructor (Dr. Reyes), Teaching Assistant
 
       % USER: STUDENT
       \multicolumn{3}{|l|}{\textbf{Student (Child of User)}}\\ \hline
-      mac\_id & String & Mac IDs for students \\ \hline
+      mac\_id & String & McMaster MacID. Equals \texttt{user\_name} for users who sign in through SSO; \texttt{user\_name} is authoritative. \\ \hline
       student\_number & String & McMaster student number, unique per student \\ \hline
       enrolled\_course & Course & Capstone course in which the student is enrolled. \\ \hline
       enrollment\_status & Enum & ENROLLED, or FLAGGED if absent from the latest import \\ \hline
@@ -1964,7 +1965,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       program & Enum & SE, TRON, CS \\ \hline
       instructors & Collection\textless Instructor\textgreater & List of Instructors in charge of the course. \\ \hline
       tas & Collection\textless TA\textgreater & List of TAs assisting in the course. \\ \hline
-      enrollment\_list & Collection\textless Student\textgreater & List of enrolled students and managing Instructors/TAs. \\ \hline
+      enrollment\_list & Collection\textless Student\textgreater & List of students enrolled in the course. \\ \hline
       disabled\_features & Collection\textless Enum\textgreater & List of features labelled by an enum \\ \hline
       min\_team\_size & Integer & Minimum number of students allowed in a team team. \\ \hline
       max\_team\_size & Integer & Maximum number of students allowed in a team team. \\ \hline
@@ -1998,8 +1999,8 @@ Instructor (Dr. Reyes), Teaching Assistant
       members & Collection\textless Student\textgreater & Reference to all team members in the team. \\ \hline
       member\_roles & Collection\textless Enum\textgreater & All roles of team members. \\ \hline
       poc & Student & Reference to the point of contact on the team. \\ \hline
-      project & Project & Which project they have selected, if applicable. \\ \hline
-      status & Enum & Derived, not stored independently: the team-project status of the team's current ProjectApplication (see Section~\ref{sec:lifecycle}). \texttt{ProjectApplication.status} is the source of truth. \\ \hline
+      project & Project & The project of the team's application that has reached Agreed or a later status. Empty until then. \\ \hline
+      status & Enum & Derived, not stored independently: the status of the team's ProjectApplication for the project in \texttt{Team.project}, or empty if the team has no project (see Section~\ref{sec:lifecycle}). \texttt{ProjectApplication.status} is the source of truth. \\ \hline
       updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
       ta & TA & Reference to the TA assigned to the team, if any. \\ \hline
 
@@ -2029,6 +2030,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       proposed\_solution & String & Potential solution that the team can choose to implement (Optional) \\ \hline
       completion\_status & String & What work has already been done on the project (Required) \\ \hline
       industry & String & Industry or area on which the work is done (Required) \\ \hline
+      project\_type & Enum & HARDWARE or NON\_HARDWARE (Required) \\ \hline
       supervisor\_capacity & Integer & Maximum number of teams that can work on the project (Required) \\ \hline
       additional & String & Additional Notes or terms for the project (Optional) \\ \hline
       confidentiality & String & Confidentiality details. (Required) \\ \hline
@@ -2043,7 +2045,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       team & Team & Reference to the team that the project application belongs to. \\ \hline
       project & Project & Reference to the Project that the application is for. \\ \hline
       submission\_date & DateTime & When the application was submitted. \\ \hline
-      status & Enum & Team-project status: APPLIED, SUPERVISOR\_ACCEPTS, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING, AGREED, SUBMITTED, UNDER\_REVIEW, CHANGES\_REQUESTED, REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
+      status & Enum & Team-project status: APPLIED, SUPERVISOR\_ACCEPTS, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING, AGREED, TEAM\_PROJECT\_SUBMITTED, TEAM\_PROJECT\_UNDER\_REVIEW, TEAM\_PROJECT\_CHANGES\_REQUESTED, TEAM\_PROJECT\_REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
       supervisor\_accepted & Boolean & Whether the supervisor has accepted the team. True means a slot is reserved for the team, until the team is declined, withdraws, is rejected, or dissolves. \\ \hline
       team\_accepted & Boolean & Whether the team has accepted the supervisor. SUPERVISOR\_ACCEPTS means only the supervisor has accepted, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING means only the team has, and AGREED means both have. \\ \hline
       threads & Collection\textless Thread\textgreater & Communication medium on the application. \\ \hline
@@ -2053,7 +2055,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       \multicolumn{3}{|l|}{\textbf{Thread}}\\ \hline
       thread\_id & ID & Unique identifier for each thread. \\ \hline
       author & User & Reference to the user who started the thread with a post. \\ \hline
-      subject & String & Reference to the subject or title of the thread. \\ \hline
+      subject & String & Subject or title of the thread. \\ \hline
       content & String & The main content of the thread written by the author. \\ \hline
       post\_date & DateTime & Creation date of the thread. \\ \hline
       replies & Collection\textless (String (Author), DateTime, String (Content))\textgreater & Full discussion and details within the thread. \\ \hline
