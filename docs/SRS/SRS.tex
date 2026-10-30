@@ -63,34 +63,34 @@
 \input{../Comments.text}
 \input{../Common.text}
 
-% Used so that cross-references have a meaningful prefix
+% Descriptive identifiers are the public-facing IDs throughout the SRS.
+% Counters are retained only for internal ordering; readers see stable mnemonic IDs.
+\newcommand{\descriptiveid}[1]{\texttt{\detokenize{#1}}}
+\newcommand{\idref}[1]{\hyperref[#1]{\descriptiveid{#1}}}
+\newcommand{\idlabel}[1]{\hypertarget{#1}{\descriptiveid{#1}}}
+\newcommand{\reqitem}[2]{\refstepcounter{#1}\label{#2}\idlabel{#2}}
 
-\newcounter{srnum} %Stakeholder Requirement (SR) Number
-\newcommand{\srthesrnum}{SR\thesrnum}
-\newcommand{\srref}[1]{SR\ref{#1}}
+\newcounter{srnum} % Stakeholder requirement ordering
+\newcommand{\srref}[1]{\idref{#1}}
 
-\newcounter{ucnum} %Use Case (UC) Number
-\newcommand{\uctheucnum}{UC\theucnum}
-\newcommand{\ucref}[1]{UC\ref{#1}}
+\newcounter{ucnum} % Use-case ordering
+\newcommand{\ucref}[1]{\idref{#1}}
 
-\newcounter{reqnum} %Functional Requirement (FR) Number
-\newcommand{\rthereqnum}{FR\thereqnum}
-\newcommand{\rref}[1]{FR\ref{#1}}
+\newcounter{reqnum} % Functional requirement ordering
+\newcommand{\rref}[1]{\idref{#1}}
 \newcommand{\rationale}[1]{\par\emph{Rationale:} #1}
 \newcommand{\fitcrit}[1]{\par\emph{Fit Criterion:} #1}
 
-\newcounter{nfrnum} %Non-Functional Requirement (NFR) Number
-\newcommand{\rthenfrnum}{NFR\thenfrnum}
-\newcommand{\nfrref}[1]{NFR\ref{#1}}
+\newcounter{nfrnum} % Retained for compatibility with any numbered NFR lists
+\newcommand{\nfrref}[1]{\idref{#1}}
 
-\newcounter{lcnum} %Likely Change (LC) Number
-\newcommand{\lthelcnum}{LC\thelcnum}
-\newcommand{\lcref}[1]{LC\ref{#1}}
+\newcounter{lcnum} % Likely-change ordering
+\newcommand{\lcref}[1]{\idref{#1}}
 
-\newcounter{dprnum} % Data Privacy Requirement Number
-\newcommand{\dprref}[1]{DPR\ref{#1}}
+\newcounter{dprnum} % Data/privacy requirement ordering
+\newcommand{\dprref}[1]{\idref{#1}}
 
-% Stakeholder tags: clickable, jump to the appendix subsection
+% Stakeholder interview evidence counters
 \newcounter{sn}
 \newcounter{esn}
 \newcounter{isn}
@@ -118,7 +118,7 @@
 \newcommand{\concurrentUsers}{400}
 \newcommand{\thinkTime}{10 seconds}
 
-\usepackage{fullpage}
+\usepackage[margin=0.75in]{geometry}
 
 \begin{document}
 
@@ -771,115 +771,115 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
 
   \noindent \begin{itemize}
       % ---------- Project proposals ----------
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ProposalTemplate}]
+     \item[]\reqitem{srnum}{SR_ProposalTemplate}
         Supervisors and instructors shall be able to propose a project using an
         structured template rather than a unstructured description. The template should
         include the expected scope/goals, the capstone team's deliverables, project impact, 
         industry or field of study, confidentiality, and IP concerns. (\stkS, \stkSEI, \stkES)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_OptionalFields}]
+      \item[]\reqitem{srnum}{SR_OptionalFields}
         The proposal template shall clearly distinguish required fields from optional ones,
         so that standardization does not discourage potential supervisors from
         submitting good projects and ideas. (\stkSEI)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ProposalGuidance}]
+        \item[]\reqitem{srnum}{SR_ProposalGuidance}
         Supervisors and student teams shall have access to guidelines,
         an FAQ section, and examples of past capstone projects to help them generate ideas
         and judge appropriate size, scope, and content. (\stkS, \stkES)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_CourseInfoEarly}]
+        \item[]\reqitem{srnum}{SR_CourseInfoEarly}
         The course outline, calendar, objectives, and content-coverage expectations
         shall be available to potential supervisors before they propose a
         project. (\stkES)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StudentProposals}]
+        \item[]\reqitem{srnum}{SR_StudentProposals}
         Student teams shall have a documented process for proposing their
         own project, including a template and guidance on how to calibrate the scope.
         Student-proposed projects shall be visible to supervisors so that teams and supervisors
         can find each other without the system matching them. (\stkS, \stkIS)
 
-      % ---------- Project discovery and selection ----------
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_BrowseProjects}]
+        % ---------- Project discovery and selection ----------
+        \item[]\reqitem{srnum}{SR_BrowseProjects}
         Students can browse through all available projects in one
         place and see which projects are availible versus already assigned to a team. (\stkS)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ProjectStatus}]
+        \item[]\reqitem{srnum}{SR_ProjectStatus}
         All stakeholders should be able to see the status of all projects
         (e.g., open, full, closed) and the stage each team has reached on a project (e.g., applied,
         agreed, approved) at any time. (\stkS, \stkES, \stkSEI)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StatusNotify}]
+        \item[]\reqitem{srnum}{SR_StatusNotify}
         Stakeholders shall be notified when the status of a project they care
         about changes via email. (\stkS, \stkES)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_UnselectedProjects}]
+        \item[]\reqitem{srnum}{SR_UnselectedProjects}
         The instructors and TAs will be able to identify which projects have not been
         selected after project selection, in order to follow up with their supervisors. (\stkSEI)
 
-      % ---------- Approval ----------
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_HumanApproval}]
+        % ---------- Approval ----------
+        \item[]\reqitem{srnum}{SR_HumanApproval}
         Approval decisions shall be made by the instructor and TAs and not automated. Routine
         checks and repeated feedback should be automated to reduce their workload. (\stkSEI)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ReviewDialogue}]
+        \item[]\reqitem{srnum}{SR_ReviewDialogue}
         Students and the instructor shall be able to exchange feedback iteratively
         during the approval process, preserving student exposure to review-based
         workflows. (\stkSEI, \stkS)
 
-      % ---------- Profiles and team matching ----------
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_StudentProfiles}]
+        % ---------- Profiles and team matching ----------
+        \item[]\reqitem{srnum}{SR_StudentProfiles}
         Students should be able to provide background information (team bio,
         interests, skills, experience, linkedln link) that supervisors can see before meeting
         a team. (\stkES, \stkIS)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamValidity}]
+        \item[]\reqitem{srnum}{SR_TeamValidity}
         The instructor and TAs can get accurate, up-to-date, and validated
         team composition data (e.g., all students are in exactly one team). (\stkSEI)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamSubmissionChecks}]
+        \item[]\reqitem{srnum}{SR_TeamSubmissionChecks}
         When a team submits its project for approval, the system will check that
         all required information, documents, and repository setup exist. (\stkSEI)
 
-      % ---------- Schedule and expectations ----------
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_CrossCourseTimelines}]
+        % ---------- Schedule and expectations ----------
+        \item[]\reqitem{srnum}{SR_CrossCourseTimelines}
         Supervisors working with teams across multiple capstone courses shall be
         able to see how the timelines and requirements differ between those
         courses. (\stkIS)
 
-      % ---------- Communication ----------
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TeamContacts}]
+        % ---------- Communication ----------
+        \item[]\reqitem{srnum}{SR_TeamContacts}
         Supervisors can see each team's members, team number,
         the point of contact, and assigned TA. (\stkES, \stkIS)
 
-      % ---------- Notifications ----------
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_PushNotify}]
+        % ---------- Notifications ----------
+        \item[]\reqitem{srnum}{SR_PushNotify}
         Stakeholders shall be notified of tasks and deadlines through channels
         they already use (outlook), so that they do not have to remember to check for
         them. (\stkES)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Checklist}]
+        \item[]\reqitem{srnum}{SR_Checklist}
         Each stakeholder shall have a checklist of the actions required of them
         and their current completion state. (\stkES)
 
-      % ---------- Overall platform ----------
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_SinglePlace}]
+        % ---------- Overall platform ----------
+        \item[]\reqitem{srnum}{SR_SinglePlace}
         Stakeholders should be able to do capstone coordination (projects,
         schedule, teams, communication, and notes) in one place. (\stkS, \stkES)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_ReduceAdmin}]
-        Administrative tasks including the generation of a list of approved projects, 
+        \item[]\reqitem{srnum}{SR_ReduceAdmin}
+        Administrative tasks including the generation of a list of approved projects,
         groups, selected projects, and supervisors will be automated.
         (\stkSEI, \stkES)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_TAApproval}]
+        \item[]\reqitem{srnum}{SR_TAApproval}
         TAs shall be able to approve team projects in the same way as instructors, but shall not take part in the
         approval of project proposals. (\stkSEI)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_CourseConfig}]
+        \item[]\reqitem{srnum}{SR_CourseConfig}
         Instructors shall be able to choose which features their course uses and set their course's rules, so that a
         course with a simpler process is not burdened by features it does not need. (\stkSEI, \stkTI)
 
-      \item[SR\refstepcounter{srnum}\thesrnum \label{SR_Enrollment}]
+        \item[]\reqitem{srnum}{SR_Enrollment}
         Instructors and TAs shall be able to populate a course with its enrolled students without entering each student
         by hand, using Avenue to Learn or through file upload, and they shall be able to see which enrolled
         students are not yet on a team. (\stkSEI, \stkTI)
@@ -908,9 +908,9 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     ending up with no project before the deadline for project selection.
   \item Technical Ability: Ability is medium. She is comfortable with GitLab, JSON, and
     web tools, but still wants the process to be intuitive as it will reduce stress.
-  \item Based on: \stkS~\ref{S_Vague}, \stkS~\ref{S_Uncertainty},
-    \stkS~\ref{S_Status}, \stkS~\ref{S_ManyTabs}, \stkS~\ref{S_OnePlace}
-\end{itemize}
+    \item Based on: \stkS~\idref{S_Vague}, \stkS~\idref{S_Uncertainty},
+    \stkS~\idref{S_Status}, \stkS~\idref{S_ManyTabs}, \stkS~\idref{S_OnePlace}
+  \end{itemize}
 
 \subsection{Persona 2: Marcus, External Supervisor}
 \begin{itemize}
@@ -930,10 +930,10 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     and searching through email CC lists to find who to reply to.
   \item Technical Ability: Ability is medium to high. He is comfortable with new
     applications, but has little patience for keeping track of multiple platforms.
-  \item Based on: \stkES~\ref{ES_Template}, \stkES~\ref{ES_NoStudentInfo},
-    \stkES~\ref{ES_ManyLogins}, \stkES~\ref{ES_NotifyNotRemember},
-    \stkES~\ref{ES_WhoToEmail}
-\end{itemize}
+    \item Based on: \stkES~\idref{ES_Template}, \stkES~\idref{ES_NoStudentInfo},
+    \stkES~\idref{ES_ManyLogins}, \stkES~\idref{ES_NotifyNotRemember},
+    \stkES~\idref{ES_WhoToEmail}
+  \end{itemize}
 
 \subsection{Persona 3: Dr. Malik, Internal Supervisor}
 \begin{itemize}
@@ -950,10 +950,10 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     to send reports.
   \item Technical Ability: Ability is medium. He uses email and standard web tools
     daily, but wants a simple interface.
-  \item Based on: \stkIS~\ref{IS_Schedule}, \stkIS~\ref{IS_MultiCourse},
-    \stkIS~\ref{IS_Procedure}, \stkIS~\ref{IS_KnowTA},
-    \stkIS~\ref{IS_Reports}
-\end{itemize}
+    \item Based on: \stkIS~\idref{IS_Schedule}, \stkIS~\idref{IS_MultiCourse},
+    \stkIS~\idref{IS_Procedure}, \stkIS~\idref{IS_KnowTA},
+    \stkIS~\idref{IS_Reports}
+  \end{itemize}
 
 \subsection{Persona 4: Dr. Reyes, Course Instructor}
 \begin{itemize}
@@ -972,10 +972,10 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     does not want strict standards that discourage good projects.
   \item Technical Ability: Ability is high. He is comfortable with scripts, GitLab, and
     CI, and values students being exposed to them.
-  \item Based on: \stkSEI~\ref{I_CurrentProcess}, \stkSEI~\ref{I_TeamJSON},
-    \stkSEI~\ref{I_Decisions}, \stkSEI~\ref{I_Unselected},
-    \stkSEI~\ref{I_Automate}, \stkSEI~\ref{I_RepeatFeedback}
-\end{itemize}
+    \item Based on: \stkSEI~\idref{I_CurrentProcess}, \stkSEI~\idref{I_TeamJSON},
+    \stkSEI~\idref{I_Decisions}, \stkSEI~\idref{I_Unselected},
+    \stkSEI~\idref{I_Automate}, \stkSEI~\idref{I_RepeatFeedback}
+  \end{itemize}
 
 
 % ==============================================================
@@ -1026,8 +1026,8 @@ External Supervisor or Internal Supervisor (Marcus, Dr. Malik)
     the instructor.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_ProposalTemplate},
-\ref{SR_OptionalFields}, \ref{SR_ProposalGuidance}, \ref{SR_CourseInfoEarly}
+  \textbf{Related Requirements:} \idref{SR_ProposalTemplate},
+  \idref{SR_OptionalFields}, \idref{SR_ProposalGuidance}, \idref{SR_CourseInfoEarly}
 
 % ---------------- UC 2 ----------------
 \refstepcounter{ucnum} \label{UC_ReviewProposal}
@@ -1070,8 +1070,8 @@ Instructor (Dr. Reyes)
     ``Proposal rejected'', and the full feedback history is saved.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_HumanApproval},
-\ref{SR_ReviewDialogue}, \ref{SR_StatusNotify}, \ref{SR_ReduceAdmin}
+  \textbf{Related Requirements:} \idref{SR_HumanApproval},
+  \idref{SR_ReviewDialogue}, \idref{SR_StatusNotify}, \idref{SR_ReduceAdmin}
 
 % ---------------- UC 3 ----------------
 \refstepcounter{ucnum} \label{UC_BrowseProjects}
@@ -1111,8 +1111,8 @@ Student (Priya)
   \item The student's team has a saved list of preferred projects.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_BrowseProjects}, \ref{SR_ProjectStatus},
-\ref{SR_SinglePlace}
+  \textbf{Related Requirements:} \idref{SR_BrowseProjects}, \idref{SR_ProjectStatus},
+  \idref{SR_SinglePlace}
 
 % ---------------- UC 4 ----------------
 \refstepcounter{ucnum} \label{UC_SelectProject}
@@ -1159,8 +1159,8 @@ Student (Priya)
     accepts, and the project becomes ``Full'' only when all of its slots are reserved.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_ProjectStatus}, \ref{SR_StatusNotify},
-\ref{SR_BrowseProjects}
+  \textbf{Related Requirements:} \idref{SR_ProjectStatus}, \idref{SR_StatusNotify},
+  \idref{SR_BrowseProjects}
 
 % ---------------- UC 5 ----------------
 \refstepcounter{ucnum} \label{UC_ProposeOwnProject}
@@ -1203,8 +1203,8 @@ Student (Priya)
     the team.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_StudentProposals},
-\ref{SR_ProposalTemplate}, \ref{SR_ProposalGuidance}
+  \textbf{Related Requirements:} \idref{SR_StudentProposals},
+  \idref{SR_ProposalTemplate}, \idref{SR_ProposalGuidance}
 
 % ---------------- UC 6 ----------------
 \refstepcounter{ucnum} \label{UC_TeamProfile}
@@ -1242,7 +1242,7 @@ Student (Priya)
   \item The team's profile is saved and visible to authorized stakeholders.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_StudentProfiles}
+  \textbf{Related Requirements:} \idref{SR_StudentProfiles}
 
 % ---------------- UC 7 ----------------
 \refstepcounter{ucnum} \label{UC_ViewTeam}
@@ -1280,7 +1280,7 @@ External Supervisor or Internal Supervisor (Marcus, Dr. Malik)
   \item The supervisor knows who the team is and how to contact them.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_TeamContacts}, \ref{SR_StudentProfiles}
+  \textbf{Related Requirements:} \idref{SR_TeamContacts}, \idref{SR_StudentProfiles}
 
 % ---------------- UC 8 ----------------
 \refstepcounter{ucnum} \label{UC_ValidateTeams}
@@ -1316,7 +1316,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \item The exported team data is accurate, up to date, and valid.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin}
+  \textbf{Related Requirements:} \idref{SR_TeamValidity}, \idref{SR_ReduceAdmin}
 
 % ---------------- UC 9 ----------------
 \refstepcounter{ucnum} \label{UC_FollowUpUnselected}
@@ -1353,8 +1353,8 @@ Instructor (Dr. Reyes), Teaching Assistant
     with their supervisors.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_UnselectedProjects},
-\ref{SR_ProjectStatus}
+  \textbf{Related Requirements:} \idref{SR_UnselectedProjects},
+  \idref{SR_ProjectStatus}
 
 % ---------------- UC 10 ----------------
 \refstepcounter{ucnum} \label{UC_ViewTimelines}
@@ -1389,8 +1389,8 @@ Internal Supervisor (Dr. Malik), External Supervisor (Marcus)
   \item The supervisor knows the expectations and deadlines in each course.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_CrossCourseTimelines},
-\ref{SR_CourseInfoEarly}
+  \textbf{Related Requirements:} \idref{SR_CrossCourseTimelines},
+  \idref{SR_CourseInfoEarly}
 
 % ---------------- UC 11 ----------------
 \refstepcounter{ucnum} \label{UC_NotifyChecklist}
@@ -1430,8 +1430,8 @@ Any stakeholder (Priya, Marcus, Dr. Malik, Dr. Reyes)
   \item The task is recorded as complete and the checklist is up to date.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_PushNotify}, \ref{SR_Checklist},
-\ref{SR_StatusNotify}
+  \textbf{Related Requirements:} \idref{SR_PushNotify}, \idref{SR_Checklist},
+  \idref{SR_StatusNotify}
 
 % ---------------- UC 12 ----------------
 
@@ -1488,9 +1488,9 @@ Student (Priya), Instructor (Dr. Reyes), TA
     \ucref{UC_ValidateTeams}). The project's own status (``Open'' or ``Full'') is unchanged.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_HumanApproval},
-\ref{SR_ReviewDialogue}, \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin},
-\ref{SR_TeamSubmissionChecks}
+  \textbf{Related Requirements:} \idref{SR_HumanApproval},
+  \idref{SR_ReviewDialogue}, \idref{SR_TeamValidity}, \idref{SR_ReduceAdmin},
+  \idref{SR_TeamSubmissionChecks}
 
 
 % ---------------- UC 13 ----------------
@@ -1532,7 +1532,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \item The course's enrollment list is up to date and the time of the last import is recorded.
 \end{itemize}
 
-\textbf{Related Requirements:} \ref{SR_Enrollment}, \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin}
+  \textbf{Related Requirements:} \idref{SR_Enrollment}, \idref{SR_TeamValidity}, \idref{SR_ReduceAdmin}
 
 
 % ==============================================================
@@ -1548,174 +1548,174 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \noindent \begin{itemize}
 
-              % ---------- Project Proposal ----------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_SupervisorProposal}:] The system shall allow supervisors to create and submit project proposals using a structured template including a title, problem statement/background, objectives, skills/requirements, team deliverables, project impact, supervisor capacity details, level of current completion, hardware/non-hardware, industry, information regarding confidentiality and IP concerns, and additional project terms.
+                % ---------- Project Proposal ----------
+              \item[]\reqitem{reqnum}{FR_SupervisorProposal} The system shall allow supervisors to create and submit project proposals using a structured template including a title, problem statement/background, objectives, skills/requirements, team deliverables, project impact, supervisor capacity details, level of current completion, hardware/non-hardware, industry, information regarding confidentiality and IP concerns, and additional project terms.
               \rationale{Standardizing proposals reduces inconsistencies in project descriptions helping sudents understand exactly what the project is about and allowing supervisors to clearly highlight their expections.}
               \fitcrit{Supervisors can successfully fill out the defined fields with the appropriate information and submit a proposal for review.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ProposalOptionalFields}:] The system shall distinguish required project proposal fields from optional ones preventing submissions if any required fields are not sufficiently filled.
+              \item[]\reqitem{reqnum}{FR_ProposalOptionalFields} The system shall distinguish required project proposal fields from optional ones preventing submissions if any required fields are not sufficiently filled.
               \rationale{Keeping most fields optional would prevent supervisors from being discouraged to propose a project idea if they lack some details regarding the scope of their project. A projec that lacks a detailed scope can still be a good idea.}
               \fitcrit{The system prevents stakeholders from submitting projects where mandatory fields are not sufficiently filled but submits a project that has mandatory fields filled even if some optional fields are missing.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_StudentProposal}:] The system shall allow student teams to create and publish a project proposal in a separate student-proposed project list using a structured template including the title, problem statement/background, and proposed solution/methodology.
+              \item[]\reqitem{reqnum}{FR_StudentProposal} The system shall allow student teams to create and publish a project proposal in a separate student-proposed project list using a structured template including the title, problem statement/background, and proposed solution/methodology.
               \rationale{Students need a dcumented way to present their own project ideas if they choose not to select from the list of ideas from supervisors.}
               \fitcrit{A student team can successfully create a project proposal, fill out the defined fields with the above information, and the proposal appears in a student-proposed project list.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ReviewProposal}:] The system shall allow instructors to review project proposals submitted by supervisors and approve, request, or provide feedback and request changes.
+              \item[]\reqitem{reqnum}{FR_ReviewProposal} The system shall allow instructors to review project proposals submitted by supervisors and approve, request, or provide feedback and request changes.
               \rationale{Instructors need to verify that the proposed project is sufficient for a Senior-level capstone project and that the details provided are sufficiet for an understanding of the project.}
               \fitcrit{A instructor can access a project proposal then accept, reject, or request changes successfully. Rejection or change requests are sent back to the supervisor for revision while accepted projects are included in the student project catalog.}
 
               % ---------- Project Catalog ----------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ViewApprovedProjects}:] The system shall provide a centralized catalog where all projects approved by the instructor can be found, filtered, and browsed based on details and availability.
+              \item[]\reqitem{reqnum}{FR_ViewApprovedProjects} The system shall provide a centralized catalog where all projects approved by the instructor can be found, filtered, and browsed based on details and availability.
               \rationale{Students should be able to find projects and compare the varying opportunities with their team's skills and interests.}
               \fitcrit{Users can view all the projects that were approved by the professor, search by title or keywords, and filter by the varying project fields. The filter and search options should also only return the relevant projects.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ViewProjectStatus}:] The system shall display the current availability status of each project in the catalog (open or full) and the maximum number of teams it can take. See Figure~\ref{fig:lifecycle}.
+              \item[]\reqitem{reqnum}{FR_ViewProjectStatus} The system shall display the current availability status of each project in the catalog (open or full) and the maximum number of teams it can take. See Figure~\ref{fig:lifecycle}.
               \rationale{It is critical for students and supervisors to have clear visibility which projects are still available for selection. This gives students the ability to still request available projects if they have been rejected from others and supervisors to properly advertise their status.}
               \fitcrit{Each project in the catalog clearly displays the availability status and the supervisor capacity. Even if labels are not updated in real-time, the core application should respond to user actions appropriately based on status (i.e. taken projects cannot be requested).}
 
               % ---------- Student Profile ----------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_StudentProfile}:] The system shall allow students to create and update their profiles providing background information including bio, program, interests, project preferences, skills, experience, work style, and LinkedIn that are viewable by all users within the course.
+              \item[]\reqitem{reqnum}{FR_StudentProfile} The system shall allow students to create and update their profiles providing background information including bio, program, interests, project preferences, skills, experience, work style, and LinkedIn that are viewable by all users within the course.
               \rationale{Informative profiles allows students to discover other students with similar skills and interests when forming teams. It also allows supervisors to briefly evaluate interested students before interviewing them.}
               \fitcrit{Students can create, save, update, and visit their profiles. These profiles should also be viewable by other students and supervisors.}
 
               % ---------- Student Teams ----------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_StudentTeams}:] The system shall allow students to create and join teams, invite specific students to join, recruit additional members, and assign roles.
+              \item[]\reqitem{reqnum}{FR_StudentTeams} The system shall allow students to create and join teams, invite specific students to join, recruit additional members, and assign roles.
               \rationale{Students should be able to use the platform to create teams, join other teams, invite the people they know or fill in remaining spaces on their existing team by recruiting new individuals.}
               \fitcrit{Students are able to create a team, send invitations to selected students to which those students can accept or deny, specify number of members needed and assign roles including a point-of-contact. Students can join an existing team.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ValidateTeamRules}:] The system shall validate team membership based on up-to-date course team formation rules, including minimum and maximum team sizes, permitted program combinations, and duplicate membership.
+              \item[]\reqitem{reqnum}{FR_ValidateTeamRules} The system shall validate team membership based on up-to-date course team formation rules, including minimum and maximum team sizes, permitted program combinations, and duplicate membership.
               \rationale{The capstone course requires that certain constraints are met when forming teams and automating this reduces administrative efforts for TAs and Instructors.}
               \fitcrit{The system prevents team formations that violate any of the rules mentioned above.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_TeamDiscovery}:] The system shall allow students who are seeking teammates to indicate their availability and discover other students or teams looking for members.
+              \item[]\reqitem{reqnum}{FR_TeamDiscovery} The system shall allow students who are seeking teammates to indicate their availability and discover other students or teams looking for members.
               \rationale{Students who do not have a team or simply want to join a team instead of creating one will have a catalog of other teams and other students seeking others with similar interests.}
               \fitcrit{A student can indicate whether they are looking for a team and they can discover other teams/students looking for additional members.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_TeamProfile}:] The system shall allow student teams to create and update a shared team profile including the member bios, collective skills, project interests, goals, and work style that are viewable by all users within the course.
+              \item[]\reqitem{reqnum}{FR_TeamProfile} The system shall allow student teams to create and update a shared team profile including the member bios, collective skills, project interests, goals, and work style that are viewable by all users within the course.
               \rationale{Team profiles help supervisors evaluate the overal team's interests and whether the team's goals and skills align with the project in a consolidated way without having to go through each team member's profile.}
               \fitcrit{Authorized team members can create and modify their team profile based on their team members' profiles. Other users can view these profiles.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_TeamRecommend}:] The system shall recommend other available students/teams and capstone projects based on shared skills, interests, experience, and project preferences.
+              \item[]\reqitem{reqnum}{FR_TeamRecommend} The system shall recommend other available students/teams and capstone projects based on shared skills, interests, experience, and project preferences.
               \rationale{Recommendations help student obtain the desired experience from the capstone course and work on projects that match their interests while pairing with like-minded students.}
               \fitcrit{Students can receive teammate and project recommendations after their profile is complete based on highest similarities.}
 
               % ---------- Project Applications & Communication ----------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ProjectInterest}:] The system shall allow student teams to express interest in a supervisor-proposed project.
+              \item[]\reqitem{reqnum}{FR_ProjectInterest} The system shall allow student teams to express interest in a supervisor-proposed project.
               \rationale{A centralized application process allows supervisors to identify interested teams and communicate without relying on back-and-forth email chains.}
               \fitcrit{A student can submit an application expressing their interest to the project that can be reviewed by the supervisor.}
-              
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_DeclineTeam}:] The system shall allow supervisors to accept or decline requests from student teams to work on their proposed projects, and record when both parties agree to the working arrangement. See Figure~\ref{fig:lifecycle}
+
+              \item[]\reqitem{reqnum}{FR_DeclineTeam} The system shall allow supervisors to accept or decline requests from student teams to work on their proposed projects, and record when both parties agree to the working arrangement. See Figure~\ref{fig:lifecycle}
               \rationale{This reduces confusion by explicitely recording when both parties have understood each other's terms and have formally agreed to work with each other.}
               \fitcrit{Both the supervisor and students can record a decision to confirm or deny the terms of the project. An agreement is marked after both parties accept.}
 
               % Explicit requirement to amend an agreement?
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ProjectThreads}:] The system shall allow any authorized users to create and reply to threads associated with their own project proposals, student team formations, and project applications. For TAs and Professors, that will be any projects in their scope.
+              \item[]\reqitem{reqnum}{FR_ProjectThreads} The system shall allow any authorized users to create and reply to threads associated with their own project proposals, student team formations, and project applications. For TAs and Professors, that will be any projects in their scope.
               \rationale{Users can exchange meaningful feedback, ask for clarification during the project selection stage, and communicate to understand project and course needs.}
               \fitcrit{An authorized user can create or respond to a thread under a project proposal, project application, or a team formation they are associated with.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ThreadsNotify}:] The system shall notify a user by email when there is a new reply in a thread they are part of, a decision on their application, agreement, or submission, or a status change on a project or team they are associated with.
+              \item[]\reqitem{reqnum}{FR_ThreadsNotify} The system shall notify a user by email when there is a new reply in a thread they are part of, a decision on their application, agreement, or submission, or a status change on a project or team they are associated with.
               \rationale{Notifications keep related stakeholders informed regarding project-related updates and decisions without repeatedly checking the platform.}
               \fitcrit{Any changes to a project's status, decisions from either a student/supervisor, and thread updates, the system sends an email identifying the event to all relevant and authorized users. Students also get notifications for new project listing.}
 
               % ---------- Project and Team Approvals ---------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_RequestApproval}:] The system shall allow student teams to submit (or re-submit after modification given instructor feedback) their selected project and team information for instructor approval when in-platform approval is enabled. See Figure~\ref{fig:lifecycle}.
+              \item[]\reqitem{reqnum}{FR_RequestApproval} The system shall allow student teams to submit (or re-submit after modification given instructor feedback) their selected project and team information for instructor approval when in-platform approval is enabled. See Figure~\ref{fig:lifecycle}.
               \rationale{A centralized submission allows students to provide all capstone project related details for instructors to approve without relying on external tools.}
               \fitcrit{Student teams can submit their project and team information through in-platform approval process that can be reviewed by instructors.}
-              
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ApprovalResponse}:] The system shall allow course instructors and TAs to approve, reject, or request modifications with feedback to submitted team-project applications when in-platform approval is enabled.
+
+              \item[]\reqitem{reqnum}{FR_ApprovalResponse} The system shall allow course instructors and TAs to approve, reject, or request modifications with feedback to submitted team-project applications when in-platform approval is enabled.
               \rationale{Instructors and TAs must have the final say on team project approval}
               \fitcrit{An instructor or TA can select an approval decision for the submitted team-project and provide feedback to improve project descriptions or identify missing items.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ExternalApproval}:] The system shall support recording capstone project and team approvals either manually by instructors or TAs associated with the project or automatically through an adapter.
+              \item[]\reqitem{reqnum}{FR_ExternalApproval} The system shall support recording capstone project and team approvals either manually by instructors or TAs associated with the project or automatically through an adapter.
               \rationale{Different capstone courses have different approval systems that they would prefer to keep in place so the system must account for this.}
-              \fitcrit{For courses without integration adapter, either the TA or the instructor can manually update the status of the project as approved. If there is an adapter available, the system will automatically synchronize and update the approval status based on the information recieved from the external system.}              
+              \fitcrit{For courses without integration adapter, either the TA or the instructor can manually update the status of the project as approved. If there is an adapter available, the system will automatically synchronize and update the approval status based on the information recieved from the external system.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ApprovalPreflightValidate}:] The system shall validate submissions before sending them to instructors to ensure project information is complete, the project is available, the team does not already have another approved project, and the submission adheres to course-specific requirements.
+              \item[]\reqitem{reqnum}{FR_ApprovalPreflightValidate} The system shall validate submissions before sending them to instructors to ensure project information is complete, the project is available, the team does not already have another approved project, and the submission adheres to course-specific requirements.
               \rationale{To reduce instructor workload, repeated feadback and routine checks based on course constriaints should be done automatically.}
               \fitcrit{The system will prevent project submissions if any of the requirements above are not met, otherwise, the project can be submitted.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ApprovalRevision}:] The system shall allow users to submit changes to previously approved team and project information that will still require the instructor to review before confirming. See Figure~\ref{fig:lifecycle}.
+              \item[]\reqitem{reqnum}{FR_ApprovalRevision} The system shall allow users to submit changes to previously approved team and project information that will still require the instructor to review before confirming. See Figure~\ref{fig:lifecycle}.
               \rationale{Details about projects may change later and require updates.}
               \fitcrit{Student teams can propose changes to approved project or team record. The orginal approval remains in effect until the instructor accepts the new changes.}
 
               % ---------- Course Coordination and Admin ---------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_DisableFeatures}:] The system shall allow course instructors to configure the platform features including team formation, project approvals, and project proposals rules by disabling any undesired features for their course.
+              \item[]\reqitem{reqnum}{FR_DisableFeatures} The system shall allow course instructors to configure the platform features including team formation, project approvals, and project proposals rules by disabling any undesired features for their course.
               \rationale{Different capstone courses have different requirements and workflows, so instructors must be able to configure or customize the system to meet their course's needs.}
               \fitcrit{An instructor can successfully enable or disable a supported features and define constraints that match their course's workflow.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ReferenceMaterial}:] The system shall allow course instructors and TAs to publish and maintain the course outline, course resources, FAQs, timelines, and past capstone examples for students and supervisors to view as reference.
+              \item[]\reqitem{reqnum}{FR_ReferenceMaterial} The system shall allow course instructors and TAs to publish and maintain the course outline, course resources, FAQs, timelines, and past capstone examples for students and supervisors to view as reference.
               \rationale{Early access to course expectations reduces confusion about project scope, deliverables, deadlines, and responsibilities for both the student and supervisor.}
               \fitcrit{An instructor or TA can add, edit, and publish course resources where students or supervisors and retrieve published resources.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_RequiredActionsList}:] The system shall provide users with a checklist of required actions and their completion status based on the course requirements.
+              \item[]\reqitem{reqnum}{FR_RequiredActionsList} The system shall provide users with a checklist of required actions and their completion status based on the course requirements.
               \rationale{Stakeholders need a concise way to identify outstanding responsiblities and monitor their progress in the capstone approval procedure. This helps them keep on top of tasks and prevents them from missing critical deadlines.}
               \fitcrit{Users can view a checklist containing their assigned actions and corresponding completion states. The system updates completion states for actions that are done and verified, such as submitting a project proposal or completing an approval submission.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ActionRequiredEmail}:] The system shall send users administrative email notifications for upcoming deadlines and outstanding actions from a user's checklist.
+              \item[]\reqitem{reqnum}{FR_ActionRequiredEmail} The system shall send users administrative email notifications for upcoming deadlines and outstanding actions from a user's checklist.
               \rationale{Email notifications will help stakeholders complete required tasks and fulfill their capstone responsibilities without regularly checking in the platform.}
               \fitcrit{When configured, the system sends an email identifying incomplete or urgent action items and upcoming deadlines.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ReadCourseInformation}:] The system shall provide authorized Instructors and TAs with access and detailed information for projects, teams, supervisors, and their statuses across their assigned capstone course(s) or designated capstone teams.
+              \item[]\reqitem{reqnum}{FR_ReadCourseInformation} The system shall provide authorized Instructors and TAs with access and detailed information for projects, teams, supervisors, and their statuses across their assigned capstone course(s) or designated capstone teams.
               \rationale{Instructors need visbility to identify unselected projects, coordinate with supervisors, and maintain accurate admin details.}
               \fitcrit{An authorized instructor or TA can view and filter project and team statuses, monitor approval progress, and access relevant discussions.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ExportCourseInformation}:] The system shall provide an automatically generated exportable report to Instructors and TAs providing a list of approved projects, team compositions, project selections, and supervisors.
+              \item[]\reqitem{reqnum}{FR_ExportCourseInformation} The system shall provide an automatically generated exportable report to Instructors and TAs providing a list of approved projects, team compositions, project selections, and supervisors.
               \rationale{Automated reports reduce manual administrative work for Instructors and TAs if they want to obtain accurate course-wide records through compiled documentation.}
               \fitcrit{An authorized instructor or TA can generate and download reports containing selected admin records reflecting approved projects, team compositions, project selections, and supervisor information.}
 
               % ---------- Authentication and User Management ---------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_MacSSO}:] The system shall allow users to authenticate via McMaster Single Sign-On (SSO) for McMaster students and staff or another trusted authentication system for external supervisors before accessing any other services.
+              \item[]\reqitem{reqnum}{FR_MacSSO} The system shall allow users to authenticate via McMaster Single Sign-On (SSO) for McMaster students and staff or another trusted authentication system for external supervisors before accessing any other services.
               \rationale{This allows the platform to uphold its security when handling sensitive information and that the account is accessed by the intended individual.}
               \fitcrit{A user can sign in using an available identify provider and access the functions available to them.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_AuthorizationRBAC}:] The system shall restrict access to system functionality and information according to the user's role and course permissions.
+              \item[]\reqitem{reqnum}{FR_AuthorizationRBAC} The system shall restrict access to system functionality and information according to the user's role and course permissions.
               \rationale{Different stakeholders (Students, TAs, Instructors, and Supervisors) have different roles in the platform so access restrictions are critical to prevent unauthorized access when it comes to viewing and modifying content. An example is that teams should only have access to modify only their team's approved project details. An Instructor can modify any project's details.}
               \fitcrit{Users are only able to access information and perform actions permitted by their assigned roles and scope.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_UpdateRoles}:] The system shall allow authorized administrators to manage users' course association and assigned roles.
+              \item[]\reqitem{reqnum}{FR_UpdateRoles} The system shall allow authorized administrators to manage users' course association and assigned roles.
               \rationale{Different capstone courses involve different participants, and access permissions must reflect each users' responsibilities.}
               \fitcrit{An authorized administrator can view and update a user's course association and permitted course role.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_LogExternalErrors}:] The system shall log all errors caused by external providers and notify university IT professionals and/or course instructors when they are detected.
+              \item[]\reqitem{reqnum}{FR_LogExternalErrors} The system shall log all errors caused by external providers and notify university IT professionals and/or course instructors when they are detected.
               \rationale{External providers may cause service disruptions and knowing when disruptions happen allows measuring their impact (missed deadlines, for example).}
               \fitcrit{An authorized administrator can read a log displaying external provider errors exclusively.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_RejectComponentDisable}:] The system shall reject all component disable requests if there are pending actions within the component and notify the user of pending actions.
+              \item[]\reqitem{reqnum}{FR_RejectComponentDisable} The system shall reject all component disable requests if there are pending actions within the component and notify the user of pending actions.
               \rationale{Disabling features may potentially leave the system in a partially invalid state. For example, disabling the project approvals component strands pending project approval requests.}
               \fitcrit{The user interface displays an error message when attempting to disable the project approval component with at least one record present, and the pending records are displayed.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_DisplayTimestamps}:] The system shall display a timestamp for any displayed records when they were last updated.
+              \item[]\reqitem{reqnum}{FR_DisplayTimestamps} The system shall display a timestamp for any displayed records when they were last updated.
               \rationale{Providing users with a timestamp can allow them to judge whether the information they are reading is up-to-date and can contact instructors or supervisors when that is not the case.}
               \fitcrit{Any user authorized to read project proposals and user profiles is able to view a timestamp on all pages.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_DurableNotifications}:] The system shall store pending notifications durably until delivery is verified.
+              \item[]\reqitem{reqnum}{FR_DurableNotifications} The system shall store pending notifications durably until delivery is verified.
               \rationale{Lost notifications mean that users are not alerted of potentially time-sensitive matters and this can result in missed deadlines and loss of time.}
               \fitcrit{The system being abruptly closed before being able to send a notification sends it after starting back up.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ReverifyUsers}:] The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.
+              \item[]\reqitem{reqnum}{FR_ReverifyUsers} The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.
               \rationale{Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.}
               \fitcrit{The system prompts user to re-enter credentials after requesting to delete a project they proposed.}
 
               % ---------- Enrollment and TA Roles ---------
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_ImportEnrollment}:] The system shall allow instructors and TAs to import a course's enrollment list from Avenue to Learn, show a preview of the students to be added and the differences from the current list, and apply the import only after the user confirms it.
+              \item[]\reqitem{reqnum}{FR_ImportEnrollment} The system shall allow instructors and TAs to import a course's enrollment list from Avenue to Learn, show a preview of the students to be added and the differences from the current list, and apply the import only after the user confirms it.
               \rationale{Populating a course with its students by hand is time consuming, and an unchecked import could wrongly add or exclude students.}
               \fitcrit{An instructor or TA can import an enrollment list and see a preview. No change is applied to the course until the user confirms.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_UpdateEnrollment}:] The system shall allow instructors and TAs to add students to a course from an uploaded file or by manual entry, including students who join after the initial import.
+              \item[]\reqitem{reqnum}{FR_UpdateEnrollment} The system shall allow instructors and TAs to add students to a course from an uploaded file or by manual entry, including students who join after the initial import.
               \rationale{Having an Avenue site is optional, Avenue may be unavailable, and students sometimes join a course late.}
               \fitcrit{In a course with no Avenue site, the enrollment list can be populated from a file or manually. A student can be added manually after an import.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_EnrollmentDiscrepency}:] The system shall flag students who are in the course but absent from the latest enrollment list, and shall not remove them from the course or a team until an instructor or TA confirms.
+              \item[]\reqitem{reqnum}{FR_EnrollmentDiscrepency} The system shall flag students who are in the course but absent from the latest enrollment list, and shall not remove them from the course or a team until an instructor or TA confirms.
               \rationale{Removing students automatically could leave a team undersized or invalid in the middle of approval.}
               \fitcrit{A student absent from the latest import is listed for review and remains on their team until course staff confirm the removal.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_NeedsGroup}:] The system shall show instructors and TAs the enrolled students who are not on a team.
+              \item[]\reqitem{reqnum}{FR_NeedsGroup} The system shall show instructors and TAs the enrolled students who are not on a team.
               \rationale{Instructors currently compare the class list against team lists by hand to find and contact students without a team.}
               \fitcrit{The list contains exactly the enrolled students who are on no team, and it updates as teams change.}
 
-              \item[FR\refstepcounter{reqnum}\thereqnum \label{FR_AssignTA}:] The system shall allow instructors and TAs to assign a TA to each team, and shall show the assigned TA to the team's members and supervisor.
+              \item[]\reqitem{reqnum}{FR_AssignTA} The system shall allow instructors and TAs to assign a TA to each team, and shall show the assigned TA to the team's members and supervisor.
               \rationale{Supervisors want to know their teams' TAs, and the assignment is currently kept in a manually edited file.}
               \fitcrit{Course staff can assign a TA to a team. The team's members and supervisor see the assigned TA, or ``not yet assigned'' if there is none.}
 
@@ -2058,55 +2058,55 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Storage}
   \begin{enumerate}
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label1}:] The system shall securely store its data in a centrally managed backend system accessible by authorized actors
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label2}:] The system shall store data based on the Data Entity definitions in Sections 7.1 and 7.2
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label3}:] The system shall maintain accuracy and consistency of stored information ensuring it is up-to-date based on real-time actions
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label4}:] The system shall backup all data every 2 weeks to reduce the risk of data loss from system failures or deletions
+    \item[]\reqitem{dprnum}{DPR_CentralizedDataStorage} The system shall securely store its data in a centrally managed backend system accessible by authorized actors
+    \item[]\reqitem{dprnum}{DPR_DataEntityStructure} The system shall store data based on the Data Entity definitions in Sections 7.1 and 7.2
+    \item[]\reqitem{dprnum}{DPR_DataAccuracyAndConsistency} The system shall maintain accuracy and consistency of stored information ensuring it is up-to-date based on real-time actions
+    \item[]\reqitem{dprnum}{DPR_BiweeklyDataBackups} The system shall backup all data every 2 weeks to reduce the risk of data loss from system failures or deletions
   \end{enumerate}
 
   \subsubsection{Data Retention and Deletion}
   \begin{enumerate}
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label5}:] The system shall retain instructor and course related data to be used the following year until the instructor has taken action to make the deletions.
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label6}:] The system shall allow restricted deletion of any data only by authorized administrators that are managing the application with access to the database.
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label7}:] The system shall allow authorized users to delete content that they created or are specifically managing on the application including their own personal information as well as make edits.
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label8}:] The system shall automatically delete student information at the end of the capstone period
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label9}:] The system shall only retain completed project information past the capstone period if the team has consented
+    \item[]\reqitem{dprnum}{DPR_CourseDataRetention} The system shall retain instructor and course related data to be used the following year until the instructor has taken action to make the deletions.
+    \item[]\reqitem{dprnum}{DPR_AdministratorDeletionControl} The system shall allow restricted deletion of any data only by authorized administrators that are managing the application with access to the database.
+    \item[]\reqitem{dprnum}{DPR_UserManagedContentDeletion} The system shall allow authorized users to delete content that they created or are specifically managing on the application including their own personal information as well as make edits.
+    \item[]\reqitem{dprnum}{DPR_EndOfTermStudentDataDeletion} The system shall automatically delete student information at the end of the capstone period
+    \item[]\reqitem{dprnum}{DPR_ConsentBasedProjectRetention} The system shall only retain completed project information past the capstone period if the team has consented
   \end{enumerate}
 
   \subsubsection{Privacy Controls}
   \begin{enumerate}
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label10}:] The system shall implement Role-Based Access Control to allow users to perform read, write, delete, and modify actions based on their role (e.g. Students may not modify other projects that do not belong to them while instructors can edit any project in their course)
+    \item[]\reqitem{dprnum}{DPR_RoleBasedDataPermissions} The system shall implement Role-Based Access Control to allow users to perform read, write, delete, and modify actions based on their role (e.g. Students may not modify other projects that do not belong to them while instructors can edit any project in their course)
   \end{enumerate}
 
   \subsubsection{Consent}
   \begin{enumerate}
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label11}:] The system shall inform users about all information including personal data that is being retained and used for recommendations
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label12}:] The system shall not disclose any data to unauthorized external parties
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label13}:] The system shall provide a Privacy Notice providing users with information related to data collection, use, storage, and retention
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label14}:] The system shall allow consent withdrawal
+    \item[]\reqitem{dprnum}{DPR_TransparencyForRecommendationData} The system shall inform users about all information including personal data that is being retained and used for recommendations
+    \item[]\reqitem{dprnum}{DPR_PreventUnauthorizedDisclosure} The system shall not disclose any data to unauthorized external parties
+    \item[]\reqitem{dprnum}{DPR_PrivacyNotice} The system shall provide a Privacy Notice providing users with information related to data collection, use, storage, and retention
+    \item[]\reqitem{dprnum}{DPR_ConsentWithdrawal} The system shall allow consent withdrawal
   \end{enumerate}
 
   \subsubsection{Encryption}
   \begin{enumerate}
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label15}:] The system shall utilize standard and secure network protocols HTTP with TLS to establish secure communication within \projname{}
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label16}:] The system shall utilize McMaster SSO for McMaster student and staff authentication
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label17}:] The system shall encrypt personal information and any confidential data at rest
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label18}:] The system shall use another trusted identity provider to authenticate external supervisors
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label19}:] The system shall not retain or store any user passwords in plaintext but use securely managed access and refresh tokens to maintain sessions
+    \item[]\reqitem{dprnum}{DPR_TLSCommunication} The system shall utilize standard and secure network protocols HTTP with TLS to establish secure communication within \projname{}
+    \item[]\reqitem{dprnum}{DPR_McMasterSSO} The system shall utilize McMaster SSO for McMaster student and staff authentication
+    \item[]\reqitem{dprnum}{DPR_EncryptionAtRest} The system shall encrypt personal information and any confidential data at rest
+    \item[]\reqitem{dprnum}{DPR_ExternalSupervisorAuthentication} The system shall use another trusted identity provider to authenticate external supervisors
+    \item[]\reqitem{dprnum}{DPR_NoPlaintextPasswords} The system shall not retain or store any user passwords in plaintext but use securely managed access and refresh tokens to maintain sessions
   \end{enumerate}
 
   \subsubsection{Compliance}
   \begin{enumerate}
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label20}:] The system shall comply with applicable privacy legislation related to collection, use, disclosure, and protection of personal information found under Ontario's Freedom of Information and Protection of Privacy Act (FIPPA).
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label21}:] The system shall also adhere to data privacy policies applicable to McMaster and the related faculties
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label22}:] The system shall ensure secure authentication and communication with APIs and third party services
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label23}:] Unauthorized access, data breaches, data loss or disclosure shall be documented and sent to the relevant parties and the University
+    \item[]\reqitem{dprnum}{DPR_FIPPACompliance} The system shall comply with applicable privacy legislation related to collection, use, disclosure, and protection of personal information found under Ontario's Freedom of Information and Protection of Privacy Act (FIPPA).
+    \item[]\reqitem{dprnum}{DPR_McMasterPrivacyPolicies} The system shall also adhere to data privacy policies applicable to McMaster and the related faculties
+    \item[]\reqitem{dprnum}{DPR_ThirdPartyAPIAuthentication} The system shall ensure secure authentication and communication with APIs and third party services
+    \item[]\reqitem{dprnum}{DPR_SecurityIncidentReporting} Unauthorized access, data breaches, data loss or disclosure shall be documented and sent to the relevant parties and the University
   \end{enumerate}
 
   \subsubsection{Enrollment Data}
   \begin{enumerate}
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label24}:] The system shall import only the enrollment fields it needs (name, email or MacID, program, and course) from Avenue to Learn or an uploaded file.
-    \item[DPR\refstepcounter{dprnum}\thedprnum \label{DPR_Label25}:] The system shall treat imported enrollment data as student information, subject to \dprref{DPR_Label8} and \dprref{DPR_Label20}.
+    \item[]\reqitem{dprnum}{DPR_MinimalEnrollmentData} The system shall import only the enrollment fields it needs (name, email or MacID, program, and course) from Avenue to Learn or an uploaded file.
+    \item[]\reqitem{dprnum}{DPR_EnrollmentDataClassification} The system shall treat imported enrollment data as student information, subject to \dprref{DPR_EndOfTermStudentDataDeletion} and \dprref{DPR_FIPPACompliance}.
   \end{enumerate}
 
 % ==============================================================
@@ -2140,7 +2140,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Look and Feel Requirements}
   \subsubsection{Appearance Requirements}
   \begin{enumerate}[label=LF-A\arabic*, ref=LF-A\arabic*]
-    \item\label{NFR_ScreenSize} User interface layouts must display correctly on desktop, tablet, and mobile screens.\newline
+    \item[]\idlabel{NFR_ScreenSize}\label{NFR_ScreenSize} User interface layouts must display correctly on desktop, tablet, and mobile screens.\newline
     \textbf{Rationale}: Users will access the platform through phones, computers, tablets, and layouts which do not display correctly may prevent users from performing primary actions.\newline
     \textbf{Fit Criterion}: An automated tool such as Playwright renders every page at widths 1920px, 1024px, 430px and reports no horizontal overflows, clipped controls, or controls smaller than a 40px square.
   \end{enumerate}
@@ -2155,7 +2155,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsubsection{Ease of Use Requirements}
 
   \begin{enumerate}[label=UH-EOU\arabic*, ref=UH-EOU\arabic*]
-    \item\label{NFR_UsabilityFirstSuccess} \usabilityTestSuccessPerc{} of first-time users shall be able to access the platform and complete their primary tasks outlined in Section~\ref{sec:use-cases}
+    \item[]\idlabel{NFR_UsabilityFirstSuccess}\label{NFR_UsabilityFirstSuccess} \usabilityTestSuccessPerc{} of first-time users shall be able to access the platform and complete their primary tasks outlined in Section~\ref{sec:use-cases}
     within \usabilityTestTime{}.\\
     \textbf{Rationale}: No assumptions about users can be made beyond basic web browsing abilities, as described in the user characteristics section (Section~\ref{SecUserCharacteristics}). Many existing web applications that perform similar functions are able to provide an intuitive experience requiring no prior knowledge.\\
     \textbf{Fit Criterion}: A first-time user shall be able to complete the procedure as described in
@@ -2172,9 +2172,9 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Learning Requirements}
   \begin{enumerate}[label=UH-L\arabic*, ref=UH-L\arabic*]
-    \item\label{NFR_LearnUnassisted} A first time user shall be able to learn how to perform their primary tasks outlined in Section~\ref{sec:use-cases} with no training or assistance. \\
+    \item[]\idlabel{NFR_LearnUnassisted}\label{NFR_LearnUnassisted} A first time user shall be able to learn how to perform their primary tasks outlined in Section~\ref{sec:use-cases} with no training or assistance. \\
     \textbf{Rationale}: Requiring an upfront, unnecessary time investment to learn how to use the platform can add friction and reduce adoption.\\
-    \textbf{Fit Criterion}: User testing outlined in \ref{NFR_UsabilityFirstSuccess} is satisfied with no assistance, prior training, or external learning material.
+    \textbf{Fit Criterion}: User testing outlined in \idref{NFR_UsabilityFirstSuccess} is satisfied with no assistance, prior training, or external learning material.
   \end{enumerate}
 
   \subsubsection{Understandability and Politeness Requirements}
@@ -2185,7 +2185,7 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Accessibility Requirements}
   \begin{enumerate}[label=UH-A\arabic*, ref=UH-A\arabic*]
-    \item\label{NFR_AccessibilityWCAG} The system shall conform to the WCAG 2.0 Level AA standard.\\
+    \item[]\idlabel{NFR_AccessibilityWCAG}\label{NFR_AccessibilityWCAG} The system shall conform to the WCAG 2.0 Level AA standard.\\
     \textbf{Rationale}: The system will be classified as a public-facing site which operates within Ontario's jurisdiction and must, at least, conform to the minimum standard set by AODA.\\
     \textbf{Fit Criterion}: An automated audit using an industry standard tool (such as Axe or Lighthouse) running on all user interfaces, reporting no critical violations.
 
@@ -2194,7 +2194,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Performance Requirements}
   \subsubsection{Speed and Latency Requirements}
   \begin{enumerate}[label=PR-SL\arabic*, ref=PR-SL\arabic*]
-    \item\label{NFR_PerfTail} The system shall respond to user requests with a \tailPercentile{} percentile latency of at most \tailLatency{}.\\
+    \item[]\idlabel{NFR_PerfTail}\label{NFR_PerfTail} The system shall respond to user requests with a \tailPercentile{} percentile latency of at most \tailLatency{}.\\
     \textbf{Rationale}: Use is concentrated at the start of the academic year, when projects are proposed and teams are formed (see System Context). The system is expected to have up to \concurrentUsers{} staff, students, and external supervisors active at the same time during this period. A slow experience can hurt adoption, and a failure to handle load can lead to service degradation.\\
     \textbf{Fit Criterion}: A load test simulates \concurrentUsers{} concurrent users for a sustained period. Each simulated user repeatedly performs a representative mix of tasks (e.g., browsing the project catalog, viewing a project, applying to a project, replying to a thread) with a \thinkTime{} pause between actions. The latency of every request is recorded, and the \tailPercentile{} percentile is at most \tailLatency{}. The resulting request rate is measured and reported with the test results, rather than fixed in advance.
 
@@ -2214,20 +2214,20 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Robustness or Fault-Tolerance Requirements}
   \begin{enumerate}[label=PR-RFT\arabic*, ref=PR-RFT\arabic*]
-    \item\label{NFR_Uptime} The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
+    \item[]\idlabel{NFR_Uptime}\label{NFR_Uptime} The system shall be available with at least \uptimePercent{} uptime (\unschedDowntime{} of unscheduled downtime per week).\\
     \textbf{Rationale}: The system being inaccessible can result in missed deadlines, data loss, and overall frustration. This can impact adoption, perception, and erode trust.\\
     \textbf{Fit Criterion}: The system responds to a periodic health check, which runs every minute, with success responses accounting for at least \uptimePercent{} over any 7-day period. Scheduled maintenance windows are excluded from the measurement.
 
-    \item\label{NFR_Recoverable} The system shall be recoverable after an incident to a previous state within the 24 hours before the incident.\\
+    \item[]\idlabel{NFR_Recoverable}\label{NFR_Recoverable} The system shall be recoverable after an incident to a previous state within the 24 hours before the incident.\\
     \textbf{Rationale}: The system might experience a data loss incident. It must be recoverable with minimal losses.\\
     \textbf{Fit Criterion}: The system can be restored to a previous state using the interface.
   \end{enumerate}
 
   \subsubsection{Capacity Requirements}
   \begin{enumerate}[label=PR-C\arabic*, ref=PR-C\arabic*]
-    \item\label{NFR_PeakUsers} The system shall be capable of handling at least \concurrentUsers{} concurrent users while meeting \ref{NFR_PerfTail}.\\
+    \item[]\idlabel{NFR_PeakUsers}\label{NFR_PeakUsers} The system shall be capable of handling at least \concurrentUsers{} concurrent users while meeting \idref{NFR_PerfTail}.\\
     \textbf{Rationale}: Users will be accessing similar resources concurrently, especially at the start of a year. System degradation can prevent users from performing essential tasks.\\
-    \textbf{Fit Criterion}: The system shall meet the thresholds specified in \ref{NFR_PerfTail} with \concurrentUsers{} simulated users.
+    \textbf{Fit Criterion}: The system shall meet the thresholds specified in \idref{NFR_PerfTail} with \concurrentUsers{} simulated users.
   \end{enumerate}
 
   \subsubsection{Scalability or Extensibility Requirements}
@@ -2257,18 +2257,18 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Requirements for Interfacing with Adjacent Systems}
   \begin{enumerate}[label=OE-IAS\arabic*, ref=OE-IAS\arabic*]
-    \item\label{NFR_Browsers} The system shall be accessible on the latest two major versions of Firefox, Safari, and Chrome.\\
+    \item[]\idlabel{NFR_Browsers}\label{NFR_Browsers} The system shall be accessible on the latest two major versions of Firefox, Safari, and Chrome.\\
     \textbf{Rationale}: Web browsers provide an abstraction layer that isolates functionality from the underlying operating system environment, removing OS-support as a concern.\\
     \textbf{Fit Criterion}: All target browsers shall be tested using an automated web testing tool such as Playwright or Selenium and complete all tests successfully. This is described in-depth in Section~4.2.3 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan}.
 
-    \item\label{NFR_Container} The hosted component of the system shall run on the latest two supported major versions of Docker.\\
+    \item[]\idlabel{NFR_Container}\label{NFR_Container} The hosted component of the system shall run on the latest two supported major versions of Docker.\\
     \textbf{Rationale}: Similar to web browsers, Docker provides an abstraction layer over the underlying operating system and a sandboxed environment for executing code.\\
     \textbf{Fit Criterion}: The hosted component of the system successfully builds and starts as a Docker image.
   \end{enumerate}
 
   \subsubsection{Productization Requirements}
   \begin{enumerate}[label=OE-P\arabic*, ref=OE-P\arabic*]
-    \item\label{NFR_DeployUnassisted} The system shall be deployable by an IT professional by following the deployment guide with no assistance in under \deployTime{}.\\
+    \item[]\idlabel{NFR_DeployUnassisted}\label{NFR_DeployUnassisted} The system shall be deployable by an IT professional by following the deployment guide with no assistance in under \deployTime{}.\\
     \textbf{Rationale}: Issues during deployment can increase downtime which results in frustration with the platform.\\
     \textbf{Fit Criterion}: A technically competent individual outside of the main development team is able to complete the task described in Section~4.2.2 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan} within the time constraint.
 
@@ -2284,7 +2284,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Maintainability and Support Requirements}
   \subsubsection{Maintenance Requirements}
   \begin{enumerate}[label=MS-M\arabic*, ref=MS-M\arabic*]
-    \item\label{NFR_ChangeEffort} The effort required to make likely changes, which can be found in Section~\ref{LC_LikelyChanges}, shall be less than \maintFrac{} of the original development time.\\
+    \item[]\idlabel{NFR_ChangeEffort}\label{NFR_ChangeEffort} The effort required to make likely changes, which can be found in Section~\idref{LC_LikelyChanges}, shall be less than \maintFrac{} of the original development time.\\
     \textbf{Rationale}: A system which is difficult to maintain will eventually reach an unusable state when environments change (e.g.: hardware changes or software updates introduce/expose bugs, vulnerabilities are discovered, privacy regulations change, etc.) and fixes/updates are too costly to perform.\\
     \textbf{Fit Criterion}: Based on a development effort of 40 hours / week, maintenance cost shall not exceed \changeEffort{} / week.
   \end{enumerate}
@@ -2297,7 +2297,7 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Adaptability Requirements}
   \begin{enumerate}[label=MS-A\arabic*, ref=MS-A\arabic*]
-    \item\label{NFR_LiveDisable} All major features, with the exception of the RBAC component, can be disabled on a live system with no code changes.\\
+    \item[]\idlabel{NFR_LiveDisable}\label{NFR_LiveDisable} All major features, with the exception of the RBAC component, can be disabled on a live system with no code changes.\\
     \textbf{Rationale}: The need to toggle major features was established during stakeholder interviews. The platform needs to be flexible to fit the working style of a variety of instructors. RBAC ensures visibility rules are enforced and this is essential for protecting sensitive information.\\
     \textbf{Fit Criterion}: Every major feature can be disabled on a live system with no code changes.
   \end{enumerate}
@@ -2306,11 +2306,11 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Security Requirements}
   \subsubsection{Access Requirements}
   \begin{enumerate}[label=SEC-AC\arabic*, ref=SEC-AC\arabic*]
-    \item\label{NFR_Authenticate} The system shall require authentication before any other actions are possible.\\
+    \item[]\idlabel{NFR_Authenticate}\label{NFR_Authenticate} The system shall require authentication before any other actions are possible.\\
     \textbf{Rationale}: Authentication provides the system with a user's identity which ensures access rules are enforced.\\
     \textbf{Fit Criterion}: Unauthenticated users receive an error response when making requests which are not authentication-related. 
 
-    \item\label{NFR_Authorize} The system shall restrict access only to students, TAs, and instructors directly enrolled in the capstone courses, and to potential supervisors approved by an instructor. All users are only able to access data that they are approved to view. Non-approved users are unable to read or write any data.\\
+    \item[]\idlabel{NFR_Authorize}\label{NFR_Authorize} The system shall restrict access only to students, TAs, and instructors directly enrolled in the capstone courses, and to potential supervisors approved by an instructor. All users are only able to access data that they are approved to view. Non-approved users are unable to read or write any data.\\
     \textbf{Rationale}: The system stores sensitive user and course data which is a primary target of cyber attacks.\\
     \textbf{Fit Criterion}: Authenticated users receive an error response when requesting or modifying data they are not authorized to view or modify.
 
@@ -2318,7 +2318,7 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Integrity Requirements}
   \begin{enumerate}[label=SEC-INT\arabic*, ref=SEC-INT\arabic*]
-    \item\label{NFR_ConcurrencySafety} All data operations involving multiple data entities must be concurrency-safe.\\
+    \item[]\idlabel{NFR_ConcurrencySafety}\label{NFR_ConcurrencySafety} All data operations involving multiple data entities must be concurrency-safe.\\
     \textbf{Rationale}: Many data operations will be executing at any given time and the system must ensure all data operations do not operate on stale or corrupt data.\\
     \textbf{Fit Criterion}: The system remains in a correct state after a set of concurrent data modification operations. A correct state is one which can be represented as the output of some sequence of a set of concurrent operations.
 
@@ -2326,30 +2326,30 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \subsubsection{Privacy Requirements}
   \begin{enumerate}[label=SEC-P\arabic*, ref=SEC-P\arabic*]
-    \item\label{NFR_EssentialPersonal} The system shall only collect personal data when it is essential to the system's operations.\\
+    \item[]\idlabel{NFR_EssentialPersonal}\label{NFR_EssentialPersonal} The system shall only collect personal data when it is essential to the system's operations.\\
     \textbf{Rationale}: The platform stores personal data to facilitate basic operations and is subject to regulations imposed by Ontario's FIPPA.\\
     \textbf{Fit Criterion}: All stored user data can be traced to a requirement in Section~\ref{sec:functional-requirements} or Section~\ref{sec:non-functional-requirements}.
 
-    \item\label{NFR_EncryptTransit} The system shall ensure data is encrypted in-transit.\\
+    \item[]\idlabel{NFR_EncryptTransit}\label{NFR_EncryptTransit} The system shall ensure data is encrypted in-transit.\\
     \textbf{Rationale}: Communications can be intercepted by other peers in a network and internet service providers (ISPs) and hold sensitive data. Encryption ensures that data can only be read by the server and client.\\
     \textbf{Fit Criterion}: The system refuses to respond to all requests made over an unencrypted connection.
 
-    \item\label{NFR_EncryptRest} The system shall ensure data is encrypted at rest, with decryption protected by a cloud key management provider or a hardware security mechanism.\\
+    \item[]\idlabel{NFR_EncryptRest}\label{NFR_EncryptRest} The system shall ensure data is encrypted at rest, with decryption protected by a cloud key management provider or a hardware security mechanism.\\
     \textbf{Rationale}: While physical access to server storage is unlikely, a system vulnerability in the host operating system, virtualization layer, filesystem, or in other dependent systems may allow attackers to read stored user data.\\
     \textbf{Fit Criterion}: Database content is not readable and not recoverable from a database fragment/part file without a decryption key.
 
-    \item\label{NFR_PasswordHash} All user passwords shall be stored in a cryptographically secure, salted, and irreversible format.\\
+    \item[]\idlabel{NFR_PasswordHash}\label{NFR_PasswordHash} All user passwords shall be stored in a cryptographically secure, salted, and irreversible format.\\
     \textbf{Rationale}: Ensuring passwords are not recoverable protects users from data exposure events.\\
     \textbf{Fit Criterion}: Passwords are hashed using an industry standard algorithm such as Argon2id or bcrypt.
   \end{enumerate}
 
   \subsubsection{Audit Requirements}
   \begin{enumerate}[label=SEC-AU\arabic*, ref=SEC-AU\arabic*]
-    \item\label{NFR_AuditLog} All user actions shall be audited including metadata such as when the actions where taken, what action was taken, the user, and their privilege level at the time of the action.\\
+    \item[]\idlabel{NFR_AuditLog}\label{NFR_AuditLog} All user actions shall be audited including metadata such as when the actions where taken, what action was taken, the user, and their privilege level at the time of the action.\\
     \textbf{Rationale}: User actions must be auditable to ensure any discrepancies about events such as team enrolment, project approvals, and other critical events are tracable.\\
     \textbf{Fit Criterion}: A full sequence of audit logs can be composed together to provide a 100\% accurate image of the system's state.
 
-    \item\label{NFR_AuditTamper} All logs shall be stored in tamper-resistant/tamper-evident storage.\\
+    \item[]\idlabel{NFR_AuditTamper}\label{NFR_AuditTamper} All logs shall be stored in tamper-resistant/tamper-evident storage.\\
     \textbf{Rationale}: Audit logs may be the target of attackers aiming to remove any trace of their activities.\\
     \textbf{Fit Criterion}: Attempting to tamper with or remove audit log storage files raises an alert to system operators.
 
@@ -2373,9 +2373,9 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsection{Compliance Requirements}
   \subsubsection{Legal Requirements}
   \begin{enumerate}[label=COMP-L\arabic*, ref=COMP-L\arabic*]
-    \item\label{NFR_ComplianceAODA} The system shall comply with AODA regulations, as specified in \ref{NFR_AccessibilityWCAG}.
+    \item[]\idlabel{NFR_ComplianceAODA}\label{NFR_ComplianceAODA} The system shall comply with AODA regulations, as specified in \idref{NFR_AccessibilityWCAG}.
     \textbf{Rationale}: The system will be hosted in Ontario and classified as a public-facing site. It must comply with the applicable accessibility regulations.
-    \textbf{Fit Criterion}: It meets the criterion set in \ref{NFR_AccessibilityWCAG}.
+    \textbf{Fit Criterion}: It meets the criterion set in \idref{NFR_AccessibilityWCAG}.
   \end{enumerate}
 
   \subsubsection{Standards Compliance Requirements}
@@ -2383,67 +2383,6 @@ Instructor (Dr. Reyes), Teaching Assistant
   %   \item ..
   % \end{enumerate}
   Not applicable.
-
-  %%%%%%%%%%%%%%%%%%% OLD %%%%%%%%%%%%%%%%%%%
-  
-  % \noindent \begin{itemize}
-  %   % \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accuracy}:]
-  %   % \textbf{Accuracy} \plt{Characterize the accuracy by giving the context/use for
-  %   % the software.  Maybe something like, ``The accuracy of the computed
-  %   % solutions should meet the level needed for $<$engineering or scientific
-  %   % application$>$.  The level of accuracy achieved by \projname{} shall be
-  %   % described following the procedure given in Section~X of the Verification and
-  %   % Validation Plan.''  If you do this provide a link to the VnV plan.}
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Usability}:] \textbf{Usability.}
-  %   % \plt{Characterize the usability by giving the context/use for the software.
-  %   % You should likely reference the user characteristics section.  The level of
-  %   % usability achieved by the software shall be described following the
-  %   % procedure given in Section~X of the Verification and Validation Plan.  Include a link to the VnV plan.}
-    
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Maintainability}:] \textbf{Maintainability.}
-  %   % \plt{The effort required to make any of the likely
-  %   % changes listed for \projname{} should be less than FRACTION of the original
-  %   % development time.  FRACTION is then a symbolic constant that can be defined
-  %   % at the end of the report.}
-    
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Portability}:] \textbf{Portability.}
-  %   % \plt{This NFR is easier to write than the others.  The
-  %   % systems that \projname{} should run on should be listed here.  When possible
-  %   % the specific versions of the potential operating environments should be
-  %   % given.  To make the NFR verifiable a statement could be made that the tests
-  %   % from a given section of the VnV plan can be successfully run on all of the
-  %   % possible operating environments.}
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Availability}:] \textbf{Availability.}
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Access}:] \textbf{Access.}
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Installability}:] \textbf{Installability.}
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Performance}:] \textbf{Performance.}
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Accessibility}:] \textbf{Accessibility.}
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Auditability}:] \textbf{Auditability.}
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_ModularityConfigurability}:] \textbf{Modularity and Configurability.}
-
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_PrivacyDataProtection}:] \textbf{Privacy and Data Protection.}
-
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Recoverability}:] \textbf{Recoverability.}
-
-
-  %   \item[NFR\refstepcounter{nfrnum}\thenfrnum \label{NFR_Integrity}:] \textbf{Integrity.}
-
-  %   % \item Other NFRs that might be discussed include verifiability,
-  %   % understandability, reusability, performance, reliability and availability, security, and accessibility.  You may have to add other NFRs.
-
-  % \end{itemize}
 
   \section{Requirements Traceability Matrices}
   \label{sec:traceability-matrices}
@@ -2460,7 +2399,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \plt{Further traceability to test cases and modules will be given in other
   documents.}
 
-  \begin{longtable}{p{0.15\textwidth} p{0.15\textwidth} p{0.20\textwidth} p{0.20\textwidth}}
+  \begin{longtable}{p{0.35\textwidth} p{0.35\textwidth} p{0.30\textwidth}}
 
     \toprule
     Functional Req & Stakeholder Req & Use Case \\
@@ -2512,51 +2451,51 @@ Instructor (Dr. Reyes), Teaching Assistant
     Functional Requirements} \label{tab:SR2UC2FRtm}
   \end{longtable}
 
-    \begin{longtable}{p{0.12\textwidth} p{0.45\textwidth}}
+  \begin{longtable}{p{0.45\textwidth} p{0.50\textwidth}}
 
     \toprule
     Functional Req & Nonfunctional Req \\
     \midrule
-    \rref{FR_SupervisorProposal} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_ProposalOptionalFields} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_StudentProposal} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_ReviewProposal} & \ref{NFR_Authorize}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_ViewApprovedProjects} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_PerfTail}, \ref{NFR_PeakUsers} \\ \hline
-    \rref{FR_ViewProjectStatus} & \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_StudentProfile} & \ref{NFR_Authorize}, \ref{NFR_EssentialPersonal}, \ref{NFR_EncryptRest} \\ \hline
-    \rref{FR_StudentTeams} & \ref{NFR_ConcurrencySafety}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_ValidateTeamRules} & \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_TeamDiscovery} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted} \\ \hline
-    \rref{FR_TeamProfile} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_Authorize} \\ \hline
-    \rref{FR_TeamRecommend} & \ref{NFR_ChangeEffort} \\ \hline
-    \rref{FR_ProjectInterest} & \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_DeclineTeam} & \ref{NFR_ConcurrencySafety}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_ProjectThreads} & \ref{NFR_Authorize}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_ThreadsNotify} & \ref{NFR_Uptime} \\ \hline
-    \rref{FR_RequestApproval} & \ref{NFR_ConcurrencySafety}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_ApprovalResponse} & \ref{NFR_Authorize}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_ExternalApproval} & \ref{NFR_LiveDisable}, \ref{NFR_ConcurrencySafety}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_ApprovalPreflightValidate} & \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_ApprovalRevision} & \ref{NFR_ConcurrencySafety}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_DisableFeatures} & \ref{NFR_LiveDisable}, \ref{NFR_Authorize} \\ \hline
-    \rref{FR_ReferenceMaterial} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_Authorize} \\ \hline
-    \rref{FR_RequiredActionsList} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_ActionRequiredEmail} & \ref{NFR_ConcurrencySafety}, \ref{NFR_Uptime} \\ \hline
-    \rref{FR_ReadCourseInformation} & \ref{NFR_Authorize}, \ref{NFR_EssentialPersonal} \\ \hline
-    \rref{FR_ExportCourseInformation} & \ref{NFR_Authorize}, \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_MacSSO} & \ref{NFR_Authenticate}, \ref{NFR_EncryptTransit}, \ref{NFR_PasswordHash} \\ \hline
-    \rref{FR_AuthorizationRBAC} & \ref{NFR_Authorize}, \ref{NFR_EssentialPersonal} \\ \hline
-    \rref{FR_UpdateRoles} & \ref{NFR_Authorize}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_LogExternalErrors} & \ref{NFR_Uptime}, \ref{NFR_AuditLog}, \ref{NFR_AuditTamper} \\ \hline
-    \rref{FR_RejectComponentDisable} & \ref{NFR_LiveDisable}, \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_DisplayTimestamps} & \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_DurableNotifications} & \ref{NFR_Recoverable}, \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_ReverifyUsers} & \ref{NFR_Authenticate}, \ref{NFR_PasswordHash} \\ \hline
-    \rref{FR_ImportEnrollment} & \ref{NFR_ConcurrencySafety}, \ref{NFR_EssentialPersonal}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_UpdateEnrollment} & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted}, \ref{NFR_ConcurrencySafety} \\ \hline
-    \rref{FR_EnrollmentDiscrepency} & \ref{NFR_ConcurrencySafety}, \ref{NFR_AuditLog} \\ \hline
-    \rref{FR_NeedsGroup} & \ref{NFR_Authorize} \\ \hline
-    \rref{FR_AssignTA} & \ref{NFR_Authorize}, \ref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_SupervisorProposal} & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted}, \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_ProposalOptionalFields} & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted}, \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_StudentProposal} & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted}, \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_ReviewProposal} & \idref{NFR_Authorize}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_ViewApprovedProjects} & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted}, \idref{NFR_PerfTail}, \idref{NFR_PeakUsers} \\ \hline
+    \rref{FR_ViewProjectStatus} & \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_StudentProfile} & \idref{NFR_Authorize}, \idref{NFR_EssentialPersonal}, \idref{NFR_EncryptRest} \\ \hline
+    \rref{FR_StudentTeams} & \idref{NFR_ConcurrencySafety}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_ValidateTeamRules} & \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_TeamDiscovery} & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted} \\ \hline
+    \rref{FR_TeamProfile} & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted}, \idref{NFR_Authorize} \\ \hline
+    \rref{FR_TeamRecommend} & \idref{NFR_ChangeEffort} \\ \hline
+    \rref{FR_ProjectInterest} & \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_DeclineTeam} & \idref{NFR_ConcurrencySafety}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_ProjectThreads} & \idref{NFR_Authorize}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_ThreadsNotify} & \idref{NFR_Uptime} \\ \hline
+    \rref{FR_RequestApproval} & \idref{NFR_ConcurrencySafety}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_ApprovalResponse} & \idref{NFR_Authorize}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_ExternalApproval} & \idref{NFR_LiveDisable}, \idref{NFR_ConcurrencySafety}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_ApprovalPreflightValidate} & \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_ApprovalRevision} & \idref{NFR_ConcurrencySafety}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_DisableFeatures} & \idref{NFR_LiveDisable}, \idref{NFR_Authorize} \\ \hline
+    \rref{FR_ReferenceMaterial} & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted}, \idref{NFR_Authorize} \\ \hline
+    \rref{FR_RequiredActionsList} & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted}, \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_ActionRequiredEmail} & \idref{NFR_ConcurrencySafety}, \idref{NFR_Uptime} \\ \hline
+    \rref{FR_ReadCourseInformation} & \idref{NFR_Authorize}, \idref{NFR_EssentialPersonal} \\ \hline
+    \rref{FR_ExportCourseInformation} & \idref{NFR_Authorize}, \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_MacSSO} & \idref{NFR_Authenticate}, \idref{NFR_EncryptTransit}, \idref{NFR_PasswordHash} \\ \hline
+    \rref{FR_AuthorizationRBAC} & \idref{NFR_Authorize}, \idref{NFR_EssentialPersonal} \\ \hline
+    \rref{FR_UpdateRoles} & \idref{NFR_Authorize}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_LogExternalErrors} & \idref{NFR_Uptime}, \idref{NFR_AuditLog}, \idref{NFR_AuditTamper} \\ \hline
+    \rref{FR_RejectComponentDisable} & \idref{NFR_LiveDisable}, \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_DisplayTimestamps} & \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_DurableNotifications} & \idref{NFR_Recoverable}, \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_ReverifyUsers} & \idref{NFR_Authenticate}, \idref{NFR_PasswordHash} \\ \hline
+    \rref{FR_ImportEnrollment} & \idref{NFR_ConcurrencySafety}, \idref{NFR_EssentialPersonal}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_UpdateEnrollment} & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted}, \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_EnrollmentDiscrepency} & \idref{NFR_ConcurrencySafety}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_NeedsGroup} & \idref{NFR_Authorize} \\ \hline
+    \rref{FR_AssignTA} & \idref{NFR_Authorize}, \idref{NFR_ConcurrencySafety} \\ \hline
     \bottomrule
     \caption{Traceability Between Functional and Nonfunctional Requirements}
     \label{tab:FR2Rtm}
@@ -2630,11 +2569,11 @@ Instructor (Dr. Reyes), Teaching Assistant
   Implementing an AI-based solution is primarily outside the core project scope and is instead considered a stretch goal. The 
   system does not require training an AI model to fulfill its primary functionality.
 
-  \section{Likely Changes}
-\plt{Give the likely changes, with traceability to the entity that is likely to change.}
+  \section{Likely Changes}\label{LC_LikelyChanges}
+  \plt{Give the likely changes, with traceability to the entity that is likely to change.}
 
 \noindent \begin{itemize}
-      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Users}:]
+      \item[]\reqitem{lcnum}{LC_Users}
       \textbf{Role Permissions.}
       What each role may do may change. The TA role in particular was defined late and
       may be refined as more instructors are interviewed, and additional roles may be needed for people outside the main
@@ -2642,7 +2581,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       \textit{Affected Entities:} User, Student, Instructor, Supervisor, TA.
       \textit{Related Requirements:} \rref{FR_MacSSO}, \rref{FR_AuthorizationRBAC}, \rref{FR_UpdateRoles}.
 
-      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_TeamCourseRestrictions}:]
+      \item[]\reqitem{lcnum}{LC_TeamCourseRestrictions}
       \textbf{Course and Team Rules.}
       The team formation and eligibility rules may change. The CS instructor has not yet been interviewed, so CS team
       sizes and program restrictions are unconfirmed, and students from other departments (e.g., ECE or iBioMed students
@@ -2650,15 +2589,16 @@ Instructor (Dr. Reyes), Teaching Assistant
       \textit{Affected Entities:} Student, Team, Course.
       \textit{Related Requirements:} \rref{FR_ValidateTeamRules}, \rref{FR_DisableFeatures}.
 
-      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_ProposalTemplates}:]
+      \item[]\reqitem{lcnum}{LC_ProposalTemplates}
       \textbf{Proposal Template Fields.}
       The required and optional fields of the project proposal may change as instructors review the template. Courses may
       need different fields (for example hardware information for TRON), and instructors want standards that do not
       discourage supervisors from proposing projects.
       \textit{Affected Entity:} Project.
-      \textit{Related Requirements:} \rref{FR_SupervisorProposal}, \rref{FR_ProposalOptionalFields}, \rref{FR_StudentProposal}.
+      \textit{Related Requirements:} \rref{FR_SupervisorProposal}, \rref{FR_ProposalOptionalFields},
+      \rref{FR_StudentProposal}.
 
-      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_ApprovalWorkflows}:]
+      \item[]\reqitem{lcnum}{LC_ApprovalWorkflows}
       \textbf{Approval Process.}
       How a course approves team projects may change. The TRON course approves a project when its team is given a group
       number, and the CS process is unconfirmed, so a course may need different approval steps or approvers than the ones
@@ -2666,7 +2606,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       \textit{Affected Entities:} Project, Project Application, Course.
       \textit{Related Requirements:} \rref{FR_RequestApproval}, \rref{FR_ApprovalResponse}, \rref{FR_ExternalApproval}, \rref{FR_DisableFeatures}.
 
-      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Recommendations}:]
+      \item[]\reqitem{lcnum}{LC_Recommendations}
       \textbf{Recommendations.}
       The recommendation requirement may be removed or made switchable if instructors judge that its benefit does not
       justify the overhead, or expanded if stakeholders want matching on additional criteria such as skills. Feedback from
@@ -2674,12 +2614,13 @@ Instructor (Dr. Reyes), Teaching Assistant
       \textit{Affected Entities:} Student Profile, Team Profile, Project.
       \textit{Related Requirement:} \rref{FR_TeamRecommend}.
 
-      \item[LC\refstepcounter{lcnum}\thelcnum\label{LC_Enrollment}:]
+      \item[]\reqitem{lcnum}{LC_Enrollment}
       \textbf{Enrollment Source.}
       How enrollment is obtained may change if access to Avenue to Learn data is restricted or changed, or if a course
       (especially ones outside McMaster) use a different source of enrollment data.
       \textit{Affected Entities:} Course, Student.
-      \textit{Related Requirements:} \rref{FR_ImportEnrollment}, \rref{FR_UpdateEnrollment}, \rref{FR_EnrollmentDiscrepency}.
+      \textit{Related Requirements:} \rref{FR_ImportEnrollment}, \rref{FR_UpdateEnrollment},
+      \rref{FR_EnrollmentDiscrepency}.
 \end{itemize}
 
   \plt{Give the unlikely changes.  The design can assume that the changes listed will not occur.}
@@ -2739,64 +2680,64 @@ Instructor (Dr. Reyes), Teaching Assistant
 Student who chose a project from the list of given projects.
 
 \noindent \begin{itemize}
-  \item[S\refstepcounter{sn}\thesn \label{S_TeamFirst}]
+    \item[]\reqitem{sn}{S_TeamFirst}
     Formed a team with classmates they already knew over the summer, and had
     project ideas before the term started. In hindsight, picking the project
     before the teammates might have been better, since teammates with shared
     interests working on their preferred project could lead to a better
     experience.
-  \item[S\refstepcounter{sn}\thesn]
+    \item[]S\refstepcounter{sn}\thesn
     Each member chose their top 5 projects after reading all of them, then the
     team settled on a top 3 in case some were unavailable.
-  \item[S\refstepcounter{sn}\thesn \label{S_Vague}]
+    \item[]\reqitem{sn}{S_Vague}
     Project descriptions were often vague. Some were ignored and only the title
     was read.
-  \item[S\refstepcounter{sn}\thesn \label{S_ProjectInfo}]
+    \item[]\reqitem{sn}{S_ProjectInfo}
     Information on hardware, software stack, and industry/field of study would
     be helpful.
-  \item[S\refstepcounter{sn}\thesn]
+    \item[]S\refstepcounter{sn}\thesn
     One supervisor held a meeting with all interested groups right before the
     project selection deadline, which added uncertainty.
-  \item[S\refstepcounter{sn}\thesn \label{S_Competition}]
+    \item[]\reqitem{sn}{S_Competition}
     Another group was competing for the same project, and losing it led to
     frustration.
-  \item[S\refstepcounter{sn}\thesn \label{S_Uncertainty}]
+    \item[]\reqitem{sn}{S_Uncertainty}
     Considerable uncertainty while landing a project, with worry about not
     having one available.
-  \item[S\refstepcounter{sn}\thesn \label{S_OwnTemplate}]
+    \item[]\reqitem{sn}{S_OwnTemplate}
     A template for proposing their own project would help.
-  \item[S\refstepcounter{sn}\thesn \label{S_OwnGuidelines}]
+    \item[]\reqitem{sn}{S_OwnGuidelines}
     Guidelines or an FAQ on proposing their own project would reduce
     uncertainty about size, scope, and content requirements.
-  \item[S\refstepcounter{sn}\thesn \label{S_Status}]
+    \item[]\reqitem{sn}{S_Status}
     Wants a way to know when a project is taken, open, dropped, etc.
-  \item[S\refstepcounter{sn}\thesn \label{S_Newsletter}]
+    \item[]\reqitem{sn}{S_Newsletter}
     A notification mechanism for project status would help; a newsletter was
     suggested.
-  \item[S\refstepcounter{sn}\thesn \label{S_MeetingUnclear}]
+    \item[]\reqitem{sn}{S_MeetingUnclear}
     Supervisor communication (mechanism, process, content) is unclear: is an
     agenda needed, will the supervisor mostly speak, who leads each meeting?
     Guidelines may be enough.
-  \item[S\refstepcounter{sn}\thesn]
+    \item[]S\refstepcounter{sn}\thesn
     Unsure whether supervisors will have time to meet regularly (e.g., weekly).
-  \item[S\refstepcounter{sn}\thesn \label{S_MeetingPurpose}]
+    \item[]\reqitem{sn}{S_MeetingPurpose}
     Meetings are useful for answering a backlog of questions and filling
     knowledge gaps with an expert instead of researching alone.
-  \item[S\refstepcounter{sn}\thesn \label{S_EmailSimple}]
+    \item[]\reqitem{sn}{S_EmailSimple}
     Prefers email for simple questions.
-  \item[S\refstepcounter{sn}\thesn \label{S_SuggestedMeetings}]
+    \item[]\reqitem{sn}{S_SuggestedMeetings}
     ``Suggested meetings'' aligned with deliverables would set expectations and
     help groups know whether they are on track.
-  \item[S\refstepcounter{sn}\thesn]
+    \item[]S\refstepcounter{sn}\thesn
     The GitLab approval process was intuitive due to prior GitHub/GitLab
     experience.
-  \item[S\refstepcounter{sn}\thesn]
+    \item[]S\refstepcounter{sn}\thesn
     JSON files were a hassle but not problematic.
-  \item[S\refstepcounter{sn}\thesn \label{S_ManyTabs}]
+    \item[]\reqitem{sn}{S_ManyTabs}
     Finding where things are is time consuming and requires many open tabs.
-  \item[S\refstepcounter{sn}\thesn]
+    \item[]S\refstepcounter{sn}\thesn
     Google Calendar was helpful but would benefit from more information.
-  \item[S\refstepcounter{sn}\thesn \label{S_OnePlace}]
+    \item[]\reqitem{sn}{S_OnePlace}
     Having everything in one place (like Avenue) would have been more helpful.
 \end{itemize}
 
@@ -2805,62 +2746,62 @@ Student who chose a project from the list of given projects.
 Supervisor from outside the university.
 
 \noindent \begin{itemize}
-  \item[ES\refstepcounter{esn}\theesn]
+    \item[]ES\refstepcounter{esn}\theesn
     The proposal process was smooth, and working with one of the professors
     and meeting the team was smooth as well.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_StatusHard}]
+    \item[]\reqitem{esn}{ES_StatusHard}
     Knowing project statuses is a challenge.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_SharedNotes}]
+    \item[]\reqitem{esn}{ES_SharedNotes}
     A centralized platform for meeting notes would help. Some teams get more
     information from meetings than others, and notes should be shared with
     everyone. Summaries of meetings and project status, and a template for
     them, would be great.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_Schedule}]
+    \item[]\reqitem{esn}{ES_Schedule}
     A schedule would clear up expectations. Some teams come in early and some
     late; timelines and deadlines are unclear.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_Template}]
+    \item[]\reqitem{esn}{ES_Template}
     A template would be better than an open-ended description box for
     proposals. It is hard to know what is expected from the capstone team, so a
     best-effort approach is taken.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_CourseInfo}]
+    \item[]\reqitem{esn}{ES_CourseInfo}
     Guidelines on course content, content coverage, and capstone objectives
     would let supervisors tailor the experience. The course calendar and
     outline are wanted earlier, ideally before proposing.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_Examples}]
+    \item[]\reqitem{esn}{ES_Examples}
     Examples (e.g., past capstones) would help with idea generation and
     expectation setting. Ideas were thrown around and refined internally, but
     guidance would have been better.
-  \item[ES\refstepcounter{esn}\theesn]
+    \item[]ES\refstepcounter{esn}\theesn
     Extra back-and-forth with the professor (capstone processes, expectations,
     IP questions) could be avoided by providing more information up front; a
     template or FAQ would help.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_NotifyNotRemember}]
+    \item[]\reqitem{esn}{ES_NotifyNotRemember}
     Being notified to do tasks on a platform is fine; having to remember to
     open it is the problem. Email or phone notifications should be considered.
     A notification and checklist is preferred over searching in the platform.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_ManyLogins}]
+    \item[]\reqitem{esn}{ES_ManyLogins}
     Too many platforms to log in to is tedious. A new application is fine.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_SuggestedTimes}]
+    \item[]\reqitem{esn}{ES_SuggestedTimes}
     Suggested meeting times and a schedule would help, though some supervisors
     have their own schedule that works better.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_NoStudentInfo}]
+    \item[]\reqitem{esn}{ES_NoStudentInfo}
     No information about students before team meetings; a leap of faith was
     required, relying on gut feeling and the right questions. Did not know
     they had the final say.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_StudentProfiles}]
+    \item[]\reqitem{esn}{ES_StudentProfiles}
     Wants a way to learn about students (team bio, interests, skills,
     experience), even if not all shown up front; looking them up (e.g.,
     LinkedIn) was mentioned.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_Matching}]
+    \item[]\reqitem{esn}{ES_Matching}
     Wants teams matched to projects based on preference criteria and skill
     sets.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_WhoToEmail}]
+    \item[]\reqitem{esn}{ES_WhoToEmail}
     Hard to find where to communicate back to students. Groups usually had one
     representative email and CC their members, which made emails hard to
     search. With many names and no group numbers, they defaulted to the first
     person who emailed. Inviting everyone was too taxing; wants some way to
     streamline.
-  \item[ES\refstepcounter{esn}\theesn \label{ES_Admin}]
+    \item[]\reqitem{esn}{ES_Admin}
     Overall, there is a lot of administration on the supervisor side.
 \end{itemize}
 
@@ -2870,157 +2811,157 @@ Professor at the university who supervises teams, submits proposals, and
 advises the instructors.
 
 \noindent \begin{itemize}
-  \item[IS\refstepcounter{isn}\theisn \label{IS_Role}]
+    \item[]\reqitem{isn}{IS_Role}
     Mostly a supervisor. Submits proposals and then waits to see what else is
     on the list in case something interests him. Interviews and supervises
     groups, attends lectures when possible, helps with presentations and Expo
     posters, and is often on the outside of the course.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_StudentProposed}]
+    \item[]\reqitem{isn}{IS_StudentProposed}
     Unsure how student-proposed projects will be handled.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_ApprovalTiming}]
+    \item[]\reqitem{isn}{IS_ApprovalTiming}
     The three capstone courses are not well coordinated. The timing and method
     of the approval process (whether a project can be a capstone project) is
     not really known.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_Standardize}]
+    \item[]\reqitem{isn}{IS_Standardize}
     Current descriptions are 100--200 words. Standardizing them is hard and he
     is unsure what the standard should be. Some supervisors may want something
     specific, and one group delivered something related to, but very different
     from, the proposal.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_Schedule}]
+    \item[]\reqitem{isn}{IS_Schedule}
     Supervisors do not know the course schedule (when the SRS is due, when
     implementation starts, validation testing, user testing). There is
     confusion about what happens and when things are due.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_MultiCourse}]
+    \item[]\reqitem{isn}{IS_MultiCourse}
     Supervisors with teams across multiple courses (SE/CS/Tron) may not know
     that each course has different timelines and requirements.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_Procedure}]
+    \item[]\reqitem{isn}{IS_Procedure}
     No standardized procedure, e.g., how a group with an idea finds a
     supervisor. Wants the timeline and procedure centralized and standardized.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_Reports}]
+    \item[]\reqitem{isn}{IS_Reports}
     Wants a low-effort mechanism for supervisors to submit a report or
     feedback at the end. One professor sends feedback emails, but others do
     not seem to remember them and send reports voluntarily.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_Communication}]
+    \item[]\reqitem{isn}{IS_Communication}
     Communication and regular updates (check-ins) between supervisors and
     teams are essential and need to be accounted for. Discussion is needed on
     weekly meetings and who questions go to (TA or professor).
-  \item[IS\refstepcounter{isn}\theisn \label{IS_KnowTA}]
+    \item[]\reqitem{isn}{IS_KnowTA}
     Wants to know who each of his groups' TAs are.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_StudentSkills}]
+    \item[]\reqitem{isn}{IS_StudentSkills}
     Student skills would help guide discussions with supervisors.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_Scope}]
+    \item[]\reqitem{isn}{IS_Scope}
     Would like the capstone process all in one place, but is unsure whether
     that would work with other professors, or whether the platform should
     cover only the proposal stage.
-  \item[IS\refstepcounter{isn}\theisn \label{IS_Accounts}]
+    \item[]\reqitem{isn}{IS_Accounts}
     Accounts are mentioned as a need (details not captured in notes).
 \end{itemize}
 
 % ==================== Software Engineering Instructor ====================
-\paragraph{Software Engineering Instructor (SEI)} \label{app:stk_instr}
-Professor who runs the Software Engineering capstone course.
+  \paragraph{Software Engineering Instructor (SEI)} \label{app:stk_instr}
+  Professor who runs the Software Engineering capstone course.
 
-\noindent \begin{itemize}
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_CurrentProcess}]
-    Current process: before the course, emails contacts to find projects.
-    Interested supervisors submit an MS Form (title, organization, contact,
-    description, confidentiality, IP concerns). A Google Form funnels into a
-    spreadsheet that a script turns into LaTeX. Students form teams, choose
-    projects, and organize meetings. A merge request in GitLab counts as
-    approval.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_SupervisorChanges}]
-    Supervisor details often change and are updated. Supervisors are contacted
-    to confirm they know a team will work with them, which often surfaces
-    Expo and other capstone details.
-  \item[SEI\refstepcounter{instn}\theinstn]
-    Teams are classified by project hardware (SE vs.\ Mech).
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_TeamJSON}]
-    Team details are recorded in a JSON file, processed and verified by a
-    Python script (e.g., every person is in exactly one team). The team
-    composition CSV should be an output that is up to date, correct, and valid.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_Decisions}]
-    Would rather spend time on decisions such as project viability and
-    approval.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_Recruiting}]
-    Often has to reach out to potential supervisors to have enough projects
-    each year.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_Unselected}]
-    Wants to know which projects have not been selected, e.g., to send a thank
-    you email.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_Automate}]
-    Coordination, communication, and details such as approved projects and
-    groups should be automated as much as possible.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_ApprovalCriteria}]
-    Approval criterion: enough substance. Game projects often need extra work
-    to add substance (e.g., more analysis such as proving fairness, or more
-    components).
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_Standards}]
-    Standards could be considered, but enforcing them can scare away good
-    projects; optional questions may help.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_NoAIApproval}]
-    No AI agents making approvals. AI-generated summaries could be considered,
-    but their usefulness is unclear.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_PRs}]
-    Pull requests are still favored because they expose students to CI and
-    show its usefulness, and allow back-and-forth between professor and
-    students.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_RepeatFeedback}]
-    The same feedback is sent to multiple groups. An AI agent could respond to
-    PRs with already-resolved issues (e.g., professor not added as
-    collaborator), leaving more important work to the instructor.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_Universal}]
-    Possibly usable universally, which may require modularity and
-    extensibility.
-  \item[SEI\refstepcounter{instn}\theinstn \label{I_MatchingOptional}]
-    Algorithmic matching of teams to projects could be interesting, with a way
-    to turn it off. Overhead must be worth it; this could be offset by moving
-    other things (e.g., meetings) from Teams or Zoom onto this platform.
-\end{itemize}
+  \noindent \begin{itemize}
+              \item[]\reqitem{instn}{I_CurrentProcess}
+              Current process: before the course, emails contacts to find projects.
+              Interested supervisors submit an MS Form (title, organization, contact,
+              description, confidentiality, IP concerns). A Google Form funnels into a
+              spreadsheet that a script turns into LaTeX. Students form teams, choose
+              projects, and organize meetings. A merge request in GitLab counts as
+              approval.
+              \item[]\reqitem{instn}{I_SupervisorChanges}
+              Supervisor details often change and are updated. Supervisors are contacted
+              to confirm they know a team will work with them, which often surfaces
+              Expo and other capstone details.
+              \item[]SEI\refstepcounter{instn}\theinstn
+              Teams are classified by project hardware (SE vs.\ Mech).
+              \item[]\reqitem{instn}{I_TeamJSON}
+              Team details are recorded in a JSON file, processed and verified by a
+              Python script (e.g., every person is in exactly one team). The team
+              composition CSV should be an output that is up to date, correct, and valid.
+              \item[]\reqitem{instn}{I_Decisions}
+              Would rather spend time on decisions such as project viability and
+              approval.
+              \item[]\reqitem{instn}{I_Recruiting}
+              Often has to reach out to potential supervisors to have enough projects
+              each year.
+              \item[]\reqitem{instn}{I_Unselected}
+              Wants to know which projects have not been selected, e.g., to send a thank
+              you email.
+              \item[]\reqitem{instn}{I_Automate}
+              Coordination, communication, and details such as approved projects and
+              groups should be automated as much as possible.
+              \item[]\reqitem{instn}{I_ApprovalCriteria}
+              Approval criterion: enough substance. Game projects often need extra work
+              to add substance (e.g., more analysis such as proving fairness, or more
+              components).
+              \item[]\reqitem{instn}{I_Standards}
+              Standards could be considered, but enforcing them can scare away good
+              projects; optional questions may help.
+              \item[]\reqitem{instn}{I_NoAIApproval}
+              No AI agents making approvals. AI-generated summaries could be considered,
+              but their usefulness is unclear.
+              \item[]\reqitem{instn}{I_PRs}
+              Pull requests are still favored because they expose students to CI and
+              show its usefulness, and allow back-and-forth between professor and
+              students.
+              \item[]\reqitem{instn}{I_RepeatFeedback}
+              The same feedback is sent to multiple groups. An AI agent could respond to
+              PRs with already-resolved issues (e.g., professor not added as
+              collaborator), leaving more important work to the instructor.
+              \item[]\reqitem{instn}{I_Universal}
+              Possibly usable universally, which may require modularity and
+              extensibility.
+              \item[]\reqitem{instn}{I_MatchingOptional}
+              Algorithmic matching of teams to projects could be interesting, with a way
+              to turn it off. Overhead must be worth it; this could be offset by moving
+              other things (e.g., meetings) from Teams or Zoom onto this platform.
+  \end{itemize}
 
 % ==================== TRON INSTRUCTOR ====================
-\paragraph{Tron Instructor (TI)} \label{app:stk_tron}
-Professor who runs the Mechatronics capstone course.
-\noindent \begin{itemize}
-    \item[TI\refstepcounter{tin}\thetin \label{TI_Course}]
-    The TRON course was separated from the SE course because of growing class size. The TRON and CS courses run very
-    differently, and he runs his course more flexibly than the SE course. He emphasizes personal responsibility and
-    meets with each team informally every week.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_Tools}]
-    Most of the course runs on Microsoft Teams, with a private channel per team that the instructor and TAs can access,
-    plus general channels and shared files (lectures, IP information, example videos, rubrics). Avenue holds grades,
-    submissions, and a list of deliverables. Deliverables are due at the end of the week and are accepted without
-    penalty until the following Tuesday.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_Similar}]
-    The beginning of the capstone courses is the most common part between them, and the courses have a similar number
-    of deliverables.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_Approval}]
-    Projects are approved on Teams. A project is approved when its team receives a group number.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_Roster}]
-    He receives the list of students in the capstone courses, manually marks off those who are in a group, and contacts
-    the rest. He tries not to force students into groups, so some students are delayed in getting a group. One student
-    joined a group very late, and the situation was handed to the undergraduate advisor.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_Populate}]
-    Teams channels must be created and populated from Avenue or added manually, and students are removed if they are
-    not on Avenue. Populating a platform with student information is not trivial. Having an Avenue course is optional;
-    an instructor requests one and it is then created.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_CrossProgram}]
-    SE students on TRON projects are treated as TRON students, and their grades are sent to the SE instructor. TRON
-    students cannot join software-only projects. ECE students on TRON projects must be graded by an ECE professor to
-    show their involvement. Cross-discipline capstones, such as iBioMed, need additional considerations and
-    involvement from professors, and accreditation is a concern.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_Projects}]
-    Projects are collected over the summer through the SE instructor and his contacts, and are kept in a LaTeX
-    document. Many TRON projects are student-proposed, and student-proposed projects are often high quality and
-    people-centred.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_StudentOwned}]
-    The capstone is student-centred. Students own the project even if stakeholders are involved, and the only rule is
-    that students must be able to talk about it (presentations, EXPO). Supervisor-only deliverables are secondary and
-    should not overwhelm students. He sends the supervisors a list of the previous year's deliverables.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_Meetings}]
-    Teams meet in person during class time.
-    \item[TI\refstepcounter{tin}\thetin \label{TI_OpenQuestion}]
-    Open question: how involved the platform will be in the capstone process.
-\end{itemize}
+  \paragraph{Tron Instructor (TI)} \label{app:stk_tron}
+  Professor who runs the Mechatronics capstone course.
+  \noindent \begin{itemize}
+              \item[]\reqitem{tin}{TI_Course}
+              The TRON course was separated from the SE course because of growing class size. The TRON and CS courses run very
+              differently, and he runs his course more flexibly than the SE course. He emphasizes personal responsibility and
+              meets with each team informally every week.
+              \item[]\reqitem{tin}{TI_Tools}
+              Most of the course runs on Microsoft Teams, with a private channel per team that the instructor and TAs can access,
+              plus general channels and shared files (lectures, IP information, example videos, rubrics). Avenue holds grades,
+              submissions, and a list of deliverables. Deliverables are due at the end of the week and are accepted without
+              penalty until the following Tuesday.
+              \item[]\reqitem{tin}{TI_Similar}
+              The beginning of the capstone courses is the most common part between them, and the courses have a similar number
+              of deliverables.
+              \item[]\reqitem{tin}{TI_Approval}
+              Projects are approved on Teams. A project is approved when its team receives a group number.
+              \item[]\reqitem{tin}{TI_Roster}
+              He receives the list of students in the capstone courses, manually marks off those who are in a group, and contacts
+              the rest. He tries not to force students into groups, so some students are delayed in getting a group. One student
+              joined a group very late, and the situation was handed to the undergraduate advisor.
+              \item[]\reqitem{tin}{TI_Populate}
+              Teams channels must be created and populated from Avenue or added manually, and students are removed if they are
+              not on Avenue. Populating a platform with student information is not trivial. Having an Avenue course is optional;
+              an instructor requests one and it is then created.
+              \item[]\reqitem{tin}{TI_CrossProgram}
+              SE students on TRON projects are treated as TRON students, and their grades are sent to the SE instructor. TRON
+              students cannot join software-only projects. ECE students on TRON projects must be graded by an ECE professor to
+              show their involvement. Cross-discipline capstones, such as iBioMed, need additional considerations and
+              involvement from professors, and accreditation is a concern.
+              \item[]\reqitem{tin}{TI_Projects}
+              Projects are collected over the summer through the SE instructor and his contacts, and are kept in a LaTeX
+              document. Many TRON projects are student-proposed, and student-proposed projects are often high quality and
+              people-centred.
+              \item[]\reqitem{tin}{TI_StudentOwned}
+              The capstone is student-centred. Students own the project even if stakeholders are involved, and the only rule is
+              that students must be able to talk about it (presentations, EXPO). Supervisor-only deliverables are secondary and
+              should not overwhelm students. He sends the supervisors a list of the previous year's deliverables.
+              \item[]\reqitem{tin}{TI_Meetings}
+              Teams meet in person during class time.
+              \item[]\reqitem{tin}{TI_OpenQuestion}
+              Open question: how involved the platform will be in the capstone process.
+  \end{itemize}
 
   \subsection{Appendix B: Development Plan}
 
@@ -3041,76 +2982,76 @@ and then the dependencies between features.
 
 \subsection{Phase 1: Core Workflow (implemented in the course)}
 \begin{itemize}
-  \item Importing course enrollment from Avenue to Learn, with file upload as an alternative, and a list
-    of enrolled students who are not on a team (\ucref{UC_ImportEnrollment}; \ref{SR_Enrollment}). Team validation
+    \item Importing course enrollment from Avenue to Learn, with file upload as an alternative, and a list
+    of enrolled students who are not on a team (\ucref{UC_ImportEnrollment}; \idref{SR_Enrollment}). Team validation
     (\ucref{UC_ValidateTeams}) needs to know who is enrolled, so this comes first.
-  \item Supervisor proposal submission with a structured template, and
+    \item Supervisor proposal submission with a structured template, and
     instructor approval before a project is listed
     (\ucref{UC_SubmitProposal}, \ucref{UC_ReviewProposal};
-    \ref{SR_ProposalTemplate}, \ref{SR_OptionalFields}, \ref{SR_HumanApproval}).
-  \item Browsing projects with a visible status, and team selection
+    \idref{SR_ProposalTemplate}, \idref{SR_OptionalFields}, \idref{SR_HumanApproval}).
+    \item Browsing projects with a visible status, and team selection
     (\ucref{UC_BrowseProjects}, \ucref{UC_SelectProject};
-    \ref{SR_BrowseProjects}, \ref{SR_ProjectStatus}).
-  \item Team project submission with automated checks, and instructor and TA review
+    \idref{SR_BrowseProjects}, \idref{SR_ProjectStatus}).
+    \item Team project submission with automated checks, and instructor and TA review
     with iterative feedback (\ucref{UC_ApproveTeamProject};
-    \ref{SR_TeamSubmissionChecks}, \ref{SR_ReviewDialogue}, \ref{SR_TAApproval}). This is the
+    \idref{SR_TeamSubmissionChecks}, \idref{SR_ReviewDialogue}, \idref{SR_TAApproval}). This is the
     highest-value feature for the instructor, so it is part of the first
     working version.
-  \item Validated team composition export
-    (\ucref{UC_ValidateTeams}; \ref{SR_TeamValidity}, \ref{SR_ReduceAdmin}).
-\end{itemize}
+    \item Validated team composition export
+    (\ucref{UC_ValidateTeams}; \idref{SR_TeamValidity}, \idref{SR_ReduceAdmin}).
+  \end{itemize}
 
 \subsection{Phase 2: Communication and Visibility (implemented in the course)}
 \begin{itemize}
-  \item Email notifications for status changes and tasks, and a checklist of
-    required actions (\ucref{UC_NotifyChecklist}; \ref{SR_StatusNotify},
-    \ref{SR_PushNotify}, \ref{SR_Checklist}).
-  \item Team profiles visible to supervisors, and team contact details
-    (\ucref{UC_TeamProfile}, \ucref{UC_ViewTeam}; \ref{SR_StudentProfiles},
-    \ref{SR_TeamContacts}).
-  \item Course schedule and timelines (\ucref{UC_ViewTimelines};
-    \ref{SR_CrossCourseTimelines}).
-  \item Identifying unselected projects
-    (\ucref{UC_FollowUpUnselected}; \ref{SR_UnselectedProjects}).
-\end{itemize}
+    \item Email notifications for status changes and tasks, and a checklist of
+    required actions (\ucref{UC_NotifyChecklist}; \idref{SR_StatusNotify},
+    \idref{SR_PushNotify}, \idref{SR_Checklist}).
+    \item Team profiles visible to supervisors, and team contact details
+    (\ucref{UC_TeamProfile}, \ucref{UC_ViewTeam}; \idref{SR_StudentProfiles},
+    \idref{SR_TeamContacts}).
+    \item Course schedule and timelines (\ucref{UC_ViewTimelines};
+    \idref{SR_CrossCourseTimelines}).
+    \item Identifying unselected projects
+    (\ucref{UC_FollowUpUnselected}; \idref{SR_UnselectedProjects}).
+  \end{itemize}
 
-\subsection{Phase 3: Extended Features (implemented if time allows)}
-\begin{itemize}
-  \item Student-initiated project proposals
-  (\ucref{UC_ProposeOwnProject}; \ref{SR_StudentProposals}). Phase 1 already
+  \subsection{Phase 3: Extended Features (implemented if time allows)}
+  \begin{itemize}
+    \item Student-initiated project proposals
+    (\ucref{UC_ProposeOwnProject}; \idref{SR_StudentProposals}). Phase 1 already
     provides most of the approval flow, so this mainly adds a proposal path, a
     student-proposed project list that supervisors can browse, and an optional field
     for naming a supervisor.
-  \item Guidelines, FAQ, examples of past projects, and early access to course
-    information (\ref{SR_ProposalGuidance}, \ref{SR_CourseInfoEarly}). This
+    \item Guidelines, FAQ, examples of past projects, and early access to course
+    information (\idref{SR_ProposalGuidance}, \idref{SR_CourseInfoEarly}). This
     is mostly content, so it can be added without changing the core system.
-  \item Supervisor capacity limits (a count of teams per supervisor) and
+    \item Supervisor capacity limits (a count of teams per supervisor) and
     related checks.
-\end{itemize}
+  \end{itemize}
 
-\subsection{Future Work (not implemented, or faked for the demo)}
-\begin{itemize}
-  \item (\ref{SR_SinglePlace}) a single place for all capstone coordination,
+  \subsection{Future Work (not implemented, or faked for the demo)}
+  \begin{itemize}
+    \item (\idref{SR_SinglePlace}) a single place for all capstone coordination,
     is addressed in part by the above, but full replacement of external tools
     (e.g., email, calendar, meeting tools) is future work.
-  \item Meeting notes, searchable communication history, and suggested
+    \item Meeting notes, searchable communication history, and suggested
     meeting schedules are not in the current requirements. They would be added
     after the core system is stable.
-  \item Matching teams to projects by skills and interests is future work. It
+    \item Matching teams to projects by skills and interests is future work. It
     is optional and the instructor wants it to be switchable.
-  \item Support for other capstone courses or universities (modularity) is a
+    \item Support for other capstone courses or universities (modularity) is a
     design goal, but a second deployment is future work.
-\end{itemize}
+  \end{itemize}
 
-\subsection{Faked or Simplified for the Course}
-\begin{itemize}
-  \item Email delivery may use a test mailbox or log messages instead of
+  \subsection{Faked or Simplified for the Course}
+  \begin{itemize}
+    \item Email delivery may use a test mailbox or log messages instead of
     reaching real inboxes during demos.
-  \item Authentication may use a simplified sign-in for the demo, with real
+    \item Authentication may use a simplified sign-in for the demo, with real
     integration with university accounts as future work.
-  \item Data may be seeded with example projects, teams, and supervisors
+    \item Data may be seeded with example projects, teams, and supervisors
     instead of imported from the existing forms and spreadsheets.
-\end{itemize}
+  \end{itemize}
 
   \subsection{Appendix C: Values of Auxiliary Constants}
 
@@ -3123,20 +3064,20 @@ and then the dependencies between features.
 
   The following auxiliary constants show the values of symbolic parameters introduced within the NFRs Section \ref{sec:non-functional-requirements}. 
 
-  \begin{longtable}{|p{3.2cm}|p{2.5cm}|p{5cm}|p{2cm}|}
+  \begin{longtable}{|p{2cm}|p{2cm}|p{4cm}|p{4.5cm}|}
     \hline
     \textbf{Constant} & \textbf{Value} & \textbf{Description} & \textbf{NFR Reference} \\ \hline
-    Maintenance Effort & \maintFrac & Maintenance effort as a fraction of total development effort. & \ref{NFR_ChangeEffort} \\ \hline
-    Change Effort & \changeEffort & Cost for weekly maintenance effort based on development effort. & \ref{NFR_ChangeEffort} \\ \hline
-    Usability Success Percentage & \usabilityTestSuccessPerc & Percentage of first-time test participants who successfully complete their primary tasks. & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted} \\ \hline
-    Usability Test Time & \usabilityTestTime & Time for first-time users to complete their primary tasks. & \ref{NFR_UsabilityFirstSuccess}, \ref{NFR_LearnUnassisted} \\ \hline
-    Deploy Time & \deployTime & Deployment time by IT professional with a deployment guide and no assistance. & \ref{NFR_DeployUnassisted} \\ \hline
-    Uptime Percent & \uptimePercent & Minimum required system uptime. & \ref{NFR_Uptime} \\ \hline
-    Unscheduled Downtime & \unschedDowntime & Maximum unscheduled hours of downtime per week. & \ref{NFR_Uptime} \\ \hline
-    Tail Percentile & \tailPercentile & Percentile used to evaluate response latency. & \ref{NFR_PerfTail} \\ \hline
-    Tail Latency & \tailLatency & Maximum response latency at the specified percentile. & \ref{NFR_PerfTail}, \ref{NFR_PeakUsers} \\ \hline
-    Concurrent Users & \concurrentUsers & Peak number of concurrent users simulated during performance testing. & \ref{NFR_PerfTail}, \ref{NFR_PeakUsers} \\ \hline
-    User Think Time & \thinkTime & Pause between actions for each simulated user during performance testing. & \ref{NFR_PerfTail} \\ \hline
+    Maintenance Effort & \maintFrac & Maintenance effort as a fraction of total development effort. & \idref{NFR_ChangeEffort} \\ \hline
+    Change Effort & \changeEffort & Cost for weekly maintenance effort based on development effort. & \idref{NFR_ChangeEffort} \\ \hline
+    Usability Success Percentage & \usabilityTestSuccessPerc & Percentage of first-time test participants who successfully complete their primary tasks. & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted} \\ \hline
+    Usability Test Time & \usabilityTestTime & Time for first-time users to complete their primary tasks. & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted} \\ \hline
+    Deploy Time & \deployTime & Deployment time by IT professional with a deployment guide and no assistance. & \idref{NFR_DeployUnassisted} \\ \hline
+    Uptime Percent & \uptimePercent & Minimum required system uptime. & \idref{NFR_Uptime} \\ \hline
+    Unscheduled Downtime & \unschedDowntime & Maximum unscheduled hours of downtime per week. & \idref{NFR_Uptime} \\ \hline
+    Tail Percentile & \tailPercentile & Percentile used to evaluate response latency. & \idref{NFR_PerfTail} \\ \hline
+    Tail Latency & \tailLatency & Maximum response latency at the specified percentile. & \idref{NFR_PerfTail}, \idref{NFR_PeakUsers} \\ \hline
+    Concurrent Users & \concurrentUsers & Peak number of concurrent users simulated during performance testing. & \idref{NFR_PerfTail}, \idref{NFR_PeakUsers} \\ \hline
+    User Think Time & \thinkTime & Pause between actions for each simulated user during performance testing. & \idref{NFR_PerfTail} \\ \hline
     \caption{Auxiliary Constants}
     \label{tab:AuxiliaryConstants}
 \end{longtable}
