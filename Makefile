@@ -9,9 +9,19 @@ PDFLATEX_CMD = pdflatex -interaction=nonstopmode -recorder
 # instead of LaTeX. Uses the pdflatex already installed for the .tex rule.
 PANDOC_CMD = pandoc --pdf-engine=pdflatex --toc -V geometry:margin=1in
 
-# Define the compile step for pdflatex
+# Define the compile step for pdflatex, print the actual errors if compilation fails
 define COMPILE_TEX
-	cd $(dir $1) && $(PDFLATEX_CMD) $(notdir $1) || { echo "Error: pdflatex failed for $1"; exit 1; }
+	cd $(dir $1) && { \
+		$(PDFLATEX_CMD) $(notdir $1); status=$$?; \
+		if [ $$status -ne 0 ]; then \
+			echo ""; \
+			echo "========== LATEX COMPILATION ERRORS =========="; \
+			grep -n -B 5 -A 12 '^!' $(basename $(notdir $1)).log || true; \
+			echo "========== END LATEX ERRORS =========="; \
+			echo "Error: pdflatex failed for $1 (exit code $$status)"; \
+			exit $$status; \
+		fi; \
+	}
 endef
 
 # Define the bibtex command
