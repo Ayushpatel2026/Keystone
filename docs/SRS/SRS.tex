@@ -1087,7 +1087,7 @@ Instructor (Dr. Reyes)
 \begin{itemize}
   \item The proposal has the status ``Open'', ``Proposal changes requested'', or
     ``Proposal rejected'', and the full feedback history is saved.
-  \item If the proposer was an unverified external supervisor, they are now verified
+  \item If the proposer was an unverified external supervisor, they are now verified if the proposal was approved.
 \end{itemize}
 
   \textbf{Related Requirements:} \idref{SR_HumanApproval},
@@ -1588,13 +1588,13 @@ Instructor (Dr. Reyes), Teaching Assistant
 
               % ---------- Project Catalog ----------
               \item[]\reqitem{reqnum}{FR_ViewApprovedProjects} The system shall provide a centralized catalog
-              where all projects approved by the instructor that the user is permitted to view (Table~\ref{tab:Visibility}) can be found.
+              where all projects approved by the instructor that the user is permitted to view (Table~\ref{tab:Visibility}) can be found, filtered, and browsed based on details and availability.
               \rationale{Students should be able to find projects and compare the varying opportunities with their team's skills and interests.}
               \fitcrit{Users can view all the projects that were approved by the professor, search by title or keywords, and filter by the varying project fields. The filter and search options should also only return the relevant projects.}
 
               \item[]\reqitem{reqnum}{FR_ViewProjectStatus} The system shall display the current availability status of each project in the catalog (open or full) and the maximum number of teams it can take. See Figure~\ref{fig:lifecycle}.
               \rationale{It is critical for students and supervisors to have clear visibility which projects are still available for selection. This gives students the ability to still request available projects if they have been rejected from others and supervisors to properly advertise their status.}
-              \fitcrit{Each team's team-project status is displayed using only the lifecycle labels, and a team that is not Approved is never displayed as Approved. Even if labels are not updated in real-time, the core application should respond to user actions appropriately based on status (i.e. taken projects cannot be requested).}
+              \fitcrit{Each project in the catalog clearly displays the availability status and the supervisor capacity. Even if labels are not updated in real-time, the core application should respond to user actions appropriately based on status (i.e. taken projects cannot be requested).}
 
               % ---------- Student Profile ----------
               \item[]\reqitem{reqnum}{FR_StudentProfile} The system shall allow students to create and update their profiles providing background information including bio, program, interests, project preferences, skills, experience, work style, and LinkedIn that are viewable by students, TAs, instructors, and approved supervisors.
@@ -1732,7 +1732,7 @@ Instructor (Dr. Reyes), Teaching Assistant
               \fitcrit{The system being abruptly closed before being able to send a notification sends it after starting back up.}
 
               \item[]\reqitem{reqnum}{FR_ReverifyUsers} The system shall re-verify the user before: (1) changing credentials, email, or linked authentication; (2) deleting a proposal, project, profile, thread, or account; (3) changing a user's role or course association; (4) a supervisor or team accepting an agreement; (5) leaving or dissolving a team; (6) a final instructor or TA approval or rejection; (7) confirming an enrollment import or changing course rules or the approval mode.
-              Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.
+              Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.
               \rationale{Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.}
               \fitcrit{The system prompts user to re-enter credentials after requesting to delete a project they proposed.}
 
@@ -2128,9 +2128,11 @@ Instructor (Dr. Reyes), Teaching Assistant
     Student-proposed project published to the student-proposed list & Students, TAs, instructors, internal supervisors, and verified external supervisors \\ \hline
     Project application, and threads on a project, application, or team formation & The participants in it, and the course instructors and TAs \\ \hline
     Student and team profiles & Students, TAs, instructors, internal supervisors, and verified external supervisors. Not unverified external supervisors. \\ \hline
-    Team-project status and approval feedback & The team, its supervisor, and the course instructors and TAs \\ \hline
+    Team-project status & The team, its supervisor, and the course instructors and TAs \\ \hline
+    Team project approval feedback & The team, the course instructors and TAs \\ \hline
     Course reference material and proposal template & Every signed-in user with a role, including unverified external supervisors \\ \hline
-    Any record & Not readable by an account with no role \\ \hline
+    Course administrative records (e.g. enrolled students, list of unselected projects) & Only course instructors and TAs \\ \hline
+    Name of the TA assigned to a team & the team, its supervisor, and course instructors and TAs \\ \hline
     \caption{Visibility by record type and state} \label{tab:Visibility}
   \end{longtable}
 
@@ -2635,8 +2637,38 @@ Instructor (Dr. Reyes), Teaching Assistant
       \item \textbf{Data Privacy and Retention:} These requirements were designed to ensure that a user's sensitive information
       such as email and any data about their project remains secure in our backends and in compliance with Privacy Protection
       policies. Keeping data encrypted can do this and RBAC keeps everyone's access adhering to the principle of least privilege.
-
   \end{itemize}
+
+  \item \textbf{Data Visibility and Hosting:} The CS instructor asked whether data can stay internal to
+  McMaster when external supervisors are involved, and whether internal-only hosting would prevent those
+  supervisors from reaching it. The data in \projname{} falls into four groups, and none of them needs to be
+  confined to the university network.
+  \begin{itemize}
+    \item \emph{Reference material} (course outline, expectations, FAQ, past project examples, and the proposal
+    template) is not sensitive, and every signed-in user can read it, including an unverified external supervisor.
+    \item \emph{Student and team profiles} contain only what students choose to enter, which is comparable to a
+    professional profile on Linkedin or their personal websites. They are visible to course members,
+    internal supervisors, and verified external supervisors, and users are informed of this through the
+    privacy notice (\dprref{DPR_PrivacyNotice}).
+    \item \emph{Industry project proposals} are confidential to their sponsors. They are protected by access
+    control, not by hosting location: an external supervisor sees only their own proposals, and other supervisors never see them
+    (\rref{FR_ExternalSupervisorScope}).
+    \item \emph{Administrative records} (e.g. the imported enrollment list, approval feedback, and the
+    audit log) are restricted by role and are never visible to external supervisors. A supervisor sees only the status of their team's project and the name of the team's
+    assigned TA.
+  \end{itemize}
+  Because the data that external supervisors can reach is public in nature, self-published by students, or
+  protected by role-based access, \projname{} does not need to be restricted to the university network, and
+  doing so would stop industry sponsors from using it. Instead, access depends on who signs in. A McMaster sign-in
+  is accepted as proof of affiliation. A sign-in through the external provider proves nothing, so it starts
+  \emph{unverified} with access to reference material only, and becomes \emph{verified}, gaining access to
+  student profiles and student-proposed projects, only when an instructor approves a proposal that the user
+  submitted (\rref{FR_ExternalSupervisorVerification}). Users also accept terms of use and a privacy notice at
+  sign-in, which informs them of what is visible to whom. This supplements access control and FIPPA compliance
+  (\dprref{DPR_FIPPACompliance}) and does not replace them. Where \projname{} is hosted does not change who may
+  see which records. The protection of personal information on
+  any host is provided by the encryption and privacy requirements (\dprref{DPR_EncryptionAtRest},
+  \dprref{DPR_TLSCommunication}, \dprref{DPR_FIPPACompliance}).
 
   \subsection{AI Requirements}
   \label{rat:ai-requirements}
