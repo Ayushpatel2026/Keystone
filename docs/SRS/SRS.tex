@@ -404,18 +404,32 @@ Oct 30th 2026 & 1.5 & Addressed conflicts in defintions and acronyms, added like
     Approval adapter & A component that reads the approval outcome of a team project from an external approval system and updates the team-project status. Integrated mode is only available for courses that have an adapter.\\
     Custom document & A deliverable, chosen by each team from a list, that suits the type of project
     (for example, a usability testing report).\\
+<<<<<<< HEAD
     TA & Teaching assistant who supports a capstone course. TAs can populate course information, view projects and teams, and take part in team project approval, and may be assigned to specific teams. A TA does not take part in project proposal approval.\\
     Administrator & An instructor or TA with the administrator permission (\texttt{is\_admin} set), who can manage users' course association and roles, read the external-provider error log, and delete data that other users cannot. Not a separate role.\\
+=======
+    TA & Teaching assistant for a capstone course (course TA). Can populate course information, view projects and teams, and take part in team project approval. A TA does not take part in project proposal approval.\\
+    Team TA & A course TA assigned to a specific team (\rref{FR_Label40}). A course TA need not be a team TA.\\
+    Administrator & A user with \texttt{is\_admin} set, who operates the deployed system: manages users' course association and roles, reads the external-provider error log, and may delete data not owned by them. Not a course role. May be university IT staff or an instructor.\\
+>>>>>>> c9aa6c0 (rebasing)
     MacID & A McMaster University user account identifier.\\
     Avenue to Learn (Avenue) & McMaster's learning management system. It holds course enrollment for courses that have
     an Avenue site, which is optional. \\
     Enrollment list & The list of students enrolled in a capstone course, imported from Avenue to Learn or uploaded from a
     file. \\
+<<<<<<< HEAD
     External supervisor & A supervisor who signs in without a McMaster account. Every external sign-in is an
     external supervisor, who is \emph{unverified} until an instructor approves a project proposal that the supervisor submitted, and \emph{verified} afterwards.\\
     Verified external supervisor & An external supervisor whose project proposal has been approved by an instructor.
     Can additionally read student profiles and student-proposed projects.
     Never able to read other supervisors' proposals or projects.\\
+=======
+    Slot & One unit of a supervisor's capacity for a project. Reserved when the supervisor accepts a team; released when that team is declined, withdraws, is rejected, or dissolves (Section~\ref{sec:lifecycle}).\\
+    Project application & The record of one team's interest in one project. It carries the team-project status.\\
+    Point of contact & The team member designated to receive communication for the team (\texttt{Team.poc}).\\
+    Agreed & The team-project status reached when both the supervisor and the team have accepted.\\
+    Student post & A discussion thread started by a student or team, such as one seeking teammates (a \texttt{Thread}).\\
+>>>>>>> c9aa6c0 (rebasing)
     \bottomrule
     \caption{Definitions and Acronyms} \label{tab:DefinitionsAndAcronyms}
   \end{longtable}
@@ -1887,7 +1901,11 @@ Instructor (Dr. Reyes), Teaching Assistant
     Student & Course & N : 1 & A student is enrolled in exactly one course \\ \hline
     Instructor & Course & N : M & An instructor manages one or more courses \\ \hline
     TA & Course & N : M & A TA assists in one or more courses \\ \hline
+<<<<<<< HEAD
     TA & Team & 1 : N & A TA may be assigned to many teams. A team has at most one assigned TA \\ \hline
+=======
+    TA & Team & 1 : N & A course TA may be assigned as team TA to many teams. A team has at most one team TA \\ \hline
+>>>>>>> c9aa6c0 (rebasing)
     Student & Student Profile & 1 : 0..1 & A student may have one student profile associated with their account\\ \hline
     Student & Team & N : 0..1 & A student belongs to at most one team\\ \hline
     Supervisor & Project & 1 : N & A supervisor may supervise multiple projects\\ \hline
@@ -1900,7 +1918,11 @@ Instructor (Dr. Reyes), Teaching Assistant
     Team & Project Application & 1 : N & A student team may submit multiple project applications.\\ \hline
     Project & Project Application & 1 : N & A project may have many project applications but each application belongs to a single project.\\ \hline
     Project & Thread & 1 : N & A project may have many threads but each of those threads belongs to a single project.\\ \hline
+<<<<<<< HEAD
     Project Application & Thread & 1 : 0..1 & An application has at most one discussion thread, created when the first post is made. Each such thread belongs to a single application.\\ \hline
+=======
+    Project Application & Thread & 1 : N & An application may have many threads but each of those threads belongs to a single application.\\ \hline
+>>>>>>> c9aa6c0 (rebasing)
     Course & Project & 1 : N & Many projects belong to one course\\ \hline
     Course & Course Resource & 1 : N & A course may have many course resources\\ \hline
     \caption{Entity Relationships} \label{tab:EntityRelationships}
@@ -1939,11 +1961,19 @@ Instructor (Dr. Reyes), Teaching Assistant
       email & String & Email of the user \\ \hline
       user\_name & String & MAC ID if signin through SSO or other Auth ID \\ \hline
       account\_status & Enum & Statuses such as ACTIVE, DISABLED, PENDING \\ \hline
+<<<<<<< HEAD
       is\_admin & Boolean & True if the user holds the administrator permission (see Table~\ref{tab:DefinitionsAndAcronyms}). Only true for an instructor or TA. Only an administrator can change it. \\ \hline
 
       % USER: STUDENT
       \multicolumn{3}{|l|}{\textbf{Student (Child of User)}}\\ \hline
       mac\_id & String & McMaster MacID. Equals \texttt{user\_name} for users who sign in through SSO; \texttt{user\_name} is authoritative. \\ \hline
+=======
+      is\_admin & Boolean & True if the user is an administrator (see Table~\ref{tab:DefinitionsAndAcronyms}). Never true for a Student; may be true for an instructor or university IT staff. Only an administrator can change it. \\ \hline
+
+      % USER: STUDENT
+      \multicolumn{3}{|l|}{\textbf{Student (Child of User)}}\\ \hline
+      mac\_id & String & Mac IDs for students \\ \hline
+>>>>>>> c9aa6c0 (rebasing)
       student\_number & String & McMaster student number, unique per student \\ \hline
       enrolled\_course & Course & Capstone course in which the student is enrolled. \\ \hline
       enrollment\_status & Enum & ENROLLED, or FLAGGED if absent from the latest import \\ \hline
@@ -2007,8 +2037,13 @@ Instructor (Dr. Reyes), Teaching Assistant
       members & Collection\textless Student\textgreater & Reference to all team members in the team. \\ \hline
       member\_roles & Collection\textless Enum\textgreater & All roles of team members. \\ \hline
       poc & Student & Reference to the point of contact on the team. \\ \hline
+<<<<<<< HEAD
       project & Project & The project of the team's application that has reached Agreed or a later status. Empty until then. \\ \hline
       status & Enum & Derived, not stored independently: the status of the team's ProjectApplication for the project in \texttt{Team.project}, or empty if the team has no project (see Section~\ref{sec:lifecycle}). \texttt{ProjectApplication.status} is the source of truth. \\ \hline
+=======
+      project & Project & Which project they have selected, if applicable. \\ \hline
+      status & Enum & Derived, not stored independently: the team-project status of the team's current ProjectApplication (see Section~\ref{sec:lifecycle}). \texttt{ProjectApplication.status} is the source of truth. \\ \hline
+>>>>>>> c9aa6c0 (rebasing)
       updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
       ta & TA & Reference to the TA assigned to the team, if any. \\ \hline
 
@@ -2034,7 +2069,11 @@ Instructor (Dr. Reyes), Teaching Assistant
       objectives & String & Objectives of the project. (Required) \\ \hline
       requirements & Collection\textless String\textgreater & List of skills and experience needed for the project (Optional) \\ \hline
       deliverables & String & What deliverables need to be met for the completion of the project (Optional) \\ \hline
+<<<<<<< HEAD
       impact & String & Expected benefit of the project for its stakeholders (Required) \\ \hline
+=======
+      impact & String & Expected benefit or impact of the project (Required) \\ \hline
+>>>>>>> c9aa6c0 (rebasing)
       proposed\_solution & String & Potential solution that the team can choose to implement (Optional) \\ \hline
       completion\_status & String & What work has already been done on the project (Required) \\ \hline
       industry & String & Industry or area on which the work is done (Required) \\ \hline
