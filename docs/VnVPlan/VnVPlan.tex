@@ -238,10 +238,7 @@ the contents of the subsections.}
 
 \wss{Include a blurb here to explain why the subsections below
   cover the requirements.  References to the SRS would be good here.}
-The tests below verify the functional requirements defined in Section 6 in the SRS. Tests are group
-by major functionalitys including project proposals, team formation, project applications, approvals,
-communication, and course administration. Each test evaluates whether the system produces the expected
-results under the given conditions
+The tests below verify the functional requirements defined in Section 6 in the SRS. Tests are group by major functionalitys including project proposals, team formation, project applications, approvals, communication, and course administration. Each test evaluates whether the system produces the expected results under the given conditions
 
 \subsubsection{Project Proposal Submission and Validation}
 
@@ -250,23 +247,17 @@ results under the given conditions
   covers tests for input constraints, you should reference the data constraints
   table in the SRS.}
 
-This section covers the tests for project proposal submission and validation, as
-specified in FR\_SupervisorProposal, FR\_ProposalOptionalFields, and
-FR\_StudentProposal in Section 6 of the SRS. The tests verify successful
-supervisor and student proposal submissions, as well as the rejection of
-incomplete submissions and acceptance of proposals without optional information.
+This section covers the tests for project proposal submission and validation, as specified in FR\_SupervisorProposal, FR\_ProposalOptionalFields, and FR\_StudentProposal in Section 6 of the SRS. The tests verify successful supervisor and student proposal submissions, as well as the rejection of incomplete submissions and acceptance of proposals without optional information.
 
 \begin{enumerate}
 
 \item \textbf{T-FR-01: Submit a Complete Supervisor Proposal}\\
 
 \textbf{Type:} Automatic
+
+\textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
-\textbf{Initial State:} A supervisor is authenticated, has permission to submit
-proposals, and the proposal submission period is open.
-					
-\textbf{Input:} The supervisor completes and submits a proposal with the
-following information:
+\textbf{Input:} The supervisor completes and submits a proposal with the following information:
 \begin{itemize}
     \item Title: Autonomous Waste Sorting System
     \item Background: Manual waste sorting is inefficient and time-consuming.
@@ -282,85 +273,48 @@ following information:
     \item Confidentiality/IP Concerns: None
     \item Additional Terms: No additional restrictions
 \end{itemize}
-					
-\textbf{Output:} The system accepts the submission and stores the proposal with
-the ``Proposal submitted'' status making it available for instructors to review.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_SupervisorProposal} of
-the SRS. A proposal containing valid information for every field counts as a
-valid complete submission. This establishes a normal workflow where incomplete
-and invalid submissions can be compared to. Upon acceptance of the input, the
-system is expected to accept it and make it available for the instructor to look
-through.
+\textbf{Output:} The system accepts the submission and stores the proposal with the ``Proposal submitted'' status making it available for instructors to review.
 
-\textbf{How test will be performed:} Using Playwright, authenticate as a
-supervisor, populate the proposal form with the predefined values, and submit
-it. Verify the confirmation and SUBMITTED status. Then, authenticate as an
-instructor and confirm that the proposal is accessible with the correct
-information.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_SupervisorProposal} of the SRS. A proposal containing valid information for every field counts as a valid complete submission. This establishes a normal workflow where incomplete and invalid submissions can be compared to. Upon acceptance of the input, the system is expected to accept it and make it available for the instructor to look through.
+
+\textbf{How test will be performed:} Using Playwright, authenticate as a supervisor, populate the proposal form with the predefined values, and submit it. Verify the confirmation and SUBMITTED status. Then, authenticate as an instructor and confirm that the proposal is accessible with the correct information.
 
 \item \textbf{T-FR-02: Reject Missing Required Fields}\\
 
 \textbf{Type:} Automatic
 					
-\textbf{Initial State:} A supervisor is authenticated, has permission to submit
-proposals, and the proposal submission period is open.
+\textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
-\textbf{Input:} A completed proposal template similar to T-FR-01 with one or
-more of the following required fields missing: title, background, course,
-objectives, impact, supervisor capacity details, level of current completion,
-industry, and information regarding confidentiality and IP concern. The
-supervisor will submit. Repeat for each of the following fields.
+\textbf{Input:} A completed proposal template similar to T-FR-01 with one or more of the following required fields missing: title, background, course, objectives, impact, supervisor capacity details, level of current completion, industry, and information regarding confidentiality and IP concern. The supervisor will submit. Repeat for each of the following fields.
 					
-\textbf{Output:} The system rejects the submission, identifies the missing
-mandatory field(s), and prevents the proposal from entering the Proposal
-submitted state. The instructor will not receive the proposal.
+\textbf{Output:} The system rejects the submission, identifies the missing mandatory field(s), and prevents the proposal from entering the Proposal submitted state. The instructor will not receive the proposal.
 
-\textbf{Test Case Derivation:} Dervied from \texttt{FR\_ProposalOptionalFields}
-of the SRS. Leaving out one mandatory field at a time isolates each validation
-constraint and verifies that all required fields are independently enforced.
+\textbf{Test Case Derivation:} Dervied from \texttt{FR\_ProposalOptionalFields} of the SRS. Leaving out one mandatory field at a time isolates each validation constraint and verifies that all required fields are independently enforced.
 
-\textbf{How test will be performed:} Using Playwright, populate the form with a
-valid baseline proposal. Remove one mandatory field, attempt submission, and
-verify that validation prevents submission. Repeat for each mandatory field. The
-test passes if every incomplete proposal is rejected and the corresponding
-missing field is identified. Repeated with as many combinations of mandatory
-fields as necessary.
+\textbf{How test will be performed:} Using Playwright, populate the form with a valid baseline proposal. Remove one mandatory field, attempt submission, and verify that validation prevents submission. Repeat for each mandatory field. The test passes if every incomplete proposal is rejected and the corresponding missing field is identified. Repeated with as many combinations of mandatory fields as necessary.
 
 \item \textbf{T-FR-03: Accept Missing Optional Fields}\\
 
 \textbf{Type:} Automatic
 					
-\textbf{Initial State:} A supervisor is authenticated, has permission to submit
-proposals, and the proposal submission period is open.
+\textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
-\textbf{Input:} A completed proposal template similar to T-FR-01 with all of the
-following required fields: title, background, course, objectives, impact,
-supervisor capacity details, level of current completion, industry, and
-information regarding confidentiality and IP concern. All optional fields will
-be left empty. The supervisor will submit. Repeat for each of the following
-fields.
+\textbf{Input:} A completed proposal template similar to T-FR-01 with all of the following required fields: title, background, course, objectives, impact, supervisor capacity details, level of current completion, industry, and information regarding confidentiality and IP concern. All optional fields will be left empty. The supervisor will submit. Repeat for each of the following fields.
 					
-\textbf{Output:} The system accepts the submission and stores the proposal with
-the ``Proposal submitted'' status making it available for instructors to review.
+\textbf{Output:} The system accepts the submission and stores the proposal with the ``Proposal submitted'' status making it available for instructors to review.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProposalOptionalFields}
-of the SRS. A proposal containing only mandatory fields represents the minimum
-valid submission and verifies that optional information is not incorrectly
-enforced as mandatory.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProposalOptionalFields} of the SRS. A proposal containing only mandatory fields represents the minimum valid submission and verifies that optional information is not incorrectly enforced as mandatory.
 
-\textbf{How test will be performed:} Using Playwright, complete only the
-required proposal fields and submit. Verify that the proposal is accepted
-despite the missing optional information and is accessible to the instructor.
-The test passes if both conditions are satisfied.
+\textbf{How test will be performed:} Using Playwright, complete only the required proposal fields and submit. Verify that the proposal is accepted despite the missing optional information and is accessible to the instructor. The test passes if both conditions are satisfied.
 
 \item \textbf{T-FR-04: Publish a Student-Proposed Project}\\
 
 \textbf{Type:} Automatic
-					
+
 \textbf{Initial State:} A student is authenticated and belongs to a team, and
 the proposal submission period is open.
-					
+
 \textbf{Input:} The student publishes a proposal containing:
 \begin{itemize}
     \item Title: Smart Campus Navigation
@@ -369,19 +323,12 @@ the proposal submission period is open.
     \item Proposed Solution/Methodology: Develop a web application providing
     campus navigation and accessible route suggestions.
 \end{itemize}
-					
-\textbf{Output:} The proposal is stored, associated with the submitting team,
-and displayed in the separate student-proposed project list with the correct
-information.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentProposal}. A
-student team providing all specified project information verifies successful
-proposal creation and publication in the correct list.
+\textbf{Output:} The proposal is stored, associated with the submitting team, and displayed in the separate student-proposed project list with the correct information.
 
-\textbf{How test will be performed:} Use Playwright to authenticate as a student
-belonging to a team, complete the student proposal template, and publish it.
-Verify the stored information, team association, and visibility in the
-student-proposed project list using an account authorized to view it.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentProposal}. A student team providing all specified project information verifies successful proposal creation and publication in the correct list.
+
+\textbf{How test will be performed:} Use Playwright to authenticate as a student belonging to a team, complete the student proposal template, and publish it. Verify the stored information, team association, and visibility in the student-proposed project list using an account authorized to view it.
 
 \end{enumerate}
 
@@ -392,9 +339,7 @@ student-proposed project list using an account authorized to view it.
   covers tests for input constraints, you should reference the data constraints
   table in the SRS.}
 
-This section covers FR\_ReviewProposal, including the approval, rejection, and
-revision workflows defined in UC\_ReviewProposal. It also accounts for the
-updated external supervisor verification rule.
+This section covers FR\_ReviewProposal, including the approval, rejection, and revision workflows defined in UC\_ReviewProposal. It also accounts for the updated external supervisor verification rule.
 
 \begin{enumerate}
 
@@ -402,111 +347,62 @@ updated external supervisor verification rule.
 
 \textbf{Control:} Automatic
 
-\textbf{Initial State:} An authenticated instructor has access to an unapproved
-proposal titled Autonomous Waste Sorting System submitted by an unverified
-external supervisor. The proposal status is ``Proposal submitted''.
+\textbf{Initial State:} An authenticated instructor has access to an unapproved proposal titled Autonomous Waste Sorting System submitted by an unverified external supervisor. The proposal status is ``Proposal submitted''.
 
 \textbf{Input:} The instructor reviews the proposal and approves it.
 
-\textbf{Output:} The project status changes to ``Open'', and the project becomes
-visible in the approved catalog to authorized users. The supervisor is notified
-and becomes verified.
+\textbf{Output:} The project status changes to ``Open'', and the project becomes visible in the approved catalog to authorized users. The supervisor is notified and becomes verified.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and
-\texttt{FR\_ExternalSupervisorVerification}. Approving an unverified external
-supervisor's proposal verifies both the approval transition and the associated
-supervisor verification rule.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and \texttt{FR\_ExternalSupervisorVerification}. Approving an unverified external supervisor's proposal verifies both the approval transition and the associated supervisor verification rule.
 
-\textbf{How Test Will Be Performed:} Use Playwright to approve the proposal as
-an instructor. Verify the project status, authorized catalog visibility, and
-supervisor notification. Then sign in as the external supervisor and verify that
-the account is marked verified and can access permitted student profiles. The
-test passes if all conditions are satisfied.
-
+\textbf{How Test Will Be Performed:} Use Playwright to approve the proposal as an instructor. Verify the project status, authorized catalog visibility, and supervisor notification. Then sign in as the external supervisor and verify that the account is marked verified and can access permitted student profiles. The test passes if all conditions are satisfied.
 
 \item \textbf{T-FR-06: Request Changes to a Proposal}\\
 
 \textbf{Control:} Automatic
 
-\textbf{Initial State:} An instructor has access to a proposal with the
-``Proposal submitted'' status, submitted by an unverified external supervisor.
+\textbf{Initial State:} An instructor has access to a proposal with the ``Proposal submitted'' status, submitted by an unverified external supervisor.
 
-\textbf{Input:} The instructor requests changes and provides the feedback and
-comments asking for clarification on the expected project deliverables and
-scope.
+\textbf{Input:} The instructor requests changes and provides the feedback and comments asking for clarification on the expected project deliverables and scope.
 
-\textbf{Output:} The proposal status becomes ``Proposal changes requested''. The
-feedback is stored and communicated to the supervisor. The project remains
-unpublished, and the supervisor remains unverified.
+\textbf{Output:} The proposal status becomes ``Proposal changes requested''. The feedback is stored and communicated to the supervisor. The project remains unpublished, and the supervisor remains unverified.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and
-\texttt{FR\_ExternalSupervisorVerification}. A revision request verifies that
-feedback does not trigger approval or external supervisor verification.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and \texttt{FR\_ExternalSupervisorVerification}. A revision request verifies that feedback does not trigger approval or external supervisor verification.
 
-\textbf{How Test Will Be Performed:} Use Playwright to request changes and
-submit the predefined feedback. Verify the status, stored feedback, and
-notification. Confirm that the project is excluded from the approved catalog and
-that the supervisor remains unverified.
-
+\textbf{How Test Will Be Performed:} Use Playwright to request changes and submit the predefined feedback. Verify the status, stored feedback, and notification. Confirm that the project is excluded from the approved catalog and that the supervisor remains unverified.
 
 \item \textbf{T-FR-07: Reject a Supervisor Proposal}\\
 
 \textbf{Control:} Automatic
 
-\textbf{Initial State:} An authenticated instructor has access to a proposal
-with the ``Proposal submitted'' status, submitted by an unverified external
-supervisor.
+\textbf{Initial State:} An authenticated instructor has access to a proposal with the ``Proposal submitted'' status, submitted by an unverified external supervisor.
 
-\textbf{Input:} Reject the proposal with the reason ``The proposed scope does
-not meet capstone course expectations.''
+\textbf{Input:} Reject the proposal with the reason ``The proposed scope does not meet capstone course expectations.''
 
-\textbf{Output:} The proposal status changes to ``Proposal rejected''. The
-rejection reason is preserved, the supervisor is notified, and the project
-remains excluded from the approved catalog. The supervisor remains unverified.
+\textbf{Output:} The proposal status changes to ``Proposal rejected''. The rejection reason is preserved, the supervisor is notified, and the project remains excluded from the approved catalog. The supervisor remains unverified.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and
-\texttt{FR\_ExternalSupervisorVerification}. Rejection verifies that an
-unsuccessful review does not grant approval-related permissions.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and \texttt{FR\_ExternalSupervisorVerification}. Rejection verifies that an unsuccessful review does not grant approval-related permissions.
 
-\textbf{How Test Will Be Performed:} Use Playwright to reject the proposal.
-Verify the updated status, recorded reason, and notification. Confirm that the
-project remains unpublished and the supervisor remains unverified.
-
+\textbf{How Test Will Be Performed:} Use Playwright to reject the proposal. Verify the updated status, recorded reason, and notification. Confirm that the project remains unpublished and the supervisor remains unverified.
 
 \item \textbf{T-FR-08: Revise and Resubmit a Proposal}\\
 
 \textbf{Control:} Automatic
 
-\textbf{Initial State:} A supervisor proposal has the status ``Proposal changes
-requested'' and contains instructor feedback asking for clearer project
-deliverables.
+\textbf{Initial State:} A supervisor proposal has the status ``Proposal changes requested'' and contains instructor feedback asking for clearer project deliverables.
 
-\textbf{Input:} The supervisor changes the deliverables from ``Working
-prototype'' to ``Working prototype, technical documentation, and final
-demonstration'', then resubmits.
+\textbf{Input:} The supervisor changes the deliverables from ``Working prototype'' to ``Working prototype, technical documentation, and final demonstration'', then resubmits.
 
-\textbf{Output:} The revised information is stored, the proposal returns to
-``Proposal submitted'', and the instructor can review the updated version.
-Previous feedback remains in the review history.
+\textbf{Output:} The revised information is stored, the proposal returns to ``Proposal submitted'', and the instructor can review the updated version. Previous feedback remains in the review history.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and
-\texttt{UC\_ReviewProposal}. Resubmission verifies the transition back to
-instructor review without losing earlier feedback.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and \texttt{UC\_ReviewProposal}. Resubmission verifies the transition back to instructor review without losing earlier feedback.
 
-\textbf{How Test Will Be Performed:} Use Playwright to sign in as the
-supervisor, modify the deliverables, and resubmit. Verify the new information
-and status. Sign in as the instructor and confirm the revised proposal and
-earlier feedback are accessible.
+\textbf{How Test Will Be Performed:} Use Playwright to sign in as the supervisor, modify the deliverables, and resubmit. Verify the new information and status. Sign in as the instructor and confirm the revised proposal and earlier feedback are accessible.
 
 \end{enumerate}
 
 \subsubsection{Project Discovery and Availability}
-
-This section covers \texttt{FR\_ViewApprovedProjects}
-and \texttt{FR\_ViewProjectStatus} of the SRS.
-Tests verify search and filtering, project
-visibility restrictions, and availability
-based on reserved supervisor capacity.
+This section covers \texttt{FR\_ViewApprovedProjects} and \texttt{FR\_ViewProjectStatus} of the SRS. Tests verify search and filtering, project visibility restrictions, and availability based on reserved supervisor capacity.
 
 \begin{enumerate}
 
@@ -514,30 +410,20 @@ based on reserved supervisor capacity.
 
 \textbf{Control:} Automatic
 
-\textbf{Initial State:} An authenticated student is enrolled in the course.
-Three approved projects are visible to the student:
+\textbf{Initial State:} An authenticated student is enrolled in the course. Three approved projects are visible to the student:
 \begin{itemize}
     \item Project A: Autonomous Waste Sorting System, Environmental Technology, Open.
     \item Project B: Healthcare Scheduling System, Healthcare, Open.
     \item Project C: Automated Assembly Line, Manufacturing, Full.
 \end{itemize}
 
-\textbf{Input:} Apply the industry filter ``Environmental Technology'',
-availability filter ``Open'', and search keyword ``Autonomous''.
+\textbf{Input:} Apply the industry filter ``Environmental Technology'', availability filter ``Open'', and search keyword ``Autonomous''.
 
-\textbf{Output:} Only Project A is returned. Projects B and C are excluded
-because they do not satisfy every criterion.
+\textbf{Output:} Only Project A is returned. Projects B and C are excluded because they do not satisfy every criterion.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewApprovedProjects}.
-Projects with overlapping and distinct attributes verify that keyword searching
-and multiple filters are applied together.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewApprovedProjects}. Projects with overlapping and distinct attributes verify that keyword searching and multiple filters are applied together.
 
-\textbf{How Test Will Be Performed:} Populate the test environment with the
-three projects. Use Playwright to apply the filters and keyword. Compare
-returned project identifiers with the expected set \{A\}. The test passes if
-exactly Project A is returned.
-
-
+\textbf{How Test Will Be Performed:} Populate the test environment with the three projects. Use Playwright to apply the filters and keyword. Compare returned project identifiers with the expected set \{A\}. The test passes if exactly Project A is returned.
 
 \item \textbf{T-FR-10: Exclude Unapproved or Unauthorized Projects}\\
 
@@ -552,42 +438,21 @@ exactly Project A is returned.
     \item Project C: Automated Assembly Line, approved with status ``Full'',
     submitted by External Supervisor Y.
 \end{itemize}
-A student enrolled in the course, the course instructor, and External
-Supervisors X and Y have authenticated accounts. Each external supervisor is
-associated only with their own project.
+A student enrolled in the course, the course instructor, and External Supervisors X and Y have authenticated accounts. Each external supervisor is associated only with their own project.
 
-\textbf{Input:} The student searches for Projects A and B. The instructor opens
-Project B for review. External Supervisor X searches for Project C, while
-External Supervisor Y searches for Project C.
+\textbf{Input:} The student searches for Projects A and B. The instructor opens Project B for review. External Supervisor X searches for Project C, while External Supervisor Y searches for Project C.
 
-\textbf{Output:} The student can view Project A but cannot view Project B
-because it has not been approved. The instructor can access Project B for
-review. External Supervisor X cannot view Project C because it belongs to
-another external supervisor, while External Supervisor Y can view Project C
-because they proposed it.
+\textbf{Output:} The student can view Project A but cannot view Project B because it has not been approved. The instructor can access Project B for review. External Supervisor X cannot view Project C because it belongs to another external supervisor, while External Supervisor Y can view Project C because they proposed it.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewApprovedProjects}
-and \texttt{FR\_ExternalSupervisorScope} of the SRS. Using projects with
-different approval states and ownership verifies that catalog visibility is
-restricted by both instructor approval and the user's authorization.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewApprovedProjects} and \texttt{FR\_ExternalSupervisorScope} of the SRS. Using projects with different approval states and ownership verifies that catalog visibility is restricted by both instructor approval and the user's authorization.
 
-\textbf{How Test Will Be Performed:} Configure the three projects with the
-specified statuses and ownership. Using Playwright, authenticate as the student
-and search for Projects A and B. Verify that only Project A is displayed.
-Authenticate as the instructor and verify that Project B is accessible in the
-proposal review interface. Authenticate as External Supervisor X and search for
-Project C, verifying that it is excluded from results. Finally, authenticate as
-External Supervisor Y and verify that Project C is accessible.
-
-The test passes if each account can access only the project records permitted by
-the SRS visibility rules.
+\textbf{How Test Will Be Performed:} Configure the three projects with the specified statuses and ownership. Using Playwright, authenticate as the student and search for Projects A and B. Verify that only Project A is displayed. Authenticate as the instructor and verify that Project B is accessible in the proposal review interface. Authenticate as External Supervisor X and search for Project C, verifying that it is excluded from results. Finally, authenticate as External Supervisor Y and verify that Project C is accessible. The test passes if each account can access only the project records permitted by the SRS visibility rules.
 
 \item \textbf{T-FR-11: Display Project Availability and Capacity}\\
 
 \textbf{Control:} Automatic
 
-\textbf{Initial State:} An authenticated student can access two approved
-projects:
+\textbf{Initial State:} An authenticated student can access two approved projects:
 \begin{itemize}
     \item Project A: Maximum capacity of 2 teams with 1 supervisor slot
     reserved.
@@ -596,48 +461,223 @@ projects:
 
 \textbf{Input:} The student opens the project catalog and views both projects.
 
-\textbf{Output:} Project A displays ``Open'' with a maximum capacity of 2 teams.
-Project B displays ``Full'' with a maximum capacity of 1 team.
+\textbf{Output:} Project A displays ``Open'' with a maximum capacity of 2 teams. Project B displays ``Full'' with a maximum capacity of 1 team.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewProjectStatus}.
-Remaining capacity is calculated as $C_{remaining} = C_{max} - R$ where $R$ is
-reserved slot and $C_{max}$ is maximum capacity. Project A has $2-1=1$ available
-slot, while Project B has $1-1=0$. These cases verify the correct availability
-states.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewProjectStatus}. Remaining capacity is calculated as $C_{remaining} = C_{max} - R$ where $R$ is reserved slot and $C_{max}$ is maximum capacity. Project A has $2-1=1$ available slot, while Project B has $1-1=0$. These cases verify the correct availability states.
 
-\textbf{How Test Will Be Performed:} Configure both projects with the specified
-capacities and reserved slots. Use Playwright to view their catalog entries and
-compare the displayed statuses and maximum capacities with the expected values.
-
+\textbf{How Test Will Be Performed:} Configure both projects with the specified capacities and reserved slots. Use Playwright to view their catalog entries and compare the displayed statuses and maximum capacities with the expected values.
 
 \item \textbf{T-FR-12: Prevent Applications to Full Projects}\\
 
 \textbf{Control:} Automatic
 
-\textbf{Initial State:} An authenticated student belongs to a registered team.
-An approved project has a maximum capacity of one team and its only supervisor
-slot is reserved, giving it the ``Full'' status.
+\textbf{Initial State:} An authenticated student belongs to a registered team. An approved project has a maximum capacity of one team and its only supervisor slot is reserved, giving it the ``Full'' status.
 
-\textbf{Input:} The student attempts to submit an application to the full
-project.
+\textbf{Input:} The student attempts to submit an application to the full project.
 
-\textbf{Output:} The system rejects the application, informs the student that
-the project is unavailable, and does not create an application record.
+\textbf{Output:} The system rejects the application, informs the student that the project is unavailable, and does not create an application record.
 
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewProjectStatus} and
-\texttt{UC\_SelectProject}. A project with zero remaining capacity verifies that
-availability restrictions are enforced by the application workflow rather than
-only displayed visually.
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewProjectStatus} and \texttt{UC\_SelectProject}. A project with zero remaining capacity verifies that availability restrictions are enforced by the application workflow rather than only displayed visually.
 
-\textbf{How Test Will Be Performed:}
-Use Playwright to navigate to the full project and attempt to apply through the
-normal user interface. Verify that the application is blocked and that no new
-application record is created. The test passes if the full project cannot
-receive a new application.
+\textbf{How Test Will Be Performed:} Use Playwright to navigate to the full project and attempt to apply through the normal user interface. Verify that the application is blocked and that no new application record is created. The test passes if the full project cannot receive a new application.
 
 \end{enumerate}
 
-\subsubsection{Area of Testing2}
+\subsubsection{Student Profiles and Team Formation}
+
+This section covers \texttt{FR\_StudentProfile}, \texttt{FR\_StudentTeams}, \texttt{FR\_ValidateTeamRules}, \texttt{FR\_TeamDiscovery}, and \texttt{FR\_TeamProfile} in Section 6 of the SRS. The tests verify that students can create and maintain profiles, form teams, manage invitations, discover available teammates, and comply with course-specific team formation rules. The tests also verify the handling of invalid team configurations and changes to existing rules.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-13: Create and View a Student Profile}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} A student is authenticated and enrolled in the Software Engineering capstone course. The student has not created a profile.
+
+\textbf{Input:} The student creates a profile with:
+\begin{itemize}
+    \item Bio: Fourth-year Software Engineering student interested in developing
+    AI applications.
+    \item Program: Software Engineering
+    \item Interests: Artificial intelligence and robotics
+    \item Project Preferences: AI and automation projects
+    \item Skills: Python, Java, React
+    \item Experience: Software development internship
+    \item Work Style: Collaborative and organized
+    \item LinkedIn: https://www.linkedin.com/in/teststudent
+\end{itemize}
+The student saves the profile.
+
+\textbf{Output:} The system successfully stores the profile with all provided information. The student can reopen the profile and view the saved values. Other authorized students and supervisors can also view the profile.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentProfile}. Providing values for the specified profile attributes verifies that students can create persistent profiles containing information used for teammate and project discovery.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as the student, complete the profile form, and save it. Reopen the profile and verify all stored fields. Authenticate as another authorized student and an approved supervisor to verify profile visibility.
+
+\item \textbf{T-FR-14: Update an Existing Student Profile}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated student has an existing profile with the skills ``Python, Java, React'' and project preferences ``AI and automation projects'' (Profile provided in T-FR-13).
+
+\textbf{Input:} The student updates the skills to ``Python, Java, React, PyTorch'' and changes the project preferences to ``Machine learning and computer vision''. The student saves the changes.
+
+\textbf{Output:} The updated profile contains the new skills and project preferences. Unmodified information remains unchanged, and the revised values are visible when the profile is reopened.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentProfile}. Changing selected profile fields verifies that students can maintain their information without unintentionally modifying or losing unrelated profile attributes.
+
+\textbf{How Test Will Be Performed:} Using Playwright, open the existing profile, change the specified fields, and save. Reload the profile and compare all stored fields with their expected values. Confirm that the updated information is visible to authorized users.
+
+\item \textbf{T-FR-15: Create a Student Team and Assign Roles}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Three authenticated students, Student A, Student B, and Student C, are enrolled in the Software Engineering capstone course and do not belong to any existing teams. The course permits teams of 3 to 5 students.
+
+\textbf{Input:} Student A creates a team named ``Amazing Engineers'', adds Student B and Student C through the supported team formation workflow, and assigns Student A as the team's point of contact.
+
+\textbf{Output:} The team is created with the three students as members. Student A is identified as the point of contact, and the team membership and assigned roles are stored correctly.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentTeams}. Creating a team with a valid number of members and assigning a point of contact verifies that students can organize themselves into teams and define responsibilities.
+
+\textbf{How Test Will Be Performed:} Configure the course team size limits and create the three student accounts. Using Playwright, create the team, complete the necessary membership invitations or confirmations, and assign the point-of-contact role. Verify the team membership and recorded role assignments.
+
+\item \textbf{T-FR-16: Send and Accept a Team Invitation}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has 3 members and a maximum permitted size of 5 as defined in T-FR-15. Student D is enrolled in the same course and does not belong to another team.
+
+\textbf{Input:} Student A invites Student D to join Team Amazing Engineers. Student D opens the invitation and accepts.
+
+\textbf{Output:} Student D becomes a member of Team Amazing Engineers. The membership count increases from 3 to 4, and Student D appears in the team's member list. The invitation is no longer pending.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentTeams}. Accepting an invitation verifies that team invitations can be received and that accepted invitations update the team's membership.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Student A and invite Student D. Authenticate as Student D, accept the invitation, and verify that both accounts display the updated team membership and invitation status.
+
+\item \textbf{T-FR-17: Decline a Team Invitation}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has 3 members and can recruit additional students. Student E is enrolled in the course, has no team, and has received an invitation to join Team Amazing Engineers.
+
+\textbf{Input:} Student E declines the invitation.
+
+\textbf{Output:} The invitation is recorded as declined. Student E is not added to Team Amazing Engineers, and the team's membership count remains 3.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentTeams}. Declining an invitation verifies that students can reject team membership requests without changing existing team composition.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Student A and invite Student E. Authenticate as Student E and decline the invitation. Verify that the invitation is no longer pending, Student E remains without a team, and Team Amazing Engineers's member list is unchanged.
+
+\item \textbf{T-FR-18: Find and Join an Existing Team}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has 3 members and a maximum permitted size of 5. The team is configured to recruit 2 additional members. Student F is enrolled in the course, is not on a team, and is eligible to join Team Amazing Engineers.
+
+\textbf{Input:} Student F discovers Team Amazing Engineers through the team recruitment interface and submits a request to join. The team accepts the request.
+
+\textbf{Output:} Student F becomes a member of Team Amazing Engineers, increasing membership to 4. The team now requires only 1 additional member, and the membership information is updated for all current members.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentTeams}. Joining through an open recruitment opportunity verifies that students can join existing teams without requiring a direct invitation from an existing team member.
+
+\textbf{How Test Will Be Performed:} Using Playwright, configure Team Amazing Engineers to recruit additional members. Authenticate as Student F, find the team, and request to join. Accept the request through the team interface and verify the updated membership and recruitment count.
+
+\item \textbf{T-FR-19: Reject Invalid Team Sizes}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The course team formation rules require a minimum of 3 students and a maximum of 5 students per finalized team.
+
+\textbf{Input:} Attempt to finalize a team containing 2 students, a team containing 3 students, a team containing 5 students, and a team containing 6 students.
+
+\textbf{Output:} Teams containing 3 or 5 students satisfy the team size requirements. Finalization of teams containing 2 or 6 students is rejected, with a validation message explaining the violated team size constraint.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ValidateTeamRules}. For minimum size $m = 3$ and maximum size $M = 5$, valid finalized team sizes must satisfy $m \leq n \leq M$. Testing $n = 2, 3, 5, 6$ verifies both invalid boundaries and valid boundary values.
+
+\textbf{How Test Will Be Performed:} Configure the course size limits and prepare four teams with the specified membership counts $n = 2, 3, 5, 6$. Using Playwright, attempt to finalize or validate each team through the supported interface. Verify that valid teams pass and invalid teams receive the appropriate errors.
+
+\item \textbf{T-FR-20: Reject Disallowed Program Combinations}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The course configuration permits teams consisting entirely of Software Engineering students or a combination of Software Engineering and Mechatronics students. Teams combining Software Engineering and Computer Science students are not permitted. The minimum team size is 3.
+
+\textbf{Input:} Attempt to finalize two teams: \begin{itemize} \item Team A: 2 Software Engineering students and 1 Mechatronics student. \item Team B: 2 Software Engineering students and 1 Comuter Science student. \end{itemize}
+
+\textbf{Output:} Team A passes program-combination validation. Team B fails validation, and the system identifies that course rules have been violated.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ValidateTeamRules}. Testing one permitted and one disallowed combination verifies that the system enforces configurable program restrictions rather than allowing every combination of enrolled students.
+
+\textbf{How Test Will Be Performed:} Configure the permitted program combinations and prepare both teams using the specified student programs. Using Playwright, initiate team validation and verify that Team A passes while Team B is rejected.
+
+\item \textbf{T-FR-21: Prevent Duplicate Team Membership}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A is already a member of Team Amazing Engineers. Team Fantastic Coders is an existing team with an available membership slot. Both teams belong to the same capstone course.
+
+\textbf{Input:} Student A attempts to join Team Fantastic Coders while remaining a member of Team Amazing Engineers.
+
+\textbf{Output:} The system rejects Student A's attempt to join Team Fantastic Coders. Student A remains a member of Team Amazing Engineers only, and neither team's membership is incorrectly modified.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ValidateTeamRules}. Attempting to join a second team verifies that duplicate membership is prevented and that a student belongs to at most one team.
+
+\textbf{How Test Will Be Performed:} Configure the two teams and their membership records. Using Playwright, authenticate as Student A and attempt to join Team Fantastic Coders. Verify the rejection and confirm that Student A remains associated only with Team Amazing Engineers.
+
+\item \textbf{T-FR-22: Flag Existing Teams After Rule Changes}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} A course permits team sizes from 3 to 5 students. Team Amazing Engineers has 3 members, and Team Fantastic Coders has 5 members. Both teams are valid under the existing rules.
+
+\textbf{Input:} The instructor changes the minimum team size from 3 to 4 while retaining the maximum team size of 5.
+
+\textbf{Output:} The system identifies Team Amazing Engineers as non-compliant with the proposed rules. After the change is applied, Team Amazing Engineers remains intact but is flagged for instructor review. Team Fantastic Coders remains valid and is not flagged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ValidateTeamRules}. Changing the minimum size from $m = 3$ to $m = 4$ makes Team Amazing Engineers's membership $n = 3 < m$, while Team Fantastic Coders continues to satisfy $4 \leq n \leq 5$. This verifies that changes to formation rules identify newly non-compliant teams without automatically invalidating or dissolving them.
+
+\textbf{How Test Will Be Performed:} Configure the initial course rules and create both teams. Using Playwright, authenticate as an instructor and change the minimum team size. Verify that Team Amazing Engineers is identified as affected before confirmation. Apply the rule change and confirm that Team Amazing Engineers is flagged while both teams retain their original memberships.
+
+\item \textbf{T-FR-23: Discover Students and Teams Seeking Members}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Students A and B are enrolled in the same course and have not joined a team. Team Amazing Engineers is recruiting 2 additional members, while Team Fantastic Coders is not recruiting.
+
+\textbf{Input:} Student A marks their profile as ``Looking for a team''. Student B leaves their availability disabled. Another authenticated student opens the teammate and team discovery interface.
+
+\textbf{Output:} Student A appears among students seeking a team, while Student B does not. Team Amazing Engineers appears among teams recruiting additional members, while Team Fantastic Coders does not.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_TeamDiscovery}. Using students and teams with different recruitment states verifies that the discovery interface reflects which users and teams are actively seeking members.
+
+\textbf{How Test Will Be Performed:} Using Playwright, configure the specified student availability and team recruitment statuses. Authenticate as another student and open the discovery interface. Verify that only Student A and Team Amazing Engineers appear in their respective discovery results.
+
+\item \textbf{T-FR-24: Create, Update, and View a Team Profile}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers consists of three registered students. The team has not created a shared team profile.
+
+\textbf{Input:} An authorized team member creates a profile containing:
+\begin{itemize}
+    \item Team Bio: A team focused on practical software and robotics solutions.
+    \item Collective Skills: Python, React, embedded systems
+    \item Project Interests: Robotics and automation
+    \item Goals: Develop a functional prototype
+    \item Work Style: Weekly meetings and shared task management
+\end{itemize}
+The member saves the profile, then updates the collective skills to include ``Computer vision''.
+
+\textbf{Output:} The shared team profile is stored with the specified information. After editing, the collective skills include computer vision, and all other profile fields remain unchanged. The profile is visible to authorized users.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_TeamProfile}. Creating, editing, and viewing a shared profile verifies that teams can maintain consolidated information about their members' skills, interests, goals, and work style for other authorized stakeholders.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as an authorized Team Amazing Engineers member, create the team profile, and save it. Reopen the profile, update the collective skills, and verify that the change persists. Authenticate as another authorized user and verify that the shared profile and updated information are visible.
+
+\end{enumerate}
 
 ...
 
