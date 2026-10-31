@@ -2,6 +2,9 @@
 
 \usepackage{booktabs}
 \usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{amssymb}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
@@ -11,6 +14,8 @@
     urlcolor=blue
 }
 \usepackage[round]{natbib}
+
+\usepackage[margin=0.75in]{geometry}
 
 \input{../Comments.text}
 \input{../Common.text}
@@ -38,6 +43,7 @@
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
 2026-10-29 & 1.0 & General Information\\
+2026-10-31 & 1.1 & Plan and the SRS validation walkthrough appendix\\
 \bottomrule
 \end{tabularx}
 
@@ -88,10 +94,17 @@ in.}
 
 \pagenumbering{arabic}
 
-This document ... \wss{provide an introductory blurb and roadmap of the
-  Verification and Validation plan}
+  This document describes how \projname{} will be verified (are we building the
+  product right?) and validated (are we building the right product?). Section~\ref{sec:general}
+  gives general information, including what is tested, what is not, and which documents the plan
+  relies on. Section~\ref{sec:plan} describes the plan: who verifies what, how the SRS, design,
+  this plan, and the implementation are verified, which tools are used, and how the software is
+  validated with stakeholders. Section~\ref{sec:system-tests} describes the system tests, and
+  Section~\ref{sec:unit-tests} describes the unit tests. The appendix contains the material used to
+  validate the SRS with the course instructors.
 
 \section{General Information}
+\label{sec:general}
 
 \subsection{Summary}
 
@@ -123,7 +136,7 @@ The objectives are ordered by priority, based on the risks identified in the SRS
 
 \textbf{Out of scope.}
 \begin{itemize}
-  \item \textbf{Quality of recommendations.} We will test that recommendations are produced and displayed (\rref{FR_Label12}), but not whether they are good matches. Recommendation quality is a stretch goal in the SRS, and judging it would need a study with real students.
+  \item \textbf{Quality of recommendations.} We will test that recommendations are produced and displayed (\rref{FR_TeamRecommend}), but not whether they are good matches. Recommendation quality is a stretch goal in the SRS, and judging it would need a study with real students.
   \item \textbf{External systems.} We assume that McMaster SSO, Avenue to Learn, the email service, and third-party libraries have been verified by their developers. We test our handling of their failures (for example, an unavailable Avenue), not their correct operation. Following the SRS Development Plan, email delivery and authentication may be simulated during the course.
   \item \textbf{Availability over time.} The availability criterion is measured over a long window (see the SRS), which cannot be observed within the course timeline. We will verify that the health check works and that the system meets the target over the period that the demo allows.
   \item \textbf{Maintainability.} We will review the likely changes in the SRS against the design, but will not measure the actual effort of making changes.
@@ -152,98 +165,276 @@ The following documents define what is verified and how the verification is orga
 \end{itemize}
 
 \section{Plan}
+\label{sec:plan}
 
-\wss{Introduce this section.  You can provide a roadmap of the sections to
-  come.}
+  This section describes who verifies and validates \projname{}, and how. Section~\ref{sec:team} assigns
+  roles. Sections~\ref{sec:srs-verification} to~\ref{sec:impl-verification} describe the verification of the SRS, the
+  design, this plan, and the implementation. Section~\ref{sec:tools} lists the automated tools, and
+  Section~\ref{sec:validation} describes how the software is validated with stakeholders.
 
-\subsection{Verification and Validation Team}
+  \paragraph{Handling review feedback.} All reviews in this plan follow one process, which is not repeated in each subsection.
+  Every finding from a review, walkthrough, inspection, or stakeholder meeting is recorded as a GitHub issue with the
+  \emph{Verification} label (and the \emph{Documentation} or \emph{Bug} label where relevant), and is assigned to a team
+  member.
+  The assignee fixes the finding on a branch and opens a pull request that references the issue. The pull request goes through the
+  normal pull request review described in the Development Plan \citep{DevelopmentPlan}, and the issue is closed only after the pull
+  request is merged and the reviewer who raised the finding, or a teammate, confirms that the change addresses it.
+  A finding that the team decides not to act on is closed with a written reason.
 
-\wss{Your teammates.  Maybe your supervisor.
-  You should do more than list names.  You should say what each person's role is
-  for the project's verification.  A table is a good way to summarize this information.}
+  \subsection{Verification and Validation Team}
+  \label{sec:team}
 
-\subsection{SRS Verification}
+  Verification tasks rotate between team members, and no one verifies work that they wrote alone. The roles are in
+  Table~\ref{tab:vv-team}. The documentation and technical QA role rotates per deliverable in the order set in the
+  Development Plan \citep{DevelopmentPlan}: Ahmed, Andrew, Ayush, Waqar, and then repeats.
 
-\wss{List any approaches you intend to use for SRS verification.  This may
-  include ad hoc feedback from reviewers, like your classmates (like your
-  primary reviewer), or you may plan for something more rigorous/systematic.}
+  \begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.3cm} >{\raggedright\arraybackslash}p{3.3cm} X}
+      \toprule
+      \textbf{Role} & \textbf{Members} & \textbf{Description}\\
+      \midrule
+      Documentation and technical QA & Rotates per deliverable: Ahmed, Andrew, Ayush, Waqar &
+      Checks each deliverable against the repository checklist and the Avenue rubric before submission,
+      runs the traceability check between documents, and flags gaps in time to fix them.
+      The same member performs the post-merge functional QA for code in that deliverable period,
+      and owns the system test results for it.\\
+      \addlinespace
+      Unit test owner & Ayush Patel &
+      Owns the backend (pytest) and frontend (Jest) unit tests and their coverage, and reviews unit tests in
+      pull requests for whether they test the intended behaviour.\\
+      \addlinespace
+      Integration test owner & Ahmed Rashrash &
+      Owns the integration tests, including backend with the PostgreSQL database, and the interactions
+      with the email service, Avenue to Learn, and the authentication providers.\\
+      \addlinespace
+      End-to-end test owner & Andrew Habib &
+      Owns the automated end-to-end (Playwright) tests for the most common use cases, including the cross-browser, screen-size, and accessibility checks.\\
+      \addlinespace
+      CI/CD and automation owner & Waqar Ul-Hassan &
+      Owns the GitHub Actions pipeline, the static analysis, coverage, and
+      SonarQube setup, the performance test harness, and the mutation testing run,
+      so that all checks run automatically as described in Section~\ref{sec:tools}.\\
+      \addlinespace
+      Verification issue tracking & Andrew Habib (GitHub Manager) &
+      Keeps the \emph{Verification} label, issue templates, and project board consistent,
+      and checks before each milestone that no review finding is left open or unassigned.\\
+      \addlinespace
+      Reviewers & All four team members &
+      Review each other's pull requests and take part in the design and code walkthroughs. \\
+      \addlinespace
+      Standing reviewer & Chris Schankula (TA) &
+      Reviews and provides feedback on each deliverable\\
+      \addlinespace
+      External reviewers and validators & Dr. Spencer Smith (supervisor and SE instructor), Dr. Mehdi Moradi (CS instructor), Dr. Alan Wassyng (TRON instructor). &
+      Not members of the team. They judge whether the requirements and the software match how their courses work.\\
+      \bottomrule
+    \end{tabularx}
+    \caption{Verification and validation roles}
+    \label{tab:vv-team}
+  \end{table}
 
-\wss{If you have a supervisor for the project, you shouldn't just say they will
-read over the SRS.  You should explain your structured approach to the review.
-Will you have a meeting?  What will you present?  What questions will you ask?
-Will you give them instructions for a task-based inspection?  Will you use your
-issue tracker?}
+  \subsection{SRS Verification}
+  \label{sec:srs-verification}
 
-\wss{Maybe create an SRS checklist?}
+  The SRS \citep{SRS} is verified in four steps before it is treated as the basis for design and testing.
 
-\subsection{Design Verification}
+  \begin{enumerate}
+    \item \textbf{Internal review.} Each team member reviews the sections that they did not write,
+    using the SRS checklist from the course. The reviewer also checks the qualities that the SRS
+    template asks for: unambiguous, consistent, complete, validatable, and abstract.
+    The documentation and technical QA member then checks traceability:
+    every stakeholder requirement maps to a use case and a functional requirement,
+    every functional requirement maps to a stakeholder requirement or a nonfunctional requirement,
+    every ``Traces To'' entry in the Hazard Analysis \citep{HazardAnalysis} names a requirement that exists in the SRS,
+    and every requirement has a fit criterion that can be tested.
+    \item \textbf{TA review.} Chris Schankula reviews the SRS and provides feedback.
+    \item \textbf{Peer review.} Classmates review the SRS using the Peer Review issue template, with the SRS checklist and the rubric.
+    \item \textbf{Validation with the instructors.} Reviewing the SRS ourselves cannot show that it matches how the courses really work,
+    so Dr. Smith validates the facts that only he can confirm, through a structured walkthrough and a checklist. These are described below.
+  \end{enumerate}
 
-\wss{Plans for design verification}
+  \textbf{Walkthrough and checklist with Dr. Smith.} We hold one 45 minute session with Dr. Smith,
+  in the first supervisor meeting after the SRS is submitted and before the design document is started.
+  The team presents instead of asking him to read the SRS, because the SRS is long and the questions
+  that matter are about the use cases and the lifecycle. The agenda is in Table~\ref{tab:walkthrough-agenda}.
+  We walk through the project and team-project status
+  lifecycle and four use cases: \texttt{UC\_ReviewProposal}, \texttt{UC\_ApproveTeamProject},
+  \texttt{UC\_ImportEnrollment}, and \texttt{UC\_FollowUpUnselected}.
+  These are the ones where the instructor's own process and decisions matter most.
+  For each one, the presenter reads the main success scenario and the alternative flows and asks the
+  targeted questions listed in Appendix~\ref{app:walkthrough}.
+  Dr. Smith then marks a short checklist of the statements in the SRS that only he can confirm, each as correct,
+  needs a change, or unsure. The agenda, the questions, and the checklist are in Appendix~\ref{app:walkthrough}.
+  His answers are recorded in the Supervisor Meeting issue, and every ``needs a change'' or ``unsure'' answer
+  becomes a Verification issue as described above.
 
-\wss{The review will include reviews by your classmates}
+  \subsection{Design Verification}
+  \label{sec:design-verification}
 
-\wss{Create a checklists?}
+  The design documents are the Module Guide and the Module Interface Specification \citep{MG, MIS}. They are verified as follows.
 
-\subsection{Verification and Validation Plan Verification}
+  \begin{enumerate}
+    \item \textbf{Checklist review.} Teammates, the TA, and classmates review the documents using the
+    course's MG and MIS checklists and the rubric.
+    \item \textbf{Requirements coverage check.} The documentation and technical QA member builds a table
+    mapping every functional requirement and every safety and security requirement to the module(s) that satisfy it,
+    and every module to the requirement(s) it exists for.
+    \item \textbf{Hazard scenario review.} For each hazard in the FMEA of the Hazard Analysis \citep{HazardAnalysis},
+    the team identifies the design element that mitigates it and checks that the mitigation is in the
+    design and not only in the requirements. The review gives extra attention to the places where
+    the design is most likely to fail such as the status lifecycle and slot reservation logic,
+    simultaneous requests (race conditions), and the enforcement of visibility rules on every read path.
+    \item \textbf{Design walkthrough with Dr. Smith.} We walk through the module decomposition with him using
+    scenarios, because modularity is his main design concern.
+    Example scenarios are: an instructor disables a feature, a course uses external instead of
+    in-platform approval, a course changes its team size rules after teams have formed,
+    and a second university uses \projname{} with a different enrollment source.
+    For each scenario, we trace which modules change and which do not, and he judges whether the result is acceptable.
+  \end{enumerate}
 
-\wss{The verification and validation plan is an artifact that should also be
-verified.  Techniques for this include review and mutation testing.}
+  \subsection{Verification and Validation Plan Verification}
+  \label{sec:vnv-verification}
 
-\wss{The review will include reviews by your classmates}
+  This plan is verified in the following ways.
 
-\wss{Create a checklists?}
+  \begin{enumerate}
+    \item \textbf{Review.} Teammates, the TA, and classmates review the plan using the course's VnV plan
+    checklist and the rubric.
+    \item \textbf{Coverage check.} We confirm that every in-scope requirement in the SRS has at least one test,
+    using the traceability table in this document. Requirements that carry the
+    most risk (the status lifecycle and slot reservation, team size limits, role-based visibility,
+    and enrollment import) must have more than one test, so that a passing test suite gives real confidence.
+    \item \textbf{Hazard check.} For each hazard in the Hazard Analysis, we ask which test would fail if
+    the hazard occurred. A hazard with no such test is a finding.
+    \item \textbf{Validation review with Dr. Smith.} He reviews only the software validation plan
+    (Section~\ref{sec:validation}) and the usability test protocol, because this is where his input is most useful.
+    \item \textbf{Mutation testing (planned extra, high-risk areas only).} To check that the automated tests
+    can detect faults, the team will run mutation testing on the highest-risk backend modules only. This includes
+    the status lifecycle and slot reservation logic, the team formation rule checks, and the role-based visibility checks.
+    The tool is mutmut. The run happens before the Revision 0 demo and before the final demo.
+    Surviving mutants are examined, and each one that shows a missing test becomes a Verification issue.
+    If time runs short, mutation testing is dropped without affecting any other part of this plan.
+  \end{enumerate}
 
-\subsection{Implementation Verification}
+  \subsection{Implementation Verification}
+  \label{sec:impl-verification}
 
-\wss{You should at least point to the tests listed in this document and the unit
-  testing plan.}
+  Implementation verification combines dynamic testing, static analysis, and a code walkthrough.
 
-\wss{In this section you would also give any details of any plans for static
-  verification of the implementation.  Potential techniques include code
-  walkthroughs, code inspection, static analyzers, etc.}
+  \subsubsection*{Dynamic testing}
 
-\wss{The final class presentation in CAS 741 could be used as a code
-walkthrough.  There is also a possibility of using the final presentation (in
-CAS741) for a partial usability survey.}
+  \begin{itemize}
+    \item \textbf{Unit tests (owner: Ayush).} Backend unit tests with pytest cover the API endpoints and the
+    core logic. Frontend unit tests with Jest cover components, including form validation and the display of statuses.
+    Test design follows the guidance in the Development Plan \citep{DevelopmentPlan},
+    including boundary values and expected failures.
+    The target is about 80\% statement coverage. Section~\ref{sec:unit-tests} describes the unit tests in detail.
+    \item \textbf{Integration tests (owner: Ahmed).} These run the backend against a real PostgreSQL database
+    in Docker, to test the transactions, constraints, and locking that the safety requirements depend on.
+    The email service is replaced by a local test mail server (for example Mailpit), so tests can check what is sent,
+    to whom, and how often. Avenue to Learn is replaced by a stub that can return a valid list,
+    a malformed list, a duplicate entry, or no response, so that we test our handling of its failures,
+    as the General Information section describes. Authentication providers are simulated in the same way.
+    \item \textbf{End-to-end tests (owner: Andrew).} Playwright tests drive the real application in a
+    browser through the most important use cases for each role.
+    They run in Chrome, Firefox, and Safari (WebKit) at the three screen widths named in the SRS, and include
+    an automated accessibility audit (axe-core) of every page.
+    \item \textbf{Performance tests (owner: Waqar).} A load test with Locust simulates the number of
+    concurrent users, think time, and 95th percentile latency limit set in the nonfunctional requirement
+    \texttt{NFR\_PerfTail} of the SRS. The load test runs before milestones, not on every pull request,
+    because it is slow and needs a full deployment. A first baseline run is done once the project catalog and
+    application flow exist, and a run is done before each milestone from the Revision 0 demo onward, so that
+    slow queries are found early.
+  \end{itemize}
 
-\subsection{Automated Testing and Verification Tools}
+  \subsubsection*{Static verification}
 
-\wss{What tools are you using for automated testing.  Likely a unit testing
-  framework and maybe a profiling tool, like ValGrind.  Other possible tools
-  include a static analyzer, make, continuous integration tools, test coverage
-  tools, etc.  Explain your plans for summarizing code coverage metrics.
-  Linters are another important class of tools.  For the programming language
-  you select, you should look at the available linters.  There may also be tools
-  that verify that coding standards have been respected, like flake9 for
-  Python.}
+  \begin{itemize}
+    \item \textbf{Static analyzers and linters.} Ruff and ESLint run on all code,
+    as in the Development Plan \citep{DevelopmentPlan}. We add a static type checker for the
+    backend (mypy) and strict mode in TypeScript, because type errors in status and role handling are a
+    likely source of faults. SonarQube analyzes code quality and coverage reports.
+    Dependency audits (\texttt{pip-audit} and \texttt{npm audit}) check for known vulnerabilities.
+    \item \textbf{Code walkthrough.} Before the Revision 0 demo, the team and the TA hold a walkthrough of the
+    modules where a fault would cause the most harm: the status lifecycle and slot reservation logic,
+    the visibility and role checks (including the external supervisor limits),
+    and the notification queue and enrollment import.
+    The author of a module presents it, and the other participants inspect it against a short checklist:
+    the code follows the module interface specification, multi-step changes happen in one transaction,
+    every read path checks permissions on the server, errors are handled explicitly,
+    course rules are read from configuration and not written in the code, and each branch has a test.
+    The session is recorded in a Team Meeting issue, and findings follow the process above.
+    This is in addition to normal pull request review.
+  \end{itemize}
 
-\wss{If you have already done this in the development plan, you can point to
-that document.}
+  \subsection{Automated Testing and Verification Tools}
+  \label{sec:tools}
 
-\wss{The details of this section will likely evolve as you get closer to the
-  implementation.}
+  The team follows continuous integration and delivery (CI/CD) practice,
+  using GitHub Actions as described in the Development Plan \citep{DevelopmentPlan}.
+  Table~\ref{tab:tools} lists the tools, what they are used for, and when they run.
+  Pull requests cannot be merged while a required check fails.
+  Falling below the 80\% statement coverage target does not block a merge but is flagged for review,
+  as the Development Plan states.
 
-\subsection{Software Validation}
+  \begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.3cm} >{\raggedright\arraybackslash}p{4.7cm} X}
+      \toprule
+      \textbf{Tool} & \textbf{Purpose} & \textbf{When it runs}\\
+      \midrule
+      Ruff, ESLint & Linting and style for Python and TypeScript & Every push and pull request\\
+      \addlinespace
+      mypy, TypeScript strict mode & Static type checking & Every push and pull request\\
+      \addlinespace
+      pytest, pytest-cov & Backend unit tests and coverage (Cobertura XML) & Every push and pull request\\
+      \addlinespace
+      Jest & Frontend unit tests and coverage (LCOV) & Every push and pull request\\
+      \addlinespace
+      SonarQube & Code quality analysis, and coverage reporting from the pytest-cov and Jest reports & Every pull request and merge to main\\
+      \addlinespace
+      pip-audit, npm audit & Known vulnerabilities in dependencies & Every pull request and merge to main\\
+      \addlinespace
+      Docker with PostgreSQL, test mail server (Mailpit), Avenue stub & Integration and concurrency tests & Every pull request and merge to main\\
+      \addlinespace
+      Playwright, axe-core & End-to-end tests in Chrome, Firefox, and WebKit, and the accessibility audit & Every pull request and merge to main\\
+      \addlinespace
+      Locust & Load test at the load given in \texttt{NFR\_PerfTail} & Manually started workflow before milestones (not on every pull request)\\
+      \addlinespace
+      mutmut (planned extra) & Mutation testing of the high-risk backend modules & Manually started before the Revision 0 and final demos\\
+      \bottomrule
+    \end{tabularx}
+    \caption{Automated testing and verification tools}
+    \label{tab:tools}
+  \end{table}
 
-\wss{If there is any external data that can be used for validation, you should
-  point to it here.  If there are no plans for validation, you should state that
-  here.}
+  \subsection{Software Validation}
+  \label{sec:validation}
 
-\wss{You might want to use review sessions with the stakeholder to check that
-the requirements document captures the right requirements.  Maybe task based
-inspection?}
+  Validation checks that we are building the right product:
+  one that solves the problems in the Problem Statement \citep{ProblemStatement},
+  and not only one that meets the SRS. It is done with stakeholders in the following ways.
+  The details of each will be given later, in the usability test protocol (Section~\ref{sec:usability-tests})
+  and the Usability Testing Report.
 
-\wss{For those capstone teams with an external supervisor, the Rev 0 demo should 
-be used as an opportunity to validate the requirements.  You should plan on 
-demonstrating your project to your supervisor shortly after the scheduled Rev 0 demo.  
-The feedback from your supervisor will be very useful for improving your project.}
+  \begin{itemize}
+    \item \textbf{Usability testing.} Students, TAs, and professors complete the primary tasks of their
+    roles, as described in the Custom Documents section.
+    \item \textbf{Stakeholder interviews.} We interview students, supervisors, and instructors again after
+    the requirements and the first working version are available, to check that the platform addresses what they told us.
+    \item \textbf{Demonstrations.} The Proof of Concept demo, the Revision 0 demo, and the final demo are used as
+    validation points with Dr. Smith. After the Revision 0 demo, we also demonstrate the platform to
+    Dr. Moradi and Dr. Wassyng and students.
+  \end{itemize}
 
-\wss{For teams without an external supervisor, user testing can serve the same purpose 
-as a Rev 0 demo for the supervisor.}
+  As the General Information section states, external supervisors from industry are not part of the
+  usability test.
 
-\wss{This section might reference back to the SRS verification section.}
-
-\section{System Tests}
+  \section{System Tests}
+  \label{sec:system-tests}
 
 \wss{There should be text between all headings, even if it is just a roadmap of
 the contents of the subsections.}
@@ -376,7 +567,8 @@ How test will be performed:
 \wss{Provide a table that shows which test cases are supporting which
   requirements.}
 
-\section{Unit Test Description}
+  \section{Unit Test Description}
+  \label{sec:unit-tests}
 
 \wss{This section should not be filled in until after the MIS (detailed design
   document) has been completed.}
@@ -509,8 +701,6 @@ How test will be performed:
 
 \section{Appendix}
 
-This is where you can place additional information.
-
 \subsection{Symbolic Parameters}
 
 The definition of the test cases will call for SYMBOLIC\_CONSTANTS.
@@ -520,7 +710,120 @@ Their values are defined in this section for easy maintenance.
 
 \wss{This is a section that would be appropriate for some projects.}
 
-\newpage{}
+  \subsection{SRS Validation Walkthrough and Checklist}
+  \label{app:walkthrough}
+
+  This appendix contains the material used to validate the SRS \citep{SRS} with
+  Dr. Smith (Section~\ref{sec:srs-verification}). It has three parts: the agenda of the walkthrough,
+  the questions asked for each use case, and the checklist that Dr. Smith completes.
+
+  \subsubsection{Agenda}
+
+  The session lasts 45 minutes. A team member presents, and a second member records answers in the Supervisor Meeting issue.
+  The checklist and agenda are given to Dr. Smith before the session.
+
+  \begin{table}[h!]
+    \centering
+    \renewcommand{\arraystretch}{1.2}
+    \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{1.6cm} >{\raggedright\arraybackslash}p{5.2cm} X}
+      \toprule
+      \textbf{Minutes} & \textbf{Topic} & \textbf{What we show}\\
+      \midrule
+      3 & Introduction & Purpose of the session, how answers are recorded, how the checklist works\\
+      5 & Status lifecycle & The project and team-project status lifecycle diagram and the slot (capacity) rule\\
+      8 & \texttt{UC\_ReviewProposal} & Main success scenario and the alternative flows (changes requested, rejected)\\
+      12 & \texttt{UC\_ApproveTeamProject} & Main success scenario, the automated checks, and the alternative flows\\
+      7 & \texttt{UC\_ImportEnrollment} & Main success scenario, the preview, and the alternative flows (Avenue unavailable, absent student)\\
+      5 & \texttt{UC\_FollowUpUnselected} & Main success scenario and the list of unselected projects\\
+      5 & Remaining checklist items and close & Visibility rules, scope, and priorities\\
+      \bottomrule
+    \end{tabularx}
+    \caption{Agenda of the SRS walkthrough with Dr. Smith}
+    \label{tab:walkthrough-agenda}
+  \end{table}
+
+  \subsubsection{Questions for each use case}
+
+  \paragraph{Status lifecycle.}
+  \begin{itemize}
+    \item Are these the statuses that you would want to see for a project and for a team on a project, and are any missing or unnecessary?
+    \item Is it right that a team's application does not use a slot, and that a slot is reserved only when the supervisor accepts?
+  \end{itemize}
+
+  \paragraph{\texttt{UC\_ReviewProposal}.}
+  \begin{itemize}
+    \item Is requesting changes and receiving a revised proposal enough, or do you need to edit a proposal yourself?
+    \item Is it acceptable that an external supervisor is verified only when you approve a proposal that they submitted?
+  \end{itemize}
+
+  \paragraph{\texttt{UC\_ApproveTeamProject}.}
+  \begin{itemize}
+    \item Which parts of the review must never be automated?
+    \item How should a change to an already approved project be handled in your course?
+    \item In external approval mode, who records the outcome in the platform, and how soon?
+  \end{itemize}
+
+  \paragraph{\texttt{UC\_ImportEnrollment}.}
+  \begin{itemize}
+    \item Is the Avenue enrollment list the list that you use, and does it include each student's program?
+    \item How do you handle students who join late or come from other departments today?
+    \item What should happen to a student who is on a team but missing from a new import?
+  \end{itemize}
+
+  \paragraph{\texttt{UC\_FollowUpUnselected}.}
+  \begin{itemize}
+    \item Is ``closed with no approved team'' the right definition of an unselected project?
+    \item What do you want to see on the list (for example project title, supervisor, and contact details)?
+    \item Do you want the platform to send the thank-you message, or only produce the list?
+  \end{itemize}
+
+  \subsubsection{Checklist}
+
+  For each statement, the reviewer ticks \emph{OK} if it is correct, \emph{Change} if it needs to change (with a note)
+
+  \begingroup
+  \small
+  \setlength{\tabcolsep}{3pt}
+  \renewcommand{\arraystretch}{1.25}
+  \begin{longtable}{|>{\raggedright\arraybackslash}p{0.5cm}|>{\raggedright\arraybackslash}p{8cm}|>{\raggedright\arraybackslash}p{6cm}|c|c|}
+    \caption{SRS validation checklist}\label{tab:srs-checklist}\\
+    \hline
+    \textbf{\#} & \textbf{Statement in the SRS} & \textbf{SRS reference} & \textbf{OK} & \textbf{Change}\\ \hline
+    \endfirsthead
+    \hline
+    \endhead
+
+    \multicolumn{5}{|l|}{\textbf{A. Project proposals}}\\ \hline
+    1 & A supervisor or student team submits a proposal. Only the instructor decides: list it (status Open), request changes, or reject it. TAs do not take part in proposal approval. & \texttt{UC\_ReviewProposal}, \texttt{FR\_ReviewProposal}, \texttt{SR\_TAApproval} & $\square$ & $\square$ \\ \hline
+    2 & Approving an unverified external supervisor's own proposal verifies them, and nothing else does. A verified supervisor can then see student profiles and student-proposed projects, but never another supervisor's projects. & \texttt{FR\_ExternalSupervisorVerification}, \texttt{FR\_ExternalSupervisorScope} & $\square$ & $\square$ \\ \hline
+    3 & The required proposal fields are title, background, objectives, impact, completion status, industry, hardware or non-hardware, supervisor capacity, confidentiality, and IP. The optional fields are requirements, deliverables, proposed solution, and additional terms. & \texttt{FR\_SupervisorProposal}, \texttt{FR\_ProposalOptionalFields} & $\square$ & $\square$ \\ \hline
+
+    \multicolumn{5}{|l|}{\textbf{B. Selection and agreement}}\\ \hline
+    4 & An application does not use a slot. A slot is reserved when the supervisor accepts a team, a project is Full only when all its slots are reserved, and a team is Agreed only when both sides have accepted. & Capacity rule (Section on the lifecycle), \texttt{UC\_SelectProject} & $\square$ & $\square$ \\ \hline
+    5 & The project statuses (Draft to Closed) and the team-project statuses (Applied to Declined or withdrawn) are complete and correctly named. & Status lifecycle figure & $\square$ & $\square$ \\ \hline
+    6 & A project is Closed when the selection period ends. A Closed project with no approved team is unselected, and the instructor can list these to follow up with their supervisors. & \texttt{UC\_FollowUpUnselected}, \texttt{FR\_ReadCourseInformation} & $\square$ & $\square$ \\ \hline
+
+    \multicolumn{5}{|l|}{\textbf{C. Team project approval}}\\ \hline
+    7 & Before a submission reaches the instructor, the platform checks that required fields and documents are present, the repository exists and is set up correctly, the instructor is a collaborator, every member is on exactly one team, the team has no other approved project, and the project is available. & \texttt{FR\_ApprovalPreflightValidate}, \texttt{UC\_ApproveTeamProject} & $\square$ & $\square$ \\ \hline
+    8 & The instructor or a TA approves, rejects, or requests changes. The platform never decides automatically. & \texttt{SR\_HumanApproval}, \texttt{SR\_TAApproval}, \texttt{FR\_ApprovalResponse} & $\square$ & $\square$ \\ \hline
+    9 & A course can approve in the platform, record outcomes by hand from an external process, or (where an adapter exists) synchronize with one. Recording by hand is enough for the course's current process. & \texttt{FR\_ExternalApproval}, approval mode definition & $\square$ & $\square$ \\ \hline
+    10 & A change to an approved project stays pending, and the original approval stays in effect until the instructor accepts the change. & \texttt{FR\_ApprovalRevision} & $\square$ & $\square$ \\ \hline
+
+    \multicolumn{5}{|l|}{\textbf{D. Enrollment, teams, visibility, and scope}}\\ \hline
+    11 & Enrollment is imported from Avenue (or a file) with a preview. Duplicates and malformed entries are flagged, students missing from a new import are flagged and never removed automatically, and late students can be added by hand. & \texttt{UC\_ImportEnrollment}, \texttt{FR\_ImportEnrollment}, \texttt{FR\_EnrollmentDiscrepency} & $\square$ & $\square$ \\ \hline
+    12 & Team size limits and permitted program combinations are set per course by the instructor. Teams that stop complying after a rule change are flagged for review, not removed. The values for the course are correct. & \texttt{FR\_ValidateTeamRules}, course data in the data dictionary & $\square$ & $\square$ \\ \hline
+    13 & The rules for who can read each type of record (proposals, projects, profiles, applications, approval feedback, and the TA's name) are correct, with nothing too open or too closed. & \texttt{DPR\_VisibilityMatrix}, visibility tables & $\square$ & $\square$ \\ \hline
+    14 & The items listed as not done (IP resolution, matching supervisors to student projects, meeting scheduling, direct messaging, post-approval feedback requests) are correct, and the priorities of the development phases match the instructor's biggest pain points. & Scope section, Development Plan & $\square$ & $\square$ \\ \hline
+  \end{longtable}
+  \endgroup
+
+  \noindent \textbf{Other comments or corrections:}
+
+  \vspace{1.2cm}
+
+  \noindent Reviewer: \rule{5cm}{0.4pt} \hspace{1cm} Date: \rule{3cm}{0.4pt}
+
+  \newpage{}
 
 \section{Appendix --- Generative AI Use Disclosure}
 
