@@ -238,47 +238,402 @@ the contents of the subsections.}
 
 \wss{Include a blurb here to explain why the subsections below
   cover the requirements.  References to the SRS would be good here.}
+The tests below verify the functional requirements defined in Section 6 in the SRS. Tests are group
+by major functionalitys including project proposals, team formation, project applications, approvals,
+communication, and course administration. Each test evaluates whether the system produces the expected
+results under the given conditions
 
-\subsubsection{Area of Testing1}
+\subsubsection{Project Proposal Submission and Validation}
 
 \wss{It would be nice to have a blurb here to explain why the subsections below
   cover the requirements.  References to the SRS would be good here.  If a section
   covers tests for input constraints, you should reference the data constraints
   table in the SRS.}
-		
-\paragraph{Title for Test}
+
+This section covers the tests for project proposal submission and validation, as
+specified in FR\_SupervisorProposal, FR\_ProposalOptionalFields, and
+FR\_StudentProposal in Section 6 of the SRS. The tests verify successful
+supervisor and student proposal submissions, as well as the rejection of
+incomplete submissions and acceptance of proposals without optional information.
 
 \begin{enumerate}
 
-\item{test-id1\\}
+\item \textbf{T-FR-01: Submit a Complete Supervisor Proposal}\\
 
-Control: Manual versus Automatic
+\textbf{Type:} Automatic
 					
-Initial State: 
+\textbf{Initial State:} A supervisor is authenticated, has permission to submit
+proposals, and the proposal submission period is open.
 					
-Input: 
+\textbf{Input:} The supervisor completes and submits a proposal with the
+following information:
+\begin{itemize}
+    \item Title: Autonomous Waste Sorting System
+    \item Background: Manual waste sorting is inefficient and time-consuming.
+    \item Objectives: Develop a system that identifies and sorts recyclable
+    materials.
+    \item Required Skills: Python, computer vision, and mechanical design.
+    \item Deliverables: Working prototype and technical documentation.
+    \item Project Impact: Improved recycling efficiency.
+    \item Supervisor Capacity: 2 teams
+    \item Current Completion: Concept stage
+    \item Project Type: Hardware
+    \item Industry: Environmental technology
+    \item Confidentiality/IP Concerns: None
+    \item Additional Terms: No additional restrictions
+\end{itemize}
 					
-Output: \wss{The expected result for the given inputs.  Output is not how you
-are going to return the results of the test.  The output is the expected
-result.}
+\textbf{Output:} The system accepts the submission and stores the proposal with
+the ``Proposal submitted'' status making it available for instructors to review.
 
-Test Case Derivation: \wss{Justify the expected value given in the Output field}
-					
-How test will be performed: 
-					
-\item{test-id2\\}
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_SupervisorProposal} of
+the SRS. A proposal containing valid information for every field counts as a
+valid complete submission. This establishes a normal workflow where incomplete
+and invalid submissions can be compared to. Upon acceptance of the input, the
+system is expected to accept it and make it available for the instructor to look
+through.
 
-Control: Manual versus Automatic
-					
-Initial State: 
-					
-Input: 
-					
-Output: \wss{The expected result for the given inputs}
+\textbf{How test will be performed:} Using Playwright, authenticate as a
+supervisor, populate the proposal form with the predefined values, and submit
+it. Verify the confirmation and SUBMITTED status. Then, authenticate as an
+instructor and confirm that the proposal is accessible with the correct
+information.
 
-Test Case Derivation: \wss{Justify the expected value given in the Output field}
+\item \textbf{T-FR-02: Reject Missing Required Fields}\\
 
-How test will be performed: 
+\textbf{Type:} Automatic
+					
+\textbf{Initial State:} A supervisor is authenticated, has permission to submit
+proposals, and the proposal submission period is open.
+					
+\textbf{Input:} A completed proposal template similar to T-FR-01 with one or
+more of the following required fields missing: title, background, course,
+objectives, impact, supervisor capacity details, level of current completion,
+industry, and information regarding confidentiality and IP concern. The
+supervisor will submit. Repeat for each of the following fields.
+					
+\textbf{Output:} The system rejects the submission, identifies the missing
+mandatory field(s), and prevents the proposal from entering the Proposal
+submitted state. The instructor will not receive the proposal.
+
+\textbf{Test Case Derivation:} Dervied from \texttt{FR\_ProposalOptionalFields}
+of the SRS. Leaving out one mandatory field at a time isolates each validation
+constraint and verifies that all required fields are independently enforced.
+
+\textbf{How test will be performed:} Using Playwright, populate the form with a
+valid baseline proposal. Remove one mandatory field, attempt submission, and
+verify that validation prevents submission. Repeat for each mandatory field. The
+test passes if every incomplete proposal is rejected and the corresponding
+missing field is identified. Repeated with as many combinations of mandatory
+fields as necessary.
+
+\item \textbf{T-FR-03: Accept Missing Optional Fields}\\
+
+\textbf{Type:} Automatic
+					
+\textbf{Initial State:} A supervisor is authenticated, has permission to submit
+proposals, and the proposal submission period is open.
+					
+\textbf{Input:} A completed proposal template similar to T-FR-01 with all of the
+following required fields: title, background, course, objectives, impact,
+supervisor capacity details, level of current completion, industry, and
+information regarding confidentiality and IP concern. All optional fields will
+be left empty. The supervisor will submit. Repeat for each of the following
+fields.
+					
+\textbf{Output:} The system accepts the submission and stores the proposal with
+the ``Proposal submitted'' status making it available for instructors to review.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProposalOptionalFields}
+of the SRS. A proposal containing only mandatory fields represents the minimum
+valid submission and verifies that optional information is not incorrectly
+enforced as mandatory.
+
+\textbf{How test will be performed:} Using Playwright, complete only the
+required proposal fields and submit. Verify that the proposal is accepted
+despite the missing optional information and is accessible to the instructor.
+The test passes if both conditions are satisfied.
+
+\item \textbf{T-FR-04: Publish a Student-Proposed Project}\\
+
+\textbf{Type:} Automatic
+					
+\textbf{Initial State:} A student is authenticated and belongs to a team, and
+the proposal submission period is open.
+					
+\textbf{Input:} The student publishes a proposal containing:
+\begin{itemize}
+    \item Title: Smart Campus Navigation
+    \item Problem Statement: Students have difficulty locating classrooms and
+    accessible routes across campus.
+    \item Proposed Solution/Methodology: Develop a web application providing
+    campus navigation and accessible route suggestions.
+\end{itemize}
+					
+\textbf{Output:} The proposal is stored, associated with the submitting team,
+and displayed in the separate student-proposed project list with the correct
+information.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentProposal}. A
+student team providing all specified project information verifies successful
+proposal creation and publication in the correct list.
+
+\textbf{How test will be performed:} Use Playwright to authenticate as a student
+belonging to a team, complete the student proposal template, and publish it.
+Verify the stored information, team association, and visibility in the
+student-proposed project list using an account authorized to view it.
+
+\end{enumerate}
+
+\subsubsection{Instructor Project Proposal}
+
+\wss{It would be nice to have a blurb here to explain why the subsections below
+  cover the requirements.  References to the SRS would be good here.  If a section
+  covers tests for input constraints, you should reference the data constraints
+  table in the SRS.}
+
+This section covers FR\_ReviewProposal, including the approval, rejection, and
+revision workflows defined in UC\_ReviewProposal. It also accounts for the
+updated external supervisor verification rule.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-05: Approve a Supervisor Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated instructor has access to an unapproved
+proposal titled Autonomous Waste Sorting System submitted by an unverified
+external supervisor. The proposal status is ``Proposal submitted''.
+
+\textbf{Input:} The instructor reviews the proposal and approves it.
+
+\textbf{Output:} The project status changes to ``Open'', and the project becomes
+visible in the approved catalog to authorized users. The supervisor is notified
+and becomes verified.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and
+\texttt{FR\_ExternalSupervisorVerification}. Approving an unverified external
+supervisor's proposal verifies both the approval transition and the associated
+supervisor verification rule.
+
+\textbf{How Test Will Be Performed:} Use Playwright to approve the proposal as
+an instructor. Verify the project status, authorized catalog visibility, and
+supervisor notification. Then sign in as the external supervisor and verify that
+the account is marked verified and can access permitted student profiles. The
+test passes if all conditions are satisfied.
+
+
+\item \textbf{T-FR-06: Request Changes to a Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An instructor has access to a proposal with the
+``Proposal submitted'' status, submitted by an unverified external supervisor.
+
+\textbf{Input:} The instructor requests changes and provides the feedback and
+comments asking for clarification on the expected project deliverables and
+scope.
+
+\textbf{Output:} The proposal status becomes ``Proposal changes requested''. The
+feedback is stored and communicated to the supervisor. The project remains
+unpublished, and the supervisor remains unverified.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and
+\texttt{FR\_ExternalSupervisorVerification}. A revision request verifies that
+feedback does not trigger approval or external supervisor verification.
+
+\textbf{How Test Will Be Performed:} Use Playwright to request changes and
+submit the predefined feedback. Verify the status, stored feedback, and
+notification. Confirm that the project is excluded from the approved catalog and
+that the supervisor remains unverified.
+
+
+\item \textbf{T-FR-07: Reject a Supervisor Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated instructor has access to a proposal
+with the ``Proposal submitted'' status, submitted by an unverified external
+supervisor.
+
+\textbf{Input:} Reject the proposal with the reason ``The proposed scope does
+not meet capstone course expectations.''
+
+\textbf{Output:} The proposal status changes to ``Proposal rejected''. The
+rejection reason is preserved, the supervisor is notified, and the project
+remains excluded from the approved catalog. The supervisor remains unverified.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and
+\texttt{FR\_ExternalSupervisorVerification}. Rejection verifies that an
+unsuccessful review does not grant approval-related permissions.
+
+\textbf{How Test Will Be Performed:} Use Playwright to reject the proposal.
+Verify the updated status, recorded reason, and notification. Confirm that the
+project remains unpublished and the supervisor remains unverified.
+
+
+\item \textbf{T-FR-08: Revise and Resubmit a Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} A supervisor proposal has the status ``Proposal changes
+requested'' and contains instructor feedback asking for clearer project
+deliverables.
+
+\textbf{Input:} The supervisor changes the deliverables from ``Working
+prototype'' to ``Working prototype, technical documentation, and final
+demonstration'', then resubmits.
+
+\textbf{Output:} The revised information is stored, the proposal returns to
+``Proposal submitted'', and the instructor can review the updated version.
+Previous feedback remains in the review history.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and
+\texttt{UC\_ReviewProposal}. Resubmission verifies the transition back to
+instructor review without losing earlier feedback.
+
+\textbf{How Test Will Be Performed:} Use Playwright to sign in as the
+supervisor, modify the deliverables, and resubmit. Verify the new information
+and status. Sign in as the instructor and confirm the revised proposal and
+earlier feedback are accessible.
+
+\end{enumerate}
+
+\subsubsection{Project Discovery and Availability}
+
+This section covers \texttt{FR\_ViewApprovedProjects}
+and \texttt{FR\_ViewProjectStatus} of the SRS.
+Tests verify search and filtering, project
+visibility restrictions, and availability
+based on reserved supervisor capacity.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-09: Search and Filter Approved Projects}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated student is enrolled in the course.
+Three approved projects are visible to the student:
+\begin{itemize}
+    \item Project A: Autonomous Waste Sorting System, Environmental Technology, Open.
+    \item Project B: Healthcare Scheduling System, Healthcare, Open.
+    \item Project C: Automated Assembly Line, Manufacturing, Full.
+\end{itemize}
+
+\textbf{Input:} Apply the industry filter ``Environmental Technology'',
+availability filter ``Open'', and search keyword ``Autonomous''.
+
+\textbf{Output:} Only Project A is returned. Projects B and C are excluded
+because they do not satisfy every criterion.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewApprovedProjects}.
+Projects with overlapping and distinct attributes verify that keyword searching
+and multiple filters are applied together.
+
+\textbf{How Test Will Be Performed:} Populate the test environment with the
+three projects. Use Playwright to apply the filters and keyword. Compare
+returned project identifiers with the expected set \{A\}. The test passes if
+exactly Project A is returned.
+
+
+
+\item \textbf{T-FR-10: Exclude Unapproved or Unauthorized Projects}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The system contains three projects:
+\begin{itemize}
+    \item Project A: Autonomous Waste Sorting System, approved with status
+    ``Open'', submitted by External Supervisor X.
+    \item Project B: Drone Inspection Platform, with status ``Proposal
+    submitted'', awaiting instructor approval.
+    \item Project C: Automated Assembly Line, approved with status ``Full'',
+    submitted by External Supervisor Y.
+\end{itemize}
+A student enrolled in the course, the course instructor, and External
+Supervisors X and Y have authenticated accounts. Each external supervisor is
+associated only with their own project.
+
+\textbf{Input:} The student searches for Projects A and B. The instructor opens
+Project B for review. External Supervisor X searches for Project C, while
+External Supervisor Y searches for Project C.
+
+\textbf{Output:} The student can view Project A but cannot view Project B
+because it has not been approved. The instructor can access Project B for
+review. External Supervisor X cannot view Project C because it belongs to
+another external supervisor, while External Supervisor Y can view Project C
+because they proposed it.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewApprovedProjects}
+and \texttt{FR\_ExternalSupervisorScope} of the SRS. Using projects with
+different approval states and ownership verifies that catalog visibility is
+restricted by both instructor approval and the user's authorization.
+
+\textbf{How Test Will Be Performed:} Configure the three projects with the
+specified statuses and ownership. Using Playwright, authenticate as the student
+and search for Projects A and B. Verify that only Project A is displayed.
+Authenticate as the instructor and verify that Project B is accessible in the
+proposal review interface. Authenticate as External Supervisor X and search for
+Project C, verifying that it is excluded from results. Finally, authenticate as
+External Supervisor Y and verify that Project C is accessible.
+
+The test passes if each account can access only the project records permitted by
+the SRS visibility rules.
+
+\item \textbf{T-FR-11: Display Project Availability and Capacity}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated student can access two approved
+projects:
+\begin{itemize}
+    \item Project A: Maximum capacity of 2 teams with 1 supervisor slot
+    reserved.
+    \item Project B: Maximum capacity of 1 team with 1 supervisor slot reserved.
+\end{itemize}
+
+\textbf{Input:} The student opens the project catalog and views both projects.
+
+\textbf{Output:} Project A displays ``Open'' with a maximum capacity of 2 teams.
+Project B displays ``Full'' with a maximum capacity of 1 team.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewProjectStatus}.
+Remaining capacity is calculated as $C_{remaining} = C_{max} - R$ where $R$ is
+reserved slot and $C_{max}$ is maximum capacity. Project A has $2-1=1$ available
+slot, while Project B has $1-1=0$. These cases verify the correct availability
+states.
+
+\textbf{How Test Will Be Performed:} Configure both projects with the specified
+capacities and reserved slots. Use Playwright to view their catalog entries and
+compare the displayed statuses and maximum capacities with the expected values.
+
+
+\item \textbf{T-FR-12: Prevent Applications to Full Projects}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated student belongs to a registered team.
+An approved project has a maximum capacity of one team and its only supervisor
+slot is reserved, giving it the ``Full'' status.
+
+\textbf{Input:} The student attempts to submit an application to the full
+project.
+
+\textbf{Output:} The system rejects the application, informs the student that
+the project is unavailable, and does not create an application record.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewProjectStatus} and
+\texttt{UC\_SelectProject}. A project with zero remaining capacity verifies that
+availability restrictions are enforced by the application workflow rather than
+only displayed visually.
+
+\textbf{How Test Will Be Performed:}
+Use Playwright to navigate to the full project and attempt to apply through the
+normal user interface. Verify that the application is blocked and that no new
+application record is created. The test passes if the full project cannot
+receive a new application.
 
 \end{enumerate}
 
