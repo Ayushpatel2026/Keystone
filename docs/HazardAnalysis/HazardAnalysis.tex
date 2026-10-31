@@ -370,7 +370,7 @@ Display error, log failure, raise warning to IT department and/or instructors &
 User session is stolen &
 Attacker can act as the user, read sensitive data, perform unapproved actions &
 Compromised device, unencrypted user traffic, compromised external service &
-Re-verify user for important actions &
+Re-verify the user before every action on the closed list in \ssrref{SSR_ReverifyCriticalActions} &
 \ssrref{SSR_ReverifyCriticalActions} &
 \reqitem{hnum}{H_SessionTheft} \\
 
@@ -387,6 +387,28 @@ Default to zero privileges if automatic assignment fails, provide instructor wit
 \reqitem{hnum}{H_WrongRole} \\
 
 \addlinespace
+\addlinespace
+
+&
+A person with no connection to the course signs in through the external provider and is treated as a supervisor &
+Student information and student-proposed projects are disclosed to outsiders, and the platform can be scraped &
+The external provider accepts any identity, and the role is assigned at sign-in &
+Give every external sign-in the unverified external supervisor role, limited to course reference material, the proposal template, and their own proposals, and verify it only when an instructor approves a proposal that the account submitted &
+\ssrref{SSR_ExternalSupervisorVerification}, \ssrref{SSR_ZeroDefaultPrivileges} &
+\reqitem{hnum}{H_UnvettedExternalAccess} \\
+
+\addlinespace
+\addlinespace
+
+&
+An external supervisor reads another sponsor's confidential project &
+Loss of confidentiality of industry project ideas, loss of sponsor trust, IP disputes &
+Visibility rules written for ``course members'' applied to all supervisors, or other sponsors' projects exposed through search, counts, status, or email &
+Scope every read path for an external supervisor to the projects they proposed or are named on, and answer other requests as not found &
+\ssrref{SSR_ExternalSupervisorScope}, \ssrref{SSR_EnforceVisibility} &
+\reqitem{hnum}{H_CrossSponsorExposure} \\
+
+\addlinespace
 \hline
 \addlinespace
 
@@ -397,6 +419,17 @@ Component state does not account for all possible configurations &
 Reject disable request, advise user on actions needed before feature can be disabled &
 \ssrref{SSR_RejectDisable}, \ssrref{SSR_NotifyPendingActions} &
 \reqitem{hnum}{H_DisableBreaksWorkflow} \\
+
+\addlinespace
+\addlinespace
+
+&
+Team formation rules are misconfigured, or changed after teams have formed &
+Valid teams are blocked, or invalid teams are accepted; teams that were valid under the old rules become non-compliant without notice &
+Wrong team size limits or program combinations entered, rule edits applied without checking existing teams &
+Validate the rule configuration on save, restrict edits to instructors, preview the teams a change would make non-compliant, and flag those teams for instructor review instead of invalidating them &
+\ssrref{SSR_RuleChangeImpact}, \ssrref{SSR_AuditLog} &
+\reqitem{hnum}{H_RuleMisconfiguration} \\
 
 \addlinespace
 \hline
@@ -417,7 +450,8 @@ Display a timestamp for when any displayed records were last updated &
 Confidential project or IP exposed &
 Potential monetary loss, loss of trust, exposed vulnerabilities &
 Project visibility rules not being enforced across a project &
-Ensure that visibility restrictions are enforced &
+Check every way of reading a record (catalog, search, project detail, threads, emails, exports, recommendations)
+on the server against the visibility matrix in the SRS &
 \ssrref{SSR_EnforceVisibility} &
 \reqitem{hnum}{H_ConfidentialExposure} \\
 
@@ -428,21 +462,44 @@ Ensure that visibility restrictions are enforced &
 Project description misrepresents project &
 Team cannot move forward with project, time wasted &
 Project proposal prompt not asking for critical information  &
-Ensure project proposal prompt includes required fields on critical information &
+Require every attribute that the SRS data dictionary marks as Required and prompt for the optional ones &
 \ssrref{SSR_ProposalPromptCoverage} &
 \reqitem{hnum}{H_MisleadingDescription} \\
+
+\addlinespace
+\addlinespace
+
+&
+A supervisor accepts a team and takes the last slot, but the project is not shown as Full (or a released slot does not reopen it) &
+Other teams apply to or wait on a project that cannot take them &
+Failure between reserving the slot and updating the project status or notifying applicants &
+Reserve the slot, update the project status, and queue notifications to teams with open applications in a single transaction &
+\ssrref{SSR_AtomicActions} &
+\reqitem{hnum}{H_StaleProjectStatus} \\
 
 \addlinespace
 \hline
 \addlinespace
 
 Project approval &
-Approving a team for a project fails to inform other interested teams that the project is closed &
-Teams believe the project is still open and wait for a response that will never arrive &
-Component fails after completing the first approval and before updating rejected teams of new project status &
-Ensure all compound actions are atomic, potentially by using a database which supports atomic transactions and making the database the single source of truth &
-\ssrref{SSR_AtomicActions} &
-\reqitem{hnum}{H_StaleProjectStatus} \\
+A team or supervisor sees ``Approved'' when the team-project status is Agreed, Submitted, or Under review, or a post-approval change replaces the approved record before the instructor accepts it &
+Team acts on an approval it does not have, or the official record is wrong &
+Displayed status derived separately from the stored status, change requests written directly to the approved record &
+Display only the stored team-project status using the lifecycle labels, hold changes to an approved record as pending, and apply them only when the instructor accepts &
+\ssrref{SSR_ApprovalStatusIntegrity} &
+\reqitem{hnum}{H_MisleadingApprovalStatus} \\
+
+\addlinespace
+\hline
+\addlinespace
+
+Approval adapter (integrated mode) &
+Synchronization with the external approval system is stale or fails &
+\projname{} shows a status that differs from the external system, a team misses a deadline or is treated as approved or unapproved incorrectly &
+External system outage or interface change, adapter error, delayed polling &
+Show the time of the last successful sync on externally approved records, flag failed syncs, and let the instructor or TA record the outcome manually (logged) &
+\ssrref{SSR_AdapterSyncStatus} &
+\reqitem{hnum}{H_AdapterSyncFailure} \\
 
 \addlinespace
 \hline
@@ -478,6 +535,28 @@ Ensure that queued notifications remain available until delivery is verified to 
 \reqitem{hnum}{H_LostNotification} \\
 
 \addlinespace
+\addlinespace
+
+&
+Notification is sent to the wrong recipient &
+Confidential proposal, IP, or student information is disclosed to someone who should not see it &
+Recipients resolved from stale roles or associations, confidential fields placed in the email body &
+Resolve recipients at send time from current role and association, and include only an event summary and a link in the email body &
+\ssrref{SSR_NotificationRecipientScope} &
+\reqitem{hnum}{H_MisaddressedNotification} \\
+
+\addlinespace
+\addlinespace
+
+&
+Same notification delivered more than once &
+Users are confused or ignore later notifications, trust in the platform drops &
+Retries after an unconfirmed delivery &
+Give each notification a unique identifier so a retry never results in a second send &
+\ssrref{SSR_NotificationDeduplication} &
+\reqitem{hnum}{H_DuplicateNotification} \\
+
+\addlinespace
 \hline
 \addlinespace
 
@@ -489,6 +568,7 @@ Regular, automated backups which are verified to be able to restore platform to 
 \ssrref{SSR_AutomatedBackups} &
 \reqitem{hnum}{H_DataLoss} \\
 
+&
 Personal data kept longer than needed &
 Privacy breach, loss of trust, legal exposure &
 No retention policy, deletion not implemented &
@@ -566,84 +646,138 @@ rationale design process how and why to fake it.)}
 \begin{itemize}
     \item[]\reqitem{ssrnum}{SSR_ExternalErrorLogging} The system shall log all errors caused by external providers and notify university IT professionals and/or course instructors when they are detected.\\
     \textbf{Rationale}: Outages caused by external providers prevent users from using the platform and require immediate attention to restore in a timely manner.\\
+    \textbf{Fit Criterion}: An authorized administrator can read a log that contains external provider errors, and an instructor or IT contact is notified when one occurs.\\
     \textbf{Traces To}: \srsref{FR_LogExternalErrors}
 
     \item[]\reqitem{ssrnum}{SSR_AuditLog} The system shall record all user actions with the time, a user identifier, and their privilege level at the time of the action, in an append-only audit log.\\
     \textbf{Rationale}: Accounts may get compromised and any actions taken may need to be reviewed and reversed.\\
+    \textbf{Fit Criterion}: One action of each type (approval decision, status change, role change) produces an entry with time, user identifier, and privilege level, and no interface or API path edits or deletes entries. \\
     \textbf{Traces To}: \srsref{NFR_AuditLog}, \srsref{NFR_AuditTamper}, \srsref{FR_AuthorizationRBAC}, \srsref{FR_UpdateRoles}
 
     \item[]\reqitem{ssrnum}{SSR_RejectDisable} The system shall reject all component disable requests if there are pending actions within the component.\\
     \textbf{Rationale}: Disabling features may potentially leave the system in a partially invalid state. For example, disabling the project approvals component strands pending project approval requests.\\
+    \textbf{Fit Criterion}: Attempting to disable the project approval component while at least one approval record is pending is rejected, and the pending records are listed.\\
     \textbf{Traces To}: \srsref{FR_RejectComponentDisable}
 
     \item[]\reqitem{ssrnum}{SSR_RecordTimestamps} The system shall display a timestamp for any displayed records when they were last updated.\\
     \textbf{Rationale}: Providing users with a timestamp can allow them to judge whether the information they are reading is up-to-date and can contact instructors or supervisors when that is not the case.\\
+    \textbf{Fit Criterion}: Every project and profile page displays a last-updated timestamp that changes when the record is modified.\\
     \textbf{Traces To}: \srsref{FR_DisplayTimestamps}
 
     \item[]\reqitem{ssrnum}{SSR_DurableNotifications} All pending notifications shall be stored durably until delivery is verified.\\
     \textbf{Rationale}: Lost notifications mean that users are not alerted of potentially time-sensitive matters and this can result in missed deadlines and loss of time.\\
+    \textbf{Fit Criterion}: If the system is stopped before a queued notification is sent, the notification is sent after restart.\\
     \textbf{Traces To}: \srsref{FR_DurableNotifications}
 
     \item[]\reqitem{ssrnum}{SSR_AutomatedBackups} The platform shall provide a mechanism for automatically creating regular backups which can restore the platform to a previous state.\\
     \textbf{Rationale}: Data loss incidents are not uncommon and can be caused by faulty hardware, accidental changes, and many others. Storing a set of backups ensures that any data loss is minimized to a backup period timespan.\\
+    \textbf{Fit Criterion}: Restoring the latest backup into a clean environment reproduces the project, team, and approval records.\\
     \textbf{Traces To}: \srsref{NFR_Recoverable}
 
     \item[]\reqitem{ssrnum}{SSR_MultipleBrowseViews} The platform shall provide multiple ways to find, filter, and browse the list of projects.\\
     \textbf{Rationale}: While a recommendation engine is proposed, it may be flawed or operate on outdated data. To ensure users don't miss a project that they may favour, providing multiple ways to display the list can bring different projects to the top.\\
+    \textbf{Fit Criterion}: The catalog offers search, filters, and at least two sort orders, and every open project can be reached without using recommendations.\\
     \textbf{Traces To}: \srsref{FR_ViewApprovedProjects}
 
     \item[]\reqitem{ssrnum}{SSR_AtomicActions} All system actions which involve multiple dependent reads and writes, with at least one write, shall be atomic.\\
     \textbf{Rationale}: System actions which involve multiple steps may fail at any point, leaving the system in a partially corrupt state. Atomicity guarantees that an operation either fully completes, or fully fails. Operations which fail can then simply be retried.\\
+    \textbf{Fit Criterion}: A fault injected after the first write of slot reservation, slot release, and approval leaves either all or none of that action's changes.\\
     \textbf{Traces To}: \srsref{NFR_ConcurrencySafety}
-
-    \item[]\reqitem{ssrnum}{SSR_ReverifyCriticalActions} The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.\\
-    \textbf{Rationale}: Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.\\
-    \textbf{Traces To}: \srsref{FR_ReverifyUsers}
-
-    \item[]\reqitem{ssrnum}{SSR_ZeroDefaultPrivileges} The system shall assign new users zero privileges when their identity cannot be assigned automatically or verified.\\
-    \textbf{Rationale}: No assumptions can be made about new users. They may be students who are not enrolled in a capstone course, malicious actors attempting to extract user information, individuals posing as supervisors to get free labour, etc. Ensuring no unverified users get access to the platform mitigates those risks.\\
-    \textbf{Traces To}: \srsref{FR_MacSSO}, \srsref{FR_AuthorizationRBAC}, \srsref{FR_UpdateRoles}, \srsref{NFR_Authorize}
 
     \item[]\reqitem{ssrnum}{SSR_NoStaleReads} The system shall ensure that operations on sets or aggregations of multiple data entries do not operate on stale data at any point during an operation.\\
     \textbf{Rationale}: Concurrent operations which rely on aggregations of data entries may introduce a data race, resulting in an invalid state after the operation. For example, two students attempting to join the same team which only has one available slot can end up exceeding the team size limit, if the mechanism is not implemented correctly.\\
+    \textbf{Fit Criterion}: Over repeated runs, two simultaneous requests to join a team with one free slot produce exactly one success and one explicit failure.\\
     \textbf{Traces To}: \srsref{NFR_ConcurrencySafety}
 
     \item[]\reqitem{ssrnum}{SSR_NotifyPendingActions} The system shall notify the user of pending actions when disabling a component fails.\\
     \textbf{Rationale}: It may be possible to disable certain components but require additional actions to be taken, such as responding to pending project approvals.\\
+    \textbf{Fit Criterion}: Attempting to disable the project approval component while at least one approval record is pending is rejected, and the pending records are listed.\\
     \textbf{Traces To}: \srsref{FR_RejectComponentDisable}
 
-    \item[]\reqitem{ssrnum}{SSR_EnforceVisibility} The system shall enforce visibility restrictions across all points of communication.\\
-    \textbf{Rationale}: Exposing IP or confidential information can lead to damages and loss of trust.\\
-    \textbf{Traces To}: \srsref{FR_AuthorizationRBAC}
+    \item[]\reqitem{ssrnum}{SSR_ReverifyCriticalActions} The system shall re-verify the user before performing any of the following actions: (1) changing credentials, email, or linked authentication; (2) deleting a proposal, project, profile, thread, or account; (3) changing a user's role or course association; (4) a supervisor or team accepting an agreement; (5) leaving or dissolving a team; (6) a final instructor or TA approval or rejection; (7) confirming an enrollment import or changing course rules or the approval mode. This list is closed; adding an action requires amending this requirement. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.\\
+    \textbf{Rationale}: Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.\\
+    \textbf{Traces To}: \srsref{FR_ReverifyUsers}\\
+    \textbf{Fit Criterion}: For each of the seven actions, attempting it in a session that has not been re-verified prompts for re-verification and does not perform the action until it succeeds.
 
-    \item[]\reqitem{ssrnum}{SSR_ProposalPromptCoverage} The system shall display project proposal prompts which cover all necessary information relevant to a project's viability as a capstone project.\\
-    \textbf{Rationale}: Prompting only an open-ended description provides supervisors with no information on what students and instructors are looking for in a capstone-level project.\\
-    \textbf{Traces To}: \srsref{FR_SupervisorProposal}, \srsref{FR_ProposalOptionalFields}
+    \item[]\reqitem{ssrnum}{SSR_EnforceVisibility} The system shall check every way of reading a record on the server against the visibility matrix in \srsref{DPR_VisibilityMatrix}. The covered channels are the project catalog, search and filters, project detail pages, threads, notification emails, exported reports, and recommendations.\\
+    \textbf{Rationale}: Exposing IP or confidential information can lead to damages and loss of trust. Checking only some channels leaves the others as a way around the restriction.\\
+    \textbf{Traces To}: \srsref{FR_AuthorizationRBAC}, \srsref{DPR_VisibilityMatrix}, \srsref{DPR_RoleBasedDataPermissions}\\
+    \textbf{Fit Criterion}: For each role and each covered channel, requesting a record that the matrix hides from that role is denied, and no notification email or export contains a field the recipient is not permitted to read.
+
+    \item[]\reqitem{ssrnum}{SSR_ProposalPromptCoverage} The proposal template shall require every Project attribute that the SRS data dictionary (\srsref{FR_SupervisorProposal}) marks as Required (background, objectives, impact, completion status, industry, supervisor capacity, confidentiality, and IP) and shall prompt for the Optional attributes.\\
+    \textbf{Rationale}: Prompting only an open-ended description gives supervisors no information on what students and instructors are looking for in a capstone-level project, and omits what students need to judge a project (for example how much already exists).\\
+    \textbf{Traces To}: \srsref{FR_SupervisorProposal}, \srsref{FR_ProposalOptionalFields}\\
+    \textbf{Fit Criterion}: Submission is blocked, with the empty field highlighted, if any Required attribute is empty, and succeeds when only Optional attributes are empty.
+
+    \item[]\reqitem{ssrnum}{SSR_ZeroDefaultPrivileges} The system shall assign new users zero privileges when their identity cannot be assigned automatically or verified. The exception is a new sign-in through the external authentication provider, which is assigned the unverified external supervisor role.\\
+    \textbf{Rationale}: No assumptions can be made about new users. They may be students who are not enrolled in a capstone course, malicious actors attempting to extract user information, individuals posing as supervisors to get free labour, etc. Ensuring no unverified users get access to student information mitigates those risks. Unverified external supervisors need only course reference material and their own proposals to submit a proposal.\\
+    \textbf{Traces To}: \srsref{FR_MacSSO}, \srsref{FR_AuthorizationRBAC}, \srsref{FR_UpdateRoles}, \srsref{NFR_Authorize}, \srsref{FR_ExternalSupervisorVerification}\\
+    \textbf{Fit Criterion}: A McMaster account with no assigned role receives an authorization error on every read and write of course data. A new external sign-in can read only course reference material, the proposal template, and its own proposals.
+
+    \item[]\reqitem{ssrnum}{SSR_ExternalSupervisorVerification} The system shall give an external supervisor access to student profiles and student-proposed projects only after an instructor approves a project proposal that the external supervisor submitted, and shall record the verification in the audit log. No other action shall verify an external supervisor.\\
+    \textbf{Rationale}: An external identity provider cannot confirm that a person is an industry sponsor, and student information must not be available to anyone who signs in. The instructor's review of a real proposal is the check.\\
+    \textbf{Traces To}: \srsref{FR_ExternalSupervisorVerification}, \srsref{FR_UpdateRoles}\\
+    \textbf{Fit Criterion}: A new external account requesting a student profile receives an authorization error. It can read one after an instructor approves its proposal, but not if a student proposal naming it is approved, and the verification appears in the audit log.
+
+    \item[]\reqitem{ssrnum}{SSR_ExternalSupervisorScope} The system shall restrict an external supervisor, on every channel listed in \ssrref{SSR_EnforceVisibility}, to the access specified in the SRS (\srsref{FR_ExternalSupervisorScope}): unverified external supervisors to course reference material, the proposal template, and their own proposals, and verified ones additionally to student profiles, student-proposed projects, and the applications to their own projects. Requests for any other supervisor's proposal or project shall be answered as not found.\\
+    \textbf{Rationale}: Industry project ideas are confidential, and any person can obtain an external account.\\
+    \textbf{Traces To}: \srsref{FR_ExternalSupervisorScope}, \srsref{DPR_VisibilityMatrix}\\
+    \textbf{Fit Criterion}: For each channel, an external supervisor requesting another sponsor's project receives a not-found response, and that project does not appear in any list, search result, count, or email to them. An unverified external supervisor is denied student profiles on every channel.
+
+    \item[]\reqitem{ssrnum}{SSR_PersonalDataDeletion} The system shall delete personal data on request and at the end of a course cycle, and shall collect only the data that a feature needs. Audit log entries are retained, with the user reference anonymized.\\
+    \textbf{Rationale}: Keeping personal data longer than needed increases the harm of a breach. Anonymizing rather than deleting audit entries keeps the audit log trustworthy.\\
+    \textbf{Traces To}: \srsref{NFR_EssentialPersonal}, \srsref{DPR_UserManagedContentDeletion}, \srsref{DPR_EndOfTermStudentDataDeletion}, \srsref{DPR_ConsentWithdrawal}\\
+    \textbf{Fit Criterion}: After a deletion request or the end-of-term job, personal fields are absent from the database and from exports (except data covered by consent to retain), and audit entries remain with no identifying user reference.
 
     \item[]\reqitem{ssrnum}{SSR_RespectfulDeclines} The system shall present decline and rejection decisions with respectful message templates and shall not publish rankings of students or teams.\\
     \textbf{Rationale}: Blunt or public decisions cause stress and a sense of unfair treatment, and may stop students from using the platform.\\
-    \textbf{Traces To}: \srsref{FR_DeclineTeam}, \srsref{FR_ApprovalResponse}
-
-    \item[]\reqitem{ssrnum}{SSR_PersonalDataDeletion} The system shall delete personal data on request and at the end of a course cycle, and shall collect only the data that a feature needs.\\
-    \textbf{Rationale}: Keeping personal data longer than needed increases the harm of a breach.\\
-    \textbf{Traces To}: \srsref{NFR_EssentialPersonal}
+    \textbf{Fit Criterion}: Every decline or rejection message is generated from a template, and no page ranks students or teams.\\
+    \textbf{Traces To}: \srsref{FR_DeclineTeam}
 
     \item[]\reqitem{ssrnum}{SSR_EnrollmentPreview} The system shall show a preview of any enrollment import and shall apply it only after course staff confirm it.\\
     \textbf{Rationale}: An unchecked import could wrongly add or exclude students and give misleading team validation results.\\
+    \textbf{Fit Criterion}: An import changes no enrollment record until the user confirms the preview.\\
     \textbf{Traces To}: \srsref{FR_ImportEnrollment}
 
     \item[]\reqitem{ssrnum}{SSR_EnrollmentFallback} If an enrollment import fails or does not include a student, the system shall leave existing enrollment unchanged, tell the user, and let course staff add students from a file or manually.\\
     \textbf{Rationale}: Avenue may be unavailable, may not exist for a course, or may lack late-joining students, and course staff must still be able to populate the course.\\
+    \textbf{Fit Criterion}: With Avenue unavailable, existing enrollment is unchanged, an error is shown, and file upload and manual add both work.\\
     \textbf{Traces To}: \srsref{FR_LogExternalErrors}, \srsref{FR_ImportEnrollment}, \srsref{FR_UpdateEnrollment}
 
     \item[]\reqitem{ssrnum}{SSR_NoAutoRemoval} The system shall not remove a student from a course or team because the student is absent from an enrollment import, and shall flag such students for confirmation by course staff.\\
     \textbf{Rationale}: Automatic removal could leave a team undersized or invalid in the middle of approval.\\
+    \textbf{Fit Criterion}: A student on a team who is absent from the latest import stays on the team and appears on a review list.\\
     \textbf{Traces To}: \srsref{FR_EnrollmentDiscrepency}
 
     \item[]\reqitem{ssrnum}{SSR_EnrollmentValidation} The system shall check imported enrollment for duplicate and malformed student entries and show any problems in the preview before the import can be confirmed.\\
     \textbf{Rationale}: Stale or partial data from an external source can corrupt enrollment records.\\
+    \textbf{Fit Criterion}: Duplicate and malformed entries are listed in the preview and block confirmation until resolved.\\
     \textbf{Traces To}: \srsref{FR_ImportEnrollment}
 
+    \item[]\reqitem{ssrnum}{SSR_ApprovalStatusIntegrity} The system shall display team-project status only from the stored status, using the lifecycle labels in the SRS, and shall hold a change to an approved record as pending until the instructor accepts it.\\
+    \textbf{Rationale}: Users act on the status they see. Showing Approved before approval, or altering the approved record early, leads teams and supervisors to act on an approval that does not exist.\\
+    \textbf{Traces To}: \srsref{FR_ViewProjectStatus}, \srsref{FR_ApprovalRevision}, \srsref{FR_RequestApproval}\\
+    \textbf{Fit Criterion}: A team in each non-Approved status is never displayed as Approved, and a submitted change to an approved record leaves the approved values unchanged until the instructor accepts it.
+
+    \item[]\reqitem{ssrnum}{SSR_AdapterSyncStatus} For records whose approval comes from an external approval system, the system shall show the time of the last successful synchronization, flag a failed synchronization, and allow the instructor or TA to record the outcome manually, with the manual change logged.\\
+    \textbf{Rationale}: A stale or failed sync makes \projname{} disagree with the system that holds the real decision, and users need to see that the data may be out of date.\\
+    \textbf{Traces To}: \srsref{FR_ExternalApproval}\\
+    \textbf{Fit Criterion}: With the external system made unavailable, the record shows the last-synced time and a failure flag, and a manual override by course staff is saved with an audit entry.
+
+    \item[]\reqitem{ssrnum}{SSR_NotificationRecipientScope} The system shall determine each notification's recipients at send time from the user's current role and association with the item, and shall limit the email body to an event summary and a link, excluding confidential project, IP, and profile fields.\\
+    \textbf{Rationale}: A misaddressed email can disclose confidential information outside the platform, where visibility rules cannot be enforced.\\
+    \textbf{Traces To}: \srsref{FR_ThreadsNotify}, \srsref{DPR_PreventUnauthorizedDisclosure}\\
+    \textbf{Fit Criterion}: After a user's role or association with an item is removed, no further notifications for that item are sent to them, and sampled emails contain no confidential fields.
+
+    \item[]\reqitem{ssrnum}{SSR_NotificationDeduplication} The system shall give each notification a unique identifier and shall not send the same notification to the same recipient more than once, including when delivery is retried.\\
+    \textbf{Rationale}: Durable delivery retries until success, which can duplicate messages if a confirmation is lost.\\
+    \textbf{Traces To}: \srsref{FR_DurableNotifications}\\
+    \textbf{Fit Criterion}: When delivery confirmation is suppressed and delivery retried, the recipient receives the notification exactly once.
+
+    \item[]\reqitem{ssrnum}{SSR_RuleChangeImpact} The system shall validate the course team formation rules on save (minimum size at most maximum size, at least one permitted program combination), restrict editing them to instructors, show the teams that a change would make non-compliant before it is applied, and flag those teams for instructor review rather than invalidating them.\\
+    \textbf{Rationale}: Wrong or retroactive rules can block valid teams or silently invalidate teams in the middle of approval.\\
+    \textbf{Traces To}: \srsref{FR_ValidateTeamRules}, \srsref{FR_DisableFeatures}\\
+    \textbf{Fit Criterion}: A configuration with minimum above maximum is rejected, a change that affects existing teams shows them in a preview, and after applying it those teams remain intact and appear on a review list.
 \end{itemize}
 
 \section{Roadmap}
@@ -655,6 +789,9 @@ The safety and security requirements follow the phases of the development plan i
 implemented in the same phase as the feature it protects, so that no feature is released without the
 protection that its hazards call for. Requirements that protect features outside the course timeline, or that
 depend on parts of the system that are faked for the demo, are future work.
+
+Within a phase, the order of requirements follows the dependencies between features in the SRS development plan,
+not a computed risk score. Any requirement deferred to future work is listed below with the reason it can safely wait.
 
 \subsection{Phase 1: Core Workflow (implemented in the course)}
 
@@ -668,6 +805,7 @@ team project submission and review, and the validated team composition export.
     \item \ssrref{SSR_ZeroDefaultPrivileges}: new accounts have no privileges until their role is assigned (\hazref{H_WrongRole}).
     \item \ssrref{SSR_AuditLog}: an append-only audit log for approval decisions, status changes, and role changes (\hazref{H_WrongRole}).
     Logging every user action is future work.
+    \item \ssrref{SSR_ExternalSupervisorVerification}, \ssrref{SSR_ExternalSupervisorScope}: the unverified state for every external sign-in, verification through approval of the supervisor's own proposal, and external-supervisor scoping on every read path (\hazref{H_UnvettedExternalAccess}, \hazref{H_CrossSponsorExposure}). These stay in scope even though the demo uses simplified sign-in, because the role checks do not depend on the real identity provider.
     \item \ssrref{SSR_RecordTimestamps}: last-updated time shown on project records (\hazref{H_OutdatedProject}).
     \item \ssrref{SSR_MultipleBrowseViews}: several ways to sort and filter the project list when browsing (\hazref{H_IrrelevantRanking}). Ranked recommendations
     themselves are future work.
@@ -680,6 +818,8 @@ team project submission and review, and the validated team composition export.
     \item \ssrref{SSR_RespectfulDeclines}: decline and rejection message templates, with no public rankings (\hazref{H_BluntRejection}).
     \item \ssrref{SSR_EnrollmentPreview}, \ssrref{SSR_EnrollmentFallback}, \ssrref{SSR_NoAutoRemoval}, \ssrref{SSR_EnrollmentValidation}: preview and confirmation, fallbacks, flagging, and
     checks for imported enrollment (\hazref{H_ImportUnavailable} to \hazref{H_LateStudent}). Enrollment import is part of Phase~1 in the SRS.
+    \item \ssrref{SSR_ApprovalStatusIntegrity}: only the stored team-project status is displayed, and changes to approved records are held until accepted (\hazref{H_MisleadingApprovalStatus}).
+    \item \ssrref{SSR_RuleChangeImpact}: validation of course rules and a preview of affected teams before a rule change is applied (\hazref{H_RuleMisconfiguration}).
 \end{itemize}
 
 \subsection{Phase 2: Communication and Visibility (implemented in the course)}
@@ -693,6 +833,7 @@ identifying unselected projects.
     \item \ssrref{SSR_ExternalErrorLogging}: alerts to the instructor when an external provider fails (\hazref{H_AuthProviderOutage}).
     \item \ssrref{SSR_EnforceVisibility}: visibility checks are extended to team profiles, contact details, and unselected projects
     (\hazref{H_ConfidentialExposure}).
+    \item \ssrref{SSR_NotificationRecipientScope}, \ssrref{SSR_NotificationDeduplication}: recipients resolved at send time, summary-only email bodies, and unique notification identifiers (\hazref{H_MisaddressedNotification}, \hazref{H_DuplicateNotification}).
 \end{itemize}
 
 \subsection{Phase 3: Extended Features (implemented if time allows)}
@@ -709,15 +850,15 @@ identifying unselected projects.
 \begin{itemize}
     \item \ssrref{SSR_RejectDisable}, \ssrref{SSR_NotifyPendingActions}: rules for disabling components apply once features can be switched on and off for
     each course (modularity and other courses). Until then the hazard (\hazref{H_DisableBreaksWorkflow}) cannot occur.
-    \item \ssrref{SSR_ReverifyCriticalActions}: re-verification for critical actions with email codes or MFA depends on real authentication
+    \item \ssrref{SSR_ReverifyCriticalActions}: re-verification with email codes or MFA depends on real authentication
     (McMaster accounts and external accounts), which is simplified for the demo. In the course the system only asks
-    for confirmation before destructive actions (\hazref{H_SessionTheft}).
-    \item \ssrref{SSR_MultipleBrowseViews}: ranking and explaining recommendations, with matching of teams to projects (\hazref{H_IrrelevantRanking}).
-    \item \ssrref{SSR_AuditLog}: full action logging, and tamper-evident logs.
-    \item \ssrref{SSR_ExternalErrorLogging}: notifying university IT of provider outages.
-    \item \ssrref{SSR_PersonalDataDeletion}: deletion on request and at the end of a course cycle (\hazref{H_ExcessRetention}).
-    \item Hazards of any integration with an external approval system (stale or failed synchronization) need
-    requirements of their own when it is built.
+    for confirmation before the destructive actions on the list (\hazref{H_SessionTheft}). The deferral is acceptable because demo accounts hold no real student or sponsor data.
+    \item \ssrref{SSR_AdapterSyncStatus}: needed only when an adapter to an external approval system is built. Until then approvals are recorded manually, which is the case this requirement's manual override already covers (\hazref{H_AdapterSyncFailure}).
+    \item \ssrref{SSR_MultipleBrowseViews}: ranking and explaining recommendations, with matching of teams to projects (\hazref{H_IrrelevantRanking}). The Phase~1 sorting and filtering already keep every project reachable without recommendations.
+    \item \ssrref{SSR_AuditLog}: full action logging and tamper-evident storage. Phase~1 logs the actions whose outcomes may need review or reversal (approvals, status changes, role changes); logging every other action adds volume without supporting a decision.
+    \item \ssrref{SSR_ExternalErrorLogging}: notifying university IT of provider outages. In the course deployment the instructor is notified in Phase~2; contacting IT depends on a hosting arrangement outside the course.
+    \item \ssrref{SSR_PersonalDataDeletion}: deletion on request and at the end of a course cycle (\hazref{H_ExcessRetention}). The demo uses seeded data and holds no real student information, so retention harm arises only once a real deployment stores it. Minimal collection (\srsref{NFR_EssentialPersonal}) applies from Phase~1.
+    \item Hazards of any integration with an external approval system beyond \hazref{H_AdapterSyncFailure} need requirements of their own when it is built.
 \end{itemize}
 
 \newpage{}
