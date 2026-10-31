@@ -403,7 +403,7 @@ Oct 30th 2026 & 1.5 & Addressed conflicts in defintions and acronyms, added like
     Approval adapter & A component that reads the approval outcome of a team project from an external approval system and updates the team-project status. Integrated mode is only available for courses that have an adapter.\\
     Custom document & A deliverable, chosen by each team from a list, that suits the type of project
     (for example, a usability testing report).\\
-    TA & Teaching assistant who supports a capstone course. TAs can populate course information, view projects and teams, and take part in team project approval, and may be assigned to specific teams (\rref{FR_Label40}). A TA does not take part in project proposal approval.\\
+    TA & Teaching assistant who supports a capstone course. TAs can populate course information, view projects and teams, and take part in team project approval, and may be assigned to specific teams. A TA does not take part in project proposal approval.\\
     Administrator & An instructor or TA with the administrator permission (\texttt{is\_admin} set), who can manage users' course association and roles, read the external-provider error log, and delete data that other users cannot. Not a separate role.\\
     MacID & A McMaster University user account identifier.\\
     Avenue to Learn (Avenue) & McMaster's learning management system. It holds course enrollment for courses that have
@@ -1809,8 +1809,8 @@ Instructor (Dr. Reyes), Teaching Assistant
     \item \textbf{TAs (Child of User)}: TAs assist instructors in course and team management, including approving team
     projects, and may be assigned to teams.
     \item \textbf{Administrator permission (\texttt{is\_admin} on an Instructor or TA)}: Lets the user manage users' course
-    association and roles (\rref{FR_Label30}), read the external-provider error log (\rref{FR_Label31}), and delete data
-    per \dprref{DPR_Label6}. It is a permission, not a separate role.
+    association and roles (\rref{FR_UpdateRoles}), read the external-provider error log (\rref{FR_LogExternalErrors}), and delete data
+    per \dprref{DPR_AdministratorDeletionControl}. It is a permission, not a separate role.
     \item \textbf{Course}: A McMaster capstone course supported by Keystone (such as SE, CS, TRON) 
     and includes settings for a capstone course that enables features and implements team formation/
     project selection rules. It contains member and enrollment information, including where the enrollment list comes
