@@ -121,6 +121,12 @@
 \newcommand{\thinkTime}{10 seconds}
 
 \usepackage[margin=0.75in]{geometry}
+\newcommand{\recoveryPointWindow}{24 hours}
+\newcommand{\backupInterval}{24 hours} % must not exceed \recoveryPointWindow
+\newcommand{\healthCheckInterval}{1 minute}
+\newcommand{\availabilityWindow}{30-day}
+
+\usepackage{fullpage}
 
 \begin{document}
 
@@ -391,11 +397,13 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     reject it. \\
     Team project approval & The course instructor or TA's decision to approve a team's selected project
     and membership \\
-    Approval mode & How a course handles approval: in-platform, external, or integrated.\\
+    Approval mode & How a course carries out team project approval: in-platform (review runs in \projname{}), external (review happens outside \projname{}; an instructor or TA records the outcome manually), or integrated (an approval adapter reads the outcome from the external system).\\
+    Approval adapter & A component that reads the approval outcome of a team project from an external approval system and updates the team-project status. Integrated mode is only available for courses that have an adapter.\\
     Custom document & A deliverable, chosen by each team from a list, that suits the type of project
     (for example, a usability testing report).\\
-    TA & Teaching assistant who supports a capstone course and is assigned to one or more teams. TAs can populate course
-    information and participate in team project approvals. A TA does not take part in project proposal approval. \\
+    TA & Teaching assistant for a capstone course (course TA). Can populate course information, view projects and teams, and take part in team project approval. A TA does not take part in project proposal approval.\\
+    Team TA & A course TA assigned to a specific team (\rref{FR_Label40}). A course TA need not be a team TA.\\
+    Administrator & A user with \texttt{is\_admin} set, who operates the deployed system: manages users' course association and roles, reads the external-provider error log, and may delete data not owned by them. Not a course role. May be university IT staff or an instructor.\\
     MacID & A McMaster University user account identifier.\\
     Avenue to Learn (Avenue) & McMaster's learning management system. It holds course enrollment for courses that have
     an Avenue site, which is optional. \\
@@ -1853,8 +1861,9 @@ Instructor (Dr. Reyes), Teaching Assistant
   with no approved team is \emph{unselected} (see \ucref{UC_FollowUpUnselected}).
 
   \textbf{Review.} Proposals and team projects are each reviewed by the course instructor, who can approve,
-  request changes (the proposer or team then resubmits), or reject. In an \emph{external} approval mode the
-  instructor or TA records the outcome instead of the platform running the review (see \rref{FR_ExternalApproval}).
+  request changes (the proposer or team then resubmits), or reject. In \texttt{EXTERNAL} approval mode the instructor or TA records the outcome in \projname{} by hand. In
+  \texttt{INTEGRATED} mode an approval adapter reads the outcome from the external system. In both cases the platform
+  does not run the review (see \rref{FR_ExternalApproval}).
 
   \textbf{Changes after approval.} A team may submit a change to an approved project. The team's status
   stays \emph{Approved} (shown as \emph{Approved, change under review}), and the original approval
@@ -1866,12 +1875,12 @@ Instructor (Dr. Reyes), Teaching Assistant
     \toprule
     \textbf{Entity 1} & \textbf{Entity 2} & \textbf{Multiplicity} & \textbf{Description}\\
     \midrule
-    Student & Course & N : 1 & A student may be in exactly one course \\ \hline
+    Student & Course & N : 1 & A student is enrolled in exactly one course \\ \hline
     Instructor & Course & N : M & An instructor manages one or more courses \\ \hline
     TA & Course & N : M & A TA assists in one or more courses \\ \hline
+    TA & Team & 1 : N & A course TA may be assigned as team TA to many teams. A team has at most one team TA \\ \hline
     Student & Student Profile & 1 : 0..1 & A student may have one student profile associated with their account\\ \hline
     Student & Team & N : 0..1 & A student belongs to at most one team\\ \hline
-    TA & Team & 1 : N & A TA may be assigned to many teams. A team has at most one assigned TA \\ \hline
     Supervisor & Project & 1 : N & A supervisor may supervise multiple projects\\ \hline
     User & Notification & 1 : N & A user may receive multiple notifications\\ \hline
     User & Checklist & 1 : N & A user may have multiple checklists to handle\\ \hline
@@ -1881,7 +1890,8 @@ Instructor (Dr. Reyes), Teaching Assistant
     Team & Project & N : 0..1 & A student team may have at most one project while a project could have multiple teams.\\ \hline
     Team & Project Application & 1 : N & A student team may submit multiple project applications.\\ \hline
     Project & Project Application & 1 : N & A project may have many project applications but each application belongs to a single project.\\ \hline
-    Project & Thread & 1 : N & A project may have many threads but each thread belongs to a single application.\\ \hline
+    Project & Thread & 1 : N & A project may have many threads but each of those threads belongs to a single project.\\ \hline
+    Project Application & Thread & 1 : N & An application may have many threads but each of those threads belongs to a single application.\\ \hline
     Course & Project & 1 : N & Many projects belong to one course\\ \hline
     Course & Course Resource & 1 : N & A course may have many course resources\\ \hline
     \caption{Entity Relationships} \label{tab:EntityRelationships}
@@ -1920,12 +1930,12 @@ Instructor (Dr. Reyes), Teaching Assistant
       email & String & Email of the user \\ \hline
       user\_name & String & MAC ID if signin through SSO or other Auth ID \\ \hline
       account\_status & Enum & Statuses such as ACTIVE, DISABLED, PENDING \\ \hline
-      is\_admin & Boolean & Determines if user is an admin as they may have higher privileges \\ \hline
+      is\_admin & Boolean & True if the user is an administrator (see Table~\ref{tab:DefinitionsAndAcronyms}). Never true for a Student; may be true for an instructor or university IT staff. Only an administrator can change it. \\ \hline
 
       % USER: STUDENT
       \multicolumn{3}{|l|}{\textbf{Student (Child of User)}}\\ \hline
       mac\_id & String & Mac IDs for students \\ \hline
-      student\_number & String & Unique ID for each user \\ \hline
+      student\_number & String & McMaster student number, unique per student \\ \hline
       enrolled\_course & Course & Capstone course in which the student is enrolled. \\ \hline
       enrollment\_status & Enum & ENROLLED, or FLAGGED if absent from the latest import \\ \hline
 
@@ -1960,7 +1970,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       max\_team\_size & Integer & Maximum number of students allowed in a team team. \\ \hline
       allowed\_combinations & Collection\textless Set\textless Enum\textgreater\textgreater & Permitted combinations of SE, CS, and TRON students. \\ \hline
       capstone\_rules & Collection\textless String\textgreater & Additional descriptive course rules. \\ \hline
-      approval\_mode & Enum & Determines where project approvals are handled (custom or not) INTERNAL, EXTERNAL, INTEGRATION \\ \hline
+      approval\_mode & Enum & How the course carries out team project approval: IN\_PLATFORM, EXTERNAL (instructor or TA records the outcome manually), or INTEGRATED (an approval adapter reads the outcome). See Table~\ref{tab:DefinitionsAndAcronyms}. \\ \hline
       threads & Collection\textless Thread\textgreater & Allow instructors to communicate important information to all supervisors and students in the course. \\ \hline
       resource & Collection\textless CourseResource\textgreater & Instructors can post course outline, timeline, guidelines, FAQ, past capstone examples, or any other course related content. \\ \hline
       enrollment\_source & Enum & AVENUE or FILE; how the enrollment list is populated \\ \hline
@@ -1989,7 +1999,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       member\_roles & Collection\textless Enum\textgreater & All roles of team members. \\ \hline
       poc & Student & Reference to the point of contact on the team. \\ \hline
       project & Project & Which project they have selected, if applicable. \\ \hline
-      status & Enum & The team-project status of the team's current application or project (see Section~\ref{sec:lifecycle}). \\ \hline
+      status & Enum & Derived, not stored independently: the team-project status of the team's current ProjectApplication (see Section~\ref{sec:lifecycle}). \texttt{ProjectApplication.status} is the source of truth. \\ \hline
       updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
       ta & TA & Reference to the TA assigned to the team, if any. \\ \hline
 
@@ -2098,19 +2108,19 @@ Instructor (Dr. Reyes), Teaching Assistant
   The following are requirements how the system will manage data to ensure security and privacy in its lifecycle.
 
   \subsubsection{Storage}
-  \begin{enumerate}
+    \begin{enumerate}
     \item[]\reqitem{dprnum}{DPR_CentralizedDataStorage} The system shall securely store its data in a centrally managed backend system accessible by authorized actors
-    \item[]\reqitem{dprnum}{DPR_DataEntityStructure} The system shall store data based on the Data Entity definitions in Sections 7.1 and 7.2
-    \item[]\reqitem{dprnum}{DPR_DataAccuracyAndConsistency} The system shall maintain accuracy and consistency of stored information ensuring it is up-to-date based on real-time actions
-    \item[]\reqitem{dprnum}{DPR_BiweeklyDataBackups} The system shall backup all data every 2 weeks to reduce the risk of data loss from system failures or deletions
+    \item[]\reqitem{dprnum}{DPR_DataEntityStructure} The system shall store data based on the Data Entity definitions in Sections~\ref{sec:entities} and~\ref{sec:dictionary}
+    \item[]\reqitem{dprnum}{DPR_DataAccuracyAndConsistency} The system shall ensure that once a change has been saved, every later request for that data returns the updated version.
+    \item[]\reqitem{dprnum}{DPR_BiweeklyDataBackups} The system shall back up all data at least once every \backupInterval{} to reduce the risk of data loss from system failures or deletions
   \end{enumerate}
 
   \subsubsection{Data Retention and Deletion}
   \begin{enumerate}
     \item[]\reqitem{dprnum}{DPR_CourseDataRetention} The system shall retain instructor and course related data to be used the following year until the instructor has taken action to make the deletions.
-    \item[]\reqitem{dprnum}{DPR_AdministratorDeletionControl} The system shall allow restricted deletion of any data only by authorized administrators that are managing the application with access to the database.
+    \item[]\reqitem{dprnum}{DPR_AdministratorDeletionControl} The system shall allow deletion of data beyond what \dprref{DPR_UserManagedContentDeletion} permits (content the user did not create and is not managing) only by administrators (users with \texttt{is\_admin} set).
     \item[]\reqitem{dprnum}{DPR_UserManagedContentDeletion} The system shall allow authorized users to delete content that they created or are specifically managing on the application including their own personal information as well as make edits.
-    \item[]\reqitem{dprnum}{DPR_EndOfTermStudentDataDeletion} The system shall automatically delete student information at the end of the capstone period
+    \item[]\reqitem{dprnum}{DPR_EndOfTermStudentDataDeletion} The system shall automatically delete student information, including copies held in backups, at the end of the capstone period
     \item[]\reqitem{dprnum}{DPR_ConsentBasedProjectRetention} The system shall only retain completed project information past the capstone period if the team has consented
   \end{enumerate}
 
@@ -2231,7 +2241,7 @@ Instructor (Dr. Reyes), Teaching Assistant
     \textbf{Rationale}: No assumptions about users can be made beyond basic web browsing abilities, as described in the user characteristics section (Section~\ref{SecUserCharacteristics}). Many existing web applications that perform similar functions are able to provide an intuitive experience requiring no prior knowledge.\\
     \textbf{Fit Criterion}: A first-time user shall be able to complete the procedure as described in
     Section~4.2.1 of the \href{https://github.com/Ayushpatel2026/Keystone/blob/main/pdfs/VnVPlan/VnVPlan.pdf}{Verification and Validation Plan}
-    up to the described standard.
+        up to the described standard.
 
   \end{enumerate}
 
@@ -2289,9 +2299,9 @@ Instructor (Dr. Reyes), Teaching Assistant
     \textbf{Rationale}: The system being inaccessible can result in missed deadlines, data loss, and overall frustration. This can impact adoption, perception, and erode trust.\\
     \textbf{Fit Criterion}: The system responds to a periodic health check, which runs every minute, with success responses accounting for at least \uptimePercent{} over any 7-day period. Scheduled maintenance windows are excluded from the measurement.
 
-    \item[]\idlabel{NFR_Recoverable}\label{NFR_Recoverable} The system shall be recoverable after an incident to a previous state within the 24 hours before the incident.\\
-    \textbf{Rationale}: The system might experience a data loss incident. It must be recoverable with minimal losses.\\
-    \textbf{Fit Criterion}: The system can be restored to a previous state using the interface.
+    \item[]\idlabel{NFR_Recoverable}\label{NFR_Recoverable} The system shall be recoverable after an incident to a state no more than \recoveryPointWindow{} older than the incident. Only if every recovery point within that window is unavailable or fails to restore, the system shall recover from the most recent available recovery point outside the window.\\
+    \textbf{Rationale}: The system might experience a data loss incident. It must be recoverable with minimal losses, and a failed or missing recent backup should not leave the system unrecoverable.\\
+    \textbf{Fit Criterion}: Using the interface, the system can be restored to a state no more than \recoveryPointWindow{} older than a simulated incident. When every recovery point within the window is made unavailable, the system restores the most recent recovery point outside the window and tells an administrator that the window was not met.
   \end{enumerate}
 
   \subsubsection{Capacity Requirements}
@@ -3202,7 +3212,6 @@ and then the dependencies between features.
     \hline
     \textbf{Constant} & \textbf{Value} & \textbf{Description} & \textbf{NFR Reference} \\ \hline
     Maintenance Effort & \maintFrac & Maintenance effort as a fraction of total development effort. & \idref{NFR_ChangeEffort} \\ \hline
-    Change Effort & \changeEffort & Cost for weekly maintenance effort based on development effort. & \idref{NFR_ChangeEffort} \\ \hline
     Usability Success Percentage & \usabilityTestSuccessPerc & Percentage of first-time test participants who successfully complete their primary tasks. & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted} \\ \hline
     Usability Test Time & \usabilityTestTime & Time for first-time users to complete their primary tasks. & \idref{NFR_UsabilityFirstSuccess}, \idref{NFR_LearnUnassisted} \\ \hline
     Deploy Time & \deployTime & Deployment time by IT professional with a deployment guide and no assistance. & \idref{NFR_DeployUnassisted} \\ \hline
@@ -3212,6 +3221,10 @@ and then the dependencies between features.
     Tail Latency & \tailLatency & Maximum response latency at the specified percentile. & \idref{NFR_PerfTail}, \idref{NFR_PeakUsers} \\ \hline
     Concurrent Users & \concurrentUsers & Peak number of concurrent users simulated during performance testing. & \idref{NFR_PerfTail}, \idref{NFR_PeakUsers} \\ \hline
     User Think Time & \thinkTime & Pause between actions for each simulated user during performance testing. & \idref{NFR_PerfTail} \\ \hline
+    Recovery Point Window & \recoveryPointWindow & Maximum age of the restored state relative to the incident, except when no recovery point within the window is available (see \idref{NFR_Recoverable}). & \idref{NFR_Recoverable} \\ \hline
+    Backup Interval & \backupInterval & Maximum time between backups. Must not exceed the recovery point window. & \dprref{DPR_BiweeklyDataBackups}, \idref{NFR_Recoverable} \\ \hline
+    Health Check Interval & \healthCheckInterval & Time between availability health checks. & \idref{NFR_Uptime} \\ \hline
+    Availability Window & \availabilityWindow & Period over which uptime is measured. & \idref{NFR_Uptime} \\ \hline
     \caption{Auxiliary Constants}
     \label{tab:AuxiliaryConstants}
 \end{longtable}
