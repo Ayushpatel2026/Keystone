@@ -96,6 +96,8 @@
 \newcounter{isn}
 \newcounter{instn}
 \newcounter{tin}
+\newcounter{cin}
+\newcommand{\stkCI}{\hyperref[app:stk_cs]{CI}}
 \newcommand{\stkS}{\hyperref[app:stk_student]{S}}
 \newcommand{\stkES}{\hyperref[app:stk_extsup]{ES}}
 \newcommand{\stkIS}{\hyperref[app:stk_intsup]{IS}}
@@ -399,6 +401,11 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     an Avenue site, which is optional. \\
     Enrollment list & The list of students enrolled in a capstone course, imported from Avenue to Learn or uploaded from a
     file. \\
+    External supervisor & A supervisor who signs in without a McMaster account. Every external sign-in is an
+    external supervisor, who is \emph{unverified} until an instructor approves a project proposal that the supervisor submitted, and \emph{verified} afterwards.\\
+    Verified external supervisor & An external supervisor whose project proposal has been approved by an instructor.
+    Can additionally read student profiles and student-proposed projects.
+    Never able to read other supervisors' proposals or projects.\\
     \bottomrule
     \caption{Definitions and Acronyms} \label{tab:DefinitionsAndAcronyms}
   \end{longtable}
@@ -750,7 +757,10 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
     to function. It shall support courses that carry out approval in the platform, courses that carry
     it out elsewhere, and, where an adapter exists, courses that synchronize with an external process.
     \item \textbf{Users outside the university.} \projname{} shall support users who do not have a
-    McMaster account (such as industry sponsors) alongside users who do.
+    McMaster account (such as industry sponsors) alongside users who do. An external identity provider
+    cannot confirm who a person is, so external supervisors have restricted access until an instructor
+    approves one of their project proposals (see \rref{FR_ExternalSupervisorVerification} and
+    \rref{FR_ExternalSupervisorScope}).
     \item \textbf{Configurable course rules.} As \projname{} should be extensible to different capstone courses,
     course-specific rules, such as which programs may work together on which projects and the minimum and maximum
     team size, shall be set by the course instructor as configuration and shall not be fixed in the design.
@@ -796,7 +806,7 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
         Student teams shall have a documented process for proposing their
         own project, including a template and guidance on how to calibrate the scope.
         Student-proposed projects shall be visible to supervisors so that teams and supervisors
-        can find each other without the system matching them. (\stkS, \stkIS)
+        can find each other without the system matching them. (\stkS, \stkIS, \stkCI)
 
         % ---------- Project discovery and selection ----------
         \item[]\reqitem{srnum}{SR_BrowseProjects}
@@ -804,9 +814,9 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
         place and see which projects are availible versus already assigned to a team. (\stkS)
 
         \item[]\reqitem{srnum}{SR_ProjectStatus}
-        All stakeholders should be able to see the status of all projects
+        All stakeholders should be able to see the status of all projects they are permitted to view
         (e.g., open, full, closed) and the stage each team has reached on a project (e.g., applied,
-        agreed, approved) at any time. (\stkS, \stkES, \stkSEI)
+        agreed, approved) at any time. (\stkS, \stkES, \stkSEI, \stkCI)
 
         \item[]\reqitem{srnum}{SR_StatusNotify}
         Stakeholders shall be notified when the status of a project they care
@@ -877,12 +887,19 @@ Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
 
         \item[]\reqitem{srnum}{SR_CourseConfig}
         Instructors shall be able to choose which features their course uses and set their course's rules, so that a
-        course with a simpler process is not burdened by features it does not need. (\stkSEI, \stkTI)
+        course with a simpler process is not burdened by features it does not need. (\stkSEI, \stkTI, \stkCI)
 
         \item[]\reqitem{srnum}{SR_Enrollment}
         Instructors and TAs shall be able to populate a course with its enrolled students without entering each student
         by hand, using Avenue to Learn or through file upload, and they shall be able to see which enrolled
         students are not yet on a team. (\stkSEI, \stkTI)
+
+        \item[]\reqitem{srnum}{SR_ExternalSupervisorAccess}
+        External supervisors shall be able to sign in without a McMaster account and immediately see the course
+        information, past project examples, and proposal template, so that they can propose a project. Their
+        confidential project ideas shall not be visible to other external supervisors or to people with no connection to the
+        course. Once an instructor approves an external supervisor's proposal, they shall also see student profiles and
+        student-proposed projects, but never other supervisors' projects. (\stkCI, \stkSEI, \stkES)
 
   \end{itemize}
 
@@ -1046,11 +1063,13 @@ Instructor (Dr. Reyes)
 \textbf{Main Success Scenario}
 \begin{enumerate}
   \item The instructor opens the list of proposals awaiting review.
-  \item The system shows the instructor a proposal with all the filled out fields.
-  \item The instructor assesses the proposal against the approval criteria he has deteremined.
+  \item The system shows the instructor a proposal with all the filled out fields, and whether the proposer is a verified supervisor.
+  \item The instructor assesses the proposal against the approval criteria he has determined.
+  \item The instructor verifies that the proposer is a verified supervisor and not bad actor.
   \item The instructor approves the proposal by listing it.
   \item The system changes the status from ``Proposal submitted'' to ``Open'' and notifies the
-    proposer.
+    proposer. If the proposer is an unverified external supervisor, the system also marks them verified and
+    tells them that they can now see student profiles and student-proposed projects.
 \end{enumerate}
 
 \textbf{Alternative Flows}
@@ -1068,6 +1087,7 @@ Instructor (Dr. Reyes)
 \begin{itemize}
   \item The proposal has the status ``Open'', ``Proposal changes requested'', or
     ``Proposal rejected'', and the full feedback history is saved.
+  \item If the proposer was an unverified external supervisor, they are now verified
 \end{itemize}
 
   \textbf{Related Requirements:} \idref{SR_HumanApproval},
@@ -1562,20 +1582,22 @@ Instructor (Dr. Reyes), Teaching Assistant
               \fitcrit{A student team can successfully create a project proposal, fill out the defined fields with the above information, and the proposal appears in a student-proposed project list.}
 
               \item[]\reqitem{reqnum}{FR_ReviewProposal} The system shall allow instructors to review project proposals submitted by supervisors and approve, request, or provide feedback and request changes.
+              Approving a proposal submitted by an unverified external supervisor verifies that supervisor (\rref{FR_ExternalSupervisorVerification}).
               \rationale{Instructors need to verify that the proposed project is sufficient for a Senior-level capstone project and that the details provided are sufficiet for an understanding of the project.}
               \fitcrit{A instructor can access a project proposal then accept, reject, or request changes successfully. Rejection or change requests are sent back to the supervisor for revision while accepted projects are included in the student project catalog.}
 
               % ---------- Project Catalog ----------
-              \item[]\reqitem{reqnum}{FR_ViewApprovedProjects} The system shall provide a centralized catalog where all projects approved by the instructor can be found, filtered, and browsed based on details and availability.
+              \item[]\reqitem{reqnum}{FR_ViewApprovedProjects} The system shall provide a centralized catalog
+              where all projects approved by the instructor that the user is permitted to view (Table~\ref{tab:Visibility}) can be found.
               \rationale{Students should be able to find projects and compare the varying opportunities with their team's skills and interests.}
               \fitcrit{Users can view all the projects that were approved by the professor, search by title or keywords, and filter by the varying project fields. The filter and search options should also only return the relevant projects.}
 
               \item[]\reqitem{reqnum}{FR_ViewProjectStatus} The system shall display the current availability status of each project in the catalog (open or full) and the maximum number of teams it can take. See Figure~\ref{fig:lifecycle}.
               \rationale{It is critical for students and supervisors to have clear visibility which projects are still available for selection. This gives students the ability to still request available projects if they have been rejected from others and supervisors to properly advertise their status.}
-              \fitcrit{Each project in the catalog clearly displays the availability status and the supervisor capacity. Even if labels are not updated in real-time, the core application should respond to user actions appropriately based on status (i.e. taken projects cannot be requested).}
+              \fitcrit{Each team's team-project status is displayed using only the lifecycle labels, and a team that is not Approved is never displayed as Approved. Even if labels are not updated in real-time, the core application should respond to user actions appropriately based on status (i.e. taken projects cannot be requested).}
 
               % ---------- Student Profile ----------
-              \item[]\reqitem{reqnum}{FR_StudentProfile} The system shall allow students to create and update their profiles providing background information including bio, program, interests, project preferences, skills, experience, work style, and LinkedIn that are viewable by all users within the course.
+              \item[]\reqitem{reqnum}{FR_StudentProfile} The system shall allow students to create and update their profiles providing background information including bio, program, interests, project preferences, skills, experience, work style, and LinkedIn that are viewable by students, TAs, instructors, and approved supervisors.
               \rationale{Informative profiles allows students to discover other students with similar skills and interests when forming teams. It also allows supervisors to briefly evaluate interested students before interviewing them.}
               \fitcrit{Students can create, save, update, and visit their profiles. These profiles should also be viewable by other students and supervisors.}
 
@@ -1585,6 +1607,7 @@ Instructor (Dr. Reyes), Teaching Assistant
               \fitcrit{Students are able to create a team, send invitations to selected students to which those students can accept or deny, specify number of members needed and assign roles including a point-of-contact. Students can join an existing team.}
 
               \item[]\reqitem{reqnum}{FR_ValidateTeamRules} The system shall validate team membership based on up-to-date course team formation rules, including minimum and maximum team sizes, permitted program combinations, and duplicate membership.
+              When course rules change, the system shall show the teams that no longer comply and flag them for instructor review without invalidating them.
               \rationale{The capstone course requires that certain constraints are met when forming teams and automating this reduces administrative efforts for TAs and Instructors.}
               \fitcrit{The system prevents team formations that violate any of the rules mentioned above.}
 
@@ -1606,6 +1629,7 @@ Instructor (Dr. Reyes), Teaching Assistant
               \fitcrit{A student can submit an application expressing their interest to the project that can be reviewed by the supervisor.}
 
               \item[]\reqitem{reqnum}{FR_DeclineTeam} The system shall allow supervisors to accept or decline requests from student teams to work on their proposed projects, and record when both parties agree to the working arrangement. See Figure~\ref{fig:lifecycle}
+              Decline decisions shall be communicated using respectful message templates with an optional reason, and the system shall not publish rankings of students or teams.
               \rationale{This reduces confusion by explicitely recording when both parties have understood each other's terms and have formally agreed to work with each other.}
               \fitcrit{Both the supervisor and students can record a decision to confirm or deny the terms of the project. An agreement is marked after both parties accept.}
 
@@ -1616,6 +1640,7 @@ Instructor (Dr. Reyes), Teaching Assistant
               \fitcrit{An authorized user can create or respond to a thread under a project proposal, project application, or a team formation they are associated with.}
 
               \item[]\reqitem{reqnum}{FR_ThreadsNotify} The system shall notify a user by email when there is a new reply in a thread they are part of, a decision on their application, agreement, or submission, or a status change on a project or team they are associated with.
+              Recipients shall be determined when the notification is sent, and the email body shall contain only a summary of the event and a link, excluding confidential project, IP, and profile fields.
               \rationale{Notifications keep related stakeholders informed regarding project-related updates and decisions without repeatedly checking the platform.}
               \fitcrit{Any changes to a project's status, decisions from either a student/supervisor, and thread updates, the system sends an email identifying the event to all relevant and authorized users. Students also get notifications for new project listing.}
 
@@ -1629,6 +1654,7 @@ Instructor (Dr. Reyes), Teaching Assistant
               \fitcrit{An instructor or TA can select an approval decision for the submitted team-project and provide feedback to improve project descriptions or identify missing items.}
 
               \item[]\reqitem{reqnum}{FR_ExternalApproval} The system shall support recording capstone project and team approvals either manually by instructors or TAs associated with the project or automatically through an adapter.
+              For approvals synchronized through an adapter, the system shall show the time of the last successful synchronization and flag a failed one.
               \rationale{Different capstone courses have different approval systems that they would prefer to keep in place so the system must account for this.}
               \fitcrit{For courses without integration adapter, either the TA or the instructor can manually update the status of the project as approved. If there is an adapter available, the system will automatically synchronize and update the approval status based on the information recieved from the external system.}
 
@@ -1671,12 +1697,22 @@ Instructor (Dr. Reyes), Teaching Assistant
               \fitcrit{A user can sign in using an available identify provider and access the functions available to them.}
 
               \item[]\reqitem{reqnum}{FR_AuthorizationRBAC} The system shall restrict access to system functionality and information according to the user's role and course permissions.
+              Users whose role cannot be determined shall have no access to course data.
+              Users who sign in through the external provider shall have only the access given in \rref{FR_ExternalSupervisorScope}.
               \rationale{Different stakeholders (Students, TAs, Instructors, and Supervisors) have different roles in the platform so access restrictions are critical to prevent unauthorized access when it comes to viewing and modifying content. An example is that teams should only have access to modify only their team's approved project details. An Instructor can modify any project's details.}
               \fitcrit{Users are only able to access information and perform actions permitted by their assigned roles and scope.}
 
               \item[]\reqitem{reqnum}{FR_UpdateRoles} The system shall allow authorized administrators to manage users' course association and assigned roles.
               \rationale{Different capstone courses involve different participants, and access permissions must reflect each users' responsibilities.}
               \fitcrit{An authorized administrator can view and update a user's course association and permitted course role.}
+
+              \item[]\reqitem{reqnum}{FR_ExternalSupervisorVerification} The system shall give every user who signs in through the external authentication provider the external supervisor role in the unverified state, and shall change an external supervisor to verified only when an instructor approves a project proposal that the external supervisor submitted. Approval of any other proposal (including a student proposal that names the external supervisor), a request for changes, or a rejection shall not verify them. A later withdrawal of the approved proposal shall not undo verification, and an instructor may reverse it by changing the user's role (\rref{FR_UpdateRoles}).
+              \rationale{An external identity provider accepts anyone, so signing in does not show that a person is an industry sponsor. An instructor's review of a real project proposal is the check that the person is a genuine sponsor.}
+              \fitcrit{A new external sign-in is unverified and cannot read student profiles. After an instructor approves a proposal that the account submitted, it can read them. Approval of a student proposal naming the account does not change its state.}
+
+              \item[]\reqitem{reqnum}{FR_ExternalSupervisorScope} The system shall limit an external supervisor to the access in Table~\ref{tab:ExternalAccess}. An unverified external supervisor can read course reference material (including past project examples), the proposal template, and their own proposals with the threads on them. A verified external supervisor can additionally read student and team profiles, student-proposed projects, and the applications to their own projects. A request for any other supervisor's proposal or project shall be answered as if the record does not exist, and no catalog, search result, count, status, or notification shall reveal it.
+              \rationale{Industry project ideas are confidential, while student profiles hold information comparable to a public professional profile. Student information should still not be available to anyone who can sign in.}
+              \fitcrit{For each read channel in \dprref{DPR_VisibilityMatrix}, an external supervisor requesting another sponsor's project receives a not-found response and sees no trace of it in lists, searches, counts, or emails. An unverified external supervisor requesting a student profile or a student-proposed project is denied.}
 
               \item[]\reqitem{reqnum}{FR_LogExternalErrors} The system shall log all errors caused by external providers and notify university IT professionals and/or course instructors when they are detected.
               \rationale{External providers may cause service disruptions and knowing when disruptions happen allows measuring their impact (missed deadlines, for example).}
@@ -1691,15 +1727,18 @@ Instructor (Dr. Reyes), Teaching Assistant
               \fitcrit{Any user authorized to read project proposals and user profiles is able to view a timestamp on all pages.}
 
               \item[]\reqitem{reqnum}{FR_DurableNotifications} The system shall store pending notifications durably until delivery is verified.
+              A notification shall be delivered no more than once to each recipient.
               \rationale{Lost notifications mean that users are not alerted of potentially time-sensitive matters and this can result in missed deadlines and loss of time.}
               \fitcrit{The system being abruptly closed before being able to send a notification sends it after starting back up.}
 
-              \item[]\reqitem{reqnum}{FR_ReverifyUsers} The system shall re-verify users for critical, hard-to-reverse actions, such as, but not limited to, updating credentials, any deletion, updating privileges, accepting a project offer, leaving a team, and other final or destructive actions. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.
+              \item[]\reqitem{reqnum}{FR_ReverifyUsers} The system shall re-verify the user before: (1) changing credentials, email, or linked authentication; (2) deleting a proposal, project, profile, thread, or account; (3) changing a user's role or course association; (4) a supervisor or team accepting an agreement; (5) leaving or dissolving a team; (6) a final instructor or TA approval or rejection; (7) confirming an enrollment import or changing course rules or the approval mode.
+              Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge. Re-verification must include at least one of: re-entering credentials, entering an email code, responding to an MFA challenge, and/or responding to an SSO challenge.
               \rationale{Sessions may get stolen or unsecured devices may get compromised. Actions which are difficult to undo should be protected to ensure the actual account holder is performing the action.}
               \fitcrit{The system prompts user to re-enter credentials after requesting to delete a project they proposed.}
 
               % ---------- Enrollment and TA Roles ---------
               \item[]\reqitem{reqnum}{FR_ImportEnrollment} The system shall allow instructors and TAs to import a course's enrollment list from Avenue to Learn, show a preview of the students to be added and the differences from the current list, and apply the import only after the user confirms it.
+              The system shall check imported entries for duplicates and malformed identifiers and show any problems in the preview before the import can be confirmed.
               \rationale{Populating a course with its students by hand is time consuming, and an unchecked import could wrongly add or exclude students.}
               \fitcrit{An instructor or TA can import an enrollment list and see a preview. No change is applied to the course until the user confirms.}
 
@@ -1904,6 +1943,8 @@ Instructor (Dr. Reyes), Teaching Assistant
       % USER: Supervisor
       \multicolumn{3}{|l|}{\textbf{Supervisor (Child of User)}}\\ \hline
       supervisor\_type & Enum & INTERNAL (McMaster faculty) or EXTERNAL (industry sponsor). \\ \hline
+      verification\_status & Enum & UNVERIFIED or VERIFIED. INTERNAL supervisors are always VERIFIED; EXTERNAL supervisors start as UNVERIFIED. \\ \hline
+      verified\_by\_proposal & Project & The approved proposal that verified an external supervisor (empty until verified). \\ \hline
 
       % Course
       \multicolumn{3}{|l|}{\textbf{Course}}\\ \hline
@@ -1974,7 +2015,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       objectives & String & Objectives of the project. (Required) \\ \hline
       requirements & Collection\textless String\textgreater & List of skills and experience needed for the project (Optional) \\ \hline
       deliverables & String & What deliverables need to be met for the completion of the project (Optional) \\ \hline
-      impact & String & What deliverables need to be met for the completion of the project (Required) \\ \hline
+      impact & String & Expected benefit of the project for its stakeholders (Required) \\ \hline
       proposed\_solution & String & Potential solution that the team can choose to implement (Optional) \\ \hline
       completion\_status & String & What work has already been done on the project (Required) \\ \hline
       industry & String & Industry or area on which the work is done (Required) \\ \hline
@@ -2076,7 +2117,35 @@ Instructor (Dr. Reyes), Teaching Assistant
   \subsubsection{Privacy Controls}
   \begin{enumerate}
     \item[]\reqitem{dprnum}{DPR_RoleBasedDataPermissions} The system shall implement Role-Based Access Control to allow users to perform read, write, delete, and modify actions based on their role (e.g. Students may not modify other projects that do not belong to them while instructors can edit any project in their course)
+    \item[]\reqitem{dprnum}{DPR_VisibilityMatrix} The system shall restrict who can read a record according to its type and state, as shown in Table~\ref{tab:Visibility}, on every channel through which the record can be read.
   \end{enumerate}
+
+  \begin{longtable}{|p{4.6cm}|p{9.2cm}|}
+    \hline
+    \textbf{Record} & \textbf{Who can read it} \\ \hline
+    Proposal in Draft, Proposal submitted, or Proposal changes requested & The proposer, the named supervisor (once they hold a supervisor role other than unverified external supervisor), and the course instructors \\ \hline
+    Open, Full, or Closed supervisor-proposed project & Students, internal supervisors, TAs, and course instructors. An external supervisor can read only the projects they proposed or are named on (see Table~\ref{tab:ExternalAccess}). \\ \hline
+    Student-proposed project published to the student-proposed list & Students, TAs, instructors, internal supervisors, and verified external supervisors \\ \hline
+    Project application, and threads on a project, application, or team formation & The participants in it, and the course instructors and TAs \\ \hline
+    Student and team profiles & Students, TAs, instructors, internal supervisors, and verified external supervisors. Not unverified external supervisors. \\ \hline
+    Team-project status and approval feedback & The team, its supervisor, and the course instructors and TAs \\ \hline
+    Course reference material and proposal template & Every signed-in user with a role, including unverified external supervisors \\ \hline
+    Any record & Not readable by an account with no role \\ \hline
+    \caption{Visibility by record type and state} \label{tab:Visibility}
+  \end{longtable}
+
+  \begin{longtable}{|p{5.2cm}|p{4.2cm}|p{4.2cm}|}
+    \hline
+    \textbf{Record} & \textbf{Unverified external supervisor} & \textbf{Verified external supervisor} \\ \hline
+    Course reference material (outline, calendar, FAQ, guidelines, past project examples) & Yes & Yes \\ \hline
+    Proposal template & Yes & Yes \\ \hline
+    Their own proposals and projects, and threads on them & Yes & Yes \\ \hline
+    Applications to their own projects, and the profiles of the applying teams & Not applicable (no project is listed yet) & Yes \\ \hline
+    Student and team profiles & No & Yes \\ \hline
+    Student-proposed projects & No & Yes \\ \hline
+    Other supervisors' proposals and projects & No & No \\ \hline
+    \caption{What an external supervisor can read} \label{tab:ExternalAccess}
+  \end{longtable}
 
   \subsubsection{Consent}
   \begin{enumerate}
@@ -2310,7 +2379,9 @@ Instructor (Dr. Reyes), Teaching Assistant
     \textbf{Rationale}: Authentication provides the system with a user's identity which ensures access rules are enforced.\\
     \textbf{Fit Criterion}: Unauthenticated users receive an error response when making requests which are not authentication-related. 
 
-    \item[]\idlabel{NFR_Authorize}\label{NFR_Authorize} The system shall restrict access only to students, TAs, and instructors directly enrolled in the capstone courses, and to potential supervisors approved by an instructor. All users are only able to access data that they are approved to view. Non-approved users are unable to read or write any data.\\
+    \item[]\idlabel{NFR_Authorize}\label{NFR_Authorize} The system shall restrict access only to students, TAs, and instructors directly enrolled in the capstone courses, and to potential supervisors approved by an instructor.
+    All users are only able to access data that they are approved to view.
+    External supervisors can access only the data permitted to them in Table~\ref{tab:Visibility}.\\
     \textbf{Rationale}: The system stores sensitive user and course data which is a primary target of cyber attacks.\\
     \textbf{Fit Criterion}: Authenticated users receive an error response when requesting or modifying data they are not authorized to view or modify.
 
@@ -2431,9 +2502,11 @@ Instructor (Dr. Reyes), Teaching Assistant
     \rref{FR_ActionRequiredEmail} & \srref{SR_PushNotify}, \srref{SR_Checklist} & \ucref{UC_NotifyChecklist} \\ \hline
     \rref{FR_ReadCourseInformation} & \srref{SR_UnselectedProjects}, \srref{SR_TeamValidity} & \ucref{UC_ValidateTeams}, \ucref{UC_FollowUpUnselected} \\ \hline
     \rref{FR_ExportCourseInformation} & \srref{SR_ReduceAdmin}, \srref{SR_TeamValidity} & \ucref{UC_ValidateTeams} \\ \hline
-    \rref{FR_MacSSO} & -- & -- \\ \hline
-    \rref{FR_AuthorizationRBAC} & -- & -- \\ \hline
-    \rref{FR_UpdateRoles} & -- & -- \\ \hline
+    \rref{FR_MacSSO} & \srref{SR_ExternalSupervisorAccess} & -- \\ \hline
+    \rref{FR_AuthorizationRBAC} & \srref{SR_ExternalSupervisorAccess} & -- \\ \hline
+    \rref{FR_UpdateRoles} & \srref{SR_ExternalSupervisorAccess} & -- \\ \hline
+    \rref{FR_ExternalSupervisorVerification} & \srref{SR_ExternalSupervisorAccess} & \ucref{UC_SubmitProposal} \\ \hline
+    \rref{FR_ExternalSupervisorScope} & \srref{SR_ExternalSupervisorAccess} & \ucref{UC_SubmitProposal}, \ucref{UC_ViewTeam} \\ \hline
     \rref{FR_LogExternalErrors} & -- & -- \\ \hline
     \rref{FR_RejectComponentDisable} & -- & -- \\ \hline
     \rref{FR_DisplayTimestamps} & -- & -- \\ \hline
@@ -2496,6 +2569,8 @@ Instructor (Dr. Reyes), Teaching Assistant
     \rref{FR_EnrollmentDiscrepency} & \idref{NFR_ConcurrencySafety}, \idref{NFR_AuditLog} \\ \hline
     \rref{FR_NeedsGroup} & \idref{NFR_Authorize} \\ \hline
     \rref{FR_AssignTA} & \idref{NFR_Authorize}, \idref{NFR_ConcurrencySafety} \\ \hline
+    \rref{FR_ExternalSupervisorVerification} & \idref{NFR_Authorize}, \idref{NFR_AuditLog} \\ \hline
+    \rref{FR_ExternalSupervisorScope} & \idref{NFR_Authorize}, \idref{NFR_EssentialPersonal} \\ \hline
     \bottomrule
     \caption{Traceability Between Functional and Nonfunctional Requirements}
     \label{tab:FR2Rtm}
@@ -2653,7 +2728,7 @@ Instructor (Dr. Reyes), Teaching Assistant
   \label{app:interviews}
 
   The notes below were taken during stakeholder interviews. Each note is numbered
-  with its stakeholder tag (S, ES, IS, SEI, TI) so that stakeholder requirements can
+  with its stakeholder tag (S, ES, IS, SEI, TI, CI) so that stakeholder requirements can
   reference the specific note(s) they came from. Each role was covered by a small number of interviews, summarized
   in Table~\ref{tab:interviews}, so the broad claims in this document should be validated as more stakeholders are
   consulted.
@@ -2669,7 +2744,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       Internal supervisor & IS & 1 interview, with 1 professor\\
       SE course instructor & SEI & 1 interview\\
       TRON course instructor & TI & 1 interview\\
-      CS course instructor & -- & Not yet interviewed\\
+      CS course instructor & CI & 1 interview\\
       \bottomrule
     \end{tabular}
     \caption{Stakeholder interviews}\label{tab:interviews}
@@ -2963,6 +3038,27 @@ advises the instructors.
               Open question: how involved the platform will be in the capstone process.
   \end{itemize}
 
+  \paragraph{CS Instructor (CI)} \label{app:stk_cs}
+  Professor who runs the Computer Science capstone course.
+  \noindent \begin{itemize}
+              \item[]\reqitem{cin}{CI_Projects}
+              Projects from other professors are collected through the form that the SE instructor sends out. Most communication about projects happens in August. He would like to widen who receives the form for external projects.
+              \item[]\reqitem{cin}{CI_ProjectStatus}
+              Wants project state kept up to date automatically, since supervisors currently have to report it. A project accepted by a team should become unavailable.
+              \item[]\reqitem{cin}{CI_Approval}
+              Listed projects are accepted automatically since he has already seen them. More than half of teams define their own project, which are handled through a discussion board; a board of proposals he can approve would be less disorganized.
+              \item[]\reqitem{cin}{CI_TeamFormation}
+              Students struggle with team formation, which currently relies on talking to friends. Features that help students communicate would help.
+              \item[]\reqitem{cin}{CI_Config}
+              Does not use GitLab; students keep GitHub repositories and share them with him. Assignment submission should stay where it is. Instructors' and TAs' access should be configurable.
+              \item[]\reqitem{cin}{CI_NoExtraWork}
+              Does not want engagement past the selection stage, and expects supervisors to contact him if there is a problem. Features should be optional and intuitive and should not create extra work.
+              \item[]\reqitem{cin}{CI_ExternalData}
+              Open question: whether data can stay internal when external supervisors are involved, and whether internal hosting would prevent supervisors from accessing it.
+              \item[]CI\refstepcounter{cin}\thecin
+              Requested a way to book twice-per-term meetings with teams and to remind teams of missed meetings, supervisor-instructor communication per project, and record keeping between students and supervisors or instructors. Meeting booking is outside the scope.
+  \end{itemize}
+
   \subsection{Appendix B: Development Plan}
 
   \plt{This section is optional.  It is used to explain the plan for developing
@@ -2985,6 +3081,9 @@ and then the dependencies between features.
     \item Importing course enrollment from Avenue to Learn, with file upload as an alternative, and a list
     of enrolled students who are not on a team (\ucref{UC_ImportEnrollment}; \idref{SR_Enrollment}). Team validation
     (\ucref{UC_ValidateTeams}) needs to know who is enrolled, so this comes first.
+    \item External supervisor sign-in with an unverified state, verification by approval of the supervisor's own proposal,
+    and scoped visibility (\idref{SR_ExternalSupervisorAccess}). This is needed before any real sponsor uses the platform, so it
+    is not deferred.
     \item Supervisor proposal submission with a structured template, and
     instructor approval before a project is listed
     (\ucref{UC_SubmitProposal}, \ucref{UC_ReviewProposal};
@@ -3041,6 +3140,9 @@ and then the dependencies between features.
     is optional and the instructor wants it to be switchable.
     \item Support for other capstone courses or universities (modularity) is a
     design goal, but a second deployment is future work.
+    \item Automatic deletion of student data at the end of a course cycle and deletion
+    on request (\idref{DPR_EndOfTermStudentDataDeletion}, \idref{DPR_UserManagedContentDeletion})
+    are not part of the demo, which uses seeded data.
   \end{itemize}
 
   \subsection{Faked or Simplified for the Course}
