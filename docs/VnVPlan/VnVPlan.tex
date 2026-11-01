@@ -340,7 +340,7 @@ The following documents define what is verified and how the verification is orga
     \item \textbf{End-to-end tests (owner: Andrew).} Playwright tests drive the real application in a
     browser through the most important use cases for each role.
     They run in Chrome, Firefox, and Safari (WebKit) at the three screen widths named in the SRS, and include
-    an automated accessibility audit (axe-core) of every page.
+    an automated accessibility audit (axe-core) of every page in Chrome.
     \item \textbf{Performance tests (owner: Waqar).} A load test with Locust simulates the number of
     concurrent users, think time, and 95th percentile latency limit set in the nonfunctional requirement
     \texttt{NFR\_PerfTail} of the SRS. The load test runs before milestones, not on every pull request,
@@ -698,9 +698,10 @@ configured to run on Safari.
 \textbf{Type:} Dynamic, Automated
 
 \textbf{Initial State:} A GitHub Actions runner with Docker installed. The
-repository is checked out at the merge commit on the main branch.
+repository is checked out at the latest commit on the main branch.
 
-\textbf{Input/Condition:} A merge to the main branch triggers a job that builds
+\textbf{Input/Condition:} Any code change on the main branch triggers a job
+that builds
 the frontend, backend, and database images and starts them together with
 Docker Compose.
 
@@ -713,6 +714,39 @@ starts the containers, and polls the health check until it succeeds or the
 container logs, and is marked as failed if the test fails.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_Container}
+
+\end{enumerate}
+
+\subsubsection{Accessibility}
+
+These tests fulfil accessibility-related non-functional requirements:
+\nfrref{NFR_AccessibilityWCAG}, \nfrref{NFR_ComplianceAODA}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-ACC-1}\textbf{T-NFR-ACC-1: Automated Accessibility Audit}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
+
+\textbf{Input/Condition:} Any code change on the main branch triggers a GitHub
+Actions job that runs an axe-core audit, limited to the WCAG 2.0 Level A and AA rules,
+in Playwright's Chromium-based browser at the resolutions in
+\hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}. The audit covers every page,
+signed in as each role that can access it, including open dialogs and forms
+showing validation errors.
+
+\textbf{Output/Result:} No critical violations are reported on any page at any
+resolution.
+
+\textbf{How test will be performed:} The Playwright UI tests run the axe-core
+audit after each page or state is loaded. The job records the page, role,
+resolution, rule, and impact level of every violation, and is marked as failed
+if any violation is critical.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_AccessibilityWCAG},
+\nfrref{NFR_ComplianceAODA}
 
 \end{enumerate}
 
