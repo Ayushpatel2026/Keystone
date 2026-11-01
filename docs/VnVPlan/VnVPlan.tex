@@ -571,11 +571,14 @@ clarifying the prompt, fixing hardware or network issues.
 
 \textbf{How test will be performed:} Two team members run each session: a
 facilitator and a note-taker. The facilitator obtains consent and gives the participant 
-the prompt and any additional information such as credentials or form values. Timing starts
+the prompt and any additional information such as credentials or form values.
+The facilitator explains that the task is timed, but that the test judges how
+intuitive \projname{} is, not the participant's skills. Timing starts
 when the participant finishes reading the prompt and stops when the end state
 is reached. Any time spent fixing hardware/network/credential issues or clarifying the prompt
 should be subtracted. The facilitator does not guide the participant and gives assistance only when asked. 
-An assisted participant continues the task so that observations are complete. The note-taker records,
+If disqualifying assistance is given, the attempt is counted as unsuccessful,
+but the participant continues to the end state so that all issues are recorded. The note-taker records,
 for each participant, the elapsed time, whether the end state was reached, any
 assistance given, errors and wrong turns, and comments. The participant then
 completes the survey in Appendix~\ref{app:usability-survey}.
@@ -587,7 +590,48 @@ completes the survey in Appendix~\ref{app:usability-survey}.
 
 \subsubsection{Installability}
 
-..to be completed.
+These tests fulfil installability-related non-functional requirements:
+\nfrref{NFR_DeployUnassisted}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-INST-1}\textbf{T-NFR-INST-1: Unassisted Deployment}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} A fresh Linux server with Docker installed, reachable
+over the network, with a self-signed TLS certificate and key on the server. The
+participant has a laptop with SSH access to the server, the deployment guide
+(Appendix~\ref{app:deployment-guide}), the server's SSH credentials, the release tag to deploy, and a sheet with the
+admin credentials to configure. The participant has IT or software experience, is not a \projname{}
+team member, and has never deployed \projname{}. A test admin waits on a
+separate laptop.
+
+\textbf{Input/Condition:} The participant follows the deployment guide to
+connect to the server over SSH, download \projname{}, configure the admin
+credentials and TLS certificate, and start the system.
+
+\textbf{Output/Result:} Within 30 minutes and without assistance, the test
+admin loads \projname{} over HTTPS, bypassing the self-signed certificate
+warning, and signs in with the configured admin credentials. Disqualifying assistance is any
+help with \projname{} or the deployment guide. Fixing server, network, or
+credential problems is not disqualifying assistance.
+
+\textbf{How test will be performed:} A facilitator gives the participant the
+guide and credentials, and explains that the deployment is timed, but that the
+test judges how clear the guide is, not the participant's skills. Timing starts
+when the participant opens the guide and
+stops when the test admin signs in. Timing pauses while server, network, or
+credential problems are fixed. The facilitator gives assistance only when
+asked. If disqualifying assistance is given, the deployment is counted as
+unsuccessful, but the participant continues until the test admin signs in so
+that all issues are recorded. The facilitator
+records the elapsed time, assistance given, the steps where the participant
+got stuck, and unclear parts of the guide.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_DeployUnassisted}
+
+\end{enumerate}
 
 \subsubsection{Portability}
 
@@ -988,6 +1032,49 @@ Participants complete this survey after attempting their assigned task. \\
   \vspace{1.2cm}
 
   \noindent Reviewer: \rule{5cm}{0.4pt} \hspace{1cm} Date: \rule{3cm}{0.4pt}
+
+\subsection{Deployment Guide}
+\label{app:deployment-guide}
+
+This guide describes how to deploy \projname{} on a Linux server with Docker
+installed. It is used in \hyperref[T-NFR-INST-1]{\textbf{T-NFR-INST-1}}. It is a
+draft, and file and variable names will be updated to match the implementation.
+Replace values in angle brackets with those for your deployment.
+
+\begin{enumerate}
+  \item Connect to the server:
+\begin{verbatim}
+ssh <ssh-user>@<server-address>
+\end{verbatim}
+  \item Get \projname{}, enter its directory, and check out the release tag
+  provided with this guide (in the form \verb|v<major>.<minor>.<patch>|):
+\begin{verbatim}
+git clone https://github.com/Ayushpatel2026/Keystone.git
+cd Keystone
+git checkout <release-tag>
+\end{verbatim}
+  \item Create the configuration file from the template:
+\begin{verbatim}
+cp .env.example .env
+\end{verbatim}
+  \item Open \texttt{.env} and set the following values:
+\begin{verbatim}
+ADMIN_EMAIL=<admin-email>
+ADMIN_PASSWORD=<admin-password>
+TLS_CERT_PATH=<certificate-path>
+TLS_KEY_PATH=<key-path>
+\end{verbatim}
+  \item Build and start the system:
+\begin{verbatim}
+docker compose up -d --build
+\end{verbatim}
+  \item Check that all containers are running:
+\begin{verbatim}
+docker compose ps
+\end{verbatim}
+  \item Open \verb|https://<server-address>| in a browser and sign in with
+  the admin credentials.
+\end{enumerate}
 
   \newpage{}
 
