@@ -750,6 +750,39 @@ if any violation is critical.
 
 \end{enumerate}
 
+\subsubsection{Performance}
+
+These tests fulfil performance-related non-functional requirements:
+\nfrref{NFR_PerfTail}, \nfrref{NFR_PeakUsers}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-PERF-1}\textbf{T-NFR-PERF-1: Peak Load Test}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed on a server matching the
+deployment target. Seeded data contains 100 open projects with discussion
+threads, 85 teams, and 400 test accounts split by role as in
+Table~\ref{tab:load-mix}. Locust runs on a separate machine.
+
+\textbf{Input/Condition:} Before each milestone, a manually started GitHub
+Actions workflow runs Locust, which ramps up to 400 simulated users over 5
+minutes and then holds that load for 10 minutes. Each simulated user repeatedly
+performs a task chosen by the weights for its role in
+Table~\ref{tab:load-mix}, with a 10-second pause between tasks.
+
+\textbf{Output/Result:} The 95th percentile latency of all requests during the
+10 minutes at full load is at most 5.0 seconds.
+
+\textbf{How test will be performed:} Locust records the latency of every
+request. The report records the 95th percentile latency overall and per task,
+the request rate, the error rate, and the server's CPU and memory use.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_PerfTail}, \nfrref{NFR_PeakUsers}
+
+\end{enumerate}
+
 \subsection{Traceability Between Test Cases and Requirements}
 
 \wss{Provide a table that shows which test cases are supporting which
@@ -1109,6 +1142,42 @@ docker compose ps
   \item Open \verb|https://<server-address>| in a browser and sign in with
   the admin credentials.
 \end{enumerate}
+
+\subsection{Load Test Task Mix}
+\label{app:load-mix}
+
+The simulated users in \hyperref[T-NFR-PERF-1]{\textbf{T-NFR-PERF-1}} are split
+by role and choose tasks with the weights in Table~\ref{tab:load-mix}. Each
+student team applies only to open projects it has not already applied to.
+
+\begin{table}[h]
+\centering
+\caption{Role split and task weights for the load test}
+\label{tab:load-mix}
+\begin{tabular}{l r l r}
+  \toprule
+  \textbf{Role} & \textbf{Users} & \textbf{Task} & \textbf{Weight (\%)} \\
+  \midrule
+  Student & 340 & Browse and filter the project catalog & 40 \\
+   & & View a project & 30 \\
+   & & View the team's application status & 15 \\
+   & & Reply to a project thread & 10 \\
+   & & Apply to a project & 5 \\
+  \midrule
+  Supervisor & 40 & View own projects & 40 \\
+   & & View a project thread & 30 \\
+   & & Reply to a project thread & 20 \\
+   & & View applications to own projects & 10 \\
+  \midrule
+  TA & 12 & View team compositions & 60 \\
+   & & View a project & 40 \\
+  \midrule
+  Course instructor & 8 & View proposals awaiting review & 50 \\
+   & & View a proposal & 30 \\
+   & & Submit feedback on a proposal & 20 \\
+  \bottomrule
+\end{tabular}
+\end{table}
 
   \newpage{}
 
