@@ -783,6 +783,77 @@ the request rate, the error rate, and the server's CPU and memory use.
 
 \end{enumerate}
 
+\subsubsection{Reliability}
+
+These tests fulfil reliability-related non-functional requirements:
+\nfrref{NFR_Uptime}, \nfrref{NFR_Recoverable}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-REL-1}\textbf{T-NFR-REL-1: Uptime Monitoring}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed for a demo. A monitoring tool
+(such as Uptime Kuma) runs on a separate machine on a different network.
+
+\textbf{Input/Condition:} The monitor requests the backend health check every
+minute from deployment until the end of the demo. A check succeeds if it
+returns HTTP 200 within 10 seconds. Scheduled maintenance windows are logged
+before they start.
+
+\textbf{Output/Result:} At least 99\% of checks succeed.
+
+\textbf{How test will be performed:} The monitor records the time and result of
+every check. The report records the monitored period, the success percentage,
+each failed check's time and response.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Uptime}
+
+\item \label{T-NFR-REL-2}\textbf{T-NFR-REL-2: Restore From Backup}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} The system is deployed with seeded data and an admin
+account.
+
+\textbf{Input/Condition:} The incident is simulated by deleting all projects
+and teams directly in the database. The admin
+then restores the latest backup from the interface.
+
+\textbf{Output/Result:} The seeded projects and teams
+are present after the restore.
+
+\textbf{How test will be performed:} A team member takes the backup,
+simulates the incident, and restores as the admin. They
+record the backup restored, its timestamp, whether the marker project and
+seeded data are present, and any messages shown.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Recoverable}
+
+\item \label{T-NFR-REL-3}\textbf{T-NFR-REL-3: Scheduled Backup Creation}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} The system is deployed and has never been started. No
+backups exist.
+
+\textbf{Input/Condition:} The system is started for the first time. After the
+initial backup is created, the server's system time is set to 1 minute before
+the next backup is due (23 hours and 59 minutes after the initial backup).
+
+\textbf{Output/Result:} An initial backup is created when the system first
+starts, and a second backup is created within 2 minutes of the time change.
+
+\textbf{How test will be performed:} A team member starts the system and checks
+that the initial backup exists. They change the server's system time, wait 2
+minutes, and check that a second backup exists. They record the timestamps of
+both backups.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Recoverable}
+
+\end{enumerate}
+
 \subsection{Traceability Between Test Cases and Requirements}
 
 \wss{Provide a table that shows which test cases are supporting which
