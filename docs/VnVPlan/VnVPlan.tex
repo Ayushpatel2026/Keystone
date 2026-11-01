@@ -3,6 +3,7 @@
 \usepackage{booktabs}
 \usepackage{tabularx}
 \usepackage{hyperref}
+\usepackage{amsmath}
 \hypersetup{
     colorlinks,
     citecolor=blue,
@@ -1001,6 +1002,237 @@ Configure both supervisors and Team Amazing Engineers's application. Using Playw
 \textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify}, which requires recipients to be determined when the notification is sent. Removing a user's authorization before generating a notification tests that the system uses current permissions rather than a previously stored recipient list.
 
 \textbf{How Test Will Be Performed:} Configure Team Amazing Engineers and the application discussion. Remove Student B using the supported team membership workflow. Using Playwright, authenticate as the supervisor and post the specified reply. Inspect outgoing emails and verify that it is sent to Student A but not Student B. Confirm that Student B cannot access the application thread.
+
+\end{enumerate}
+
+\subsubsection{Team-Project Approval and Validation}
+
+This section covers \texttt{FR\_RequestApproval}, \texttt{FR\_ApprovalResponse}, \texttt{FR\_ApprovalPreflightValidate}, \texttt{FR\_ExternalApproval}, and \texttt{FR\_ApprovalRevision} in Section 6 of the SRS, along with the team-project status lifecycle defined in Section 7.2 and Figure 2. The tests verify that student teams can submit agreed projects for approval, that submissions are validated against course rules, and that instructors and TAs can approve, reject, or request modifications. They also verify external approval recording and the handling of changes to previously approved projects.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-44: Submit an Agreed Team-Project for Approval}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has in-platform approval enabled. Team Amazing Engineers consists of four eligible students and has reached an agreement with the supervisor of Autonomous Waste Sorting System. Its team-project status is ``Agreed''. The team satisfies the course's minimum and maximum team sizes of 3 and 5 students. All required project and team information is complete.
+
+\textbf{Input:} An authorized member of Team Amazing Engineers submits the agreed project and team information for instructor approval.
+
+\textbf{Output:} The submission is accepted and its status changes from ``Agreed'' to ``Team project submitted''. The submitted project and team information is recorded and becomes available to the course instructor for review.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RequestApproval} and \texttt{FR\_ApprovalPreflightValidate}. The team has a valid agreement, complete information, and a membership count satisfying $3 \leq n \leq 5$, since $n=4$. The submission therefore satisfies the specified preflight conditions and should enter the approval process.
+
+\textbf{How Test Will Be Performed:} Configure the agreed team-project with complete information and enable in-platform approval. Using Playwright, authenticate as a member of Team Amazing Engineers and submit the team-project for approval. Verify the updated status, saved submission information, and visibility in the instructor's approval interface.
+
+\item \textbf{T-FR-45: Reject Approval Submissions with Incomplete Information}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has in-platform approval enabled. Team Amazing Engineers consists of four valid members and has an agreed project titled Autonomous Waste Sorting System. All required team-project information is initially complete.
+
+\textbf{Input:} Repeat the approval submission test while omitting one required project or team information field at a time.
+
+\textbf{Output:} Each incomplete submission is rejected with a validation message identifying the missing information. The application remains in its previous status, and no submission is forwarded for instructor review.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalPreflightValidate}, which requires submissions to contain complete project information. For the set of required fields, a submission is complete only when all fields are valid. Omitting any required field violates this condition and must prevent submission.
+
+\textbf{How Test Will Be Performed:} Prepare an otherwise valid agreed team-project. Using Playwright, remove each required field individually and attempt submission. Verify that the corresponding validation message appears, no approval submission is created, and the original application status remains unchanged.
+
+\item \textbf{T-FR-46: Reject Approval Submissions Violating Course Rules}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course requires teams of 3 to 5 students and permits teams consisting of Software Engineering students. In-platform approval is enabled. Team Amazing Engineers has an agreed project and complete project information.
+
+\textbf{Input:} Attempt to submit Team Amazing Engineers's project for approval under the following independent membership configurations:
+\begin{itemize}
+    \item 2 Software Engineering students.
+    \item 3 Software Engineering students.
+    \item 5 Software Engineering students.
+    \item 6 Software Engineering students.
+\end{itemize}
+
+\textbf{Output:} Submissions with 2 or 6 members are rejected. Submissions with 3 or 5 members pass the team-size preflight check, provided all other requirements are satisfied. Rejected submissions do not enter the instructor review process.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalPreflightValidate} and \texttt{FR\_ValidateTeamRules}. For team size $n$, the configured validity constraint is
+
+\[
+3 \leq n \leq 5.
+\]
+
+Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy the boundary conditions. This verifies that approval preflight checks enforce the current course rules.
+
+\textbf{How Test Will Be Performed:} Independently configure the four team membership scenarios using test fixtures. For each scenario, authenticate as an authorized team member and attempt submission. Verify the expected acceptance or rejection and ensure rejected submissions do not create instructor review records.
+
+
+\item \textbf{T-FR-47: Prevent Submission When a Team Has Another Approved Project}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers consists of four valid members and already has an approved project titled Smart Campus Navigation. For testing purposes, a second project, Autonomous Waste Sorting System, is associated with Team Amazing Engineers. Its submission information is complete.
+
+\textbf{Input:} Team Amazing Engineers attempts to submit Autonomous Waste Sorting System for instructor approval.
+
+\textbf{Output:} The submission is rejected because Team Amazing Engineers already has an approved project. No second team-project approval submission is created, and the existing approved project remains unchanged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalPreflightValidate}, which explicitly requires checking that the team does not already have another approved project. Since Team Amazing Engineers is already part of a project, the new submission must be rejected.
+
+\textbf{How Test Will Be Performed:} Prepare Team Amazing Engineers with one approved project and a second candidate submission. Using Playwright, attempt to submit the second project. Verify that validation blocks the submission and that the original approved record remains unchanged.
+
+\item \textbf{T-FR-48: Approve a Submitted Team-Project In-Platform}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} In-platform approval is enabled. Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval. The application has status ``Team project under review'', and all project and team information satisfies the applicable course rules. Instructor A is authorized to review the submission.
+
+\textbf{Input:} Instructor A selects ``Approve'' for Team Amazing Engineers's submitted project.
+
+\textbf{Output:} The team-project status changes to ``Approved''. The approval decision is recorded, and the project and team are identified as approved in the relevant course records. The project's reserved capacity remains unchanged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalResponse} and Section 7.2 of the SRS. The instructor's approval completes the review process without creating an additional supervisor reservation. The number of reserved slots on the project remains the same. This verifies that team-project approval changes the approval status without incorrectly modifying project capacity.
+
+\textbf{How Test Will Be Performed:} Configure the submitted application under instructor review. Using Playwright, authenticate as Instructor A and approve the submission. Verify the ``Approved'' status, recorded decision, updated course information, and unchanged reserved-slot count.
+
+\item \textbf{T-FR-49: Request Modifications to a Team-Project Submission In-Platform}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for instructor approval. The submission has status ``Team project under review''. Its project objectives state ``Develop an automated waste sorting system''. Instructor A is authorized to review the submission.
+
+\textbf{Input:} Instructor A selects ``Request modifications'' and provides the feedback: ``Please clarify which types of waste the proposed system will identify and sort.''
+
+\textbf{Output:} The team-project status changes to ``Team project changes requested''. The instructor's feedback is recorded and made available to Team Amazing Engineers. The submission is not marked approved.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalResponse} and Section 7.2 of the SRS. The requirement permits instructors to request modifications with feedback rather than immediately approving or rejecting a team-project submission.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A, open Team Amazing Engineers's submission, and request the specified modifications. Verify the updated status, preserved feedback, and absence of an approval decision.
+
+\item \textbf{T-FR-50: Revise and Resubmit a Team-Project After Feedback}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System submission has status ``Team project changes requested''. Instructor A previously requested clarification on the types of waste the proposed system will identify and sort. The submission currently lists ``Develop an automated waste sorting system'' as its project objective.
+
+\textbf{Input:} An authorized Team Amazing Engineers member updates the project objective to ``Develop an automated waste sorting system capable of identifying and sorting plastic and metal waste'' and resubmits the team-project.
+
+\textbf{Output:} The revised information is saved, and the team-project returns to ``Team project submitted'' for instructor review. The previous feedback remains available, and the submission is not automatically approved.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RequestApproval} and \texttt{FR\_ApprovalResponse}. The SRS allows teams to modify and resubmit their information following instructor feedback. The revised submission must re-enter the review process rather than bypassing approval.
+
+\textbf{How Test Will Be Performed:} Configure the change request and feedback. Using Playwright, authenticate as an authorized Team Amazing Engineers member, update the project objective, and resubmit. Verify the updated objective, submission status, and preservation of the previous feedback.
+
+\item \textbf{T-FR-51: Reject a Submitted Team-Project}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for instructor approval. The team-project has status ``Team project under review''. The project has maximum capacity $C_{max} = 2$ and $R = 2$ reserved slots, one of which is held by Team Amazing Engineers. Instructor A is authorized to review the submission.
+
+\textbf{Input:} Instructor A rejects Team Amazing Engineers's submission with the feedback: ``The proposed project scope does not meet the course's capstone requirements.''
+
+\textbf{Output:} The team-project status changes to ``Team project rejected''. The rejection decision and feedback are recorded. Team Amazing Engineers's reserved slot is released, reducing $R$ from 2 to 1. The project's status changes from ``Full'' to ``Open''.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalResponse} and the capacity rules in Section 7.2 of the SRS. Rejection of a team-project requires releasing its reserved slot. Initially,
+
+\[
+C_{\text{remaining}}=2-2=0.
+\]
+
+After rejection,
+
+\[
+R \leftarrow R-1=1,
+\qquad
+C_{\text{remaining}}=2-1=1.
+\]
+
+The project therefore becomes ``Open'' again.
+
+\textbf{How Test Will Be Performed:} Configure the project and submitted team-project with the specified capacity values. Using Playwright, authenticate as Instructor A and reject the submission. Verify the rejection status, recorded feedback, released reservation, and project availability.
+
+\item \textbf{T-FR-52: Record an Approval Through an External Approval Process}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course uses an external project approval process without an integration adapter. Team Amazing Engineers has an agreed project titled Autonomous Waste Sorting System, and its approval has been confirmed through the external process. Instructor A and TA A are authorized to record approval decisions for the course.
+
+\textbf{Input:} Instructor A manually records the external approval decision for Team Amazing Engineers's project.
+
+\textbf{Output:} The team's project approval status is updated to ``Approved''. The recorded decision is associated with the correct team and project and becomes visible in the course's approval records.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ExternalApproval}, which requires the system to support manual recording of externally determined approval decisions when no integration adapter is available. The test verifies that the platform can represent an approval obtained outside Keystone.
+
+\textbf{How Test Will Be Performed:} Configure the course to use external approvals without an adapter. Using Playwright, authenticate as Instructor A and record Team Amazing Engineers's approval. Verify the saved approval decision and its association with the correct team and project.
+
+\item \textbf{T-FR-53: Preserve Original Approval During a Proposed Project Change}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved''. The approved project objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. Instructor A is authorized to review changes to approved projects.
+
+\textbf{Input:} Team Amazing Engineers proposes changing the project objective to ``Develop a computer vision system capable of identifying and sorting plastic, metal, and paper waste''.
+
+\textbf{Output:} The proposed change is submitted for instructor review. The team-project status is displayed as ``Approved (change under review)''. The original approved objective remains effective until the instructor accepts the change. The proposed objective is retained separately for review without overwriting the approved record.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalRevision} and Section 7.2 of the SRS. The requirement states that a previously approved project must retain its approval while a proposed modification awaits review. Therefore, the Objective does not change while the instructor acceptance is pending. Only an accepted revision may replace the original approved objective.
+
+\textbf{How Test Will Be Performed:} Configure the approved team-project with its original objective. Using Playwright, authenticate as an authorized Team Amazing Engineers member and submit the proposed change. Verify the pending-change status, preservation of the original approved objective, and availability of the proposed objective for instructor review.
+
+\item \textbf{T-FR-54: Successfully Synchronize Approval Through an External Adapter}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course uses GitLab as its external approval system, connected to \projname{} through an integration adapter. Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval, with status ``Team project submitted''. The integration adapter is configured to associate this with the corresponding GitLab PR approval record.
+
+\textbf{Input:} The integration adapter transfers Team Amazing Engineers's submission information to the corresponding GitLab approval record. An authorized reviewer approves the submission in GitLab. The adapter then synchronizes the approval decision back to \projname{}.
+
+\textbf{Output:} The GitLab approval record is associated with a \projname{} submission id. Following synchronization, the team-project status changes to ``Approved'', and the external approval decision is recorded against Team Amazing Engineers's project along with a timestamp.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ExternalApproval}, which requires \projname{} to synchronize approval decisions through an available external integration adapter. A submission identifier establishes the correspondence between the two systems, ensuring the approval is applied to the correct team-project. Successful synchronization must update the approval status and timestamp.
+
+\textbf{How Test Will Be Performed:} Configure a controlled GitLab integration environment and associate \projname{} submission with its corresponding GitLab approval record. Using Playwright, submit the team-project through \projname{} and verify that the adapter transfers the relevant information to GitLab. Record an approval decision in GitLab and trigger synchronization. Verify that the decision updates only the corresponding \projname{} team-project to ``Approved'' and that the last successful synchronization timestamp is displayed.
+
+\item \textbf{T-FR-55: Handle a Failed External Approval Synchronization}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course uses an external approval system connected through an integration adapter. Team Amazing Engineers's Autonomous Waste Sorting System application has status ``Team project under review''. The previous successful synchronization occurred at 2026-10-30 14:00:00. The external approval service is configured to return a connection failure during the next synchronization.
+
+\textbf{Input:} The integration adapter attempts to synchronize approval decisions with the unavailable external service.
+
+\textbf{Output:} The synchronization failure is flagged by Keystone. Team Amazing Engineers's application remains ``Team project under review'', and no unverified approval decision is recorded. The last successful synchronization timestamp remains 2026-10-30 14:00:00.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ExternalApproval}, which requires failed synchronization attempts to be flagged and the timestamp of the last successful synchronization to be displayed. Since no successful synchronization occurs, the previously verified approval state and timestamp must remain unchanged.
+
+\textbf{How Test Will Be Performed:} Configure a controlled external test service to fail during synchronization. Trigger the adapter and verify that Keystone displays a failure indicator. Confirm that the team-project status remains unchanged, no approval decision is incorrectly recorded, and the last successful synchronization timestamp is preserved.
+
+\item \textbf{T-FR-56: Accept a Revision to an Approved Team-Project}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved (change under review)''. The original approved objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. The team has submitted a proposed objective: ``Develop a computer vision system capable of identifying and sorting plastic, metal, and paper waste''. Instructor A is authorized to review the proposed change.
+
+\textbf{Input:} Instructor A reviews and accepts the proposed revision.
+
+\textbf{Output:} The proposed objective replaces the original approved objective. The team-project status returns to ``Approved'', and the accepted change is recorded. The project remains approved throughout the revision process.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalRevision} and Section 7.2 of the SRS. Approved project information must remain effective until an instructor accepts the proposed change. Following acceptance, the approved objective becomes the revised objective. The status returns to ``Approved'' once the revision decision is completed.
+
+\textbf{How Test Will Be Performed:} Configure the approved project with the original objective and pending revision. Using Playwright, authenticate as Instructor A and accept the proposed change. Verify that the revised objective becomes the approved value, the status returns to ``Approved'', and the decision is recorded.
+
+\item \textbf{T-FR-57: Reject a Revision to an Approved Team-Project}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved (change under review)''. The original approved objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. The proposed revision would expand the objective to include paper waste. Instructor A is authorized to review the proposed change.
+
+\textbf{Input:} Instructor A rejects the proposed revision with the feedback ``The additional material category exceeds the approved project scope.''
+
+\textbf{Output:} The proposed revision is rejected, and the team-project status returns to ``Approved''. The original approved objective remains unchanged, and the rejection decision and feedback are recorded. The existing project approval remains valid.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalRevision} and Section 7.2 of the SRS. Rejecting a proposed revision must preserve the previously approved information rather than replacing it. Therefore, the Objective does not change. The rejection affects only the proposed change, not the project's existing approval.
+
+\textbf{How Test Will Be Performed:} Configure the approved project with its original objective and pending revision. Using Playwright, authenticate as Instructor A and reject the proposed change with the specified feedback. Verify that the original objective remains approved, the project status returns to ``Approved'', and the rejection decision and feedback are recorded.
 
 \end{enumerate}
 
