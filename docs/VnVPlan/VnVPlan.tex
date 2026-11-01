@@ -679,6 +679,187 @@ The member saves the profile, then updates the collective skills to include ``Co
 
 \end{enumerate}
 
+\subsubsection{Project Recommendations, Applications, and Supervisor-Team Agreements}
+
+This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, and \texttt{FR\_DeclineTeam} in Section 6 of the SRS. The tests verify that students receive relevant recommendations, submit applications to available projects, and record mutual agreements with supervisors. The tests also verify the capacity and status transitions defined in Section 7.2 of the SRS.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-25: Recommend Compatible Projects and Teammates}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A has a complete profile containing Python, machine learning, and computer vision skills, with interests in artificial intelligence and automation. Three available projects and two students seeking teammates exist:
+\begin{itemize}
+    \item Project A: Computer Vision Defect Detection, requiring Python and computer vision skills.
+    \item Project B: Mechanical Gearbox Design, requiring CAD and mechanical design skills.
+    \item Project C: AI-Based Quality Inspection, requiring Python and machine learning skills.
+    \item Student B: Interested in artificial intelligence with Python and machine learning experience.
+    \item Student C: Interested in mechanical design with CAD and SolidWorks experience.
+\end{itemize}
+
+\textbf{Input:} Student A opens the project and teammate recommendation interface.
+
+\textbf{Output:} The system generates recommendations based on Student A's completed profile. Projects A and C are identified as stronger matches than Project B, and Student B is identified as a stronger teammate match than Student C, based on overlapping attributes.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_TeamRecommend}. Providing candidates with strongly overlapping and distinct skills and interests verifies that recommendations account for profile similarity rather than presenting unrelated candidates without considering the student's preferences.
+
+\textbf{How Test Will Be Performed:} Create the three projects and two student profiles with the specified skills and interests. Using Playwright, log in as Student A and open the recommendations page. Verify that Projects A and C are recommended ahead of Project B, and that Student B is recommended ahead of Student C, based on matching skills and interests.
+
+\item \textbf{T-FR-26: Submit an Application to an Open Project}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers consists of three registered students and has no existing application to Autonomous Waste Sorting System. The project has status ``Open'', maximum capacity $C_{max}=2$, and $R=0$ reserved slots.
+
+\textbf{Input:} A member of Team Amazing Engineers opens Autonomous Waste Sorting System and submits an application expressing the team's interest.
+
+\textbf{Output:} An application associated with Team Amazing Engineers and the project is created with the team-project status ``Applied''. The project supervisor can review the application. The project remains ``Open'' and $R=0$, since an application does not reserve a supervisor slot.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProjectInterest} and \texttt{UC\_SelectProject}. A valid application verifies that teams can express interest in an available supervisor-proposed project without immediately occupying its capacity.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as a member of Team Amazing Engineers, open the project, and submit the application. Verify the ``Applied'' status and team-project association. Authenticate as the supervisor and verify that the application is available for review. Confirm that the project remains ``Open'' with zero reserved slots.
+
+\item \textbf{T-FR-27: Reject Applications to Unavailable Projects}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers is a registered team with no applications to the test projects. Two supervisor-proposed projects exist:
+\begin{itemize}
+    \item Project A: Automated Assembly Line, status ``Full'', $C_{max}=1$, $R=1$.
+    \item Project B: Smart Energy Monitoring, status ``Closed'', with the project selection period completed.
+\end{itemize}
+
+\textbf{Input:} A member of Team Amazing Engineers attempts to apply to Project A and then Project B.
+
+\textbf{Output:} Both applications are rejected. The system indicates that the selected projects are unavailable for new applications. Neither attempt creates an application record or changes the projects' reserved-slot counts.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProjectInterest} and \texttt{UC\_SelectProject}. Testing both ``Full'' and ``Closed'' projects verifies that applications are restricted to projects currently accepting teams.
+
+\textbf{How Test Will Be Performed:} Configure the two project states. Using Playwright, authenticate as a member of Team Amazing Engineers and attempt to submit an application to each project. Verify the displayed rejection and confirm that no application records are created.
+
+\item \textbf{T-FR-28: Reserve Capacity When a Supervisor Accepts a Team}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Autonomous Waste Sorting System has maximum capacity $C_{max}=2$ and $R=1$ reserved slot. Team Fantastic Coders has an application with status ``Applied'' and has not been accepted by the supervisor.
+
+\textbf{Input:} The supervisor accepts Team Fantastic Coders's application.
+
+\textbf{Output:} Team Fantastic Coders's status becomes ``Supervisor Accepts'', the supervisor's acceptance is recorded, and the number of reserved slots increases from 1 to 2. The project status changes from ``Open'' to ``Full''. Team Fantastic Coders has not yet reached ``Agreed'' because the team has not accepted.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and the capacity rules in Section 7.2 of the SRS. Remaining capacity is calculated as $C_{remaining}=C_{max}-R$. Initially, $C_{remaining}=2-1=1$. After supervisor acceptance, $R \leftarrow R+1=2$, resulting in $C_{remaining}=2-2=0$. These values verify that supervisor acceptance reserves exactly one slot and updates the project to ``Full''.
+
+\textbf{How Test Will Be Performed:} Configure the project and Team Fantastic Coders's pending application. Using Playwright, authenticate as the supervisor and accept Team Fantastic Coders. Verify the updated team-project status, acceptance record, reserved slot count, and project availability.
+
+
+\item \textbf{T-FR-29: Record Team Acceptance Before Supervisor Acceptance (TEMP TBD)}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has an application to Autonomous Waste Sorting System with status ``Applied''. The project has maximum capacity $C_{max}=2$, $R=0$ reserved slots, and status ``Open''.
+
+\textbf{Input:} Team Amazing Engineers accepts the proposed working arrangement before receiving supervisor acceptance.
+
+\textbf{Output:} The team-project status becomes ``Team Accepts - Supervisor Pending''. The team's acceptance is recorded, but the arrangement is not marked ``Agreed''. No supervisor slot is reserved, so $R=0$ and the project remains ``Open''.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and the status lifecycle in Section 7.2 of the SRS. Team acceptance alone must not reserve project capacity or establish a mutual agreement.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as an authorized Team Amazing Engineers member and record the team's acceptance. Verify the pending-supervisor status and confirm that the project capacity and availability remain unchanged.
+
+\item \textbf{T-FR-30: Establish a Mutual Supervisor-Team Agreement}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has applied to Autonomous Waste Sorting System. The supervisor has already accepted the team, reserving one slot. The team-project status is ``Supervisor Accepts''. The team has not yet accepted the arrangement.
+
+\textbf{Input:} An authorized Team Amazing Engineers member accepts the working arrangement.
+
+\textbf{Output:} The team-project status changes to ``Agreed''. Both the supervisor's and team's acceptance decisions are recorded. The reserved slot remains occupied without incrementing again.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and Section 7.2 of the SRS. Recording the second acceptance verifies that a mutual agreement is established only when both parties accept. Since the supervisor has already reserved the slot, the second acceptance must not increase $R$ again.
+
+\textbf{How Test Will Be Performed:} Prepare the application with the supervisor's acceptance already recorded. Using Playwright, authenticate as Team Amazing Engineers and accept the arrangement. Verify the ``Agreed'' status, both acceptance records, and unchanged reserved-slot count.
+
+\item \textbf{T-FR-31: Decline a Team Application}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Fantastic Coders has submitted an application to an ``Open'' project. The application has status ``Applied'', and the supervisor has not accepted the team or reserved a slot.
+
+\textbf{Input:} The supervisor declines Team Fantastic Coders's application and provides the optional reason: ``The project requires a different combination of technical skills.''
+
+\textbf{Output:} The application changes to ``Declined or withdrawn''. The decision is communicated through a respectful message containing the supplied reason. No supervisor slot is reserved or released, and the project remains ``Open''.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam}. Declining an application before supervisor acceptance verifies that supervisors can reject applications, communicate the decision respectfully, and capacity remains unchanged.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as the supervisor, decline Team Fantastic Coders's application, and enter the specified reason. Verify the updated status, recorded reason, notification, and unchanged project capacity. Confirm that the message uses the system's respectful decline template.
+
+\item \textbf{T-FR-32: Release Reserved Capacity After Withdrawal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Autonomous Waste Sorting System has maximum capacity $C_{max}=2$ and $R=2$ reserved slots, giving it status ``Full''. Team Fantastic Coders occupies one reserved slot because its supervisor previously accepted its application.
+
+\textbf{Input:} Team Fantastic Coders withdraws its application through the supported withdrawal workflow.
+
+\textbf{Output:} Team Fantastic Coders's application changes to ``Declined or withdrawn''. Its reserved slot is released, reducing $R$ from 2 to 1. The project becomes ``Open'' and is available for additional team applications.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam}, \texttt{UC\_SelectProject}, and the capacity rules in Section 7.2 of the SRS. Initially, $C_{remaining} = C_{max}-R = 2 - 2 = 0$. Following withdrawal, $R \leftarrow R - 1 = 1$, resulting in $C_{remaining} = 2 - 1 = 1$. These transitions verify that releasing an occupied slot restores availability without changing maximum capacity.
+
+\textbf{How Test Will Be Performed:}
+Configure the project with two reserved slots and Team Fantastic Coders as one of the accepted teams. Using Playwright, authenticate as Team Fantastic Coders and withdraw its application. Verify the withdrawal status, released slot, and change from ``Full'' to ``Open''.
+
+\item \textbf{T-FR-33: Prevent Supervisor Acceptance Beyond Capacity}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Project Automated Assembly Line has maximum capacity $C_{max} = 1$ and $R = 1$ reserved slot, giving it status ``Full''. Team Team Amazing Engineers has a previously submitted application with status ``Applied'', created before the project became full.
+
+\textbf{Input:} The supervisor attempts to accept Team Amazing Engineers' application.
+
+\textbf{Output:} The acceptance is rejected because no capacity remains. Team Amazing Engineers does not acquire a reserved slot, the existing accepted team remains unchanged, and $R=1$.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and Section 7.2 of the SRS. Supervisor acceptance must preserve $0 \leq R \leq C_{max}$. Attempting another acceptance when $R = C_{max} = 1$ would produce $R + 1 = 2 > C_{max}$, violating the capacity constraint. The system must therefore prevent the action.
+
+\textbf{How Test Will Be Performed:} Prepare the full project and an existing pending application. Using Playwright, authenticate as the supervisor and attempt acceptance. Verify that the action is blocked and that neither the reservation count nor the existing team assignments change.
+
+\item \textbf{T-FR-34: Release Other Reservations After Team Agreement}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has applications to two approved projects:
+\begin{itemize}
+    \item Project A: Autonomous Waste Sorting System, capacity $C_{max}=2$, with $R=1$ reserved slot held for Team Amazing Engineers.
+    \item Project B: Automated Assembly Line, capacity $C_{max}=1$, with $R=1$ reserved slot held for Team Amazing Engineers.
+\end{itemize}
+Both supervisors have accepted Team Amazing Engineers. The team has not yet accepted either project.
+
+\textbf{Input:} Team Amazing Engineers accepts Project A's working arrangement.
+
+\textbf{Output:} Team Amazing Engineers reaches ``Agreed'' on Project A, retaining its reservation there. Its application to Project B is withdrawn, releasing the reservation. Project B's reserved slots decrease from 1 to 0, and its status changes from ``Full'' to ``Open''.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and Section 7.2 of the SRS. A team's agreement with one project must release reservations associated with competing applications. For Project B, $R \leftarrow R - 1 = 0$ and $C_{remaining} = 1 - 0 = 1$. This verifies that an agreement does not leave another project's capacity unnecessarily occupied.
+
+\textbf{How Test Will Be Performed:} Configure both projects with Team Amazing Engineers's supervisor-accepted applications. Using Playwright, authenticate as Team Amazing Engineers and accept Project A. Verify the ``Agreed'' status on Project A, withdrawal of the Project B application, and restoration of Project B's availability.
+
+\item \textbf{T-FR-35: Prevent Duplicate Supervisor Acceptance}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} A project has maximum capacity $C_{max} = 2$ and $R = 1$ reserved slot. Team Amazing Engineers's application has status ``Supervisor Accepts'', and the supervisor's acceptance has already been recorded.
+
+\textbf{Input:} The supervisor attempts to accept Team Amazing Engineers's application a second time.
+
+\textbf{Output:} The repeated action does not create another reservation nor increment the reserved-slot count. The team-project status remains ``Supervisor Accepts'' and $R=1$.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and the capacity rules in Section 7.2 of the SRS and the PoC. Each supervisor-accepted team must occupy exactly one slot. Repeated acceptance of the same application must not produce $R \leftarrow R + 1$ again.
+
+\textbf{How Test Will Be Performed:}
+Configure an application with supervisor acceptance already recorded. Using Playwright, attempt to repeat the acceptance through the available interface or resend the same supported action. Verify that no additional reservation is created and that the stored status and capacity remain unchanged.
+
+\end{enumerate}
+
 ...
 
 \subsection{Tests for Nonfunctional Requirements}
