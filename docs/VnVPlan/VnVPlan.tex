@@ -854,6 +854,43 @@ both backups.
 
 \end{enumerate}
 
+\subsubsection{Maintainability}
+
+These tests fulfil maintainability-related non-functional requirements:
+\nfrref{NFR_LiveDisable}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-MAINT-1}\textbf{T-NFR-MAINT-1: Live Feature Disable}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed and running with a seeded course
+in which every major feature is enabled: team formation, project proposals,
+project approvals, discussion threads, and recommendations. Test accounts exist
+for the course instructor and for each role that uses these features.
+
+\textbf{Input/Condition:} Any code change on the main branch triggers a GitHub
+Actions job that runs a script against the backend. For each major feature,
+the script:
+\begin{enumerate}
+  \item Sends an authenticated request that uses the feature.
+  \item Disables the feature for the course through an authenticated request as
+  the course instructor.
+  \item Sends the same request as in step 1.
+\end{enumerate}
+
+\textbf{Output/Result:} For every feature, the request in step 1 returns its
+expected response, and the request in step 3 returns HTTP 403.
+
+\textbf{How test will be performed:} The script records, for each feature, the
+requests sent and the status codes and responses received. The job is marked
+as failed if any feature does not give the expected result.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_LiveDisable}
+
+\end{enumerate}
+
 \subsection{Traceability Between Test Cases and Requirements}
 
 \wss{Provide a table that shows which test cases are supporting which
