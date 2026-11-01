@@ -860,6 +860,150 @@ Configure an application with supervisor acceptance already recorded. Using Play
 
 \end{enumerate}
 
+\subsubsection{Project Communication and Notifications}
+
+This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} in Section 6 of the SRS, along with the access restrictions defined in \texttt{FR\_ExternalSupervisorScope}. The tests verify that authorized users can create and reply to discussion threads associated with project proposals, team formations, and project applications. They also verify that relevant users receive email notifications for thread activity, application decisions, and project status changes, while ensuring that notification recipients are authorized and confidential information is not disclosed.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-36: Create a Discussion Thread on a Project Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Input:} Supervisor A creates a thread with the subject ``Project Deliverable Requirements'' and the message ``Are student teams required to produce a working physical prototype, or can the final deliverable be a software simulation?''
+
+\textbf{Output:} A new thread with the specified subject and message is created and associated with the Autonomous Waste Sorting System proposal. The author and creation timestamp are recorded, and the thread is accessible to authorized users.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProjectThreads}, which requires authorized users to create threads associated with their own project proposals. Creating a thread on a submitted proposal verifies the ability to initiate project-related communication.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Supervisor A, navigate to the proposal, and create the specified thread. Verify that the thread appears under the correct proposal and that its subject, content, author, and timestamp match the submitted information.
+
+\item \textbf{T-FR-37: Reply to a Discussion Thread}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Autonomous Waste Sorting System proposal contains a thread titled ``Project Deliverable Requirements'' asking the question proposed in T-FR-36, created by Supervisor A. Instructor A is assigned to the course and is authorized to review the proposal. The thread currently contains no replies.
+
+\textbf{Input:} Instructor A replies: ``Student teams may develop either a physical prototype or a software simulation, depending on the project's scope and learning objectives. The expected deliverables should be clearly specified in the proposal.''
+
+\textbf{Output:} The reply is appended to the existing thread with Instructor A identified as its author and a timestamp recording when the reply was submitted. The original message, including its content, author, and timestamp, remains unchanged. Both messages are displayed in chronological order under the same thread.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProjectThreads}. Allowing an authorized instructor to respond verifies that threads support ongoing communication, rather than only the creation of standalone messages.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A, open the existing thread, and submit the reply. Verify that both messages are visible, the reply is attributed to Instructor A, and the original message is preserved.
+
+\item \textbf{T-FR-38: Communicate Through Team Formation and Application Threads}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers consists of three students, including Student A and Student B. Team Amazing Engineers has an application to Autonomous Waste Sorting System with status ``Applied''. No threads are associated with the team or application.
+
+\textbf{Input:}
+\begin{enumerate}
+    \item Student A creates a team formation thread titled ``Meeting Availability'' with the message ``Can we meet on Friday?''
+    \item Student B replies ``Friday afternoon works.''
+    \item Student A creates a thread on the project application titled ``Project Requirements'' with the message ``Can we clarify the hardware requirements?''
+\end{enumerate}
+
+\textbf{Output:} Both threads are created under their corresponding records. The team formation thread contains Student A's message and Student B's reply. The project application thread contains the specified requirements question. Neither thread is associated with the wrong record.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProjectThreads}, which supports threads on team formations and project applications in addition to proposals. Testing both record types verifies that discussion functionality is available throughout the team and project selection process.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Student A and create both threads. Authenticate as Student B to reply to the team formation thread. Verify the content, authors, replies, and correct record associations.
+
+
+\item \textbf{T-FR-39: Notify Thread Participants of a New Reply}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Supervisor A and Instructor A participate in the ``Project Deliverable Requirements'' thread associated with Autonomous Waste Sorting System. Supervisor A previously asked whether student teams must produce a physical prototype or whether a software simulation is sufficient. Both users have valid email addresses and remain authorized to access the thread.
+
+\textbf{Input:} Instructor A posts the reply: ``Student teams may develop either a physical prototype or a software simulation, depending on the project's scope and learning objectives. The expected deliverables should be clearly specified in the proposal.''
+
+\textbf{Output:} The reply is appended to the existing thread with Instructor A identified as its author and a submission timestamp. Supervisor A receives an email notification identifying the new reply and containing a link to the associated discussion. The email contains only an event summary and link, without disclosing confidential project information.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify}, which requires email notifications when a new reply is posted in a thread a user participates in. The scenario verifies that Supervisor A receives a notification following Instructor A's response to the project deliverables question.
+
+\textbf{How Test Will Be Performed:} Configure the existing discussion thread and its participants. Using Playwright, authenticate as Instructor A and post the specified reply. Verify that the reply appears in the thread with the correct author and timestamp. Capture outgoing email using a controlled test email service and verify that Supervisor A receives a notification containing the event summary and valid discussion link, without confidential project information.
+
+\item \textbf{T-FR-40: Notify Teams of Supervisor Application Decisions}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has submitted an application to Autonomous Waste Sorting System with status ``Applied''. The supervisor has not made a decision, and Team Amazing Engineers's members have valid registered email addresses.
+
+\textbf{Input:} The supervisor accepts Team Amazing Engineers's application.
+
+\textbf{Output:} The application changes to ``Supervisor Accepts''. Relevant authorized members of Team Amazing Engineers receive an email notification identifying the supervisor's decision and providing a link to the application. No unrelated student receives the notification.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify} and \texttt{FR\_DeclineTeam}. The SRS requires notification of decisions on project applications and agreements. The scenario verifies that relevant users are notified following a supervisor decision.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as the supervisor and accept the application. Capture outgoing emails using the test email service. Verify the event summary, application link, recipient, and corresponding application status.
+
+\item \textbf{T-FR-41: Notify Students When a Project Becomes Available}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A is authorized to review proposals for the Software Engineering capstone course. The Autonomous Waste Sorting System proposal has status ``Proposal submitted'' and has not yet been published. Student A is enrolled in the course.
+
+\textbf{Input:} Instructor A approves the proposal, making the project available to students.
+
+\textbf{Output:} The project becomes ``Open'' and is published in the approved project catalog. Student A receives an email notification identifying that a new project listing is available and providing a link to the listing.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify} and \texttt{FR\_ReviewProposal}. The SRS specifies that students receive notifications about new project listings. Approving and publishing a proposal provides a concrete event for verifying this behaviour.
+
+\textbf{How Test Will Be Performed:} Configure the submitted proposal and enrolled student. Using Playwright, authenticate as Instructor A and approve the proposal. Verify the project appears in the catalog and that the test email service captures the notification sent to Student A.
+
+\item \textbf{T-FR-42: Exclude Confidential Information from Email Notifications}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has an application to Autonomous Waste Sorting System. The project contains the confidentiality statement ``Restricted Prototype Specifications'' and an IP field containing ``Confidential Patent Agreement''. The supervisor and Team Amazing Engineers are authorized to receive notifications about the application.
+
+\textbf{Input:} The supervisor accepts Team Amazing Engineers's application, triggering an email notification.
+
+\textbf{Output:} The email contains a summary of the acceptance decision and a link to the application. It does not contain either protected value:
+\begin{itemize}
+    \item Restricted Prototype Specifications
+    \item Confidential Patent Agreement
+\end{itemize}
+It also does not include senstive details about the project.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify}, which requires notification emails to exclude confidential, IP, and other sensitive project details. The system's response to detecting senstive values determines whether protected information was disclosed.
+
+\textbf{How Test Will Be Performed:} Populate the corresponding records with the specified values. Using Playwright, trigger the supervisor acceptance and capture the resulting email. Inspect the subject and body, including any generated preview content. Verify the event summary and link are present and that none of the protected values appear in the email.
+
+\item \textbf{T-FR-43: Exclude Unauthorized Users from Notification Recipients}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} External Supervisor A owns Autonomous Waste Sorting System. External Supervisor B owns a different project and has no association with Supervisor A's project. Team Amazing Engineers has an application to Supervisor A's project. Supervisor B is not authorized to view that project or its application.
+
+\textbf{Input:} Supervisor A accepts Team Amazing Engineers's application.
+
+\textbf{Output:} Authorized recipients associated with the application receive the relevant email notification. Supervisor B receives no notification about Supervisor A's project, and no project information is exposed to Supervisor B.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify} and \texttt{FR\_ExternalSupervisorScope}. Notification recipients must be determined according to their authorization at the time of sending. The test verifies that project confidentiality is maintained through email notifications.
+
+\textbf{How Test Will Be Performed:}
+Configure both supervisors and Team Amazing Engineers's application. Using Playwright, trigger the acceptance decision. Inspect the outgoing email records and verify that only authorized recipients receive project-related notifications. Confirm that Supervisor B's was not sent any messages related to the event.
+
+\item \textbf{T-FR-44: Re-evaluate Notification Recipients After an Authorization Change}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A and Student B are members of Team Amazing Engineers, which has an application to Autonomous Waste Sorting System. Both students initially have access to the associated discussion thread. Student B is subsequently removed from the team through an authorized membership change before a new notification is generated.
+
+\textbf{Input:} The project supervisor posts a reply to Team Amazing Engineers's application discussion thread after Student B's removal.
+
+\textbf{Output:} Student A receives the new reply notification. Student B, who is no longer authorized to access the application discussion, does not receive a notification about the new reply.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify}, which requires recipients to be determined when the notification is sent. Removing a user's authorization before generating a notification tests that the system uses current permissions rather than a previously stored recipient list.
+
+\textbf{How Test Will Be Performed:} Configure Team Amazing Engineers and the application discussion. Remove Student B using the supported team membership workflow. Using Playwright, authenticate as the supervisor and post the specified reply. Inspect outgoing emails and verify that it is sent to Student A but not Student B. Confirm that Student B cannot access the application thread.
+
+\end{enumerate}
+
 ...
 
 \subsection{Tests for Nonfunctional Requirements}
