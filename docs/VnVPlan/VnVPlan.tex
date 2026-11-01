@@ -592,7 +592,7 @@ completes the survey in Appendix~\ref{app:usability-survey}.
 \subsubsection{Portability}
 
 These tests fulfil portability-related non-functional requirements:
-\nfrref{NFR_Browsers}, \nfrref{NFR_ScreenSize}.
+\nfrref{NFR_Browsers}, \nfrref{NFR_ScreenSize}, \nfrref{NFR_Container}.
 
 \begin{enumerate}
 
@@ -648,6 +648,27 @@ configured to run on Safari.
 \textbf{How test will be performed:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_ScreenSize}, \nfrref{NFR_Browsers}
+
+\item \label{T-NFR-PORT-4}\textbf{T-NFR-PORT-4: Docker Build and Start Test}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} A GitHub Actions runner with Docker installed. The
+repository is checked out at the merge commit on the main branch.
+
+\textbf{Input/Condition:} A merge to the main branch triggers a job that builds
+the frontend, backend, and database images and starts them together with
+Docker Compose.
+
+\textbf{Output/Result:} All images build without errors, and the backend health
+check returns a success response within 1 minute of start.
+
+\textbf{How test will be performed:} The GitHub Actions job runs the build,
+starts the containers, and polls the health check until it succeeds or the
+1-minute limit is reached. The job records the Docker version, build logs, and
+container logs, and is marked as failed if the test fails.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Container}
 
 \end{enumerate}
 
