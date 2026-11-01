@@ -1236,6 +1236,177 @@ The project therefore becomes ``Open'' again.
 
 \end{enumerate}
 
+\subsubsection{Course Configuration, Reference Materials, and Administration}
+
+This section covers \texttt{FR\_DisableFeatures}, \texttt{FR\_RejectComponentDisable}, \texttt{FR\_ReferenceMaterial}, \texttt{FR\_RequiredActionsList}, \texttt{FR\_ActionRequiredEmail}, \texttt{FR\_ReadCourseInformation}, and \texttt{FR\_ExportCourseInformation} in Section 6 of the SRS. The tests verify that instructors can configure course features, authorized users can publish and access course resources, required actions are tracked and communicated, and course staff can view and export relevant administrative information. They also verify that configuration changes do not leave pending actions unresolved and that access is restricted to authorized users.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-58: Configure Course Features}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course. Team formation, project proposals, and in-platform project approvals are enabled. No pending actions exist in these components, and the course configuration permits feature changes.
+
+\textbf{Input:} Instructor A disables the in-platform project approval feature while leaving team formation and project proposals enabled.
+
+\textbf{Output:} The configuration change is saved. In-platform project approval functionality is disabled for the Software Engineering course, while team formation and project proposal functionality remain enabled. The configuration of other courses remains unchanged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DisableFeatures}, which requires instructors to configure supported platform features independently for their courses. For each feature $f$, define its enabled state as $E(f)\in\{0,1\}$. The expected configuration after the change is
+
+\[
+E(\mathrm{Approvals})=0,
+\qquad
+E(\mathrm{Teams})=1,
+\qquad
+E(\mathrm{Proposals})=1.
+\]
+
+This verifies that disabling one feature does not unintentionally disable others.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A and open the Software Engineering course configuration. Disable in-platform project approvals and save the changes. Verify the saved configuration, confirm that the approval functionality is disabled, and ensure that team formation and project proposals remain available.
+
+
+\item \textbf{T-FR-59: Prevent Disabling a Component with Pending Actions}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course, which has in-platform project approvals enabled. Team Amazing Engineers has a submission with status ``Team project under review'', awaiting an instructor decision. No other approval submissions are pending.
+
+\textbf{Input:} Instructor A attempts to disable the in-platform project approval feature.
+
+\textbf{Output:} The configuration change is rejected. The system displays an error identifying the pending approval and shows Team Amazing Engineers's submission as an unresolved action. The approval feature remains enabled, and the submission retains its original status.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RejectComponentDisable}. A component cannot be disabled while it contains pending actions. The requested change must be rejected to prevent the pending submission from becoming inaccessible.
+
+\textbf{How Test Will Be Performed:} Configure the course with one pending team-project approval. Using Playwright, authenticate as Instructor A and attempt to disable the approval feature. Verify the error message and displayed pending submission. Confirm that the component remains enabled and the submission is unchanged.
+
+\item \textbf{T-FR-60: Publish Course Reference Materials}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has no published FAQ titled ``Capstone Project Deliverables''. Instructor A is authorized to publish course resources. Student A is enrolled in the course, and External Supervisor A has an account authorized to read course reference materials.
+
+\textbf{Input:} Instructor A creates and publishes an FAQ titled ``Capstone Project Deliverables'' containing the question ``What should a project proposal include?'' and the answer ``A project proposal should describe the objectives, expected deliverables, and required skills.''
+
+\textbf{Output:} The FAQ is saved and published under the Software Engineering course resources. Instructor A, Student A, and External Supervisor A can access the published resource and view its title, question, and answer.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReferenceMaterial}, which requires instructors and TAs to publish course resources for students and supervisors. The scenario verifies resource creation and that the resource is accessible by all relevant parties in the course.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A and publish the specified FAQ. Verify that it appears in the course resources. Authenticate separately as Student A and External Supervisor A and confirm that both can retrieve the resource with its original content.
+
+\item \textbf{T-FR-61: Update a Published Course Resource}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course contains a published FAQ titled ``Capstone Project Deliverables''. Its answer states ``Project proposals must include objectives and expected deliverables''. TA A is assigned to the course and is authorized to maintain course resources.
+
+\textbf{Input:} TA A edits the FAQ answer to ``Project proposals must include objectives, expected deliverables, and required skills'' and saves the updated resource.
+
+\textbf{Output:} The updated FAQ is saved under the same course resource. Authorized students and supervisors see the revised answer when accessing it. The previous answer is no longer displayed as the current content.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReferenceMaterial}, which requires course staff to maintain and edit existing resources. The test verifies that an authorized TA can update published material and that the updated version is accessible.
+
+\textbf{How Test Will Be Performed:} Configure the published FAQ. Using Playwright, authenticate as TA A, edit the answer, and save. Retrieve the resource as an enrolled student and as an authorized external supervisor. Verify the revised content and confirm that only one current FAQ record is displayed.
+
+\item \textbf{T-FR-62: Display Required Actions and Completion States}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A is enrolled in the Software Engineering capstone course and is a member of Team Amazing Engineers. The course requires the student to complete a profile and submit team-project information for instructor approval. Student A has completed their profile, but the team's approval submission has not yet been made.
+
+\textbf{Input:} Student A opens the required actions checklist.
+
+\textbf{Output:} The checklist displays ``Complete student profile'' as checked and ``Submit team-project for approval'' as unchecked. Both actions are associated with the correct student and course.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RequiredActionsList}, which requires users to view their assigned checklist items and completion states based on course requirements.
+
+\textbf{How Test Will Be Performed:} Configure Student A's completed profile and pending team-project submission. Using Playwright, authenticate as Student A and open the checklist. Verify that both required actions are displayed with their expected completion states.
+
+\item \textbf{T-FR-63: Automatically Update a Completed Checklist Action}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A belongs to Team Amazing Engineers, which has reached an agreement with the supervisor of Autonomous Waste Sorting System. The Software Engineering capstone course has in-platform approval enabled. The required actions checklist shows ``Submit team-project for approval'' as incomplete. All submission information satisfies the course rules.
+
+\textbf{Input:} An authorized member of Team Amazing Engineers submits the agreed project and team information for instructor approval.
+
+\textbf{Output:} The team-project enters ``Team project submitted'' status. The checklist action ``Submit team-project for approval'' changes from incomplete to completed after the submission is verified. The checklist does not require a separate manual completion action.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RequiredActionsList} and \texttt{FR\_RequestApproval}. The SRS requires checklist completion states to update when associated actions are completed and verified. This verifies consistency between the actual submission status and the corresponding checklist entry.
+
+\textbf{How Test Will Be Performed:} Configure the agreed team-project and incomplete checklist action. Using Playwright, authenticate as an authorized Team Amazing Engineers member and submit the project for approval. Verify the successful submission, refresh the checklist, and confirm that the action is marked completed.
+
+\item \textbf{T-FR-64: Send Email Reminders for Outstanding Actions and Deadlines}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has administrative email reminders enabled. The course has a project approval submission deadline of November 15, 2026. Student A has an incomplete ``Submit team-project for approval'' checklist action. Student B has already completed the same action. The reminder is configured to run on November 12, 2026.
+
+\textbf{Input:} The configured administrative notification process runs on November 12, 2026.
+
+\textbf{Output:} Student A receives an email identifying the outstanding approval submission and the November 15 deadline. Student B is not incorrectly identified as having an incomplete approval submission.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ActionRequiredEmail}, which requires configured email notifications for upcoming deadlines and outstanding checklist actions. The reminder occurs three calendar days before the deadline. The scenario verifies that an incomplete required action is identified in a configured reminder without misclassifying a completed action.
+
+\textbf{How Test Will Be Performed:} Configure the reminder, deadline, and student checklist states. Run the notification process using a controlled test clock and capture outgoing email through a test email service. Verify that Student A's reminder identifies the correct action and deadline, and that Student B is not described as having the same outstanding action.
+
+\item \textbf{T-FR-65: View and Filter Course-Wide Administrative Information}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course. Its records include:
+\begin{itemize}
+    \item Project A: Autonomous Waste Sorting System, ``Open'', with Team Amazing Engineers's application under instructor review.
+    \item Project B: Smart Campus Navigation, ``Open'', with Team Fantastic Coder's project approved.
+    \item Project C: Automated Assembly Line, ``Full'', with Team Capstone Lengends' project approved.
+\end{itemize}
+Each project has an assigned supervisor, and the associated teams have valid membership records.
+
+\textbf{Input:} Instructor A opens the course administration overview and filters team-project records by approval status ``Approved''.
+
+\textbf{Output:} The filtered results contain Team Fantastic Coders and Team Capstone Lengends, but exclude Team Amazing Engineers, whose submission is still under review. The instructor can view the associated projects, team compositions, supervisors, and approval statuses.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReadCourseInformation}, which requires instructors to access and filter project and team information across their assigned courses. Searching for approved projects records produce exactly two matching team-projects.
+
+\textbf{How Test Will Be Performed:} Populate the course with the specified records. Using Playwright, authenticate as Instructor A and apply the ``Approved'' approval-status filter. Verify that exactly two approved team-projects appear and that their administrative details are accessible.
+
+\item \textbf{T-FR-66: Restrict TA Administrative Access to Assigned Scope}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course contains Team Amazing Engineers and Team Fantastic Coders. TA A is assigned to Team Amazing Engineers but not Team Fantastic Coders. Team Amazing Engineers works on Smart Campus Navigation, while Team Fantastic Coders works on Automated Assembly Line. Both teams have project records, approval statuses, and associated discussion threads.
+
+\textbf{Input:} TA A opens the course administration interface and attempts to view Team Amazing Engineers' records and Team Fantastic Coders' restricted administrative records.
+
+\textbf{Output:} TA A can access the project, team, status, and discussion information within their assigned Team (Amazing Engineers). Access to administrative information outside that scope is denied unless the TA has additional course-level permissions. No restricted information is disclosed through the administrative interface so they cannot see Team Fantastic Coders' records.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReadCourseInformation} and \texttt{FR\_AuthorizationRBAC}. Administrative information must be restricted according to the user's assigned course and team permissions. The scenario verifies that a TA's designated scope determines accessible records.
+
+\textbf{How Test Will Be Performed:} Configure TA A with permissions limited to Team Amazing Engineers. Using Playwright, authenticate as TA A and access the administrative interface. Verify that Team Amazing Engineers' information is accessible and that restricted Team Fantastic Coders information is unavailable. Confirm that attempts to access records not in their scope are rejected.
+
+\item \textbf{T-FR-67: Generate and Export a Course Administration Report}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course. The course contains the following records:
+\begin{itemize}
+    \item Team Fantastic Coders: Students A, B, and C; approved project ``Smart Campus Navigation'';
+    Supervisor A.
+    \item Team Capstone Legends: Students D, E, and F; approved project ``Automated Assembly Line''; Supervisor B.
+    \item Team Amazing Engineers: Students G, H, I, and J; project ``Autonomous Waste Sorting System'' currently under instructor review; Supervisor C.
+\end{itemize}
+
+\textbf{Input:} Instructor A requests an administrative report containing approved projects, team compositions, project selections, and supervisor information, then downloads the report.
+
+\textbf{Output:} The system generates a downloadable report containing the two approved team-project records with their corresponding members, project titles, and supervisors. Team Amazing Engineers is correctly identified as under review. All exported information matches the corresponding course records.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ExportCourseInformation}, which requires automatically generated, exportable administrative reports. The scenario verifies that report generation correctly includes requested information only which in this case is approved projects.
+
+\textbf{How Test Will Be Performed:} Configure the three team-project records. Using Playwright, authenticate as Instructor A and generate the administrative report. Download and inspect the generated file using an automated file parser appropriate to its export format. Verify the presence of Team Fantastic Coders and Team Capstone Legneds, their members and supervisors, and Team Amazing Engineers is not present.
+
+\end{enumerate}
+
 ...
 
 \subsection{Tests for Nonfunctional Requirements}
