@@ -520,35 +520,68 @@ be involved? Be specific.}
 
 \subsubsection{Usability}\label{sec:usability-tests}
 
-..to be completed.
+These tests fulfil usability-related non-functional requirements:
+\nfrref{NFR_UsabilityFirstSuccess}, \nfrref{NFR_LearnUnassisted}.
 
-\paragraph{Title for Test}
+\paragraph{Primary Use-Case Usability Tests}
 
 \begin{enumerate}
 
-\item{test-id1\\}
+\item \label{T-NFR-USBLTY-1}\textbf{T-NFR-USBLTY-1: First-Time Use of Primary Workflows}\\
 
-Type: Functional, Dynamic, Manual, Static etc.
+\textbf{Type:} Dynamic, Manual
 					
-Initial State: 
-					
-Input/Condition: 
-					
-Output/Result: 
-					
-How test will be performed: 
-					
-\item{test-id2\\}
+\textbf{Initial State:} The system is deployed with seeded projects, teams,
+course timelines, and proposals, and is open at the sign-in page on a laptop. 
+The seeded data is reset before each session. Each participant has a test account
+for their role, and the student accounts belong to a seeded team. One seeded
+student is on a team but absent from the latest enrollment import, and that
+team stays above the minimum team size without them. The eight
+participants are four students, one TA, two internal supervisors (professors),
+and one course instructor. The number of students is high because new students will
+need to learn to use the platform each year while instructors will eventually
+become familiar with the platform. No participant is a member of the \projname{} team or 
+has used or seen a demonstration of \projname{}. Each participant completes the test
+individually.
 
-Type: Functional, Dynamic, Manual, Static etc.
-					
-Initial State: 
-					
-Input: 
-					
-Output: 
-					
-How test will be performed: 
+\textbf{Input/Condition:} Each participant receives their account credentials
+and a written prompt for one task. The supervisor also receives a sheet with
+the proposal content to enter (Table~\ref{tab:usability-proposal-values}):
+\begin{itemize}
+  \item \textbf{Student}: Filter for Mechatronics projects, select a
+  project, and express the team's interest in it. End state: the team's
+  application shows the status ``Applied''.
+  \item \textbf{Supervisor}: Submit a project proposal with only the required
+  fields filled. End state: the proposal shows the status ``Proposal
+  submitted''.
+  \item \textbf{Course Instructor}: Review a submitted project proposal,
+  provide feedback, and request changes. End state: the proposal shows the
+  status ``Proposal changes requested'' along with a preview of the feedback submitted.
+  \item \textbf{TA}: Open the team composition view, identify the student
+  absent from the enrollment list, confirm their removal, and export the
+  validated team composition. End state: the export file starts
+  downloading.
+\end{itemize}
+
+\textbf{Output/Result:} At least six of eight participants (75\%) complete
+their relevant tasks within five minutes without assistance.
+Disqualifying assistance is any help with using \projname{}, such as navigation, 
+what a field means or if it is required. Disqualifying assistance does not include 
+clarifying the prompt, fixing hardware or network issues.
+
+\textbf{How test will be performed:} Two team members run each session: a
+facilitator and a note-taker. The facilitator obtains consent and gives the participant 
+the prompt and any additional information such as credentials or form values. Timing starts
+when the participant finishes reading the prompt and stops when the end state
+is reached. Any time spent fixing hardware/network/credential issues or clarifying the prompt
+should be subtracted. The facilitator does not guide the participant and gives assistance only when asked. 
+An assisted participant continues the task so that observations are complete. The note-taker records,
+for each participant, the elapsed time, whether the end state was reached, any
+assistance given, errors and wrong turns, and comments. The participant then
+completes the survey in Appendix~\ref{app:usability-survey}.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_UsabilityFirstSuccess}, 
+\nfrref{NFR_LearnUnassisted}
 
 \end{enumerate}
 
@@ -558,75 +591,65 @@ How test will be performed:
 
 \subsubsection{Portability}
 
-..to be completed.
-
-\subsubsection{Compatibility}
+These tests fulfil portability-related non-functional requirements:
+\nfrref{NFR_Browsers}, \nfrref{NFR_ScreenSize}.
 
 \begin{enumerate}
 
-\item{\textbf{compatibility-safari-sm}\\}
+\item \label{T-NFR-PORT-1}\textbf{T-NFR-PORT-1: Chrome Browser Test}\\
 
 \textbf{Type:} Dynamic, Automated
 
-\textbf{Initial State:} The system is deployed with representative data and
-test accounts.
+\textbf{Initial State:} The system is deployed with a test account for each
+role and seeded data in which each role can view at least one record of every
+type shown on its pages.
 
-\textbf{Input/Condition:} Run representative UI tests in the latest two
-major versions of Safari at 430 px $\times$ 932 px.
+\textbf{Input/Condition:} Run all UI tests in Playwright's Chromium-based browser at
+desktop (1920 px $\times$ 1080 px), tablet (1024 px $\times$ 768 px), and
+mobile (430 px $\times$ 932 px) resolutions. The tests open every page, signed
+in as each role that can access it.
 
-\textbf{Output/Result:} The tested pages have no horizontal overflow, clipped
-controls, or controls smaller than 40 px $\times$ 40 px. The tests
-complete successfully.
+\textbf{Output/Result:} At every resolution, no page has horizontal overflow,
+clipped controls, or controls smaller than 40 px $\times$ 40 px, and all UI
+tests pass.
 
-\textbf{How test will be performed:} Use Playwright to run the tests and
-viewport checks in both Safari versions. Record the browser versions, viewport,
-test results, and screenshots or logs for failures.
+\textbf{How test will be performed:} Use Playwright to run the UI tests and
+layout checks at each resolution. Record the browser version, resolution, test
+results, and screenshots or logs for failures.
 
-\textbf{Relevant NFRs}: NFR\_ScreenSize, NFR\_Browsers
+\textbf{Relevant NFRs}: \nfrref{NFR_ScreenSize}, \nfrref{NFR_Browsers}
 
-\item{\textbf{compatibility-chrome-md}\\}
-
-\textbf{Type:} Dynamic, Automated
-
-\textbf{Initial State:} The system is deployed with representative data and
-test accounts.
-
-\textbf{Input/Condition:} Run representative UI tests in the latest two
-major versions of Chrome at 1024 px $\times$ 768 px.
-
-\textbf{Output/Result:} The tested pages have no horizontal overflow, clipped
-controls, or controls smaller than 40 px $\times$ 40 px. The tests
-complete successfully.
-
-\textbf{How test will be performed:} Use Playwright to run the tests and
-viewport checks in both Chrome versions. Record the browser versions, viewport,
-test results, and screenshots or logs for failures.
-
-\textbf{Relevant NFRs}: NFR\_ScreenSize, NFR\_Browsers
-
-\item{\textbf{compatibility-firefox-lg}\\}
+\item \textbf{T-NFR-PORT-2: Firefox Browser Test}\\
 
 \textbf{Type:} Dynamic, Automated
 
-\textbf{Initial State:} The system is deployed with representative data and
-test accounts.
+\textbf{Initial State:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
 
-\textbf{Input/Condition:} Run representative UI tests in the latest two
-major versions of Firefox at 1920 px $\times$ 1080 px.
+\textbf{Input/Condition:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}, but
+configured to run on Firefox.
 
-\textbf{Output/Result:} The tested pages have no horizontal overflow, clipped
-controls, or controls smaller than 40 px $\times$ 40 px. The tests
-complete successfully.
+\textbf{Output/Result:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
 
-\textbf{How test will be performed:} Use Playwright to run the tests and
-viewport checks in both Firefox versions. Record the browser versions, viewport,
-test results, and screenshots or logs for failures.
+\textbf{How test will be performed:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
 
-\textbf{Relevant NFRs}: NFR\_ScreenSize, NFR\_Browsers
+\textbf{Relevant NFRs}: \nfrref{NFR_ScreenSize}, \nfrref{NFR_Browsers}
+
+\item \textbf{T-NFR-PORT-3: Safari Browser Test}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
+
+\textbf{Input/Condition:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}, but 
+configured to run on Safari.
+
+\textbf{Output/Result:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
+
+\textbf{How test will be performed:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_ScreenSize}, \nfrref{NFR_Browsers}
 
 \end{enumerate}
-
-...
 
 \subsection{Traceability Between Test Cases and Requirements}
 
@@ -772,9 +795,65 @@ How test will be performed:
 The definition of the test cases will call for SYMBOLIC\_CONSTANTS.
 Their values are defined in this section for easy maintenance.
 
-\subsection{Usability Survey Questions?}
+\subsection{Usability Test Proposal Values}
+\label{app:usability-proposal-values}
 
-\wss{This is a section that would be appropriate for some projects.}
+The supervisor in \hyperref[T-NFR-USBLTY-1]{\textbf{T-NFR-USBLTY-1}} enters the values in
+Table~\ref{tab:usability-proposal-values}. Values are kept short so that typing
+time does not affect the result. The fields are the required
+Project attributes in the SRS data dictionary.
+
+\begin{table}[h]
+\centering
+\caption{Proposal values for the supervisor task}
+\label{tab:usability-proposal-values}
+\begin{tabular}{l l}
+  \toprule
+  \textbf{Field} & \textbf{Value} \\
+  \midrule
+  Title & Course Planner \\
+  Course & Software Engineering \\
+  Background & Background \\
+  Objectives & Objectives \\
+  Impact & Impact \\
+  Completion status & None \\
+  Industry & Education \\
+  Project type & Non-hardware \\
+  Supervisor capacity & 1 \\
+  Confidentiality & None \\
+  IP & None \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Usability Survey Questions}
+\label{app:usability-survey}
+
+Participants complete this survey after attempting their assigned task. \\
+
+\noindent\textbf{Rating Questions}
+
+\noindent Participants rate each statement on a 1--5 scale, where 1 is
+\textbf{strongly disagree} and 5 is \textbf{strongly agree}.
+
+\begin{enumerate}
+  \item I understood what I was expected to do.
+  \item I could find the information or action I needed.
+  \item The labels and instructions were clear.
+  \item The system behaved as I expected.
+  \item I could complete the task without help.
+  \item I would feel confident using this system for the same task.
+\end{enumerate}
+
+\noindent\textbf{Open-Response Questions}
+
+\noindent Participants answer each question in their own words.
+
+\begin{enumerate}
+  \setcounter{enumi}{6}
+  \item What was the most confusing part of the task?
+  \item What, if anything, would you change to make the task easier?
+\end{enumerate}
 
   \subsection{SRS Validation Walkthrough and Checklist}
   \label{app:walkthrough}
