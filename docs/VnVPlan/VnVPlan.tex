@@ -1407,6 +1407,271 @@ Each project has an assigned supervisor, and the associated teams have valid mem
 
 \end{enumerate}
 
+\subsubsection{Enrollment and Team Administration}
+
+This section covers \texttt{FR\_ImportEnrollment}, \texttt{FR\_UpdateEnrollment}, \texttt{FR\_EnrollmentDiscrepency}, \texttt{FR\_NeedsGroup}, and \texttt{FR\_AssignTA} in Section 6 of the SRS. The tests verify that instructors and TAs can maintain course enrollment records, identify invalid or missing entries, locate students without teams, and assign TAs to teams. They also verify that enrollment changes do not occur without the required confirmation.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-68: Import and Confirm a Course Enrollment List}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course. The current enrollment contains Students A and B. An Avenue to Learn enrollment list contains Students A, B, C, and D, each with a valid and unique student identifier. No import has been applied yet.
+
+\textbf{Input:} Instructor A imports the Avenue enrollment list, reviews the preview, and confirms the import.
+
+\textbf{Output:} Before confirmation, the preview identifies Students C and D as additions, and the existing enrollment remains unchanged. After confirmation, the course enrollment contains Students A, B, C, and D without duplicate records.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ImportEnrollment} and \texttt{FR\_ReverifyUsers}. The SRS requires a preview and explicit confirmation before applying enrollment changes. Let $E$ be the original enrollment and $I$ the imported list:
+
+\[
+E=\{A,B\}, \qquad I=\{A,B,C,D\}.
+\]
+
+The expected additions are
+
+\[
+I\setminus E=\{C,D\}.
+\]
+
+Thus, the enrollment count remains 2 before confirmation and becomes 4 after confirmation.
+
+\textbf{How Test Will Be Performed:} Configure the existing enrollment and the Avenue enrollment source. Using Playwright, authenticate as Instructor A and initiate the import. Verify the preview identifies Students C and D and that no records have changed. Complete re-verification and confirm the import. Verify all four unique students are enrolled.
+
+
+\item \textbf{T-FR-69: Reject Invalid Enrollment Import Entries}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course contains Students A and B. Instructor A is authorized to import enrollment lists. A test enrollment file contains the following identifiers:
+\begin{itemize}
+    \item Student C: ``400000001''.
+    \item Student D: ``400000002''.
+    \item Duplicate entry for Student C: ``400000001''.
+    \item Student E: ``INVALID-ID''.
+\end{itemize}
+The test configuration recognizes the first two identifiers as valid and the final identifier as malformed.
+
+\textbf{Input:} Instructor A uploads the enrollment file and attempts to confirm the import without correcting the identified problems.
+
+\textbf{Output:} The import preview flags the duplicate identifier and invalid identifier. Confirmation is blocked until the problems are resolved. The original course enrollment remains unchanged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ImportEnrollment}, which requires duplicate and malformed identifiers to be identified before confirmation. A valid import requires all entries to satisfy the configured identifier rules and contain no duplicate identifiers.
+
+\textbf{How Test Will Be Performed:} Prepare the enrollment file with the specified entries. Using Playwright, upload the file and inspect the preview. Verify that both problems are displayed and confirmation cannot proceed. Confirm that no enrollment records are added or removed.
+
+\item \textbf{T-FR-70: Preserve Students Missing from an Enrollment Import}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course contains Students A, B, C, and D. Students A, B, and C belong to Team Amazing Engineers, while Student D has no team. A new Avenue enrollment list contains Students A, C, and D but omits Student B.
+
+\textbf{Input:} Instructor A imports the new enrollment list and reviews the enrollment discrepancies.
+
+\textbf{Output:} Student B is flagged for instructor review because they are absent from the latest enrollment list. Student B remains enrolled and remains a member of Team Amazing Engineers until course staff explicitly confirm their removal.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_EnrollmentDiscrepency}. The system must identify students missing from the latest enrollment list without automatically removing them. Let $E$ be the existing enrollment and $I$ the imported list:
+\[
+E=\{A,B,C,D\},
+\qquad I=\{A,C,D\}.
+\]
+
+The discrepancy set is
+
+\[
+E\setminus I=\{B\}.
+\]
+
+Student B must therefore be flagged, but their enrollment and team membership must be preserved until confirmed removal.
+
+\textbf{How Test Will Be Performed:} Configure the existing enrollment and team memberships. Using Playwright, import the updated list and inspect the preview. Verify that Student B is flagged. Confirm that Student B remains in the course and Team Amazing Engineers without a separate removal confirmation.
+
+\item \textbf{T-FR-71: Manually Add a Student to Course Enrollment}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has no Avenue integration configured. Students A, B, and C are enrolled. Student D has recently joined the course but has no enrollment record in Keystone. Instructor A is authorized to maintain course enrollment.
+
+\textbf{Input:} Instructor A manually adds Student D using the valid student identifier ``400000004'' and assigns them to the Software Engineering capstone course.
+
+\textbf{Output:} Student D is added to the course enrollment with the correct identifier and course association. The existing student records remain unchanged, and Student D becomes available in the course's student administration interface.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_UpdateEnrollment}, which requires instructors and TAs to add students manually, including students joining after the initial enrollment import. The system must support enrollment updates without relying on Avenue integration.
+
+\textbf{How Test Will Be Performed:} Configure the course without Avenue integration. Using Playwright, authenticate as Instructor A and manually add Student D. Verify that the student appears in the course enrollment with the correct identifier and association.
+
+\item \textbf{T-FR-72: Identify Enrolled Students Without Teams}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has six enrolled students. Students A, B, and C belong to Team Amazing Engineers, Student D belongs to Team Fantastic Coders, and Students E and F are not assigned to any team. Instructor A is authorized to view course administration information.
+
+\textbf{Input:} Instructor A opens the list of students who still need a team. Student E then joins Team Fantastic Coders, and Instructor A refreshes the list.
+
+\textbf{Output:} Initially, the list contains exactly Students E and F. Following Student E's team assignment, only Student F remains on the list. Students already assigned to teams are excluded.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_NeedsGroup}. Let $E$ represent enrolled students and $M$ represent students assigned to teams. The required list is
+
+\[
+N=E\setminus M.
+\]
+
+Initially, $N=\{E,F\}$. After Student E joins Team Fantastic Coders, $N=\{F\}$. This verifies that the list accurately reflects current membership.
+
+\textbf{How Test Will Be Performed:} Configure the specified enrollment and team associations. Using Playwright, authenticate as Instructor A and verify the initial list. Assign Student E to Team Fantastic Coders through the supported team workflow, refresh the list, and verify that only Student F remains.
+
+
+\item \textbf{T-FR-73: Assign a TA to a Student Team}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers consists of four students and is associated with Autonomous Waste Sorting System. No TA is assigned to the team. Instructor A is authorized to assign TAs, and TA A is associated with the Software Engineering capstone course.
+
+\textbf{Input:} Instructor A assigns TA A to Team Amazing Engineers.
+
+\textbf{Output:} The assignment is saved. Team Amazing Engineers's members and project supervisor can view TA A as the assigned TA.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_AssignTA}, which requires course staff to assign TAs to teams and display the assignment to the team's members and supervisor. The test verifies the transition from an unassigned team to a correctly assigned team.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A and assign TA A to Team Amazing Engineers. Verify the saved assignment. Authenticate as a team member and as the project supervisor and confirm that both can view TA A's assignment.
+
+\end{enumerate}
+
+\subsubsection{Authentication, Authorization, and System Integrity}
+
+This section covers \texttt{FR\_MacSSO}, \texttt{FR\_AuthorizationRBAC}, \texttt{FR\_UpdateRoles}, \texttt{FR\_ExternalSupervisorVerification}, \texttt{FR\_ExternalSupervisorScope}, \texttt{FR\_ReverifyUsers}, \texttt{FR\_LogExternalErrors}, \texttt{FR\_DisplayTimestamps}, and \texttt{FR\_DurableNotifications} in Section 6 of the SRS. The tests verify authentication through trusted providers, role-based access, external supervisor verification, protection of sensitive operations, error reporting, record timestamps, and notification recovery following system interruptions.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-74: Authenticate Users Through Trusted Identity Providers}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A has an active McMaster account associated with the Software Engineering capstone course. External Supervisor A has an account with the configured trusted external authentication provider. Neither user has an active Keystone session.
+
+\textbf{Input:} Student A signs in through McMaster SSO. External Supervisor A separately signs in using the trusted external authentication provider.
+
+\textbf{Output:} Both users are authenticated through their respective providers and can access the Keystone functions permitted by their assigned roles and verification status. Neither user receives access outside their authorized scope.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_MacSSO} and \texttt{FR\_AuthorizationRBAC}. The system must authenticate university and external users through trusted identity providers before granting access to platform services.
+
+\textbf{How Test Will Be Performed:} Configure controlled test accounts with the corresponding identity providers. Using Playwright, execute each sign-in workflow. Verify successful authentication, the resulting account identity, and access to the functions permitted by each user's role.
+
+\item \textbf{T-FR-75: Deny Course Access When User Role Is Unknown}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} User A has successfully authenticated through a trusted identity provider, but no valid course role can be determined for the account. The Software Engineering course contains student profiles, team records, and project information.
+
+\textbf{Input:} User A attempts to access the course's project catalog, student profiles, and team administration information.
+
+\textbf{Output:} Access to all course data is denied. No student, team, or project information is disclosed to User A.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_AuthorizationRBAC}, which explicitly requires users with undetermined roles to receive no access to course data. If $r(u)$ represents the course role of user $u$, then
+
+\[
+r(u)=\mathrm{undefined}
+\Rightarrow
+\mathrm{CourseAccess}(u)=0.
+\]
+
+This verifies that successful authentication alone does not authorize access.
+
+\textbf{How Test Will Be Performed:} Configure an authenticated user without a valid course role. Using Playwright, attempt to access the specified course interfaces and direct record links. Verify that all requests are denied without disclosing course data.
+
+\item \textbf{T-FR-76: Update a User's Course Role and Permissions}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Administrator A (is\_admin set) is authorized to manage user roles for the Software Engineering capstone course. User B is associated with the course and currently has the ``Student'' role. User B cannot access instructor-only course configuration features.
+
+\textbf{Input:} Administrator A changes User B's assigned course role from ``Student'' to ``TA'', completing any required re-verification.
+
+\textbf{Output:} User B's course role is updated to ``TA''. User B gains access to functions permitted to TAs in their assigned course scope, but does not gain instructor-only or administrator-only privileges. The updated role is visible in the administration interface.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_UpdateRoles}, \texttt{FR\_AuthorizationRBAC}, and \texttt{FR\_ReverifyUsers}. The system must allow authorized administrators to update roles and enforce permissions associated with the new role.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Administrator A and update User B's role after completing re-verification. Verify that the updated role is saved. Authenticate as User B and confirm access to an authorized TA function while verifying that instructor-only configuration remains inaccessible.
+
+\item \textbf{T-FR-77: Require Re-verification Before a Sensitive Action}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Supervisor A has an authenticated Keystone session and owns a proposal titled Autonomous Waste Sorting System with status ``Draft''. The proposal contains valid information and has not been deleted.
+
+\textbf{Input:} Supervisor A attempts to delete the proposal but does not successfully complete the requested identity re-verification.
+
+\textbf{Output:} The system requests identity re-verification before performing the deletion. Because re-verification is not completed, the proposal is not deleted and its existing information remains unchanged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReverifyUsers}, which requires additional identity verification before deleting proposals and other sensitive actions. The test verifies that an existing authenticated session alone is insufficient to authorize proposal deletion.
+
+\textbf{How Test Will Be Performed:} Configure Supervisor A and the draft proposal. Using Playwright, authenticate as Supervisor A and initiate deletion. Verify the re-verification challenge appears. Cancel or fail the challenge and verify that the proposal remains accessible and unchanged.
+
+\item \textbf{T-FR-78: Record and Report an External Provider Error}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Keystone is connected to a trusted external authentication provider. Administrator A is authorized to view external-provider errors.
+
+\textbf{Input:} A controlled external authentication service returns a service-unavailable failure during an authentication request.
+
+\textbf{Output:} Keystone records the external-provider error and notifies the configured university IT personnel or course instructor. Administrator A can view the recorded failure in the external-provider error log.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_LogExternalErrors}, which requires external-provider failures to be logged and reported to IT and course instructors. The failure must be identifiable as an external-provider error rather than being silently ignored.
+
+\textbf{How Test Will Be Performed:} Configure the controlled provider to return a service-unavailable error. Trigger an authentication request and verify the resulting error record. Authenticate as Administrator A and inspect the external-provider error log. Verify that the event is recorded and that a notification is generated for an authorized recipient.
+
+\item \textbf{T-FR-79: Display Record Last-Updated Timestamps}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A has a completed student profile and is authorized to update it. The profile currently lists ``Python and Java'' as its skills. Its last updated timestamp is set to 2026-10-30 14:00:00.
+
+\textbf{Input:} Student A updates the skills field to ``Python, Java, and React'' and saves the profile at time 2026-10-30 15:00:00.
+
+\textbf{Output:} The updated profile displays the revised skills and a last-updated timestamp of 2026-10-30 15:00:00. The displayed timestamp corresponds to the record's latest modification.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DisplayTimestamps}, which requires displayed records to show their last-updated timestamps. For the configured test times,
+
+\[
+T_{\mathrm{after}}
+>
+T_{\mathrm{before}}.
+\]
+
+The expected timestamp difference is one hour, verifying that the profile displays the latest update rather than its previous modification time.
+
+\textbf{How Test Will Be Performed:} Configure the profile and controlled test clock. Using Playwright, authenticate as Student A, modify the skills field, and save. Verify the revised profile content and displayed last-updated timestamp.
+
+\item \textbf{T-FR-80: Recover a Pending Notification After System Interruption}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval. Instructor A is authorized to receive notifications concerning the submission. The notification service is configured with durable pending-notification storage and a controlled test email service.
+
+\textbf{Input:} The system generates a notification for Instructor A about the new submission. Before email delivery is verified, the notification service is abruptly stopped and then restarted.
+
+\textbf{Output:} The pending notification remains stored during the interruption and is delivered after the service restarts. Instructor A receives the notification no more than once, and the system records verified delivery.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DurableNotifications}, which requires pending notifications to persist until delivery is verified and prevents duplicate delivery to the same recipient. Let $D(u,n)$ denote the number of verified deliveries of notification $n$ to user $u$. The required condition is
+
+\[
+D(u,n)\leq 1.
+\]
+
+Following recovery, the expected delivery count for Instructor A is
+
+\[
+D(\mathrm{InstructorA},n)=1.
+\]
+
+This verifies notification recovery and the prevention of duplicate delivery.
+
+\textbf{How Test Will Be Performed:} Configure the submission and notification service. Trigger the notification, then terminate the service before delivery is verified. Restart the service and inspect the controlled email service and pending notification records. Verify successful delivery and confirm that exactly one email was received for the notification.
+
+\end{enumerate}
+
 ...
 
 \subsection{Tests for Nonfunctional Requirements}
