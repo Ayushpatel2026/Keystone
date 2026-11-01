@@ -560,6 +560,72 @@ How test will be performed:
 
 ..to be completed.
 
+\subsubsection{Compatibility}
+
+\begin{enumerate}
+
+\item{\textbf{compatibility-safari-sm}\\}
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed with representative data and
+test accounts.
+
+\textbf{Input/Condition:} Run representative UI tests in the latest two
+major versions of Safari at 430 px $\times$ 932 px.
+
+\textbf{Output/Result:} The tested pages have no horizontal overflow, clipped
+controls, or controls smaller than 40 px $\times$ 40 px. The tests
+complete successfully.
+
+\textbf{How test will be performed:} Use Playwright to run the tests and
+viewport checks in both Safari versions. Record the browser versions, viewport,
+test results, and screenshots or logs for failures.
+
+\textbf{Relevant NFRs}: NFR\_ScreenSize, NFR\_Browsers
+
+\item{\textbf{compatibility-chrome-md}\\}
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed with representative data and
+test accounts.
+
+\textbf{Input/Condition:} Run representative UI tests in the latest two
+major versions of Chrome at 1024 px $\times$ 768 px.
+
+\textbf{Output/Result:} The tested pages have no horizontal overflow, clipped
+controls, or controls smaller than 40 px $\times$ 40 px. The tests
+complete successfully.
+
+\textbf{How test will be performed:} Use Playwright to run the tests and
+viewport checks in both Chrome versions. Record the browser versions, viewport,
+test results, and screenshots or logs for failures.
+
+\textbf{Relevant NFRs}: NFR\_ScreenSize, NFR\_Browsers
+
+\item{\textbf{compatibility-firefox-lg}\\}
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed with representative data and
+test accounts.
+
+\textbf{Input/Condition:} Run representative UI tests in the latest two
+major versions of Firefox at 1920 px $\times$ 1080 px.
+
+\textbf{Output/Result:} The tested pages have no horizontal overflow, clipped
+controls, or controls smaller than 40 px $\times$ 40 px. The tests
+complete successfully.
+
+\textbf{How test will be performed:} Use Playwright to run the tests and
+viewport checks in both Firefox versions. Record the browser versions, viewport,
+test results, and screenshots or logs for failures.
+
+\textbf{Relevant NFRs}: NFR\_ScreenSize, NFR\_Browsers
+
+\end{enumerate}
+
 ...
 
 \subsection{Traceability Between Test Cases and Requirements}
