@@ -6,6 +6,7 @@
 \usepackage{array}
 \usepackage{amssymb}
 \usepackage{hyperref}
+\usepackage{amsmath}
 \hypersetup{
     colorlinks,
     citecolor=blue,
@@ -447,51 +448,1433 @@ the contents of the subsections.}
 
 \wss{Include a blurb here to explain why the subsections below
   cover the requirements.  References to the SRS would be good here.}
+The tests below verify the functional requirements defined in Section 6 of the SRS. Tests are grouped by major functionalities including project proposals, team formation, project applications, approvals, communication, and course administration. Each test evaluates whether the system produces the expected results under the given conditions
 
-\subsubsection{Area of Testing1}
+\subsubsection{Project Proposal Submission and Validation}
 
 \wss{It would be nice to have a blurb here to explain why the subsections below
   cover the requirements.  References to the SRS would be good here.  If a section
   covers tests for input constraints, you should reference the data constraints
   table in the SRS.}
-		
-\paragraph{Title for Test}
+
+This section covers the tests for project proposal submission and validation, as specified in FR\_SupervisorProposal, FR\_ProposalOptionalFields, and FR\_StudentProposal in Section 6 of the SRS. The tests verify successful supervisor and student proposal submissions, as well as the rejection of incomplete submissions and acceptance of proposals without optional information.
 
 \begin{enumerate}
 
-\item{test-id1\\}
+\item \textbf{T-FR-01: Submit a Complete Supervisor Proposal}\\
 
-Control: Manual versus Automatic
-					
-Initial State: 
-					
-Input: 
-					
-Output: \wss{The expected result for the given inputs.  Output is not how you
-are going to return the results of the test.  The output is the expected
-result.}
+\textbf{Type:} Automatic
 
-Test Case Derivation: \wss{Justify the expected value given in the Output field}
+\textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
-How test will be performed: 
-					
-\item{test-id2\\}
+\textbf{Input:} The supervisor completes and submits a proposal with the following information:
+\begin{itemize}
+    \item Title: Autonomous Waste Sorting System
+    \item Background: Manual waste sorting is inefficient and time-consuming.
+    \item Objectives: Develop a system that identifies and sorts recyclable
+    materials.
+    \item Required Skills: Python, computer vision, and mechanical design.
+    \item Deliverables: Working prototype and technical documentation.
+    \item Project Impact: Improved recycling efficiency.
+    \item Supervisor Capacity: 2 teams
+    \item Current Completion: Concept stage
+    \item Project Type: Hardware
+    \item Industry: Environmental technology
+    \item Confidentiality/IP Concerns: None
+    \item Additional Terms: No additional restrictions
+\end{itemize}
 
-Control: Manual versus Automatic
-					
-Initial State: 
-					
-Input: 
-					
-Output: \wss{The expected result for the given inputs}
+\textbf{Output:} The system accepts the submission and stores the proposal with the ``Proposal submitted'' status making it available for instructors to review.
 
-Test Case Derivation: \wss{Justify the expected value given in the Output field}
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_SupervisorProposal} of the SRS. A proposal containing valid information for every field counts as a valid complete submission. This establishes a normal workflow where incomplete and invalid submissions can be compared to. Upon acceptance of the input, the system is expected to accept it and make it available for the instructor to look through.
 
-How test will be performed: 
+\textbf{How test will be performed:} Using Playwright, authenticate as a supervisor, populate the proposal form with the predefined values, and submit it. Verify the confirmation and SUBMITTED status. Then, authenticate as an instructor and confirm that the proposal is accessible with the correct information.
+
+\item \textbf{T-FR-02: Reject Missing Required Fields}\\
+
+\textbf{Type:} Automatic
+					
+\textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
+					
+\textbf{Input:} A completed proposal template similar to T-FR-01 with one or more of the following required fields missing: title, background, course, objectives, impact, supervisor capacity details, level of current completion, industry, and information regarding confidentiality and IP concern. The supervisor will submit. Repeat for each of the following fields.
+					
+\textbf{Output:} The system rejects the submission, identifies the missing mandatory field(s), and prevents the proposal from entering the Proposal submitted state. The instructor will not receive the proposal.
+
+\textbf{Test Case Derivation:} Dervied from \texttt{FR\_ProposalOptionalFields} of the SRS. Leaving out one mandatory field at a time isolates each validation constraint and verifies that all required fields are independently enforced.
+
+\textbf{How test will be performed:} Using Playwright, populate the form with a valid baseline proposal. Remove one mandatory field, attempt submission, and verify that validation prevents submission. Repeat for each mandatory field. The test passes if every incomplete proposal is rejected and the corresponding missing field is identified. Repeated with as many combinations of mandatory fields as necessary.
+
+\item \textbf{T-FR-03: Accept Missing Optional Fields}\\
+
+\textbf{Type:} Automatic
+					
+\textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
+					
+\textbf{Input:} A completed proposal template similar to T-FR-01 with all of the following required fields: title, background, course, objectives, impact, supervisor capacity details, level of current completion, industry, and information regarding confidentiality and IP concern. All optional fields will be left empty. The supervisor will submit. Repeat for each of the following fields.
+					
+\textbf{Output:} The system accepts the submission and stores the proposal with the ``Proposal submitted'' status making it available for instructors to review.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProposalOptionalFields} of the SRS. A proposal containing only mandatory fields represents the minimum valid submission and verifies that optional information is not incorrectly enforced as mandatory.
+
+\textbf{How test will be performed:} Using Playwright, complete only the required proposal fields and submit. Verify that the proposal is accepted despite the missing optional information and is accessible to the instructor. The test passes if both conditions are satisfied.
+
+\item \textbf{T-FR-04: Publish a Student-Proposed Project}\\
+
+\textbf{Type:} Automatic
+
+\textbf{Initial State:} A student is authenticated and belongs to a team, and
+the proposal submission period is open.
+
+\textbf{Input:} The student publishes a proposal containing:
+\begin{itemize}
+    \item Title: Smart Campus Navigation
+    \item Problem Statement: Students have difficulty locating classrooms and
+    accessible routes across campus.
+    \item Proposed Solution/Methodology: Develop a web application providing
+    campus navigation and accessible route suggestions.
+\end{itemize}
+
+\textbf{Output:} The proposal is stored, associated with the submitting team, and displayed in the separate student-proposed project list with the correct information.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentProposal}. A student team providing all specified project information verifies successful proposal creation and publication in the correct list.
+
+\textbf{How test will be performed:} Use Playwright to authenticate as a student belonging to a team, complete the student proposal template, and publish it. Verify the stored information, team association, and visibility in the student-proposed project list using an account authorized to view it.
 
 \end{enumerate}
 
-\subsubsection{Area of Testing2}
+\subsubsection{Instructor Project Proposal}
+
+\wss{It would be nice to have a blurb here to explain why the subsections below
+  cover the requirements.  References to the SRS would be good here.  If a section
+  covers tests for input constraints, you should reference the data constraints
+  table in the SRS.}
+
+This section covers FR\_ReviewProposal, including the approval, rejection, and revision workflows defined in UC\_ReviewProposal. It also accounts for the updated external supervisor verification rule.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-05: Approve a Supervisor Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated instructor has access to an unapproved proposal titled Autonomous Waste Sorting System submitted by an unverified external supervisor. The proposal status is ``Proposal submitted''.
+
+\textbf{Input:} The instructor reviews the proposal and approves it.
+
+\textbf{Output:} The project status changes to ``Open'', and the project becomes visible in the approved catalog to authorized users. The supervisor is notified and becomes verified.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and \texttt{FR\_ExternalSupervisorVerification}. Approving an unverified external supervisor's proposal verifies both the approval transition and the associated supervisor verification rule.
+
+\textbf{How Test Will Be Performed:} Use Playwright to approve the proposal as an instructor. Verify the project status, authorized catalog visibility, and supervisor notification. Then sign in as the external supervisor and verify that the account is marked verified and can access permitted student profiles. The test passes if all conditions are satisfied.
+
+\item \textbf{T-FR-06: Request Changes to a Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An instructor has access to a proposal with the ``Proposal submitted'' status, submitted by an unverified external supervisor.
+
+\textbf{Input:} The instructor requests changes and provides the feedback and comments asking for clarification on the expected project deliverables and scope.
+
+\textbf{Output:} The proposal status becomes ``Proposal changes requested''. The feedback is stored and communicated to the supervisor. The project remains unpublished, and the supervisor remains unverified.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and \texttt{FR\_ExternalSupervisorVerification}. A revision request verifies that feedback does not trigger approval or external supervisor verification.
+
+\textbf{How Test Will Be Performed:} Use Playwright to request changes and submit the predefined feedback. Verify the status, stored feedback, and notification. Confirm that the project is excluded from the approved catalog and that the supervisor remains unverified.
+
+\item \textbf{T-FR-07: Reject a Supervisor Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated instructor has access to a proposal with the ``Proposal submitted'' status, submitted by an unverified external supervisor.
+
+\textbf{Input:} Reject the proposal with the reason ``The proposed scope does not meet capstone course expectations.''
+
+\textbf{Output:} The proposal status changes to ``Proposal rejected''. The rejection reason is preserved, the supervisor is notified, and the project remains excluded from the approved catalog. The supervisor remains unverified.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and \texttt{FR\_ExternalSupervisorVerification}. Rejection verifies that an unsuccessful review does not grant approval-related permissions.
+
+\textbf{How Test Will Be Performed:} Use Playwright to reject the proposal. Verify the updated status, recorded reason, and notification. Confirm that the project remains unpublished and the supervisor remains unverified.
+
+\item \textbf{T-FR-08: Revise and Resubmit a Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} A supervisor proposal has the status ``Proposal changes requested'' and contains instructor feedback asking for clearer project deliverables.
+
+\textbf{Input:} The supervisor changes the deliverables from ``Working prototype'' to ``Working prototype, technical documentation, and final demonstration'', then resubmits.
+
+\textbf{Output:} The revised information is stored, the proposal returns to ``Proposal submitted'', and the instructor can review the updated version. Previous feedback remains in the review history.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReviewProposal} and \texttt{UC\_ReviewProposal}. Resubmission verifies the transition back to instructor review without losing earlier feedback.
+
+\textbf{How Test Will Be Performed:} Use Playwright to sign in as the supervisor, modify the deliverables, and resubmit. Verify the new information and status. Sign in as the instructor and confirm the revised proposal and earlier feedback are accessible.
+
+\end{enumerate}
+
+\subsubsection{Project Discovery and Availability}
+This section covers \texttt{FR\_ViewApprovedProjects} and \texttt{FR\_ViewProjectStatus} of the SRS. Tests verify search and filtering, project visibility restrictions, and availability based on reserved supervisor capacity.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-09: Search and Filter Approved Projects}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated student is enrolled in the course. Three approved projects are visible to the student:
+\begin{itemize}
+    \item Project A: Autonomous Waste Sorting System, Environmental Technology, Open.
+    \item Project B: Healthcare Scheduling System, Healthcare, Open.
+    \item Project C: Automated Assembly Line, Manufacturing, Full.
+\end{itemize}
+
+\textbf{Input:} Apply the industry filter ``Environmental Technology'', availability filter ``Open'', and search keyword ``Autonomous''.
+
+\textbf{Output:} Only Project A is returned. Projects B and C are excluded because they do not satisfy every criterion.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewApprovedProjects}. Projects with overlapping and distinct attributes verify that keyword searching and multiple filters are applied together.
+
+\textbf{How Test Will Be Performed:} Populate the test environment with the three projects. Use Playwright to apply the filters and keyword. Compare returned project identifiers with the expected set \{A\}. The test passes if exactly Project A is returned.
+
+\item \textbf{T-FR-10: Exclude Unapproved or Unauthorized Projects}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The system contains three projects:
+\begin{itemize}
+    \item Project A: Autonomous Waste Sorting System, approved with status ``Open'', submitted by External Supervisor X.
+    \item Project B: Drone Inspection Platform, with status ``Proposal submitted'', awaiting instructor approval.
+    \item Project C: Automated Assembly Line, approved with status ``Full'', submitted by External Supervisor Y.
+\end{itemize}
+A student enrolled in the course, the course instructor, and External Supervisors X and Y have authenticated accounts. Each external supervisor is associated only with their own project.
+
+\textbf{Input:} The student searches for Projects A, B, and C. The instructor attempts to access all three projects, including Project B through the proposal review interface. External Supervisor X searches for Project C, while External Supervisor Y accesses Project C.
+
+\textbf{Output:} The student can view Projects A and C, including Project C's ``Full'' status, but cannot view Project B because it has not been approved. The instructor can access all three projects, including Project B through the proposal review interface. External Supervisor X cannot view Project C because it belongs to another external supervisor, while External Supervisor Y can access Project C because they proposed it.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewApprovedProjects} and \texttt{FR\_ExternalSupervisorScope} of the SRS. Using projects with different approval states and ownership verifies that catalog visibility is restricted by both instructor approval and the user's authorization.
+
+\textbf{How Test Will Be Performed:} Configure the three projects with the specified statuses and ownership. Using Playwright, authenticate as the student and search for Projects A, B, and C. Verify that Projects A and C are displayed, including Project C's ``Full'' status, while Project B is excluded. Authenticate as the instructor and verify access to all three projects, including Project B through the proposal review interface. Authenticate as External Supervisor X and search for Project C, verifying that it is excluded from results. Finally, authenticate as External Supervisor Y and verify that Project C is accessible. The test passes if each account can access only the project records permitted by the SRS visibility rules.
+
+\item \textbf{T-FR-11: Display Project Availability and Capacity}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated student can access two approved projects:
+\begin{itemize}
+    \item Project A: Maximum capacity of 2 teams with 1 supervisor slot
+    reserved.
+    \item Project B: Maximum capacity of 1 team with 1 supervisor slot reserved.
+\end{itemize}
+
+\textbf{Input:} The student opens the project catalog and views both projects.
+
+\textbf{Output:} Project A displays ``Open'' with a maximum capacity of 2 teams, 1 reserved slot, and 1 remaining available slot. Project B displays ``Full'' with a maximum capacity of 1 team, 1 reserved slot, and 0 remaining available slots.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewProjectStatus}. Remaining capacity is calculated as $C_{remaining} = C_{max} - R$ where $R$ is reserved slot and $C_{max}$ is maximum capacity. Project A has $2-1=1$ available slot, while Project B has $1-1=0$. These cases verify the correct availability states.
+
+\textbf{How Test Will Be Performed:} Configure both projects with the specified capacities and reserved slots. Use Playwright to view their catalog entries and compare the displayed statuses and maximum capacities with the expected values.
+
+\item \textbf{T-FR-12: Prevent Applications to Full Projects}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated student belongs to a registered team. An approved project has a maximum capacity of one team and its only supervisor slot is reserved, giving it the ``Full'' status.
+
+\textbf{Input:} The student attempts to submit an application to the full project.
+
+\textbf{Output:} The system rejects the application, informs the student that the project is unavailable, and does not create an application record.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ViewProjectStatus} and \texttt{UC\_SelectProject}. A project with zero remaining capacity verifies that availability restrictions are enforced by the application workflow rather than only displayed visually.
+
+\textbf{How Test Will Be Performed:} Use Playwright to navigate to the full project and attempt to apply through the normal user interface. Verify that the application is blocked and that no new application record is created. The test passes if the full project cannot receive a new application.
+
+\end{enumerate}
+
+\subsubsection{Student Profiles and Team Formation}
+
+This section covers \texttt{FR\_StudentProfile}, \texttt{FR\_StudentTeams}, \texttt{FR\_ValidateTeamRules}, \texttt{FR\_TeamDiscovery}, and \texttt{FR\_TeamProfile} in Section 6 of the SRS. The tests verify that students can create and maintain profiles, form teams, manage invitations, discover available teammates, and comply with course-specific team formation rules. The tests also verify the handling of invalid team configurations and changes to existing rules.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-13: Create and View a Student Profile}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} A student is authenticated and enrolled in the Software Engineering capstone course. The student has not created a profile.
+
+\textbf{Input:} The student creates a profile with:
+\begin{itemize}
+    \item Bio: Fourth-year Software Engineering student interested in developing
+    AI applications.
+    \item Program: Software Engineering
+    \item Interests: Artificial intelligence and robotics
+    \item Project Preferences: AI and automation projects
+    \item Skills: Python, Java, React
+    \item Experience: Software development internship
+    \item Work Style: Collaborative and organized
+    \item LinkedIn: https://www.linkedin.com/in/teststudent
+\end{itemize}
+The student saves the profile.
+
+\textbf{Output:} The system successfully stores the profile with all provided information. The student can reopen the profile and view the saved values. Other authorized students and supervisors can also view the profile.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentProfile}. Providing values for the specified profile attributes verifies that students can create persistent profiles containing information used for teammate and project discovery.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as the student, complete the profile form, and save it. Reopen the profile and verify all stored fields. Authenticate as another authorized student and an approved supervisor to verify profile visibility.
+
+\item \textbf{T-FR-14: Update an Existing Student Profile}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} An authenticated student has an existing profile with the skills ``Python, Java, React'' and project preferences ``AI and automation projects'' (Profile provided in T-FR-13).
+
+\textbf{Input:} The student updates the skills to ``Python, Java, React, PyTorch'' and changes the project preferences to ``Machine learning and computer vision''. The student saves the changes.
+
+\textbf{Output:} The updated profile contains the new skills and project preferences. Unmodified information remains unchanged, and the revised values are visible when the profile is reopened.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentProfile}. Changing selected profile fields verifies that students can maintain their information without unintentionally modifying or losing unrelated profile attributes.
+
+\textbf{How Test Will Be Performed:} Using Playwright, open the existing profile, change the specified fields, and save. Reload the profile and compare all stored fields with their expected values. Confirm that the updated information is visible to authorized users.
+
+\item \textbf{T-FR-15: Create a Student Team and Assign Roles}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Three authenticated students, Student A, Student B, and Student C, are enrolled in the Software Engineering capstone course and do not belong to any existing teams. The course permits teams of 3 to 5 students.
+
+\textbf{Input:} Student A creates a team named ``Amazing Engineers'', adds Student B and Student C through the supported team formation workflow, and assigns Student A as the team's point of contact.
+
+\textbf{Output:} The team is created with the three students as members. Student A is identified as the point of contact, and the team membership and assigned roles are stored correctly.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentTeams}. Creating a team with a valid number of members and assigning a point of contact verifies that students can organize themselves into teams and define responsibilities.
+
+\textbf{How Test Will Be Performed:} Configure the course team size limits and create the three student accounts. Using Playwright, create the team, complete the necessary membership invitations or confirmations, and assign the point-of-contact role. Verify the team membership and recorded role assignments.
+
+\item \textbf{T-FR-16: Send and Accept a Team Invitation}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has 3 members and a maximum permitted size of 5 as defined in T-FR-15. Student D is enrolled in the same course and does not belong to another team.
+
+\textbf{Input:} Student A invites Student D to join Team Amazing Engineers. Student D opens the invitation and accepts.
+
+\textbf{Output:} Student D becomes a member of Team Amazing Engineers. The membership count increases from 3 to 4, and Student D appears in the team's member list. The invitation is no longer pending.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentTeams}. Accepting an invitation verifies that team invitations can be received and that accepted invitations update the team's membership.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Student A and invite Student D. Authenticate as Student D, accept the invitation, and verify that both accounts display the updated team membership and invitation status.
+
+\item \textbf{T-FR-17: Decline a Team Invitation}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has 3 members and can recruit additional students. Student E is enrolled in the course, has no team, and has received an invitation to join Team Amazing Engineers.
+
+\textbf{Input:} Student E declines the invitation.
+
+\textbf{Output:} The invitation is recorded as declined. Student E is not added to Team Amazing Engineers, and the team's membership count remains 3.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentTeams}. Declining an invitation verifies that students can reject team membership requests without changing existing team composition.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Student A and invite Student E. Authenticate as Student E and decline the invitation. Verify that the invitation is no longer pending, Student E remains without a team, and Team Amazing Engineers's member list is unchanged.
+
+\item \textbf{T-FR-18: Find and Join an Existing Team}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has 3 members and a maximum permitted size of 5. The team is configured to recruit 2 additional members. Student F is enrolled in the course, is not on a team, and is eligible to join Team Amazing Engineers. Student A is an existing member of Team Amazing
+Engineers.
+
+\textbf{Input:} Student F discovers Team Amazing Engineers through the team recruitment interface and submits a request to join. Student A reviews and accepts the request.
+
+\textbf{Output:} Student F becomes a member of Team Amazing Engineers, increasing membership to 4. The team now requires only 1 additional member, and the membership information is updated for all current members.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_StudentTeams}. Joining through an open recruitment opportunity verifies that students can join existing teams without requiring a direct invitation from an existing team member. It should also verify that any student on the team can accept requests.
+
+\textbf{How Test Will Be Performed:} Using Playwright, configure Team Amazing Engineers to recruit additional members. Authenticate as Student F, find the team, and submit a join request. Authenticate as Student A, review and accept Student F's request through the team interface, and verify the updated membership and recruitment count.
+
+\item \textbf{T-FR-19: Validate Team Size Constraints}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course requires a minimum of 3 students and a maximum of 5 students per team. Team Amazing Engineers contains 2 students, Team Fantastic Coders contains 3 students, and Team Capstone Legends contains 5 students. Team Amazing Engineers is recruiting additional members. Team Amazing Engineers has reached an agreement with the supervisor of Autonomous Waste Sorting System, and its team-project status is ``Agreed''. In-platform approval is enabled, and all other required submission information is complete.
+
+\textbf{Input:} Team Amazing Engineers attempts to submit its team-project information for instructor approval with only 2 members. Team Fantastic Coders and Team Capstone Legends are checked against the configured team-size requirements. Separately, a student who is not on a team attempts to join Team Capstone Legends, which already contains 5 members.
+
+\textbf{Output:} Team Amazing Engineers is identified as not meeting the minimum team size and its submission for instructor approval is rejected with a validation message. Team Amazing Engineers remains intact and may continue recruiting additional members. Team Fantastic Coders and Team Capstone Legends satisfy the configured team-size requirements. The student's attempt to join Team Capstone Legends is rejected because the maximum team size would be exceeded, and Team Capstone Legends' membership remains unchanged at 5 students.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ValidateTeamRules} and \texttt{FR\_ApprovalPreflightValidate}. For minimum size $m = 3$ and maximum size $M = 5$, compliant team sizes satisfy $m \leq n \leq M$. Testing $n = 2, 3, 5, 6$ verifies the minimum-size restriction before instructor approval, valid boundary values, and maximum-size enforcement during team membership changes.
+
+\textbf{How Test Will Be Performed:} Configure the course team-size limits and prepare Team Amazing Engineers, Team Fantastic Coders, and Team Capstone Legends with their specified membership counts. Using Playwright, authenticate as a member of Team Amazing Engineers and attempt to submit its team-project information for instructor approval. Verify that the submission is rejected, the minimum-size violation is identified, and the team-project status remains ``Agreed''. Verify that Team Fantastic Coders and Team Capstone Legends satisfy the configured team-size requirements. Authenticate as a student who is not on a team and attempt to join Team Capstone Legends. Verify that the join attempt is rejected and Team Capstone Legends retains its original 5 members.
+
+\item \textbf{T-FR-20: Reject Disallowed Program Combinations}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The course configuration permits teams consisting entirely of Software Engineering students or a combination of Software Engineering and Mechatronics students. Teams combining Software Engineering and Computer Science students are not permitted. The minimum team size is 3. Team A and Team B each initially contain 2 Software Engineering students.
+
+\textbf{Input:}
+\begin{itemize}
+    \item A Mechatronics student attempts to join Team A, increasing its membership to 3.
+    \item A Computer Science student attempts to join Team B, which would increase its membership to 3.
+\end{itemize}
+
+\textbf{Output:} The Mechatronics student successfully joins Team A, resulting in a valid team of 3 members. The Computer Science student's attempt to join Team B is rejected because the program combination is not permitted. Team B retains its original 2 Software Engineering members, and a validation message identifies the violated program-combination rule.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ValidateTeamRules}. Testing one permitted and one disallowed combination verifies that the system enforces configurable program restrictions rather than allowing every combination of enrolled students.
+
+\textbf{How Test Will Be Performed:} Configure the permitted program combinations and prepare both teams using the specified student programs. Using Playwright, initiate team validation and verify that Team A passes while Team B is rejected.
+
+\item \textbf{T-FR-21: Prevent Duplicate Team Membership}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A is already a member of Team Amazing Engineers. Team Fantastic Coders is an existing team with an available membership slot. Both teams belong to the same capstone course.
+
+\textbf{Input:} Student A attempts to join Team Fantastic Coders while remaining a member of Team Amazing Engineers.
+
+\textbf{Output:} The system rejects Student A's attempt to join Team Fantastic Coders. Student A remains a member of Team Amazing Engineers only, and neither team's membership is incorrectly modified.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ValidateTeamRules}. Attempting to join a second team verifies that duplicate membership is prevented and that a student belongs to at most one team.
+
+\textbf{How Test Will Be Performed:} Configure the two teams and their membership records. Using Playwright, authenticate as Student A and attempt to join Team Fantastic Coders. Verify the rejection and confirm that Student A remains associated only with Team Amazing Engineers.
+
+\item \textbf{T-FR-22: Flag Existing Teams After Rule Changes}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} A course permits team sizes from 3 to 5 students. Team Amazing Engineers has 3 members, and Team Fantastic Coders has 5 members. Both teams are valid under the existing rules.
+
+\textbf{Input:} The instructor changes the minimum team size from 3 to 4 while retaining the maximum team size of 5.
+
+\textbf{Output:} The system identifies Team Amazing Engineers as non-compliant with the proposed rules. After the change is applied, Team Amazing Engineers remains intact but is flagged for instructor review. Team Fantastic Coders remains valid and is not flagged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ValidateTeamRules}. Changing the minimum size from $m = 3$ to $m = 4$ makes Team Amazing Engineers's membership $n = 3 < m$, while Team Fantastic Coders continues to satisfy $4 \leq n \leq 5$. This verifies that changes to formation rules identify newly non-compliant teams without automatically invalidating or dissolving them.
+
+\textbf{How Test Will Be Performed:} Configure the initial course rules and create both teams. Using Playwright, authenticate as an instructor and change the minimum team size. Verify that Team Amazing Engineers is identified as affected before confirmation. Apply the rule change and confirm that Team Amazing Engineers is flagged while both teams retain their original memberships.
+
+\item \textbf{T-FR-23: Discover Students and Teams Seeking Members}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Students A and B are enrolled in the same course and have not joined a team. Team Amazing Engineers is recruiting 2 additional members, while Team Fantastic Coders is not recruiting.
+
+\textbf{Input:} Student A marks their profile as ``Looking for a team''. Student B leaves their availability disabled. Another authenticated student opens the teammate and team discovery interface.
+
+\textbf{Output:} Student A appears among students seeking a team, while Student B does not. Team Amazing Engineers appears among teams recruiting additional members, while Team Fantastic Coders does not.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_TeamDiscovery}. Using students and teams with different recruitment states verifies that the discovery interface reflects which users and teams are actively seeking members.
+
+\textbf{How Test Will Be Performed:} Using Playwright, configure the specified student availability and team recruitment statuses. Authenticate as another student and open the discovery interface. Verify that only Student A and Team Amazing Engineers appear in their respective discovery results.
+
+\item \textbf{T-FR-24: Create, Update, and View a Team Profile}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers consists of three registered students. The team has not created a shared team profile.
+
+\textbf{Input:} An authorized team member creates a profile containing:
+\begin{itemize}
+    \item Team Bio: A team focused on practical software and robotics solutions.
+    \item Collective Skills: Python, React, embedded systems
+    \item Project Interests: Robotics and automation
+    \item Goals: Develop a functional prototype
+    \item Work Style: Weekly meetings and shared task management
+\end{itemize}
+The member saves the profile, then updates the collective skills to include ``Computer vision''.
+
+\textbf{Output:} The shared team profile is stored with the specified information. After editing, the collective skills include computer vision, and all other profile fields remain unchanged. The profile is visible to authorized users.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_TeamProfile}. Creating, editing, and viewing a shared profile verifies that teams can maintain consolidated information about their members' skills, interests, goals, and work style for other authorized stakeholders.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as an authorized Team Amazing Engineers member, create the team profile, and save it. Reopen the profile, update the collective skills, and verify that the change persists. Authenticate as another authorized user and verify that the shared profile and updated information are visible.
+
+\end{enumerate}
+
+\subsubsection{Project Recommendations, Applications, and Supervisor-Team Agreements}
+
+This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, and \texttt{FR\_DeclineTeam} in Section 6 of the SRS. The tests verify that students receive relevant recommendations, submit applications to available projects, and record mutual agreements with supervisors. The tests also verify the capacity and status transitions defined in Section 7.2 of the SRS.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-25: Recommend Compatible Projects and Teammates}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A has a complete profile containing Python, machine learning, and computer vision skills, with interests in artificial intelligence and automation. Three available projects and two students seeking teammates exist:
+\begin{itemize}
+    \item Project A: Computer Vision Defect Detection, requiring Python and computer vision skills.
+    \item Project B: Mechanical Gearbox Design, requiring CAD and mechanical design skills.
+    \item Project C: AI-Based Quality Inspection, requiring Python and machine learning skills.
+    \item Student B: Interested in artificial intelligence with Python and machine learning experience.
+    \item Student C: Interested in mechanical design with CAD and SolidWorks experience.
+\end{itemize}
+
+\textbf{Input:} Student A opens the project and teammate recommendation interface.
+
+\textbf{Output:} The system generates recommendations based on Student A's completed profile. Projects A and C are identified as stronger matches than Project B, and Student B is identified as a stronger teammate match than Student C, based on overlapping attributes.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_TeamRecommend}. Providing candidates with strongly overlapping and distinct skills and interests verifies that recommendations account for profile similarity rather than presenting unrelated candidates without considering the student's preferences.
+
+\textbf{How Test Will Be Performed:} Create the three projects and two student profiles with the specified skills and interests. Using Playwright, log in as Student A and open the recommendations page. Verify that Projects A and C are recommended ahead of Project B, and that Student B is recommended ahead of Student C, based on matching skills and interests.
+
+\item \textbf{T-FR-26: Submit an Application to an Open Project}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers consists of three registered students, has no existing application to Autonomous Waste Sorting System, and has not accepted another project. Autonomous Waste Sorting System has status ``Open'', maximum capacity $C_{\max}=2$, and $R=0$ reserved slots.
+
+\textbf{Input:} A member of Team Amazing Engineers opens Autonomous Waste Sorting System and submits an application expressing the team's interest.
+
+\textbf{Output:} An application associated with Team Amazing Engineers and the project is created with the team-project status ``Applied''. The project supervisor can review the application. The project remains ``Open'' and $R=0$, since an application does not reserve a supervisor slot.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProjectInterest} and \texttt{UC\_SelectProject}. A valid application verifies that teams can express interest in an available supervisor-proposed project without immediately occupying its capacity.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as a member of Team Amazing Engineers, open the project, and submit the application. Verify the ``Applied'' status and team-project association. Authenticate as the supervisor and verify that the application is available for review. Confirm that the project remains ``Open'' with zero reserved slots.
+
+\item \textbf{T-FR-27: Reserve Capacity When a Supervisor Accepts a Team}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Autonomous Waste Sorting System has maximum capacity $C_{max}=2$ and $R=1$ reserved slot. Team Fantastic Coders has an application with status ``Applied'' and has not been accepted by the supervisor.
+
+\textbf{Input:} The supervisor accepts Team Fantastic Coders's application.
+
+\textbf{Output:} Team Fantastic Coders's status becomes ``Supervisor Accepts'', the supervisor's acceptance is recorded, and the number of reserved slots increases from 1 to 2. The project status changes from ``Open'' to ``Full''. Team Fantastic Coders has not yet reached ``Agreed'' because the team has not accepted.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and the capacity rules in Section 7.2 of the SRS. Remaining capacity is calculated as $C_{remaining}=C_{max}-R$. Initially, $C_{remaining}=2-1=1$. After supervisor acceptance, $R \leftarrow R+1=2$, resulting in $C_{remaining}=2-2=0$. These values verify that supervisor acceptance reserves exactly one slot and updates the project to ``Full''.
+
+\textbf{How Test Will Be Performed:} Configure the project and Team Fantastic Coders's pending application. Using Playwright, authenticate as the supervisor and accept Team Fantastic Coders. Verify the updated team-project status, acceptance record, reserved slot count, and project availability.
+
+% TODO: Need to evaluate and resolve the redundancy issue in "Applied" and "Team Accepts - Supervisor Pending" States - https://github.com/Ayushpatel2026/Keystone/issues/138
+\item \textbf{T-FR-28: Record Team Acceptance Before Supervisor Acceptance (TEMP TBD)}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has an application to Autonomous Waste Sorting System with status ``Applied''. The project has maximum capacity $C_{max}=2$, $R=0$ reserved slots, and status ``Open''.
+
+\textbf{Input:} Team Amazing Engineers accepts the proposed working arrangement before receiving supervisor acceptance.
+
+\textbf{Output:} The team-project status becomes ``Team Accepts - Supervisor Pending''. The team's acceptance is recorded, but the arrangement is not marked ``Agreed''. No supervisor slot is reserved, so $R=0$ and the project remains ``Open''.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and the status lifecycle in Section 7.2 of the SRS. Team acceptance alone must not reserve project capacity or establish a mutual agreement.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as an authorized Team Amazing Engineers member and record the team's acceptance. Verify the pending-supervisor status and confirm that the project capacity and availability remain unchanged.
+
+\item \textbf{T-FR-29: Establish a Mutual Supervisor-Team Agreement}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has applied to Autonomous Waste Sorting System. The supervisor has already accepted the team, reserving one slot. The team-project status is ``Supervisor Accepts''. The team has not yet accepted the arrangement.
+
+\textbf{Input:} An authorized Team Amazing Engineers member accepts the working arrangement.
+
+\textbf{Output:} The team-project status changes to ``Agreed''. Both the supervisor's and team's acceptance decisions are recorded. The reserved slot remains occupied without incrementing again.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and Section 7.2 of the SRS. Recording the second acceptance verifies that a mutual agreement is established only when both parties accept. Since the supervisor has already reserved the slot, the second acceptance must not increase $R$ again.
+
+\textbf{How Test Will Be Performed:} Prepare the application with the supervisor's acceptance already recorded. Using Playwright, authenticate as Team Amazing Engineers and accept the arrangement. Verify the ``Agreed'' status, both acceptance records, and unchanged reserved-slot count.
+
+\item \textbf{T-FR-30: Decline a Team Application}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Fantastic Coders has submitted an application to an ``Open'' project. The application has status ``Applied'', and the supervisor has not accepted the team or reserved a slot.
+
+\textbf{Input:} The supervisor declines Team Fantastic Coders's application and provides the optional reason: ``The project requires a different combination of technical skills.''
+
+\textbf{Output:} The application changes to ``Declined or withdrawn''. The decision is communicated through a respectful message containing the supplied reason. No supervisor slot is reserved or released, and the project remains ``Open''.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam}. Declining an application before supervisor acceptance verifies that supervisors can reject applications, communicate the decision respectfully, and capacity remains unchanged.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as the supervisor, decline Team Fantastic Coders's application, and enter the specified reason. Verify the updated status, recorded reason, notification, and unchanged project capacity. Confirm that the message uses the system's respectful decline template.
+
+\item \textbf{T-FR-31: Release Reserved Capacity After Withdrawal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Autonomous Waste Sorting System has maximum capacity $C_{max}=2$ and $R=2$ reserved slots, giving it status ``Full''. Team Fantastic Coders occupies one reserved slot because its supervisor previously accepted its application.
+
+\textbf{Input:} Team Fantastic Coders withdraws its application through the supported withdrawal workflow.
+
+\textbf{Output:} Team Fantastic Coders's application changes to ``Declined or withdrawn''. Its reserved slot is released, reducing $R$ from 2 to 1. The project becomes ``Open'' and is available for additional team applications.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam}, \texttt{UC\_SelectProject}, and the capacity rules in Section 7.2 of the SRS. Initially, $C_{remaining} = C_{max}-R = 2 - 2 = 0$. Following withdrawal, $R \leftarrow R - 1 = 1$, resulting in $C_{remaining} = 2 - 1 = 1$. These transitions verify that releasing an occupied slot restores availability without changing maximum capacity.
+
+\textbf{How Test Will Be Performed:}
+Configure the project with two reserved slots and Team Fantastic Coders as one of the accepted teams. Using Playwright, authenticate as Team Fantastic Coders and withdraw its application. Verify the withdrawal status, released slot, and change from ``Full'' to ``Open''.
+
+\item \textbf{T-FR-32: Prevent Supervisor Acceptance Beyond Capacity}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Project Automated Assembly Line has maximum capacity $C_{max} = 1$ and $R = 1$ reserved slot, giving it status ``Full''. Team Team Amazing Engineers has a previously submitted application with status ``Applied'', created before the project became full.
+
+\textbf{Input:} The supervisor attempts to accept Team Amazing Engineers' application.
+
+\textbf{Output:} The acceptance is rejected because no capacity remains. Team Amazing Engineers does not acquire a reserved slot, the existing accepted team remains unchanged, and $R=1$.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and Section 7.2 of the SRS. Supervisor acceptance must preserve $0 \leq R \leq C_{max}$. Attempting another acceptance when $R = C_{max} = 1$ would produce $R + 1 = 2 > C_{max}$, violating the capacity constraint. The system must therefore prevent the action.
+
+\textbf{How Test Will Be Performed:} Prepare the full project and an existing pending application. Using Playwright, authenticate as the supervisor and attempt acceptance. Verify that the action is blocked and that neither the reservation count nor the existing team assignments change.
+
+\item \textbf{T-FR-33: Release Other Reservations After Team Agreement}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has applications to two approved projects:
+\begin{itemize}
+    \item Project A: Autonomous Waste Sorting System, capacity $C_{max}=2$, with $R=1$ reserved slot held for Team Amazing Engineers.
+    \item Project B: Automated Assembly Line, capacity $C_{max}=1$, with $R=1$ reserved slot held for Team Amazing Engineers.
+\end{itemize}
+Both supervisors have accepted Team Amazing Engineers. The team has not yet accepted either project.
+
+\textbf{Input:} Team Amazing Engineers accepts Project A's working arrangement.
+
+\textbf{Output:} Team Amazing Engineers reaches ``Agreed'' on Project A, retaining its reservation there. Its application to Project B is withdrawn, releasing the reservation. Project B's reserved slots decrease from 1 to 0, and its status changes from ``Full'' to ``Open''.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and Section 7.2 of the SRS. A team's agreement with one project must release reservations associated with competing applications. For Project B, $R \leftarrow R - 1 = 0$ and $C_{remaining} = 1 - 0 = 1$. This verifies that an agreement does not leave another project's capacity unnecessarily occupied.
+
+\textbf{How Test Will Be Performed:} Configure both projects with Team Amazing Engineers's supervisor-accepted applications. Using Playwright, authenticate as Team Amazing Engineers and accept Project A. Verify the ``Agreed'' status on Project A, withdrawal of the Project B application, and restoration of Project B's availability.
+
+\item \textbf{T-FR-34: Prevent Duplicate Supervisor Acceptance}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} A project has maximum capacity $C_{max} = 2$ and $R = 1$ reserved slot. Team Amazing Engineers's application has status ``Supervisor Accepts'', and the supervisor's acceptance has already been recorded.
+
+\textbf{Input:} The supervisor attempts to accept Team Amazing Engineers's application a second time.
+
+\textbf{Output:} The repeated action does not create another reservation nor increment the reserved-slot count. The team-project status remains ``Supervisor Accepts'' and $R=1$.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and the capacity rules in Section 7.2 of the SRS and the PoC. Each supervisor-accepted team must occupy exactly one slot. Repeated acceptance of the same application must not produce $R \leftarrow R + 1$ again.
+
+\textbf{How Test Will Be Performed:}
+Configure an application with supervisor acceptance already recorded. Using Playwright, attempt to repeat the acceptance through the available interface or resend the same supported action. Verify that no additional reservation is created and that the stored status and capacity remain unchanged.
+
+\end{enumerate}
+
+\subsubsection{Project Communication and Notifications}
+
+This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} in Section 6 of the SRS, along with the access restrictions defined in \texttt{FR\_ExternalSupervisorScope}. The tests verify that authorized users can create and reply to discussion threads associated with project proposals, team formations, and project applications. They also verify that relevant users receive email notifications for thread activity, application decisions, and project status changes, while ensuring that notification recipients are authorized and confidential information is not disclosed.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-35: Create a Discussion Thread on a Project Proposal}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Input:} Supervisor A creates a thread with the subject ``Project Deliverable Requirements'' and the message ``Are student teams required to produce a working physical prototype, or can the final deliverable be a software simulation?''
+
+\textbf{Output:} A new thread with the specified subject and message is created and associated with the Autonomous Waste Sorting System proposal. The author and creation timestamp are recorded, and the thread is accessible to authorized users.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProjectThreads}, which requires authorized users to create threads associated with their own project proposals. Creating a thread on a submitted proposal verifies the ability to initiate project-related communication.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Supervisor A, navigate to the proposal, and create the specified thread. Verify that the thread appears under the correct proposal and that its subject, content, author, and timestamp match the submitted information.
+
+\item \textbf{T-FR-36: Reply to a Discussion Thread}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Autonomous Waste Sorting System proposal contains a thread titled ``Project Deliverable Requirements'' asking the question proposed in T-FR-36, created by Supervisor A. Instructor A is assigned to the course and is authorized to review the proposal. The thread currently contains no replies.
+
+\textbf{Input:} Instructor A replies: ``Student teams may develop either a physical prototype or a software simulation, depending on the project's scope and learning objectives. The expected deliverables should be clearly specified in the proposal.''
+
+\textbf{Output:} The reply is appended to the existing thread with Instructor A identified as its author and a timestamp recording when the reply was submitted. The original message, including its content, author, and timestamp, remains unchanged. Both messages are displayed in chronological order under the same thread.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProjectThreads}. Allowing an authorized instructor to respond verifies that threads support ongoing communication, rather than only the creation of standalone messages.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A, open the existing thread, and submit the reply. Verify that both messages are visible, the reply is attributed to Instructor A, and the original message is preserved.
+
+\item \textbf{T-FR-37: Communicate Through Team Formation and Application Threads}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers consists of three students, including Student A and Student B. Team Amazing Engineers has an application to Autonomous Waste Sorting System with status ``Applied''. No threads are associated with the team or application.
+
+\textbf{Input:}
+\begin{enumerate}
+    \item Student A creates a team formation thread titled ``Meeting Availability'' with the message ``Can we meet on Friday?''
+    \item Student B replies ``Friday afternoon works.''
+    \item Student A creates a thread on the project application titled ``Project Requirements'' with the message ``Can we clarify the hardware requirements?''
+\end{enumerate}
+
+\textbf{Output:} Both threads are created under their corresponding records. The team formation thread contains Student A's message and Student B's reply. The project application thread contains the specified requirements question. Neither thread is associated with the wrong record.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProjectThreads}, which supports threads on team formations and project applications in addition to proposals. Testing both record types verifies that discussion functionality is available throughout the team and project selection process.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Student A and create both threads. Authenticate as Student B to reply to the team formation thread. Verify the content, authors, replies, and correct record associations.
+
+\item \textbf{T-FR-38: Notify Thread Participants of a New Reply}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Supervisor A and Instructor A participate in the ``Project Deliverable Requirements'' thread associated with Autonomous Waste Sorting System. Supervisor A previously asked whether student teams must produce a physical prototype or whether a software simulation is sufficient. Both users have valid email addresses and remain authorized to access the thread.
+
+\textbf{Input:} Instructor A posts the reply: ``Student teams may develop either a physical prototype or a software simulation, depending on the project's scope and learning objectives. The expected deliverables should be clearly specified in the proposal.''
+
+\textbf{Output:} The reply is appended to the existing thread with Instructor A identified as its author and a submission timestamp. Supervisor A receives an email notification identifying the new reply and containing a link to the associated discussion. The email contains only an event summary and link, without disclosing confidential project information.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify}, which requires email notifications when a new reply is posted in a thread a user participates in. The scenario verifies that Supervisor A receives a notification following Instructor A's response to the project deliverables question.
+
+\textbf{How Test Will Be Performed:} Configure the existing discussion thread and its participants. Using Playwright, authenticate as Instructor A and post the specified reply. Verify that the reply appears in the thread with the correct author and timestamp. Capture outgoing email using a controlled test email service and verify that Supervisor A receives a notification containing the event summary and valid discussion link, without confidential project information.
+
+\item \textbf{T-FR-39: Notify Teams of Supervisor Application Decisions}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has submitted an application to Autonomous Waste Sorting System with status ``Applied''. The supervisor has not made a decision, and Team Amazing Engineers's members have valid registered email addresses.
+
+\textbf{Input:} The supervisor accepts Team Amazing Engineers's application.
+
+\textbf{Output:} The application changes to ``Supervisor Accepts''. Relevant authorized members of Team Amazing Engineers receive an email notification identifying the supervisor's decision and providing a link to the application. No unrelated student receives the notification.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify} and \texttt{FR\_DeclineTeam}. The SRS requires notification of decisions on project applications and agreements. The scenario verifies that relevant users are notified following a supervisor decision.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as the supervisor and accept the application. Capture outgoing emails using the test email service. Verify the event summary, application link, recipient, and corresponding application status.
+
+\item \textbf{T-FR-40: Notify Students When a Project Becomes Available}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A is authorized to review proposals for the Software Engineering capstone course. The Autonomous Waste Sorting System proposal has status ``Proposal submitted'' and has not yet been published. Student A is enrolled in the course.
+
+\textbf{Input:} Instructor A approves the proposal, making the project available to students.
+
+\textbf{Output:} The project becomes ``Open'' and is published in the approved project catalog. Student A receives an email notification identifying that a new project listing is available and providing a link to the listing.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify} and \texttt{FR\_ReviewProposal}. The SRS specifies that students receive notifications about new project listings. Approving and publishing a proposal provides a concrete event for verifying this behaviour.
+
+\textbf{How Test Will Be Performed:} Configure the submitted proposal and enrolled student. Using Playwright, authenticate as Instructor A and approve the proposal. Verify the project appears in the catalog and that the test email service captures the notification sent to Student A.
+
+\item \textbf{T-FR-41: Exclude Confidential Information from Email Notifications}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has an application to Autonomous Waste Sorting System. The project contains the confidentiality statement ``Restricted Prototype Specifications'' and an IP field containing ``Confidential Patent Agreement''. The supervisor and Team Amazing Engineers are authorized to receive notifications about the application.
+
+\textbf{Input:} The supervisor accepts Team Amazing Engineers's application, triggering an email notification.
+
+\textbf{Output:} The email contains a summary of the acceptance decision and a link to the application. It does not contain either protected value:
+\begin{itemize}
+    \item Restricted Prototype Specifications
+    \item Confidential Patent Agreement
+\end{itemize}
+It also does not include senstive details about the project.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify}, which requires notification emails to exclude confidential, IP, and other sensitive project details. The system's response to detecting senstive values determines whether protected information was disclosed.
+
+\textbf{How Test Will Be Performed:} Populate the corresponding records with the specified values. Using Playwright, trigger the supervisor acceptance and capture the resulting email. Inspect the subject and body, including any generated preview content. Verify the event summary and link are present and that none of the protected values appear in the email.
+
+\item \textbf{T-FR-42: Exclude Unauthorized Users from Notification Recipients}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} External Supervisor A owns Autonomous Waste Sorting System. External Supervisor B owns a different project and has no association with Supervisor A's project. Team Amazing Engineers has an application to Supervisor A's project. Supervisor B is not authorized to view that project or its application.
+
+\textbf{Input:} Supervisor A accepts Team Amazing Engineers's application.
+
+\textbf{Output:} Authorized recipients associated with the application receive the relevant email notification. Supervisor B receives no notification about Supervisor A's project, and no project information is exposed to Supervisor B.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify} and \texttt{FR\_ExternalSupervisorScope}. Notification recipients must be determined according to their authorization at the time of sending. The test verifies that project confidentiality is maintained through email notifications.
+
+\textbf{How Test Will Be Performed:}
+Configure both supervisors and Team Amazing Engineers's application. Using Playwright, trigger the acceptance decision. Inspect the outgoing email records and verify that only authorized recipients receive project-related notifications. Confirm that Supervisor B's was not sent any messages related to the event.
+
+\item \textbf{T-FR-43: Re-evaluate Notification Recipients After an Authorization Change}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A and Student B are members of Team Amazing Engineers, which has an application to Autonomous Waste Sorting System. Both students initially have access to the associated discussion thread. Student B is subsequently removed from the team through an authorized membership change before a new notification is generated.
+
+\textbf{Input:} The project supervisor posts a reply to Team Amazing Engineers's application discussion thread after Student B's removal.
+
+\textbf{Output:} Student A receives the new reply notification. Student B, who is no longer authorized to access the application discussion, does not receive a notification about the new reply.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ThreadsNotify}, which requires recipients to be determined when the notification is sent. Removing a user's authorization before generating a notification tests that the system uses current permissions rather than a previously stored recipient list.
+
+\textbf{How Test Will Be Performed:} Configure Team Amazing Engineers and the application discussion. Remove Student B using the supported team membership workflow. Using Playwright, authenticate as the supervisor and post the specified reply. Inspect outgoing emails and verify that it is sent to Student A but not Student B. Confirm that Student B cannot access the application thread.
+
+\end{enumerate}
+
+\subsubsection{Team-Project Approval and Validation}
+
+This section covers \texttt{FR\_RequestApproval}, \texttt{FR\_ApprovalResponse}, \texttt{FR\_ApprovalPreflightValidate}, \texttt{FR\_ExternalApproval}, and \texttt{FR\_ApprovalRevision} in Section 6 of the SRS, along with the team-project status lifecycle defined in Section 7.2 and Figure 2. The tests verify that student teams can submit agreed projects for approval, that submissions are validated against course rules, and that instructors and TAs can approve, reject, or request modifications. They also verify external approval recording and the handling of changes to previously approved projects.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-44: Submit an Agreed Team-Project for Approval}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has in-platform approval enabled. Team Amazing Engineers consists of four eligible students and has reached an agreement with the supervisor of Autonomous Waste Sorting System. Its team-project status is ``Agreed''. The team satisfies the course's minimum and maximum team sizes of 3 and 5 students. All project and team information required by the instructor's configuration for the Software Engineering capstone course has been provided, including any course-specific required fields.
+
+\textbf{Input:} An authorized member of Team Amazing Engineers submits the agreed project and team information for instructor approval.
+
+\textbf{Output:} The submission is accepted and its status changes from ``Agreed'' to ``Team project submitted''. The submitted project and team information is recorded and becomes available to the course instructor for review.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RequestApproval} and \texttt{FR\_ApprovalPreflightValidate}. The team has a valid agreement, complete information, and a membership count satisfying $3 \leq n \leq 5$, since $n=4$. The submission therefore satisfies the specified preflight conditions and should enter the approval process.
+
+\textbf{How Test Will Be Performed:} Configure the agreed team-project with complete information and enable in-platform approval. Using Playwright, authenticate as a member of Team Amazing Engineers and submit the team-project for approval. Verify the updated status, saved submission information, and visibility in the instructor's approval interface.
+
+\item \textbf{T-FR-45: Reject Approval Submissions with Incomplete Information}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has in-platform approval enabled. Team Amazing Engineers consists of four valid members and has an agreed project titled Autonomous Waste Sorting System. All required team-project information is initially complete.
+
+\textbf{Input:} Repeat the approval submission test while omitting one required project or team information field at a time.
+
+\textbf{Output:} Each incomplete submission is rejected with a validation message identifying the missing information. The application remains in its previous status, and no submission is forwarded for instructor review.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalPreflightValidate}, which requires submissions to contain complete project information. For the set of required fields, a submission is complete only when all fields are valid. Omitting any required field violates this condition and must prevent submission.
+
+\textbf{How Test Will Be Performed:} Prepare an otherwise valid agreed team-project. Using Playwright, remove each required field individually and attempt submission. Verify that the corresponding validation message appears, no approval submission is created, and the original application status remains unchanged.
+
+\item \textbf{T-FR-46: Reject Approval Submissions Violating Course Rules}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course requires teams of 3 to 5 students and permits teams consisting of Software Engineering students. In-platform approval is enabled. Team Amazing Engineers has an agreed project and complete project information.
+
+\textbf{Input:} Attempt to submit Team Amazing Engineers's project for approval under the following independent membership configurations:
+\begin{itemize}
+    \item 2 Software Engineering students.
+    \item 3 Software Engineering students.
+    \item 5 Software Engineering students.
+    \item 6 Software Engineering students.
+\end{itemize}
+
+\textbf{Output:} Submissions with 2 or 6 members are rejected. Submissions with 3 or 5 members pass the team-size preflight check, provided all other requirements are satisfied. Rejected submissions do not enter the instructor review process.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalPreflightValidate} and \texttt{FR\_ValidateTeamRules}. For team size $n$, the configured validity constraint is
+
+\[
+3 \leq n \leq 5.
+\]
+
+Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy the boundary conditions. This verifies that approval preflight checks enforce the current course rules.
+
+\textbf{How Test Will Be Performed:} Independently configure the four team membership scenarios using test fixtures. For each scenario, authenticate as an authorized team member and attempt submission. Verify the expected acceptance or rejection and ensure rejected submissions do not create instructor review records.
+
+\item \textbf{T-FR-47: Approve a Submitted Team-Project In-Platform}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} In-platform approval is enabled. Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval. The application has status ``Team project under review'', and all project and team information satisfies the applicable course rules. Instructor A is authorized to review the submission.
+
+\textbf{Input:} Instructor A selects ``Approve'' for Team Amazing Engineers's submitted project.
+
+\textbf{Output:} The team-project status changes to ``Approved''. The approval decision is recorded, and the project and team are identified as approved in the relevant course records. The project's reserved capacity remains unchanged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalResponse} and Section 7.2 of the SRS. The instructor's approval completes the review process without creating an additional supervisor reservation. The number of reserved slots on the project remains the same. This verifies that team-project approval changes the approval status without incorrectly modifying project capacity.
+
+\textbf{How Test Will Be Performed:} Configure the submitted application under instructor review. Using Playwright, authenticate as Instructor A and approve the submission. Verify the ``Approved'' status, recorded decision, updated course information, and unchanged reserved-slot count.
+
+\item \textbf{T-FR-48: Request Modifications to a Team-Project Submission In-Platform}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for instructor approval. The submission has status ``Team project under review''. Its project objectives state ``Develop an automated waste sorting system''. Instructor A is authorized to review the submission.
+
+\textbf{Input:} Instructor A selects ``Request modifications'' and provides the feedback: ``Please clarify which types of waste the proposed system will identify and sort.''
+
+\textbf{Output:} The team-project status changes to ``Team project changes requested''. The instructor's feedback is recorded and made available to Team Amazing Engineers. The submission is not marked approved.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalResponse} and Section 7.2 of the SRS. The requirement permits instructors to request modifications with feedback rather than immediately approving or rejecting a team-project submission.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A, open Team Amazing Engineers's submission, and request the specified modifications. Verify the updated status, preserved feedback, and absence of an approval decision.
+
+\item \textbf{T-FR-49: Revise and Resubmit a Team-Project After Feedback}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System submission has status ``Team project changes requested''. Instructor A previously requested clarification on the types of waste the proposed system will identify and sort. The submission currently lists ``Develop an automated waste sorting system'' as its project objective.
+
+\textbf{Input:} An authorized Team Amazing Engineers member updates the project objective to ``Develop an automated waste sorting system capable of identifying and sorting plastic and metal waste'' and resubmits the team-project.
+
+\textbf{Output:} The revised information is saved, and the team-project returns to ``Team project submitted'' for instructor review. The previous feedback remains available, and the submission is not automatically approved.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RequestApproval} and \texttt{FR\_ApprovalResponse}. The SRS allows teams to modify and resubmit their information following instructor feedback. The revised submission must re-enter the review process rather than bypassing approval.
+
+\textbf{How Test Will Be Performed:} Configure the change request and feedback. Using Playwright, authenticate as an authorized Team Amazing Engineers member, update the project objective, and resubmit. Verify the updated objective, submission status, and preservation of the previous feedback.
+
+\item \textbf{T-FR-50: Reject a Submitted Team-Project}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for instructor approval. The team-project has status ``Team project under review''. The project has maximum capacity $C_{max} = 2$ and $R = 2$ reserved slots, one of which is held by Team Amazing Engineers. Instructor A is authorized to review the submission.
+
+\textbf{Input:} Instructor A rejects Team Amazing Engineers's submission with the feedback: ``The proposed project scope does not meet the course's capstone requirements.''
+
+\textbf{Output:} The team-project status changes to ``Team project rejected''. The rejection decision and feedback are recorded. Team Amazing Engineers's reserved slot is released, reducing $R$ from 2 to 1. The project's status changes from ``Full'' to ``Open''.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalResponse} and the capacity rules in Section 7.2 of the SRS. Rejection of a team-project requires releasing its reserved slot. Initially,
+
+\[
+C_{\text{remaining}}=2-2=0.
+\]
+
+After rejection,
+
+\[
+R \leftarrow R-1=1,
+\qquad
+C_{\text{remaining}}=2-1=1.
+\]
+
+The project therefore becomes ``Open'' again.
+
+\textbf{How Test Will Be Performed:} Configure the project and submitted team-project with the specified capacity values. Using Playwright, authenticate as Instructor A and reject the submission. Verify the rejection status, recorded feedback, released reservation, and project availability.
+
+\item \textbf{T-FR-51: Record an Approval Through an External Approval Process}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course uses an external project approval process without an integration adapter. Team Amazing Engineers has an agreed project titled Autonomous Waste Sorting System, and its approval has been confirmed through the external process. Instructor A and TA A are authorized to record approval decisions for the course.
+
+\textbf{Input:} Instructor A manually records the external approval decision for Team Amazing Engineers's project.
+
+\textbf{Output:} The team's project approval status is updated to ``Approved''. The recorded decision is associated with the correct team and project and becomes visible in the course's approval records.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ExternalApproval}, which requires the system to support manual recording of externally determined approval decisions when no integration adapter is available. The test verifies that the platform can represent an approval obtained outside Keystone.
+
+\textbf{How Test Will Be Performed:} Configure the course to use external approvals without an adapter. Using Playwright, authenticate as Instructor A and record Team Amazing Engineers's approval. Verify the saved approval decision and its association with the correct team and project.
+
+\item \textbf{T-FR-52: Preserve Original Approval During a Proposed Project Change}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved''. The approved project objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. Instructor A is authorized to review changes to approved projects.
+
+\textbf{Input:} Team Amazing Engineers proposes changing the project objective to ``Develop a computer vision system capable of identifying and sorting plastic, metal, and paper waste''.
+
+\textbf{Output:} The proposed change is submitted for instructor review. The team-project status is displayed as ``Approved (change under review)''. The original approved objective remains effective until the instructor accepts the change. The proposed objective is retained separately for review without overwriting the approved record.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalRevision} and Section 7.2 of the SRS. The requirement states that a previously approved project must retain its approval while a proposed modification awaits review. Therefore, the Objective does not change while the instructor acceptance is pending. Only an accepted revision may replace the original approved objective.
+
+\textbf{How Test Will Be Performed:} Configure the approved team-project with its original objective. Using Playwright, authenticate as an authorized Team Amazing Engineers member and submit the proposed change. Verify the pending-change status, preservation of the original approved objective, and availability of the proposed objective for instructor review.
+
+\item \textbf{T-FR-53: Successfully Synchronize Approval Through an External Adapter}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course uses GitLab as its external approval system, connected to \projname{} through an integration adapter. Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval, with status ``Team project submitted''. The integration adapter is configured to associate this with the corresponding GitLab PR approval record.
+
+\textbf{Input:} The integration adapter transfers Team Amazing Engineers's submission information to the corresponding GitLab approval record. An authorized reviewer approves the submission in GitLab. The adapter then synchronizes the approval decision back to \projname{}.
+
+\textbf{Output:} The GitLab approval record is associated with a \projname{} submission id. Following synchronization, the team-project status changes to ``Approved'', and the external approval decision is recorded against Team Amazing Engineers's project along with a timestamp.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ExternalApproval}, which requires \projname{} to synchronize approval decisions through an available external integration adapter. A submission identifier establishes the correspondence between the two systems, ensuring the approval is applied to the correct team-project. Successful synchronization must update the approval status and timestamp.
+
+\textbf{How Test Will Be Performed:} Configure a controlled GitLab integration environment and associate \projname{} submission with its corresponding GitLab approval record. Using Playwright, submit the team-project through \projname{} and verify that the adapter transfers the relevant information to GitLab. Record an approval decision in GitLab and trigger synchronization. Verify that the decision updates only the corresponding \projname{} team-project to ``Approved'' and that the last successful synchronization timestamp is displayed.
+
+\item \textbf{T-FR-54: Handle a Failed External Approval Synchronization}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course uses an external approval system connected through an integration adapter. Team Amazing Engineers's Autonomous Waste Sorting System application has status ``Team project under review''. The previous successful synchronization occurred at 2026-10-30 14:00:00. The external approval service is configured to return a connection failure during the next synchronization.
+
+\textbf{Input:} The integration adapter attempts to synchronize approval decisions with the unavailable external service.
+
+\textbf{Output:} The synchronization failure is flagged by Keystone. Team Amazing Engineers's application remains ``Team project under review'', and no unverified approval decision is recorded. The last successful synchronization timestamp remains 2026-10-30 14:00:00.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ExternalApproval}, which requires failed synchronization attempts to be flagged and the timestamp of the last successful synchronization to be displayed. Since no successful synchronization occurs, the previously verified approval state and timestamp must remain unchanged.
+
+\textbf{How Test Will Be Performed:} Configure a controlled external test service to fail during synchronization. Trigger the adapter and verify that Keystone displays a failure indicator. Confirm that the team-project status remains unchanged, no approval decision is incorrectly recorded, and the last successful synchronization timestamp is preserved.
+
+\item \textbf{T-FR-55: Accept a Revision to an Approved Team-Project}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved (change under review)''. The original approved objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. The team has submitted a proposed objective: ``Develop a computer vision system capable of identifying and sorting plastic, metal, and paper waste''. Instructor A is authorized to review the proposed change.
+
+\textbf{Input:} Instructor A reviews and accepts the proposed revision.
+
+\textbf{Output:} The proposed objective replaces the original approved objective. The team-project status returns to ``Approved'', and the accepted change is recorded. The project remains approved throughout the revision process.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalRevision} and Section 7.2 of the SRS. Approved project information must remain effective until an instructor accepts the proposed change. Following acceptance, the approved objective becomes the revised objective. The status returns to ``Approved'' once the revision decision is completed.
+
+\textbf{How Test Will Be Performed:} Configure the approved project with the original objective and pending revision. Using Playwright, authenticate as Instructor A and accept the proposed change. Verify that the revised objective becomes the approved value, the status returns to ``Approved'', and the decision is recorded.
+
+\item \textbf{T-FR-56: Reject a Revision to an Approved Team-Project}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved (change under review)''. The original approved objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. The proposed revision would expand the objective to include paper waste. Instructor A is authorized to review the proposed change.
+
+\textbf{Input:} Instructor A rejects the proposed revision with the feedback ``The additional material category exceeds the approved project scope.''
+
+\textbf{Output:} The proposed revision is rejected, and the team-project status returns to ``Approved''. The original approved objective remains unchanged, and the rejection decision and feedback are recorded. The existing project approval remains valid.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ApprovalRevision} and Section 7.2 of the SRS. Rejecting a proposed revision must preserve the previously approved information rather than replacing it. Therefore, the Objective does not change. The rejection affects only the proposed change, not the project's existing approval.
+
+\textbf{How Test Will Be Performed:} Configure the approved project with its original objective and pending revision. Using Playwright, authenticate as Instructor A and reject the proposed change with the specified feedback. Verify that the original objective remains approved, the project status returns to ``Approved'', and the rejection decision and feedback are recorded.
+
+\end{enumerate}
+
+\subsubsection{Course Configuration, Reference Materials, and Administration}
+
+This section covers \texttt{FR\_DisableFeatures}, \texttt{FR\_RejectComponentDisable}, \texttt{FR\_ReferenceMaterial}, \texttt{FR\_RequiredActionsList}, \texttt{FR\_ActionRequiredEmail}, \texttt{FR\_ReadCourseInformation}, and \texttt{FR\_ExportCourseInformation} in Section 6 of the SRS. The tests verify that instructors can configure course features, authorized users can publish and access course resources, required actions are tracked and communicated, and course staff can view and export relevant administrative information. They also verify that configuration changes do not leave pending actions unresolved and that access is restricted to authorized users.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-57: Configure Course Features}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course. Team formation, project proposals, and in-platform project approvals are enabled. No pending actions exist in these components, and the course configuration permits feature changes.
+
+\textbf{Input:} Instructor A disables the in-platform project approval feature while leaving team formation and project proposals enabled.
+
+\textbf{Output:} The configuration change is saved. In-platform project approval functionality is disabled for the Software Engineering course, while team formation and project proposal functionality remain enabled. The configuration of other courses remains unchanged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DisableFeatures}, which requires instructors to configure supported platform features independently for their courses. For each feature $f$, define its enabled state as $E(f)\in\{0,1\}$. The expected configuration after the change is
+
+\[
+E(\mathrm{Approvals})=0,
+\qquad
+E(\mathrm{Teams})=1,
+\qquad
+E(\mathrm{Proposals})=1.
+\]
+
+This verifies that disabling one feature does not unintentionally disable others.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A and open the Software Engineering course configuration. Disable in-platform project approvals and save the changes. Verify the saved configuration, confirm that the approval functionality is disabled, and ensure that team formation and project proposals remain available.
+
+\item \textbf{T-FR-57A: Configure Required and Optional Project Proposal Fields}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has supervisor project proposals enabled. The course instructor is authenticated and has permission to configure proposal requirements. The proposal template contains fields for title, background, objectives, skills/requirements, project impact, and additional project terms.
+
+\textbf{Input:} The instructor configures title, background, objectives, and project impact as required fields, while skills/requirements and additional project terms are optional. A supervisor attempts to submit a proposal with the background field missing but all other required fields completed. The supervisor then supplies the background information and resubmits, leaving the optional fields empty.
+
+\textbf{Output:} The configuration is saved and applied to the course's proposal template. The first submission is rejected with a validation message identifying the missing background field. The second submission is accepted despite the optional fields being empty, and the proposal enters the ``Proposal submitted'' state.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ProposalOptionalFields}, \texttt{FR\_SupervisorProposal}, and \texttt{FR\_DisableFeatures}. The test verifies that the instructor's required and optional field configuration determines which proposal submissions satisfy the course's requirements.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as the course instructor and configure the specified proposal fields as required or optional. Save the configuration and authenticate as a supervisor. Complete all required fields except background and attempt submission, verifying that the submission is rejected. Supply the missing background information while leaving optional fields empty and resubmit. Verify that the proposal is accepted with status ``Proposal submitted''.
+
+\item \textbf{T-FR-57B: Configure Course-Specific Team-Project Approval Requirements}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has in-platform team-project approval enabled. Team Amazing Engineers consists of four eligible students and has reached an agreement with the supervisor of Autonomous Waste Sorting System. Its team-project status is ``Agreed''. The team satisfies the configured team formation rules. The course instructor is authenticated and authorized to configure approval submission requirements.
+
+\textbf{Input:} The instructor configures the approval process to require a project description, team information, and a public GitHub repository link, while making additional notes optional. Team Amazing Engineers attempts to submit its team-project information without the GitHub link. The team then supplies a valid GitHub link and resubmits, leaving additional notes empty.
+
+\textbf{Output:} The instructor's configuration is saved and applied to the Software Engineering capstone course. The first submission is rejected with a validation message identifying the missing GitHub repository link, and the team-project status remains ``Agreed''. The second submission is accepted despite the optional notes being empty, and the team-project status changes to ``Team project submitted''.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DisableFeatures}, \texttt{FR\_RequestApproval}, and \texttt{FR\_ApprovalPreflightValidate}. The test verifies that the platform enforces instructor-configured, course-specific submission requirements before permitting a team-project to enter the approval workflow.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as the instructor and configure the required approval submission fields. Save the configuration and authenticate as a member of Team Amazing Engineers. Complete the project description and team information but omit the required GitHub link. Attempt submission and verify that validation prevents the status transition. Enter a valid GitHub link, leave the optional notes empty, and resubmit. Verify that the submission succeeds and the team-project status becomes ``Team project submitted''.
+
+\item \textbf{T-FR-58: Prevent Disabling a Component with Pending Actions}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course, which has in-platform project approvals enabled. Team Amazing Engineers has a submission with status ``Team project under review'', awaiting an instructor decision. No other approval submissions are pending.
+
+\textbf{Input:} Instructor A attempts to disable the in-platform project approval feature.
+
+\textbf{Output:} The configuration change is rejected. The system displays an error identifying the pending approval and shows Team Amazing Engineers's submission as an unresolved action. The approval feature remains enabled, and the submission retains its original status.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RejectComponentDisable}. A component cannot be disabled while it contains pending actions. The requested change must be rejected to prevent the pending submission from becoming inaccessible.
+
+\textbf{How Test Will Be Performed:} Configure the course with one pending team-project approval. Using Playwright, authenticate as Instructor A and attempt to disable the approval feature. Verify the error message and displayed pending submission. Confirm that the component remains enabled and the submission is unchanged.
+
+\item \textbf{T-FR-59: Publish Course Reference Materials}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has no published FAQ titled ``Capstone Project Deliverables''. Instructor A is authorized to publish course resources. Student A is enrolled in the course, and External Supervisor A has an account authorized to read course reference materials.
+
+\textbf{Input:} Instructor A creates and publishes an FAQ titled ``Capstone Project Deliverables'' containing the question ``What should a project proposal include?'' and the answer ``A project proposal should describe the objectives, expected deliverables, and required skills.''
+
+\textbf{Output:} The FAQ is saved and published under the Software Engineering course resources. Instructor A, Student A, and External Supervisor A can access the published resource and view its title, question, and answer.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReferenceMaterial}, which requires instructors and TAs to publish course resources for students and supervisors. The scenario verifies resource creation and that the resource is accessible by all relevant parties in the course.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A and publish the specified FAQ. Verify that it appears in the course resources. Authenticate separately as Student A and External Supervisor A and confirm that both can retrieve the resource with its original content.
+
+\item \textbf{T-FR-60: Update a Published Course Resource}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course contains a published FAQ titled ``Capstone Project Deliverables''. Its answer states ``Project proposals must include objectives and expected deliverables''. TA A is assigned to the course and is authorized to maintain course resources.
+
+\textbf{Input:} TA A edits the FAQ answer to ``Project proposals must include objectives, expected deliverables, and required skills'' and saves the updated resource.
+
+\textbf{Output:} The updated FAQ is saved under the same course resource. Authorized students and supervisors see the revised answer when accessing it. The previous answer is no longer displayed as the current content.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReferenceMaterial}, which requires course staff to maintain and edit existing resources. The test verifies that an authorized TA can update published material and that the updated version is accessible.
+
+\textbf{How Test Will Be Performed:} Configure the published FAQ. Using Playwright, authenticate as TA A, edit the answer, and save. Retrieve the resource as an enrolled student and as an authorized external supervisor. Verify the revised content and confirm that only one current FAQ record is displayed.
+
+\item \textbf{T-FR-61: Display Required Actions and Completion States}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A is enrolled in the Software Engineering capstone course and is a member of Team Amazing Engineers. The course requires the student to complete a profile and submit team-project information for instructor approval. Student A has completed their profile, but the team's approval submission has not yet been made.
+
+\textbf{Input:} Student A opens the required actions checklist.
+
+\textbf{Output:} The checklist displays ``Complete student profile'' as checked and ``Submit team-project for approval'' as unchecked. Both actions are associated with the correct student and course.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RequiredActionsList}, which requires users to view their assigned checklist items and completion states based on course requirements.
+
+\textbf{How Test Will Be Performed:} Configure Student A's completed profile and pending team-project submission. Using Playwright, authenticate as Student A and open the checklist. Verify that both required actions are displayed with their expected completion states.
+
+\item \textbf{T-FR-62: Automatically Update a Completed Checklist Action}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A belongs to Team Amazing Engineers, which has reached an agreement with the supervisor of Autonomous Waste Sorting System. The Software Engineering capstone course has in-platform approval enabled. The required actions checklist shows ``Submit team-project for approval'' as incomplete. All submission information satisfies the course rules.
+
+\textbf{Input:} An authorized member of Team Amazing Engineers submits the agreed project and team information for instructor approval.
+
+\textbf{Output:} The team-project enters ``Team project submitted'' status. The checklist action ``Submit team-project for approval'' changes from incomplete to completed after the submission is verified. The checklist does not require a separate manual completion action.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_RequiredActionsList} and \texttt{FR\_RequestApproval}. The SRS requires checklist completion states to update when associated actions are completed and verified. This verifies consistency between the actual submission status and the corresponding checklist entry.
+
+\textbf{How Test Will Be Performed:} Configure the agreed team-project and incomplete checklist action. Using Playwright, authenticate as an authorized Team Amazing Engineers member and submit the project for approval. Verify the successful submission, refresh the checklist, and confirm that the action is marked completed.
+
+\item \textbf{T-FR-63: Send Email Reminders for Outstanding Actions and Deadlines}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has administrative email reminders enabled. The course has a project approval submission deadline of November 15, 2026. Student A has an incomplete ``Submit team-project for approval'' checklist action. Student B has already completed the same action. The reminder is configured to run on November 12, 2026.
+
+\textbf{Input:} The configured administrative notification process runs on November 12, 2026.
+
+\textbf{Output:} Student A receives an email identifying the outstanding approval submission and the November 15 deadline. Student B is not incorrectly identified as having an incomplete approval submission.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ActionRequiredEmail}, which requires configured email notifications for upcoming deadlines and outstanding checklist actions. The reminder occurs three calendar days before the deadline. The scenario verifies that an incomplete required action is identified in a configured reminder without misclassifying a completed action.
+
+\textbf{How Test Will Be Performed:} Configure the reminder, deadline, and student checklist states. Run the notification process using a controlled test clock and capture outgoing email through a test email service. Verify that Student A's reminder identifies the correct action and deadline, and that Student B is not described as having the same outstanding action.
+
+\item \textbf{T-FR-64: View and Filter Course-Wide Administrative Information}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course. Its records include:
+\begin{itemize}
+    \item Project A: Autonomous Waste Sorting System, ``Open'', with Team Amazing Engineers's application under instructor review.
+    \item Project B: Smart Campus Navigation, ``Open'', with Team Fantastic Coder's project approved.
+    \item Project C: Automated Assembly Line, ``Full'', with Team Capstone Lengends' project approved.
+\end{itemize}
+Each project has an assigned supervisor, and the associated teams have valid membership records.
+
+\textbf{Input:} Instructor A opens the course administration overview and filters team-project records by approval status ``Approved''.
+
+\textbf{Output:} The filtered results contain Team Fantastic Coders and Team Capstone Lengends, but exclude Team Amazing Engineers, whose submission is still under review. The instructor can view the associated projects, team compositions, supervisors, and approval statuses.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReadCourseInformation}, which requires instructors to access and filter project and team information across their assigned courses. Searching for approved projects records produce exactly two matching team-projects.
+
+\textbf{How Test Will Be Performed:} Populate the course with the specified records. Using Playwright, authenticate as Instructor A and apply the ``Approved'' approval-status filter. Verify that exactly two approved team-projects appear and that their administrative details are accessible.
+
+\item \textbf{T-FR-65: Restrict Instructor and TA Access to Authorized Courses}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course contains Team Amazing Engineers and Team Fantastic Coders. Team Amazing Engineers works on Smart Campus Navigation, while Team Fantastic Coders works on Automated Assembly Line. Both teams have project records, approval statuses, and associated discussion threads. Instructor A and TA A are assigned to the Software Engineering capstone course, with TA A specifically assigned to Team Amazing Engineers. A separate Mechatronics capstone course contains Team Capstone Legends Innovators. Neither Instructor A nor TA A is assigned to the Mechatronics capstone course.
+
+\textbf{Input:} Instructor A and TA A each access the course administration interface and attempt to view the records of Team Amazing Engineers, Team Fantastic Coders, and Team Capstone Legends Innovators.
+
+\textbf{Output:} Instructor A and TA A can access the project, team, approval status, and relevant discussion records of both Team Amazing Engineers and Team Fantastic Coders because both teams belong to their authorized course. TA A's assignment to Team Amazing Engineers does not prevent access to Team Fantastic Coders' records. Neither Instructor A nor TA A can access Team Capstone Legends Innovators' administrative records because they are not authorized to access the Mechatronics capstone course.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReadCourseInformation} and \texttt{FR\_AuthorizationRBAC}. Instructors and TAs must be able to access administrative information across their authorized courses while being restricted from accessing records belonging to unauthorized courses.
+
+\textbf{How Test Will Be Performed:} Configure the courses, teams, projects, and user assignments as specified. Using Playwright, authenticate as Instructor A and verify access to Team Amazing Engineers and Team Fantastic Coders, including their project statuses and relevant discussions. Verify that Team Capstone Legends Innovators' administrative records are inaccessible. Repeat the procedure as TA A and confirm that both Software Engineering teams are accessible despite TA A's individual assignment to Team Amazing Engineers. Attempt to access the Mechatronics team's records directly and verify that access is denied.
+
+\item \textbf{T-FR-66: Generate and Export a Course Administration Report}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course. The course contains the following records:
+\begin{itemize}
+    \item Team Fantastic Coders: Students A, B, and C; approved project ``Smart Campus Navigation'';
+    Supervisor A.
+    \item Team Capstone Legends: Students D, E, and F; approved project ``Automated Assembly Line''; Supervisor B.
+    \item Team Amazing Engineers: Students G, H, I, and J; project ``Autonomous Waste Sorting System'' currently under instructor review; Supervisor C.
+\end{itemize}
+
+\textbf{Input:} Instructor A requests an administrative report containing approved projects, team compositions, project selections, and supervisor information, then downloads the report.
+
+\textbf{Output:} The system generates a downloadable report containing the two approved team-project records with their corresponding members, project titles, and supervisors. Team Amazing Engineers is correctly identified as under review. All exported information matches the corresponding course records.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ExportCourseInformation}, which requires automatically generated, exportable administrative reports. The scenario verifies that report generation correctly includes requested information only which in this case is approved projects.
+
+\textbf{How Test Will Be Performed:} Configure the three team-project records. Using Playwright, authenticate as Instructor A and generate the administrative report. Download and inspect the generated file using an automated file parser appropriate to its export format. Verify the presence of Team Fantastic Coders and Team Capstone Legneds, their members and supervisors, and Team Amazing Engineers is not present.
+
+\end{enumerate}
+
+\subsubsection{Enrollment and Team Administration}
+
+This section covers \texttt{FR\_ImportEnrollment}, \texttt{FR\_UpdateEnrollment}, \texttt{FR\_EnrollmentDiscrepency}, \texttt{FR\_NeedsGroup}, and \texttt{FR\_AssignTA} in Section 6 of the SRS. The tests verify that instructors and TAs can maintain course enrollment records, identify invalid or missing entries, locate students without teams, and assign TAs to teams. They also verify that enrollment changes do not occur without the required confirmation.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-67: Import and Confirm a Course Enrollment List}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Instructor A manages the Software Engineering capstone course. The current enrollment contains Students A and B. An Avenue to Learn enrollment list contains Students A, B, C, and D, each with a valid and unique student identifier. No import has been applied yet.
+
+\textbf{Input:} Instructor A imports the Avenue enrollment list, reviews the preview, and confirms the import.
+
+\textbf{Output:} Before confirmation, the preview identifies Students C and D as additions, and the existing enrollment remains unchanged. After confirmation, the course enrollment contains Students A, B, C, and D without duplicate records.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ImportEnrollment} and \texttt{FR\_ReverifyUsers}. The SRS requires a preview and explicit confirmation before applying enrollment changes. Let $E$ be the original enrollment and $I$ the imported list:
+
+\[
+E=\{A,B\}, \qquad I=\{A,B,C,D\}.
+\]
+
+The expected additions are
+
+\[
+I\setminus E=\{C,D\}.
+\]
+
+Thus, the enrollment count remains 2 before confirmation and becomes 4 after confirmation.
+
+\textbf{How Test Will Be Performed:} Configure the existing enrollment and the Avenue enrollment source. Using Playwright, authenticate as Instructor A and initiate the import. Verify the preview identifies Students C and D and that no records have changed. Complete re-verification and confirm the import. Verify all four unique students are enrolled.
+
+
+\item \textbf{T-FR-68: Reject Invalid Enrollment Import Entries}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course contains Students A and B. Instructor A is authorized to import enrollment lists. A test enrollment file contains the following identifiers:
+\begin{itemize}
+    \item Student C: ``400000001''.
+    \item Student D: ``400000002''.
+    \item Duplicate entry for Student C: ``400000001''.
+    \item Student E: ``INVALID-ID''.
+\end{itemize}
+The test configuration recognizes the first two identifiers as valid and the final identifier as malformed.
+
+\textbf{Input:} Instructor A uploads the enrollment file and attempts to confirm the import without correcting the identified problems.
+
+\textbf{Output:} The import preview flags the duplicate identifier and invalid identifier. Confirmation is blocked until the problems are resolved. The original course enrollment remains unchanged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ImportEnrollment}, which requires duplicate and malformed identifiers to be identified before confirmation. A valid import requires all entries to satisfy the configured identifier rules and contain no duplicate identifiers.
+
+\textbf{How Test Will Be Performed:} Prepare the enrollment file with the specified entries. Using Playwright, upload the file and inspect the preview. Verify that both problems are displayed and confirmation cannot proceed. Confirm that no enrollment records are added or removed.
+
+\item \textbf{T-FR-69: Preserve Students Missing from an Enrollment Import}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course contains Students A, B, C, and D. Students A, B, and C belong to Team Amazing Engineers, while Student D has no team. A new Avenue enrollment list contains Students A, C, and D but omits Student B.
+
+\textbf{Input:} Instructor A imports the new enrollment list and reviews the enrollment discrepancies.
+
+\textbf{Output:} Student B is flagged for instructor review because they are absent from the latest enrollment list. Student B remains enrolled and remains a member of Team Amazing Engineers until course staff explicitly confirm their removal.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_EnrollmentDiscrepency}. The system must identify students missing from the latest enrollment list without automatically removing them. Let $E$ be the existing enrollment and $I$ the imported list:
+\[
+E=\{A,B,C,D\},
+\qquad I=\{A,C,D\}.
+\]
+
+The discrepancy set is
+
+\[
+E\setminus I=\{B\}.
+\]
+
+Student B must therefore be flagged, but their enrollment and team membership must be preserved until confirmed removal.
+
+\textbf{How Test Will Be Performed:} Configure the existing enrollment and team memberships. Using Playwright, import the updated list and inspect the preview. Verify that Student B is flagged. Confirm that Student B remains in the course and Team Amazing Engineers without a separate removal confirmation.
+
+\item \textbf{T-FR-70: Manually Add a Student to Course Enrollment}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has no Avenue integration configured. Students A, B, and C are enrolled. Student D has recently joined the course but has no enrollment record in Keystone. Instructor A is authorized to maintain course enrollment.
+
+\textbf{Input:} Instructor A manually adds Student D using the valid student identifier ``400000004'' and assigns them to the Software Engineering capstone course.
+
+\textbf{Output:} Student D is added to the course enrollment with the correct identifier and course association. The existing student records remain unchanged, and Student D becomes available in the course's student administration interface.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_UpdateEnrollment}, which requires instructors and TAs to add students manually, including students joining after the initial enrollment import. The system must support enrollment updates without relying on Avenue integration.
+
+\textbf{How Test Will Be Performed:} Configure the course without Avenue integration. Using Playwright, authenticate as Instructor A and manually add Student D. Verify that the student appears in the course enrollment with the correct identifier and association.
+
+\item \textbf{T-FR-71: Identify Enrolled Students Without Teams}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} The Software Engineering capstone course has six enrolled students. Students A, B, and C belong to Team Amazing Engineers, Student D belongs to Team Fantastic Coders, and Students E and F are not assigned to any team. Instructor A is authorized to view course administration information.
+
+\textbf{Input:} Instructor A opens the list of students who still need a team. Student E then joins Team Fantastic Coders, and Instructor A refreshes the list.
+
+\textbf{Output:} Initially, the list contains exactly Students E and F. Following Student E's team assignment, only Student F remains on the list. Students already assigned to teams are excluded.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_NeedsGroup}. Let $E$ represent enrolled students and $M$ represent students assigned to teams. The required list is
+
+\[
+N=E\setminus M.
+\]
+
+Initially, $N=\{E,F\}$. After Student E joins Team Fantastic Coders, $N=\{F\}$. This verifies that the list accurately reflects current membership.
+
+\textbf{How Test Will Be Performed:} Configure the specified enrollment and team associations. Using Playwright, authenticate as Instructor A and verify the initial list. Assign Student E to Team Fantastic Coders through the supported team workflow, refresh the list, and verify that only Student F remains.
+
+
+\item \textbf{T-FR-72: Assign a TA to a Student Team}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers consists of four students and is associated with Autonomous Waste Sorting System. No TA is assigned to the team. Instructor A is authorized to assign TAs, and TA A is associated with the Software Engineering capstone course.
+
+\textbf{Input:} Instructor A assigns TA A to Team Amazing Engineers.
+
+\textbf{Output:} The assignment is saved. Team Amazing Engineers's members and project supervisor can view TA A as the assigned TA.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_AssignTA}, which requires course staff to assign TAs to teams and display the assignment to the team's members and supervisor. The test verifies the transition from an unassigned team to a correctly assigned team.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A and assign TA A to Team Amazing Engineers. Verify the saved assignment. Authenticate as a team member and as the project supervisor and confirm that both can view TA A's assignment.
+
+\end{enumerate}
+
+\subsubsection{Authentication, Authorization, and System Integrity}
+
+This section covers \texttt{FR\_MacSSO}, \texttt{FR\_AuthorizationRBAC}, \texttt{FR\_UpdateRoles}, \texttt{FR\_ExternalSupervisorVerification}, \texttt{FR\_ExternalSupervisorScope}, \texttt{FR\_ReverifyUsers}, \texttt{FR\_LogExternalErrors}, \texttt{FR\_DisplayTimestamps}, and \texttt{FR\_DurableNotifications} in Section 6 of the SRS. The tests verify authentication through trusted providers, role-based access, external supervisor verification, protection of sensitive operations, error reporting, record timestamps, and notification recovery following system interruptions.
+
+\begin{enumerate}
+
+\item \textbf{T-FR-73: Authenticate Users Through Trusted Identity Providers}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A has an active McMaster account associated with the Software Engineering capstone course. External Supervisor A has an account with the configured trusted external authentication provider. Neither user has an active Keystone session.
+
+\textbf{Input:} Student A signs in through McMaster SSO. External Supervisor A separately signs in using the trusted external authentication provider.
+
+\textbf{Output:} Both users are authenticated through their respective providers and can access the Keystone functions permitted by their assigned roles and verification status. Neither user receives access outside their authorized scope.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_MacSSO} and \texttt{FR\_AuthorizationRBAC}. The system must authenticate university and external users through trusted identity providers before granting access to platform services.
+
+\textbf{How Test Will Be Performed:} Configure controlled test accounts with the corresponding identity providers. Using Playwright, execute each sign-in workflow. Verify successful authentication, the resulting account identity, and access to the functions permitted by each user's role.
+
+\item \textbf{T-FR-74: Deny Course Access When User Role Is Unknown}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} User A has successfully authenticated through a trusted identity provider, but no valid course role can be determined for the account. The Software Engineering course contains student profiles, team records, and project information.
+
+\textbf{Input:} User A attempts to access the course's project catalog, student profiles, and team administration information.
+
+\textbf{Output:} Access to all course data is denied. No student, team, or project information is disclosed to User A.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_AuthorizationRBAC}, which explicitly requires users with undetermined roles to receive no access to course data. If $r(u)$ represents the course role of user $u$, then
+
+\[
+r(u)=\mathrm{undefined}
+\Rightarrow
+\mathrm{CourseAccess}(u)=0.
+\]
+
+This verifies that successful authentication alone does not authorize access.
+
+\textbf{How Test Will Be Performed:} Configure an authenticated user without a valid course role. Using Playwright, attempt to access the specified course interfaces and direct record links. Verify that all requests are denied without disclosing course data.
+
+\item \textbf{T-FR-75: Update a User's Course Role and Permissions}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Administrator A (is\_admin set) is authorized to manage user roles for the Software Engineering capstone course. User B is associated with the course and currently has the ``Student'' role. User B cannot access instructor-only course configuration features.
+
+\textbf{Input:} Administrator A changes User B's assigned course role from ``Student'' to ``TA'', completing any required re-verification.
+
+\textbf{Output:} User B's course role is updated to ``TA''. User B gains access to functions permitted to TAs in their assigned course scope, but does not gain instructor-only or administrator-only privileges. The updated role is visible in the administration interface.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_UpdateRoles}, \texttt{FR\_AuthorizationRBAC}, and \texttt{FR\_ReverifyUsers}. The system must allow authorized administrators to update roles and enforce permissions associated with the new role.
+
+\textbf{How Test Will Be Performed:} Using Playwright, authenticate as Administrator A and update User B's role after completing re-verification. Verify that the updated role is saved. Authenticate as User B and confirm access to an authorized TA function while verifying that instructor-only configuration remains inaccessible.
+
+\item \textbf{T-FR-76: Require Re-verification Before a Sensitive Action}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Supervisor A has an authenticated Keystone session and owns a proposal titled Autonomous Waste Sorting System with status ``Draft''. The proposal contains valid information and has not been deleted.
+
+\textbf{Input:} Supervisor A attempts to delete the proposal but does not successfully complete the requested identity re-verification.
+
+\textbf{Output:} The system requests identity re-verification before performing the deletion. Because re-verification is not completed, the proposal is not deleted and its existing information remains unchanged.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_ReverifyUsers}, which requires additional identity verification before deleting proposals and other sensitive actions. The test verifies that an existing authenticated session alone is insufficient to authorize proposal deletion.
+
+\textbf{How Test Will Be Performed:} Configure Supervisor A and the draft proposal. Using Playwright, authenticate as Supervisor A and initiate deletion. Verify the re-verification challenge appears. Cancel or fail the challenge and verify that the proposal remains accessible and unchanged.
+
+\item \textbf{T-FR-77: Record and Report an External Provider Error}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Keystone is connected to a trusted external authentication provider. Administrator A is authorized to view external-provider errors.
+
+\textbf{Input:} A controlled external authentication service returns a service-unavailable failure during an authentication request.
+
+\textbf{Output:} Keystone records the external-provider error and notifies the configured university IT personnel or course instructor. Administrator A can view the recorded failure in the external-provider error log.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_LogExternalErrors}, which requires external-provider failures to be logged and reported to IT and course instructors. The failure must be identifiable as an external-provider error rather than being silently ignored.
+
+\textbf{How Test Will Be Performed:} Configure the controlled provider to return a service-unavailable error. Trigger an authentication request and verify the resulting error record. Authenticate as Administrator A and inspect the external-provider error log. Verify that the event is recorded and that a notification is generated for an authorized recipient.
+
+\item \textbf{T-FR-78: Display Record Last-Updated Timestamps}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Student A has a completed student profile and is authorized to update it. The profile currently lists ``Python and Java'' as its skills. Its last updated timestamp is set to 2026-10-30 14:00:00.
+
+\textbf{Input:} Student A updates the skills field to ``Python, Java, and React'' and saves the profile at time 2026-10-30 15:00:00.
+
+\textbf{Output:} The updated profile displays the revised skills and a last-updated timestamp of 2026-10-30 15:00:00. The displayed timestamp corresponds to the record's latest modification.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DisplayTimestamps}, which requires displayed records to show their last-updated timestamps. For the configured test times,
+
+\[
+T_{\mathrm{after}}
+>
+T_{\mathrm{before}}.
+\]
+
+The expected timestamp difference is one hour, verifying that the profile displays the latest update rather than its previous modification time.
+
+\textbf{How Test Will Be Performed:} Configure the profile and controlled test clock. Using Playwright, authenticate as Student A, modify the skills field, and save. Verify the revised profile content and displayed last-updated timestamp.
+
+\item \textbf{T-FR-79: Recover a Pending Notification After System Interruption}\\
+
+\textbf{Control:} Automatic
+
+\textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval. Instructor A is authorized to receive notifications concerning the submission. The notification service is configured with durable pending-notification storage and a controlled test email service.
+
+\textbf{Input:} The system generates a notification for Instructor A about the new submission. Before email delivery is verified, the notification service is abruptly stopped and then restarted.
+
+\textbf{Output:} The pending notification remains stored during the interruption and is delivered after the service restarts. Instructor A receives the notification no more than once, and the system records verified delivery.
+
+\textbf{Test Case Derivation:} Derived from \texttt{FR\_DurableNotifications}, which requires pending notifications to persist until delivery is verified and prevents duplicate delivery to the same recipient. Let $D(u,n)$ denote the number of verified deliveries of notification $n$ to user $u$. The required condition is
+
+\[
+D(u,n)\leq 1.
+\]
+
+Following recovery, the expected delivery count for Instructor A is
+
+\[
+D(\mathrm{InstructorA},n)=1.
+\]
+
+This verifies notification recovery and the prevention of duplicate delivery.
+
+\textbf{How Test Will Be Performed:} Configure the submission and notification service. Trigger the notification, then terminate the service before delivery is verified. Restart the service and inspect the controlled email service and pending notification records. Verify successful delivery and confirm that exactly one email was received for the notification.
+
+\end{enumerate}
 
 ...
 
