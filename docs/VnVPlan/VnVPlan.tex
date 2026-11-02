@@ -2156,8 +2156,9 @@ Table~\ref{tab:load-mix}.
 
 \textbf{Input/Condition:} The load is ramped up to \concurrentUsers{} simulated
 users over \loadRampTime{} and then held for \loadHoldTime{}. Each simulated user repeatedly
-performs a task chosen by the weights for its role in
-Table~\ref{tab:load-mix}, with a \thinkTime{} pause between tasks.
+performs a randomly chosen task, where Table~\ref{tab:load-mix} gives the
+probability of each task for the user's role, with a \thinkTime{} pause between
+tasks.
 
 \textbf{Output/Result:} The \tailPercentile{} percentile latency of all requests
 during the \loadHoldTime{} at full load is at most \tailLatency{}.
@@ -2916,16 +2917,17 @@ docker compose ps
 \label{app:load-mix}
 
 The simulated users in \hyperref[T-NFR-PERF-1]{\textbf{T-NFR-PERF-1}} are split
-by role and choose tasks with the weights in Table~\ref{tab:load-mix}. Each
-student team applies only to open projects it has not already applied to.
+by role as in Table~\ref{tab:load-mix}. Each time a simulated user starts a
+task, it picks one at random using the probabilities for its role in the
+table, which sum to 100\% for each role. Each student team applies only to open projects it has not already applied to.
 
 \begin{table}[h]
 \centering
-\caption{Role split and task weights for the load test}
+\caption{Role split and task probabilities for the load test}
 \label{tab:load-mix}
 \begin{tabular}{l r l r}
   \toprule
-  \textbf{Role} & \textbf{Users} & \textbf{Task} & \textbf{Weight (\%)} \\
+  \textbf{Role} & \textbf{Users} & \textbf{Task} & \textbf{Probability (\%)} \\
   \midrule
   Student & 340 & Browse and filter the project catalog & 40 \\
    & & View a project & 30 \\
