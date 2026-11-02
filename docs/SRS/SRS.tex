@@ -2435,7 +2435,7 @@ Instructor (Dr. Reyes), Teaching Assistant
 
     \item[]\idlabel{NFR_PasswordHash}\label{NFR_PasswordHash} All user passwords shall be stored in a cryptographically secure, salted, and irreversible format.\\
     \textbf{Rationale}: Ensuring passwords are not recoverable protects users from data exposure events.\\
-    \textbf{Fit Criterion}: Passwords are hashed using an industry standard algorithm such as Argon2id or bcrypt.
+    \textbf{Fit Criterion}: Passwords are hashed using Argon2id with a random salt generated for each password.
   \end{enumerate}
 
   \subsubsection{Audit Requirements}

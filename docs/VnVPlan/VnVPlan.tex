@@ -2461,9 +2461,9 @@ results, and the result of each attempt to open or restore the copies.
 \textbf{Input/Condition:} Two local accounts (an admin and an external
 supervisor) are created with the same password.
 
-\textbf{Output/Result:} Both stored values are Argon2id or bcrypt hashes
-(starting with \texttt{\$argon2id\$} or \texttt{\$2b\$}), neither contains the
-password, and the two values are different.
+\textbf{Output/Result:} Both stored values are Argon2id hashes with a
+random salt (starting with \texttt{\$argon2id\$}), neither contains the password, the two
+values have different salts, and the two hashes are different.
 
 \textbf{How test will be performed:} Any code change on the main branch
 triggers a GitHub Actions job that runs the backend against a PostgreSQL
