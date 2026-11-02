@@ -858,7 +858,7 @@ both backups.
 \subsubsection{Maintainability}
 
 These tests fulfil maintainability-related non-functional requirements:
-\nfrref{NFR_LiveDisable}.
+\nfrref{NFR_LiveDisable}, \nfrref{NFR_ChangeEffort}.
 
 \begin{enumerate}
 
@@ -888,6 +888,31 @@ backend. The script records, for each feature, the requests sent and the status 
 as failed if any feature does not give the expected result.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_LiveDisable}
+
+\item \label{T-NFR-MAINT-2}\textbf{T-NFR-MAINT-2: Likely Change Effort}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} The components affected by the changes in
+Table~\ref{tab:change-sample} are implemented on the main branch. The table
+lists more changes than are expected in one week of maintenance.
+
+\textbf{Input/Condition:} One of the five changes in
+Table~\ref{tab:change-sample} (20\% of the week) is selected and implemented,
+including its tests.
+
+\textbf{Output/Result:} The time to implement the change, multiplied by 5, is
+at most 8 hours.
+
+\textbf{How test will be performed:} Before the final demo, a team member
+selects one of the changes, creates a branch from main, and implements it. Timing starts when work begins and stops when all CI
+checks pass. The team member opens a pull request for the
+branch, which is closed without merging and kept as the record. They record
+the change selected, its time, and the extrapolated weekly time. The
+overestimated week compensates for the team member's familiarity with the
+code.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_ChangeEffort}
 
 \end{enumerate}
 
@@ -1532,6 +1557,35 @@ student team applies only to open projects it has not already applied to.
    & & Submit feedback on a proposal & 20 \\
   \bottomrule
 \end{tabular}
+\end{table}
+
+\subsection{Likely Change Sample}
+\label{app:change-sample}
+
+Table~\ref{tab:change-sample} lists the changes used in
+\hyperref[T-NFR-MAINT-2]{\textbf{T-NFR-MAINT-2}}. Each change is based on a
+likely change in the SRS \citep{SRS}.
+
+\begin{table}[h]
+\centering
+\caption{Sample of likely changes for one week of maintenance}
+\label{tab:change-sample}
+\begin{tabularx}{\textwidth}{r >{\raggedright\arraybackslash}X l}
+  \toprule
+  \textbf{\#} & \textbf{Change} & \textbf{Likely change} \\
+  \midrule
+  1 & Add a project field that students can filter the catalog by &
+  \texttt{LC\_ProposalTemplates} \\
+  2 & Add a team rule limiting the number of students from outside the
+  course's department & \texttt{LC\_TeamCourseRestrictions} \\
+  3 & Add a TA review step before the instructor's final approval &
+  \texttt{LC\_ApprovalWorkflows} \\
+  4 & Add a maintainer role that can only read the external-provider error
+  log & \texttt{LC\_Users} \\
+  5 & Accept an enrollment file with a different column layout &
+  \texttt{LC\_Enrollment} \\
+  \bottomrule
+\end{tabularx}
 \end{table}
 
   \newpage{}
