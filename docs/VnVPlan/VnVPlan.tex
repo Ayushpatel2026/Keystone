@@ -639,7 +639,7 @@ These tests fulfil portability-related non-functional requirements:
 
 \begin{enumerate}
 
-\item \label{T-NFR-PORT-1}\textbf{T-NFR-PORT-1: Chrome Browser Test}\\
+\item \label{T-NFR-PORT-1}\textbf{T-NFR-PORT-1: Browser and Screen Size Test}\\
 
 \textbf{Type:} Dynamic, Automated
 
@@ -647,56 +647,24 @@ These tests fulfil portability-related non-functional requirements:
 role and seeded data in which each role can view at least one record of every
 type shown on its pages.
 
-\textbf{Input/Condition:} Every page is opened in Chrome at desktop
-(1920 px $\times$ 1080 px), tablet (1024 px $\times$ 768 px), and mobile
-(430 px $\times$ 932 px) resolutions, signed in as each role that can access
-it.
+\textbf{Input/Condition:} Every page is opened in Chrome, Firefox, and Safari
+at desktop (1920 px $\times$ 1080 px), tablet (1024 px $\times$ 768 px), and
+mobile (430 px $\times$ 932 px) resolutions, signed in as each role that can
+access it.
 
-\textbf{Output/Result:} At every resolution, no page has horizontal overflow,
-clipped controls, or controls smaller than 40 px $\times$ 40 px, and all UI
-tests pass.
+\textbf{Output/Result:} In every browser and at every resolution, no page has
+horizontal overflow, clipped controls, or controls smaller than
+40 px $\times$ 40 px, and all UI tests pass.
 
 \textbf{How test will be performed:} Any code change on the main branch
 triggers a GitHub Actions job that runs the Playwright UI tests and layout
-checks in Playwright's Chromium-based browser at each resolution. The job
-records the browser version, resolution, test results, and screenshots or logs
-for failures.
+checks in Playwright's Chromium, Firefox, and WebKit browsers at each
+resolution. The job records the browser version, resolution, test results, and
+screenshots or logs for failures.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_ScreenSize}, \nfrref{NFR_Browsers}
 
-\item \label{T-NFR-PORT-2}\textbf{T-NFR-PORT-2: Firefox Browser Test}\\
-
-\textbf{Type:} Dynamic, Automated
-
-\textbf{Initial State:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
-
-\textbf{Input/Condition:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}, but
-in Firefox.
-
-\textbf{Output/Result:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
-
-\textbf{How test will be performed:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}},
-but in Playwright's Firefox browser.
-
-\textbf{Relevant NFRs}: \nfrref{NFR_ScreenSize}, \nfrref{NFR_Browsers}
-
-\item \label{T-NFR-PORT-3}\textbf{T-NFR-PORT-3: Safari Browser Test}\\
-
-\textbf{Type:} Dynamic, Automated
-
-\textbf{Initial State:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
-
-\textbf{Input/Condition:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}, but
-in Safari.
-
-\textbf{Output/Result:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
-
-\textbf{How test will be performed:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}},
-but in Playwright's WebKit browser.
-
-\textbf{Relevant NFRs}: \nfrref{NFR_ScreenSize}, \nfrref{NFR_Browsers}
-
-\item \label{T-NFR-PORT-4}\textbf{T-NFR-PORT-4: Docker Build and Start Test}\\
+\item \label{T-NFR-PORT-2}\textbf{T-NFR-PORT-2: Docker Build and Start Test}\\
 
 \textbf{Type:} Dynamic, Automated
 
