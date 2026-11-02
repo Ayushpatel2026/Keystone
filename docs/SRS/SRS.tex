@@ -1898,6 +1898,7 @@ Instructor (Dr. Reyes), Teaching Assistant
     Team & Team Profile & 1 : 0..1 & A may have at most one shared team profile\\ \hline
     Team & Project & N : 0..1 & A student team may have at most one project while a project could have multiple teams.\\ \hline
     Team & Project Application & 1 : N & A student team may submit multiple project applications.\\ \hline
+    Team & Thread & 1 : N & A team may have multiple discussion threads associated with its formation, and each thread belongs to one team. \\ \hline
     Project & Project Application & 1 : N & A project may have many project applications but each application belongs to a single project.\\ \hline
     Project & Thread & 1 : N & A project may have many threads but each of those threads belongs to a single project.\\ \hline
     Project Application & Thread & 1 : 0..1 & An application has at most one discussion thread, created when the first post is made. Each such thread belongs to a single application.\\ \hline
@@ -2011,6 +2012,7 @@ Instructor (Dr. Reyes), Teaching Assistant
       status & Enum & Derived, not stored independently: the status of the team's ProjectApplication for the project in \texttt{Team.project}, or empty if the team has no project (see Section~\ref{sec:lifecycle}). \texttt{ProjectApplication.status} is the source of truth. \\ \hline
       updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
       ta & TA & Reference to the TA assigned to the team, if any. \\ \hline
+      threads & Collection<Thread> & Discussion threads associated with the team's formation and recruitment.\\ \hline
 
       % Team Profile
       \multicolumn{3}{|l|}{\textbf{TeamProfile}}\\ \hline
