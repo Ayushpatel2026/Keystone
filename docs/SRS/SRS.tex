@@ -2124,7 +2124,7 @@ Instructor (Dr. Reyes), Teaching Assistant
     \item[]\reqitem{dprnum}{DPR_CentralizedDataStorage} The system shall securely store its data in a centrally managed backend system accessible by authorized actors
     \item[]\reqitem{dprnum}{DPR_DataEntityStructure} The system shall store data based on the Data Entity definitions in Sections~\ref{sec:entities} and~\ref{sec:dictionary}
     \item[]\reqitem{dprnum}{DPR_DataAccuracyAndConsistency} The system shall ensure that once a change has been saved, every later request for that data returns the updated version.
-    \item[]\reqitem{dprnum}{DPR_BiweeklyDataBackups} The system shall back up all data at least once every \backupInterval{} to reduce the risk of data loss from system failures or deletions
+    \item[]\reqitem{dprnum}{DPR_DailyDataBackups} The system shall back up all data at least once every \backupInterval{} to reduce the risk of data loss from system failures or deletions
   \end{enumerate}
 
   \subsubsection{Data Retention and Deletion}
@@ -3234,7 +3234,7 @@ and then the dependencies between features.
     Concurrent Users & \concurrentUsers & Peak number of concurrent users simulated during performance testing. & \idref{NFR_PerfTail}, \idref{NFR_PeakUsers} \\ \hline
     User Think Time & \thinkTime & Pause between actions for each simulated user during performance testing. & \idref{NFR_PerfTail} \\ \hline
     Recovery Point Window & \recoveryPointWindow & Maximum age of the restored state relative to the incident, except when no recovery point within the window is available (see \idref{NFR_Recoverable}). & \idref{NFR_Recoverable} \\ \hline
-    Backup Interval & \backupInterval & Maximum time between backups. Must not exceed the recovery point window. & \dprref{DPR_BiweeklyDataBackups}, \idref{NFR_Recoverable} \\ \hline
+    Backup Interval & \backupInterval & Maximum time between backups. Must not exceed the recovery point window. & \dprref{DPR_DailyDataBackups}, \idref{NFR_Recoverable} \\ \hline
     Health Check Interval & \healthCheckInterval & Time between availability health checks. & \idref{NFR_Uptime} \\ \hline
     Availability Window & \availabilityWindow & Period over which uptime is measured. & \idref{NFR_Uptime} \\ \hline
     \caption{Auxiliary Constants}
