@@ -27,6 +27,40 @@
 \providecommand{\nfrref}[1]{\descriptiveid{#1}}
 \providecommand{\dprref}[1]{\descriptiveid{#1}}
 
+% Constants from the SRS
+\newcommand{\usabilityTestTime}{5 minutes}
+\newcommand{\usabilityTestSuccessPerc}{75\%}
+\newcommand{\deployTime}{30 minutes}
+\newcommand{\tailPercentile}{95th}
+\newcommand{\tailLatency}{5.0 seconds}
+\newcommand{\concurrentUsers}{400}
+\newcommand{\thinkTime}{10 seconds}
+\newcommand{\uptimePercent}{99\%}
+\newcommand{\healthCheckInterval}{1 minute}
+\newcommand{\backupInterval}{24 hours}
+\newcommand{\maintFrac}{20\%}
+\newcommand{\changeEffort}{8 hours}
+
+% New Constants
+\newcommand{\usabilityParticipants}{eight}
+\newcommand{\usabilityMinSuccesses}{six}
+\newcommand{\desktopRes}{1920 px $\times$ 1080 px}
+\newcommand{\tabletRes}{1024 px $\times$ 768 px}
+\newcommand{\mobileRes}{430 px $\times$ 932 px}
+\newcommand{\minTargetSize}{40 px $\times$ 40 px}
+\newcommand{\containerStartTime}{1 minute}
+\newcommand{\loadProjects}{100}
+\newcommand{\loadTeams}{85}
+\newcommand{\loadRampTime}{5 minutes}
+\newcommand{\loadHoldTime}{10 minutes}
+\newcommand{\healthCheckTimeout}{10 seconds}
+\newcommand{\backupCheckWait}{2 minutes}
+\newcommand{\changeSampleSize}{5}
+\newcommand{\raceContenders}{5}
+\newcommand{\raceRepeats}{50}
+\newcommand{\auditSeedEntries}{100}
+\newcommand{\tamperAlertTime}{5 minutes}
+
 \begin{document}
 
 \title{System Verification and Validation Plan for \projname{}}
@@ -44,6 +78,7 @@
 \midrule
 2026-10-29 & 1.0 & General Information\\
 2026-10-31 & 1.1 & Plan and the SRS validation walkthrough appendix\\
+2026-11-01 & 1.2 & NFR System tests and referenced appendix parts\\
 \bottomrule
 \end{tabularx}
 
@@ -536,8 +571,8 @@ course timelines, and proposals, and is open at the sign-in page on a laptop.
 Each participant has a test account
 for their role, and the student accounts belong to a seeded team. One seeded
 student is on a team but absent from the latest enrollment import, and that
-team stays above the minimum team size without them. The eight
-participants are four students, one TA, two internal supervisors (professors),
+team stays above the minimum team size without them. The
+\usabilityParticipants{} participants are four students, one TA, two internal supervisors (professors),
 and one course instructor. The number of students is high because new students will
 need to learn to use the platform each year while instructors will eventually
 become familiar with the platform. No participant is a member of the \projname{} team or 
@@ -562,8 +597,9 @@ the proposal content to enter (Table~\ref{tab:usability-proposal-values}):
   downloading.
 \end{itemize}
 
-\textbf{Output/Result:} At least six of eight participants (75\%) complete
-their relevant tasks within five minutes without assistance.
+\textbf{Output/Result:} At least \usabilityMinSuccesses{} of
+\usabilityParticipants{} participants (\usabilityTestSuccessPerc{}) complete
+their relevant tasks within \usabilityTestTime{} without assistance.
 Disqualifying assistance is any help with using \projname{}, such as navigation, 
 what a field means or if it is required. Disqualifying assistance does not include 
 clarifying the prompt, fixing hardware or network issues.
@@ -610,7 +646,7 @@ team member, and has never deployed \projname{}.
 connect to the server over SSH, download \projname{}, configure the admin
 credentials and TLS certificate, and start the system.
 
-\textbf{Output/Result:} Within 30 minutes and without assistance, the test
+\textbf{Output/Result:} Within \deployTime{} and without assistance, the test
 admin loads \projname{} over HTTPS, bypassing the self-signed certificate
 warning, and signs in with the configured admin credentials. Disqualifying assistance is any
 help with \projname{} or the deployment guide. Fixing server, network, or
@@ -648,13 +684,13 @@ role and seeded data in which each role can view at least one record of every
 type shown on its pages.
 
 \textbf{Input/Condition:} Every page is opened in Chrome, Firefox, and Safari
-at desktop (1920 px $\times$ 1080 px), tablet (1024 px $\times$ 768 px), and
-mobile (430 px $\times$ 932 px) resolutions, signed in as each role that can
+at desktop (\desktopRes{}), tablet (\tabletRes{}), and mobile (\mobileRes{})
+resolutions, signed in as each role that can
 access it.
 
 \textbf{Output/Result:} In every browser and at every resolution, no page has
 horizontal overflow, clipped controls, or controls smaller than
-40 px $\times$ 40 px, and all UI tests pass.
+\minTargetSize{}, and all UI tests pass.
 
 \textbf{How test will be performed:} Any code change on the main branch
 triggers a GitHub Actions job that runs the Playwright UI tests and layout
@@ -675,11 +711,11 @@ checked out at the latest commit on the main branch.
 and started together with Docker Compose.
 
 \textbf{Output/Result:} All images build without errors, and the backend health
-check returns a success response within 1 minute of start.
+check returns a success response within \containerStartTime{} of start.
 
 \textbf{How test will be performed:} Any code change on the main branch
-triggers a GitHub Actions job that runs the build, starts the containers, and polls the health check until it succeeds or the
-1-minute limit is reached. The job records the Docker version, build logs, and
+triggers a GitHub Actions job that runs the build, starts the containers, and polls the health check until it succeeds or
+\containerStartTime{} has passed. The job records the Docker version, build logs, and
 container logs, and is marked as failed if the test fails.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_Container}
@@ -731,21 +767,21 @@ These tests fulfil performance-related non-functional requirements:
 \textbf{Type:} Dynamic, Automated
 
 \textbf{Initial State:} The system is deployed on a server matching the
-deployment target. Seeded data contains 100 open projects with discussion
-threads, 85 teams, and 400 test accounts split by role as in
+deployment target. Seeded data contains \loadProjects{} open projects with
+discussion threads, \loadTeams{} teams, and \concurrentUsers{} test accounts split by role as in
 Table~\ref{tab:load-mix}.
 
-\textbf{Input/Condition:} The load is ramped up to 400 simulated users over 5
-minutes and then held for 10 minutes. Each simulated user repeatedly
+\textbf{Input/Condition:} The load is ramped up to \concurrentUsers{} simulated
+users over \loadRampTime{} and then held for \loadHoldTime{}. Each simulated user repeatedly
 performs a task chosen by the weights for its role in
-Table~\ref{tab:load-mix}, with a 10-second pause between tasks.
+Table~\ref{tab:load-mix}, with a \thinkTime{} pause between tasks.
 
-\textbf{Output/Result:} The 95th percentile latency of all requests during the
-10 minutes at full load is at most 5.0 seconds.
+\textbf{Output/Result:} The \tailPercentile{} percentile latency of all requests
+during the \loadHoldTime{} at full load is at most \tailLatency{}.
 
 \textbf{How test will be performed:} Before each milestone, a manually started
 GitHub Actions workflow runs Locust on a separate machine to generate the load.
-Locust records the latency of every request. The report records the 95th percentile latency overall and per task,
+Locust records the latency of every request. The report records the \tailPercentile{} percentile latency overall and per task,
 the request rate, the error rate, and the server's CPU and memory use.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_PerfTail}, \nfrref{NFR_PeakUsers}
@@ -765,11 +801,11 @@ These tests fulfil reliability-related non-functional requirements:
 
 \textbf{Initial State:} The system is deployed for a demo.
 
-\textbf{Input/Condition:} The backend health check is requested every minute
-from a different network, from deployment until the end of the demo.
+\textbf{Input/Condition:} The backend health check is requested every
+\healthCheckInterval{} from a different network, from deployment until the end of the demo.
 
-\textbf{Output/Result:} Excluding scheduled maintenance windows, at least 99\%
-of checks return HTTP 200 within 10 seconds.
+\textbf{Output/Result:} Excluding scheduled maintenance windows, at least
+\uptimePercent{} of checks return HTTP 200 within \healthCheckTimeout{}.
 
 \textbf{How test will be performed:} A monitoring tool (such as Uptime Kuma) on
 a separate machine on a different network sends the checks and records the
@@ -809,14 +845,14 @@ backups exist.
 
 \textbf{Input/Condition:} The system is started for the first time. After the
 initial backup is created, the server's system time is set to 1 minute before
-the next backup is due (23 hours and 59 minutes after the initial backup).
+the next backup is due, \backupInterval{} after the initial backup.
 
 \textbf{Output/Result:} An initial backup is created when the system first
-starts, and a second backup is created within 2 minutes of the time change.
+starts, and a second backup is created within \backupCheckWait{} of the time change.
 
 \textbf{How test will be performed:} A team member starts the system and checks
-that the initial backup exists. They change the server's system time, wait 2
-minutes, and check that a second backup exists. They record the timestamps of
+that the initial backup exists. They change the server's system time, wait
+\backupCheckWait{}, and check that a second backup exists. They record the timestamps of
 both backups.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_Recoverable}
@@ -865,12 +901,12 @@ as failed if any feature does not give the expected result.
 Table~\ref{tab:change-sample} are implemented on the main branch. The table
 lists more changes than are expected in one week of maintenance.
 
-\textbf{Input/Condition:} One of the five changes in
-Table~\ref{tab:change-sample} (20\% of the week) is selected and implemented,
+\textbf{Input/Condition:} One of the \changeSampleSize{} changes in
+Table~\ref{tab:change-sample} (\maintFrac{} of the week) is selected and implemented,
 including its tests.
 
-\textbf{Output/Result:} The time to implement the change, multiplied by 5, is
-at most 8 hours.
+\textbf{Output/Result:} The time to implement the change, multiplied by
+\changeSampleSize{}, is at most \changeEffort{}.
 
 \textbf{How test will be performed:} Before the final demo, a team member
 selects one of the changes, creates a branch from main, and implements it. Timing starts when work begins and stops when all CI
@@ -951,16 +987,18 @@ does not give the expected result.
 
 \textbf{Initial State:} The system is running with a seeded course containing:
 \begin{itemize}
-  \item A project with one free slot and 5 teams that have applied to it,
-  \item A team with one free spot and 5 students who have requested to join it,
+  \item A project with one free slot and \raceContenders{} teams that have
+  applied to it,
+  \item A team with one free spot and \raceContenders{} students who have
+  requested to join it,
   \item A team with an application awaiting final approval.
 \end{itemize}
 
 \textbf{Input/Condition:} Each of the following batches of requests is sent,
 with the requests in a batch sent at the same time:
 \begin{enumerate}
-  \item The supervisor accepts all 5 teams for the project.
-  \item The team accepts all 5 students.
+  \item The supervisor accepts all \raceContenders{} teams for the project.
+  \item The team accepts all \raceContenders{} students.
   \item The team withdraws its application while the instructor approves it.
 \end{enumerate}
 
@@ -973,7 +1011,7 @@ Every request that was not applied returns an error response.
 \textbf{How test will be performed:} Any code change on the main branch
 triggers a GitHub Actions job that runs the backend against a PostgreSQL
 database in Docker and sends the batches. The database is reset to the initial
-state before each batch, and each batch is repeated 50 times. After each batch,
+state before each batch, and each batch is repeated \raceRepeats{} times. After each batch,
 the job reads the affected records from the database and compares them with the possible serial
 outcomes. It records each batch, the responses received, and the final state.
 The job is marked as failed if any final state is not a possible serial outcome.
@@ -1084,7 +1122,7 @@ difference is found or any log entry is missing a required field.
 \textbf{Type:} Dynamic, Manual
 
 \textbf{Initial State:} The system is deployed and running with seeded data
-and at least 100 audit log entries. Each entry includes an HMAC of the entry
+and at least \auditSeedEntries{} audit log entries. Each entry includes an HMAC of the entry
 and the previous entry's HMAC, computed with a key held by the key management
 provider or hardware security module, not stored in the database. An operator
 email address is configured.
@@ -1101,7 +1139,7 @@ log storage, with the storage restored before the next:
 \end{enumerate}
 
 \textbf{Output/Result:} Each change raises an alert to the operator email
-address within 5 minutes that identifies the affected storage.
+address within \tamperAlertTime{} that identifies the affected storage.
 
 \textbf{How test will be performed:} This test is run once tamper-evident
 storage is implemented. A team member connects to the database as the database
