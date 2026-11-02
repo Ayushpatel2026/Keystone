@@ -2175,7 +2175,8 @@ the request rate, the error rate, and the server's CPU and memory use.
 \subsubsection{Reliability}
 
 These tests fulfil reliability-related non-functional requirements:
-\nfrref{NFR_Uptime}, \nfrref{NFR_Recoverable}.
+\nfrref{NFR_Uptime}, \nfrref{NFR_Recoverable}. They also fulfil the privacy and
+data retention requirement \dprref{DPR_DailyDataBackups}.
 
 \begin{enumerate}
 
@@ -2240,6 +2241,8 @@ that the initial backup exists. They change the server's system time, wait
 both backups.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_Recoverable}
+
+\textbf{Relevant DPRs}: \dprref{DPR_DailyDataBackups}
 
 \end{enumerate}
 
@@ -2311,6 +2314,10 @@ These tests fulfil security-related non-functional requirements:
 \nfrref{NFR_ConcurrencySafety}, \nfrref{NFR_EncryptTransit},
 \nfrref{NFR_EssentialPersonal}, \nfrref{NFR_EncryptRest},
 \nfrref{NFR_PasswordHash}, \nfrref{NFR_AuditLog}, \nfrref{NFR_AuditTamper}.
+They also fulfil the privacy and data retention requirements
+\dprref{DPR_RoleBasedDataPermissions}, \dprref{DPR_VisibilityMatrix},
+\dprref{DPR_TLSCommunication}, \dprref{DPR_EncryptionAtRest},
+\dprref{DPR_NoPlaintextPasswords}.
 
 \begin{enumerate}
 
@@ -2364,6 +2371,9 @@ received status code and response. The job is marked as failed if any request
 does not give the expected result.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_Authorize}
+
+\textbf{Relevant DPRs}: \dprref{DPR_RoleBasedDataPermissions},
+\dprref{DPR_VisibilityMatrix}
 
 \item \label{T-NFR-SEC-3}\textbf{T-NFR-SEC-3: Concurrent Modifications}\\
 
@@ -2423,6 +2433,8 @@ failed if any request does not give the expected result.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_EncryptTransit}
 
+\textbf{Relevant DPRs}: \dprref{DPR_TLSCommunication}
+
 \item \label{T-NFR-SEC-5}\textbf{T-NFR-SEC-5: Encrypted Data at Rest}\\
 
 \textbf{Type:} Dynamic, Manual
@@ -2453,6 +2465,8 @@ results, and the result of each attempt to open or restore the copies.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_EncryptRest}
 
+\textbf{Relevant DPRs}: \dprref{DPR_EncryptionAtRest}
+
 \item \label{T-NFR-SEC-6}\textbf{T-NFR-SEC-6: Password Storage}\\
 
 \textbf{Type:} Dynamic, Automated
@@ -2473,6 +2487,8 @@ directly from the database. The job records both stored values and the
 result of each check. The job is marked as failed if any check fails.
 
 \textbf{Relevant NFRs}: \nfrref{NFR_PasswordHash}
+
+\textbf{Relevant DPRs}: \dprref{DPR_NoPlaintextPasswords}
 
 \item \label{T-NFR-SEC-7}\textbf{T-NFR-SEC-7: Audit Log Replay}\\
 
