@@ -27,6 +27,40 @@
 \providecommand{\nfrref}[1]{\descriptiveid{#1}}
 \providecommand{\dprref}[1]{\descriptiveid{#1}}
 
+% Constants from the SRS
+\newcommand{\usabilityTestTime}{5 minutes}
+\newcommand{\usabilityTestSuccessPerc}{75\%}
+\newcommand{\deployTime}{30 minutes}
+\newcommand{\tailPercentile}{95th}
+\newcommand{\tailLatency}{5.0 seconds}
+\newcommand{\concurrentUsers}{400}
+\newcommand{\thinkTime}{10 seconds}
+\newcommand{\uptimePercent}{99\%}
+\newcommand{\healthCheckInterval}{1 minute}
+\newcommand{\backupInterval}{24 hours}
+\newcommand{\maintFrac}{20\%}
+\newcommand{\changeEffort}{8 hours}
+
+% New Constants
+\newcommand{\usabilityParticipants}{eight}
+\newcommand{\usabilityMinSuccesses}{six}
+\newcommand{\desktopRes}{1920 px $\times$ 1080 px}
+\newcommand{\tabletRes}{1024 px $\times$ 768 px}
+\newcommand{\mobileRes}{430 px $\times$ 932 px}
+\newcommand{\minTargetSize}{40 px $\times$ 40 px}
+\newcommand{\containerStartTime}{1 minute}
+\newcommand{\loadProjects}{100}
+\newcommand{\loadTeams}{85}
+\newcommand{\loadRampTime}{5 minutes}
+\newcommand{\loadHoldTime}{10 minutes}
+\newcommand{\healthCheckTimeout}{10 seconds}
+\newcommand{\backupCheckWait}{2 minutes}
+\newcommand{\changeSampleSize}{5}
+\newcommand{\raceContenders}{5}
+\newcommand{\raceRepeats}{50}
+\newcommand{\auditSeedEntries}{100}
+\newcommand{\tamperAlertTime}{5 minutes}
+
 \begin{document}
 
 \title{System Verification and Validation Plan for \projname{}}
@@ -44,6 +78,7 @@
 \midrule
 2026-10-29 & 1.0 & General Information\\
 2026-10-31 & 1.1 & Plan and the SRS validation walkthrough appendix\\
+2026-11-01 & 1.2 & NFR System tests and referenced appendix parts\\
 \bottomrule
 \end{tabularx}
 
@@ -340,7 +375,7 @@ The following documents define what is verified and how the verification is orga
     \item \textbf{End-to-end tests (owner: Andrew).} Playwright tests drive the real application in a
     browser through the most important use cases for each role.
     They run in Chrome, Firefox, and Safari (WebKit) at the three screen widths named in the SRS, and include
-    an automated accessibility audit (axe-core) of every page.
+    an automated accessibility audit (axe-core) of every page in Chrome.
     \item \textbf{Performance tests (owner: Waqar).} A load test with Locust simulates the number of
     concurrent users, think time, and 95th percentile latency limit set in the nonfunctional requirement
     \texttt{NFR\_PerfTail} of the SRS. The load test runs before milestones, not on every pull request,
@@ -520,47 +555,619 @@ be involved? Be specific.}
 
 \subsubsection{Usability}\label{sec:usability-tests}
 
-..to be completed.
+These tests fulfil usability-related non-functional requirements:
+\nfrref{NFR_UsabilityFirstSuccess}, \nfrref{NFR_LearnUnassisted}.
 
-\paragraph{Title for Test}
+\paragraph{Primary Use-Case Usability Tests}
 
 \begin{enumerate}
 
-\item{test-id1\\}
+\item \label{T-NFR-USBLTY-1}\textbf{T-NFR-USBLTY-1: First-Time Use of Primary Workflows}\\
 
-Type: Functional, Dynamic, Manual, Static etc.
+\textbf{Type:} Dynamic, Manual
 					
-Initial State: 
-					
-Input/Condition: 
-					
-Output/Result: 
-					
-How test will be performed: 
-					
-\item{test-id2\\}
+\textbf{Initial State:} The system is deployed with seeded projects, teams,
+course timelines, and proposals, and is open at the sign-in page on a laptop.
+Each participant has a test account
+for their role, and the student accounts belong to a seeded team. One seeded
+student is on a team but absent from the latest enrollment import, and that
+team stays above the minimum team size without them. The
+\usabilityParticipants{} participants are four students, one TA, two internal supervisors (professors),
+and one course instructor. The number of students is high because new students will
+need to learn to use the platform each year while instructors will eventually
+become familiar with the platform. No participant is a member of the \projname{} team or 
+has used or seen a demonstration of \projname{}.
 
-Type: Functional, Dynamic, Manual, Static etc.
-					
-Initial State: 
-					
-Input: 
-					
-Output: 
-					
-How test will be performed: 
+\textbf{Input/Condition:} Each participant receives their account credentials
+and a written prompt for one task. The supervisor also receives a sheet with
+the proposal content to enter (Table~\ref{tab:usability-proposal-values}):
+\begin{itemize}
+  \item \textbf{Student}: Filter for Mechatronics projects, select a
+  project, and express the team's interest in it. End state: the team's
+  application shows the status ``Applied''.
+  \item \textbf{Supervisor}: Submit a project proposal with only the required
+  fields filled. End state: the proposal shows the status ``Proposal
+  submitted''.
+  \item \textbf{Course Instructor}: Review a submitted project proposal,
+  provide feedback, and request changes. End state: the proposal shows the
+  status ``Proposal changes requested'' along with a preview of the feedback submitted.
+  \item \textbf{TA}: Open the team composition view, identify the student
+  absent from the enrollment list, confirm their removal, and export the
+  validated team composition. End state: the export file starts
+  downloading.
+\end{itemize}
+
+\textbf{Output/Result:} At least \usabilityMinSuccesses{} of
+\usabilityParticipants{} participants (\usabilityTestSuccessPerc{}) complete
+their relevant tasks within \usabilityTestTime{} without assistance.
+Disqualifying assistance is any help with using \projname{}, such as navigation, 
+what a field means or if it is required. Disqualifying assistance does not include 
+clarifying the prompt, fixing hardware or network issues.
+
+\textbf{How test will be performed:} Each participant completes the test
+individually, and the seeded data is reset before each session. Two team
+members run each session: a facilitator and a note-taker. The facilitator obtains consent and gives the participant 
+the prompt and any additional information such as credentials or form values.
+The facilitator explains that the task is timed, but that the test judges how
+intuitive \projname{} is, not the participant's skills. Timing starts
+when the participant finishes reading the prompt and stops when the end state
+is reached. Any time spent fixing hardware/network/credential issues or clarifying the prompt
+should be subtracted. The facilitator does not guide the participant and gives assistance only when asked. 
+If disqualifying assistance is given, the attempt is counted as unsuccessful,
+but the participant continues to the end state so that all issues are recorded. The note-taker records,
+for each participant, the elapsed time, whether the end state was reached, any
+assistance given, errors and wrong turns, and comments. The participant then
+completes the survey in Appendix~\ref{app:usability-survey}.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_UsabilityFirstSuccess}, 
+\nfrref{NFR_LearnUnassisted}
 
 \end{enumerate}
 
 \subsubsection{Installability}
 
-..to be completed.
+These tests fulfil installability-related non-functional requirements:
+\nfrref{NFR_DeployUnassisted}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-INST-1}\textbf{T-NFR-INST-1: Unassisted Deployment}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} A Linux server with Docker installed, reachable
+over the network, with a self-signed TLS certificate and key on the server. The
+participant has a laptop with SSH access to the server, the deployment guide
+(Appendix~\ref{app:deployment-guide}), the server's SSH credentials, the release tag to deploy, and a sheet with the
+admin credentials to configure. The participant has IT or software experience, is not a \projname{}
+team member, and has never deployed \projname{}.
+
+\textbf{Input/Condition:} The participant follows the deployment guide to
+connect to the server over SSH, download \projname{}, configure the admin
+credentials and TLS certificate, and start the system.
+
+\textbf{Output/Result:} Within \deployTime{} and without assistance, the test
+admin loads \projname{} over HTTPS, bypassing the self-signed certificate
+warning, and signs in with the configured admin credentials. Disqualifying assistance is any
+help with \projname{} or the deployment guide. Fixing server, network, or
+credential problems is not disqualifying assistance.
+
+\textbf{How test will be performed:} A test admin waits on a separate laptop.
+A facilitator gives the participant the guide and credentials, and explains that the deployment is timed, but that the
+test judges how clear the guide is, not the participant's skills. Timing starts
+when the participant opens the guide and
+stops when the test admin signs in. Timing pauses while server, network, or
+credential problems are fixed. The facilitator gives assistance only when
+asked. If disqualifying assistance is given, the deployment is counted as
+unsuccessful, but the participant continues until the test admin signs in so
+that all issues are recorded. The facilitator
+records the elapsed time, assistance given, the steps where the participant
+got stuck, and unclear parts of the guide.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_DeployUnassisted}
+
+\end{enumerate}
 
 \subsubsection{Portability}
 
-..to be completed.
+These tests fulfil portability-related non-functional requirements:
+\nfrref{NFR_Browsers}, \nfrref{NFR_ScreenSize}, \nfrref{NFR_Container}.
 
-...
+\begin{enumerate}
+
+\item \label{T-NFR-PORT-1}\textbf{T-NFR-PORT-1: Browser and Screen Size Test}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed with a test account for each
+role and seeded data in which each role can view at least one record of every
+type shown on its pages.
+
+\textbf{Input/Condition:} Every page is opened in Chrome, Firefox, and Safari
+at desktop (\desktopRes{}), tablet (\tabletRes{}), and mobile (\mobileRes{})
+resolutions, signed in as each role that can
+access it.
+
+\textbf{Output/Result:} In every browser and at every resolution, no page has
+horizontal overflow, clipped controls, or controls smaller than
+\minTargetSize{}, and all UI tests pass.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job that runs the Playwright UI tests and layout
+checks in Playwright's Chromium, Firefox, and WebKit browsers at each
+resolution. The job records the browser version, resolution, test results, and
+screenshots or logs for failures.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_ScreenSize}, \nfrref{NFR_Browsers}
+
+\item \label{T-NFR-PORT-2}\textbf{T-NFR-PORT-2: Docker Build and Start Test}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} A machine with Docker installed and the repository
+checked out at the latest commit on the main branch.
+
+\textbf{Input/Condition:} The frontend, backend, and database images are built
+and started together with Docker Compose.
+
+\textbf{Output/Result:} All images build without errors, and the backend health
+check returns a success response within \containerStartTime{} of start.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job that runs the build, starts the containers, and polls the health check until it succeeds or
+\containerStartTime{} has passed. The job records the Docker version, build logs, and
+container logs, and is marked as failed if the test fails.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Container}
+
+\end{enumerate}
+
+\subsubsection{Accessibility}
+
+These tests fulfil accessibility-related non-functional requirements:
+\nfrref{NFR_AccessibilityWCAG}, \nfrref{NFR_ComplianceAODA}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-ACC-1}\textbf{T-NFR-ACC-1: Automated Accessibility Audit}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} Same as \hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
+
+\textbf{Input/Condition:} Every page, signed in as each role that can access
+it, including open dialogs and forms showing validation errors, is audited
+against the WCAG 2.0 Level A and AA rules in Chrome at the resolutions in
+\hyperref[T-NFR-PORT-1]{\textbf{T-NFR-PORT-1}}.
+
+\textbf{Output/Result:} No critical violations are reported on any page at any
+resolution.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job in which the Playwright UI tests run an axe-core
+audit, limited to the WCAG 2.0 Level A and AA rules, in Playwright's
+Chromium-based browser after each page or state is loaded. The job records the page, role,
+resolution, rule, and impact level of every violation, and is marked as failed
+if any violation is critical.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_AccessibilityWCAG},
+\nfrref{NFR_ComplianceAODA}
+
+\end{enumerate}
+
+\subsubsection{Performance}
+
+These tests fulfil performance-related non-functional requirements:
+\nfrref{NFR_PerfTail}, \nfrref{NFR_PeakUsers}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-PERF-1}\textbf{T-NFR-PERF-1: Peak Load Test}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed on a server matching the
+deployment target. Seeded data contains \loadProjects{} open projects with
+discussion threads, \loadTeams{} teams, and \concurrentUsers{} test accounts split by role as in
+Table~\ref{tab:load-mix}.
+
+\textbf{Input/Condition:} The load is ramped up to \concurrentUsers{} simulated
+users over \loadRampTime{} and then held for \loadHoldTime{}. Each simulated user repeatedly
+performs a task chosen by the weights for its role in
+Table~\ref{tab:load-mix}, with a \thinkTime{} pause between tasks.
+
+\textbf{Output/Result:} The \tailPercentile{} percentile latency of all requests
+during the \loadHoldTime{} at full load is at most \tailLatency{}.
+
+\textbf{How test will be performed:} Before each milestone, a manually started
+GitHub Actions workflow runs Locust on a separate machine to generate the load.
+Locust records the latency of every request. The report records the \tailPercentile{} percentile latency overall and per task,
+the request rate, the error rate, and the server's CPU and memory use.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_PerfTail}, \nfrref{NFR_PeakUsers}
+
+\end{enumerate}
+
+\subsubsection{Reliability}
+
+These tests fulfil reliability-related non-functional requirements:
+\nfrref{NFR_Uptime}, \nfrref{NFR_Recoverable}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-REL-1}\textbf{T-NFR-REL-1: Uptime Monitoring}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed for a demo.
+
+\textbf{Input/Condition:} The backend health check is requested every
+\healthCheckInterval{} from a different network, from deployment until the end of the demo.
+
+\textbf{Output/Result:} Excluding scheduled maintenance windows, at least
+\uptimePercent{} of checks return HTTP 200 within \healthCheckTimeout{}.
+
+\textbf{How test will be performed:} A monitoring tool (such as Uptime Kuma) on
+a separate machine on a different network sends the checks and records the
+time and result of every check. Scheduled maintenance windows are logged before
+they start. The report records the monitored period, the success percentage,
+and each failed check's time and response.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Uptime}
+
+\item \label{T-NFR-REL-2}\textbf{T-NFR-REL-2: Restore From Backup}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} The system is deployed with seeded data and an admin
+account.
+
+\textbf{Input/Condition:} A backup is taken. All projects and teams are then
+deleted directly in the database, and the latest backup is restored from the
+interface as the admin.
+
+\textbf{Output/Result:} The seeded projects and teams
+are present after the restore.
+
+\textbf{How test will be performed:} A team member takes the backup, deletes
+the projects and teams, and restores as the admin. They record the backup
+restored, its timestamp, whether the seeded data is present, and any messages
+shown.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Recoverable}
+
+\item \label{T-NFR-REL-3}\textbf{T-NFR-REL-3: Scheduled Backup Creation}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} The system is deployed and has never been started. No
+backups exist.
+
+\textbf{Input/Condition:} The system is started for the first time. After the
+initial backup is created, the server's system time is set to 1 minute before
+the next backup is due, \backupInterval{} after the initial backup.
+
+\textbf{Output/Result:} An initial backup is created when the system first
+starts, and a second backup is created within \backupCheckWait{} of the time change.
+
+\textbf{How test will be performed:} A team member starts the system and checks
+that the initial backup exists. They change the server's system time, wait
+\backupCheckWait{}, and check that a second backup exists. They record the timestamps of
+both backups.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Recoverable}
+
+\end{enumerate}
+
+\subsubsection{Maintainability}
+
+These tests fulfil maintainability-related non-functional requirements:
+\nfrref{NFR_LiveDisable}, \nfrref{NFR_ChangeEffort}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-MAINT-1}\textbf{T-NFR-MAINT-1: Live Feature Disable}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed and running with a seeded course
+in which every major feature is enabled: team formation, project proposals,
+project approvals, discussion threads, and recommendations. Test accounts exist
+for the course instructor and for each role that uses these features.
+
+\textbf{Input/Condition:} For each major feature:
+\begin{enumerate}
+  \item An authenticated request that uses the feature is sent.
+  \item The feature is disabled for the course through an authenticated request
+  as the course instructor.
+  \item The same request as in step 1 is sent.
+\end{enumerate}
+
+\textbf{Output/Result:} For every feature, the request in step 1 returns its
+expected response, and the request in step 3 returns HTTP 403.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job that runs a script sending these requests to the
+backend. The script records, for each feature, the requests sent and the status codes and responses received. The job is marked
+as failed if any feature does not give the expected result.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_LiveDisable}
+
+\item \label{T-NFR-MAINT-2}\textbf{T-NFR-MAINT-2: Likely Change Effort}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} The components affected by the changes in
+Table~\ref{tab:change-sample} are implemented on the main branch. The table
+lists more changes than are expected in one week of maintenance.
+
+\textbf{Input/Condition:} One of the \changeSampleSize{} changes in
+Table~\ref{tab:change-sample} (\maintFrac{} of the week) is selected and implemented,
+including its tests.
+
+\textbf{Output/Result:} The time to implement the change, multiplied by
+\changeSampleSize{}, is at most \changeEffort{}.
+
+\textbf{How test will be performed:} Before the final demo, a team member
+selects one of the changes, creates a branch from main, and implements it. Timing starts when work begins and stops when all CI
+checks pass. The team member opens a pull request for the
+branch, which is closed without merging and kept as the record. They record
+the change selected, its time, and the extrapolated weekly time. The
+overestimated week compensates for the team member's familiarity with the
+code.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_ChangeEffort}
+
+\end{enumerate}
+
+\subsubsection{Security}
+
+These tests fulfil security-related non-functional requirements:
+\nfrref{NFR_Authenticate}, \nfrref{NFR_Authorize},
+\nfrref{NFR_ConcurrencySafety}, \nfrref{NFR_EncryptTransit},
+\nfrref{NFR_EssentialPersonal}, \nfrref{NFR_EncryptRest},
+\nfrref{NFR_PasswordHash}, \nfrref{NFR_AuditLog}, \nfrref{NFR_AuditTamper}.
+
+\begin{enumerate}
+
+\item \label{T-NFR-SEC-1}\textbf{T-NFR-SEC-1: Unauthenticated Requests}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed and running.
+
+\textbf{Input/Condition:} An HTTP request is sent to each non-login endpoint with
+no credentials, authentication data, session, or token.
+
+\textbf{Output/Result:} Every request returns an empty HTTP 401 response.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job that runs a script against the backend. The
+script reads every endpoint and method from the backend's schema and
+sends the requests. It records each endpoint, method, status code, and response
+body. The job is marked as failed if any request does not give the expected result.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Authenticate}
+
+\item \label{T-NFR-SEC-2}\textbf{T-NFR-SEC-2: Role Access Matrix}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed and running with two seeded
+courses. The first course has one account for each role (student, internal/external/unverified
+supervisor, TA, and course instructor), and at least one record of every type and state in the
+SRS tables ``Visibility by record type and state'' and ``What an external
+supervisor can read'' \citep{SRS}. The second course has its own accounts and
+records. One account is signed in but not enrolled in any course.
+
+\textbf{Input/Condition:} As each account, a read request and a modify request
+are sent for every seeded record, including list, search, and count requests
+that return the record, and for one record ID of each type that does not
+exist.
+
+\textbf{Output/Result:} Read requests follow the two SRS visibility tables, and
+modify requests follow \dprref{DPR_RoleBasedDataPermissions}. Every allowed
+request succeeds. Every other request returns HTTP 404, the same response as a
+request for a record that does not exist, and the record does not appear in any
+list, search, or count. Accounts from the second course and the
+unenrolled account cannot read or modify any record in the first course.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job that runs a script sending these requests to the
+backend. The expected result for each account, record, and request is written
+as a table in the test code from the SRS tables. The script records each request, the expected result, and the
+received status code and response. The job is marked as failed if any request
+does not give the expected result.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_Authorize}
+
+\item \label{T-NFR-SEC-3}\textbf{T-NFR-SEC-3: Concurrent Modifications}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is running with a seeded course containing:
+\begin{itemize}
+  \item A project with one free slot and \raceContenders{} teams that have
+  applied to it,
+  \item A team with one free spot and \raceContenders{} students who have
+  requested to join it,
+  \item A team with an application awaiting final approval.
+\end{itemize}
+
+\textbf{Input/Condition:} Each of the following batches of requests is sent,
+with the requests in a batch sent at the same time:
+\begin{enumerate}
+  \item The supervisor accepts all \raceContenders{} teams for the project.
+  \item The team accepts all \raceContenders{} students.
+  \item The team withdraws its application while the instructor approves it.
+\end{enumerate}
+
+\textbf{Output/Result:} After every batch, the final state is equal to the state
+produced by running the same requests one at a time in some order. In
+particular, the project has exactly one accepted team, the team has exactly
+one new member, and the application is either withdrawn or approved, not both.
+Every request that was not applied returns an error response.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job that runs the backend against a PostgreSQL
+database in Docker and sends the batches. The database is reset to the initial
+state before each batch, and each batch is repeated \raceRepeats{} times. After each batch,
+the job reads the affected records from the database and compares them with the possible serial
+outcomes. It records each batch, the responses received, and the final state.
+The job is marked as failed if any final state is not a possible serial outcome.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_ConcurrencySafety}
+
+\item \label{T-NFR-SEC-4}\textbf{T-NFR-SEC-4: Unencrypted Requests}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is deployed and running, configured as in
+the deployment guide (Appendix~\ref{app:deployment-guide}).
+
+\textbf{Input/Condition:} An HTTP request for the home page, the sign-in
+endpoint, and a data endpoint is sent to port 80.
+
+\textbf{Output/Result:} Server responds only with a redirect to the same path
+over HTTPS.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job that starts the system with Docker Compose and
+sends the requests to port 80 from a separate container. The job records the
+status code, headers, and body received for each request. The job is marked as
+failed if any request does not give the expected result.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_EncryptTransit}
+
+\item \label{T-NFR-SEC-5}\textbf{T-NFR-SEC-5: Encrypted Data at Rest}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} The system is deployed and running with seeded data. A
+student profile and a project are created with unique marker strings in their
+text fields, and a backup is created afterwards.
+
+\textbf{Input/Condition:} The database storage files and the latest backup are
+copied to a separate machine that does not have the decryption key. The copies
+are searched for the marker strings and opened with a new PostgreSQL instance
+and the standard restore tools. The backup is then restored to a new
+\projname{} deployment on that machine.
+
+\textbf{Output/Result:} No marker string is found in any copied file, and the
+copies cannot be opened or restored to readable data. Restoring the backup to
+the new deployment prompts for the decryption key and does not restore any data
+without it. With the correct key, the restore succeeds and the marker strings
+are present.
+
+\textbf{How test will be performed:} A team member with access to the server
+copies the files, searches them (for example with \texttt{grep}), and tries to
+open and restore them. They then deploy \projname{} on the separate machine
+following the deployment guide (Appendix~\ref{app:deployment-guide}) and
+restore the backup from the interface as the admin, first without the key and
+then with it. They record the files copied, the search commands and their
+results, and the result of each attempt to open or restore the copies.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_EncryptRest}
+
+\item \label{T-NFR-SEC-6}\textbf{T-NFR-SEC-6: Password Storage}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is running with no user accounts.
+
+\textbf{Input/Condition:} Two local accounts (an admin and an external
+supervisor) are created with the same password.
+
+\textbf{Output/Result:} Both stored values are Argon2id or bcrypt hashes
+(starting with \texttt{\$argon2id\$} or \texttt{\$2b\$}), neither contains the
+password, and the two values are different.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job that runs the backend against a PostgreSQL
+database in Docker, creates the accounts, and reads both stored password values
+directly from the database. The job records both stored values and the
+result of each check. The job is marked as failed if any check fails.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_PasswordHash}
+
+\item \label{T-NFR-SEC-7}\textbf{T-NFR-SEC-7: Audit Log Replay}\\
+
+\textbf{Type:} Dynamic, Automated
+
+\textbf{Initial State:} The system is running with an empty database, except
+for accounts for every role.
+
+\textbf{Input/Condition:} Every type of approval decision, status change, and
+role change is performed at least once, as each role that can perform it. The
+audit log entries are then applied in order to a second database with the same
+accounts and no other data. Once every user action is logged, the scenario is
+extended to every type of user action.
+
+\textbf{Output/Result:} The approval decisions, statuses, and roles in the
+second database are equal to those in the first. Every log entry records its
+time, the action, the affected record, the user, and the user's role at the
+time of the action.
+
+\textbf{How test will be performed:} Any code change on the main branch
+triggers a GitHub Actions job that runs the backend against a PostgreSQL
+database in Docker, performs the actions with a scripted scenario, and applies
+the log entries with a replay script. The job compares the approval decisions,
+statuses, and roles in both databases and records every difference found. The job is marked as failed if any
+difference is found or any log entry is missing a required field.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_AuditLog}
+
+\item \label{T-NFR-SEC-8}\textbf{T-NFR-SEC-8: Audit Log Tampering}\\
+
+\textbf{Type:} Dynamic, Manual
+
+\textbf{Initial State:} The system is deployed and running with seeded data
+and at least \auditSeedEntries{} audit log entries. Each entry includes an HMAC of the entry
+and the previous entry's HMAC, computed with a key held by the key management
+provider or hardware security module, not stored in the database. An operator
+email address is configured.
+
+\textbf{Input/Condition:} Each of the following is done directly on the audit
+log storage, with the storage restored before the next:
+\begin{enumerate}
+  \item The content of one entry is changed.
+  \item One entry is deleted.
+  \item The content of one entry is changed, and the HMAC of that entry and
+  every later entry is recalculated without the key (for example with plain
+  SHA-256).
+  \item The audit log storage is deleted.
+\end{enumerate}
+
+\textbf{Output/Result:} Each change raises an alert to the operator email
+address within \tamperAlertTime{} that identifies the affected storage.
+
+\textbf{How test will be performed:} This test is run once tamper-evident
+storage is implemented. A team member connects to the database as the database
+administrator (for example with \texttt{psql}), makes each change with SQL, and
+restores the storage afterwards. They record the time of each change, the time
+each alert is received, and its content.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_AuditTamper}
+
+\item \label{T-NFR-SEC-9}\textbf{T-NFR-SEC-9: Personal Data Inspection}\\
+
+\textbf{Type:} Static, Inspection
+
+\textbf{Who is involved:} Two team members
+
+\textbf{When does it occur:} Before the Revision 0 and final demos.
+
+\textbf{How it will be performed:} Each inspector independently lists every
+\texttt{table.column} in the deployed database that stores personal
+information, and maps each one to an FR or NFR in the SRS \citep{SRS}.
+Differences between the two lists, and between the two mappings, are resolved
+by consensus. Any column that is not mapped has a GitHub issue tracking it.
+
+\textbf{Pass Condition:} Every listed column is mapped to an FR or NFR.
+
+\textbf{Relevant NFRs}: \nfrref{NFR_EssentialPersonal}
+
+\end{enumerate}
 
 \subsection{Traceability Between Test Cases and Requirements}
 
@@ -706,9 +1313,65 @@ How test will be performed:
 The definition of the test cases will call for SYMBOLIC\_CONSTANTS.
 Their values are defined in this section for easy maintenance.
 
-\subsection{Usability Survey Questions?}
+\subsection{Usability Test Proposal Values}
+\label{app:usability-proposal-values}
 
-\wss{This is a section that would be appropriate for some projects.}
+The supervisor in \hyperref[T-NFR-USBLTY-1]{\textbf{T-NFR-USBLTY-1}} enters the values in
+Table~\ref{tab:usability-proposal-values}. Values are kept short so that typing
+time does not affect the result. The fields are the required
+Project attributes in the SRS data dictionary.
+
+\begin{table}[h]
+\centering
+\caption{Proposal values for the supervisor task}
+\label{tab:usability-proposal-values}
+\begin{tabular}{l l}
+  \toprule
+  \textbf{Field} & \textbf{Value} \\
+  \midrule
+  Title & Course Planner \\
+  Course & Software Engineering \\
+  Background & Background \\
+  Objectives & Objectives \\
+  Impact & Impact \\
+  Completion status & None \\
+  Industry & Education \\
+  Project type & Non-hardware \\
+  Supervisor capacity & 1 \\
+  Confidentiality & None \\
+  IP & None \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Usability Survey Questions}
+\label{app:usability-survey}
+
+Participants complete this survey after attempting their assigned task. \\
+
+\noindent\textbf{Rating Questions}
+
+\noindent Participants rate each statement on a 1--5 scale, where 1 is
+\textbf{strongly disagree} and 5 is \textbf{strongly agree}.
+
+\begin{enumerate}
+  \item I understood what I was expected to do.
+  \item I could find the information or action I needed.
+  \item The labels and instructions were clear.
+  \item The system behaved as I expected.
+  \item I could complete the task without help.
+  \item I would feel confident using this system for the same task.
+\end{enumerate}
+
+\noindent\textbf{Open-Response Questions}
+
+\noindent Participants answer each question in their own words.
+
+\begin{enumerate}
+  \setcounter{enumi}{6}
+  \item What was the most confusing part of the task?
+  \item What, if anything, would you change to make the task easier?
+\end{enumerate}
 
   \subsection{SRS Validation Walkthrough and Checklist}
   \label{app:walkthrough}
@@ -822,6 +1485,114 @@ Their values are defined in this section for easy maintenance.
   \vspace{1.2cm}
 
   \noindent Reviewer: \rule{5cm}{0.4pt} \hspace{1cm} Date: \rule{3cm}{0.4pt}
+
+\subsection{Deployment Guide}
+\label{app:deployment-guide}
+
+This guide describes how to deploy \projname{} on a Linux server with Docker
+installed. It is used in \hyperref[T-NFR-INST-1]{\textbf{T-NFR-INST-1}}. It is a
+draft, and file and variable names will be updated to match the implementation.
+Replace values in angle brackets with those for your deployment.
+
+\begin{enumerate}
+  \item Connect to the server:
+\begin{verbatim}
+ssh <ssh-user>@<server-address>
+\end{verbatim}
+  \item Get \projname{}, enter its directory, and check out the release tag
+  provided with this guide (in the form \verb|v<major>.<minor>.<patch>|):
+\begin{verbatim}
+git clone https://github.com/Ayushpatel2026/Keystone.git
+cd Keystone
+git checkout <release-tag>
+\end{verbatim}
+  \item Create the configuration file from the template:
+\begin{verbatim}
+cp .env.example .env
+\end{verbatim}
+  \item Open \texttt{.env} and set the following values:
+\begin{verbatim}
+ADMIN_EMAIL=<admin-email>
+ADMIN_PASSWORD=<admin-password>
+TLS_CERT_PATH=<certificate-path>
+TLS_KEY_PATH=<key-path>
+\end{verbatim}
+  \item Build and start the system:
+\begin{verbatim}
+docker compose up -d --build
+\end{verbatim}
+  \item Check that all containers are running:
+\begin{verbatim}
+docker compose ps
+\end{verbatim}
+  \item Open \verb|https://<server-address>| in a browser and sign in with
+  the admin credentials.
+\end{enumerate}
+
+\subsection{Load Test Task Mix}
+\label{app:load-mix}
+
+The simulated users in \hyperref[T-NFR-PERF-1]{\textbf{T-NFR-PERF-1}} are split
+by role and choose tasks with the weights in Table~\ref{tab:load-mix}. Each
+student team applies only to open projects it has not already applied to.
+
+\begin{table}[h]
+\centering
+\caption{Role split and task weights for the load test}
+\label{tab:load-mix}
+\begin{tabular}{l r l r}
+  \toprule
+  \textbf{Role} & \textbf{Users} & \textbf{Task} & \textbf{Weight (\%)} \\
+  \midrule
+  Student & 340 & Browse and filter the project catalog & 40 \\
+   & & View a project & 30 \\
+   & & View the team's application status & 15 \\
+   & & Reply to a project thread & 10 \\
+   & & Apply to a project & 5 \\
+  \midrule
+  Supervisor & 40 & View own projects & 40 \\
+   & & View a project thread & 30 \\
+   & & Reply to a project thread & 20 \\
+   & & View applications to own projects & 10 \\
+  \midrule
+  TA & 12 & View team compositions & 60 \\
+   & & View a project & 40 \\
+  \midrule
+  Course instructor & 8 & View proposals awaiting review & 50 \\
+   & & View a proposal & 30 \\
+   & & Submit feedback on a proposal & 20 \\
+  \bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Likely Change Sample}
+\label{app:change-sample}
+
+Table~\ref{tab:change-sample} lists the changes used in
+\hyperref[T-NFR-MAINT-2]{\textbf{T-NFR-MAINT-2}}. Each change is based on a
+likely change in the SRS \citep{SRS}.
+
+\begin{table}[h]
+\centering
+\caption{Sample of likely changes for one week of maintenance}
+\label{tab:change-sample}
+\begin{tabularx}{\textwidth}{r >{\raggedright\arraybackslash}X l}
+  \toprule
+  \textbf{\#} & \textbf{Change} & \textbf{Likely change} \\
+  \midrule
+  1 & Add a project field that students can filter the catalog by &
+  \texttt{LC\_ProposalTemplates} \\
+  2 & Add a team rule limiting the number of students from outside the
+  course's department & \texttt{LC\_TeamCourseRestrictions} \\
+  3 & Add a TA review step before the instructor's final approval &
+  \texttt{LC\_ApprovalWorkflows} \\
+  4 & Add a maintainer role that can only read the external-provider error
+  log & \texttt{LC\_Users} \\
+  5 & Accept an enrollment file with a different column layout &
+  \texttt{LC\_Enrollment} \\
+  \bottomrule
+\end{tabularx}
+\end{table}
 
   \newpage{}
 
