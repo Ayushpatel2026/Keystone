@@ -1,32 +1,34 @@
-<Please keep the folder structure as given in the template repo.  We will
-discuss each artifact as we get to it in the course.  In some cases, like for
-the SRS, you should have a file of the same name.  For other cases, like the
-design documentation, you are required to document your design, but it may not
-be via a module guide and module interface specification documents.>
+# Keystone Documentation
 
-<The files and folders have been set-up with tex files that have external links
-so that cross-referencing is possible between documents.>
+This folder contains the LaTeX sources for all Keystone project documentation. Compiled PDFs live in [`../pdfs`](../pdfs).
 
-<The tex files Common.tex so that they can share definitions.>
+## Contents
 
-<The files use Comments.tex so that the comments package can be used to embed
-comments into the generated pdf.  Comments can be set to false so that they do
-not appear.>
+| Folder | Description |
+| ------ | ----------- |
+| [`ProblemStatementAndGoals/`](./ProblemStatementAndGoals) | The problem Keystone solves, its inputs and outputs, stakeholders, environment, and core and stretch goals. Also lists our custom documents. |
+| [`DevelopmentPlan/`](./DevelopmentPlan) | Team processes: meeting and communication plans, roles, Git workflow and CI/CD, schedule, proof of concept plan, expected technology, AI use, coding standard, and team charter. |
+| [`SRS/`](./SRS) | Software Requirements Specification: stakeholder, functional, non-functional, and data requirements, use cases, personas, and traceability. |
+| [`HazardAnalysis/`](./HazardAnalysis) | Hazard analysis: FMEA, resulting safety and security requirements, and a roadmap for implementing them. |
+| [`VnVPlan/`](./VnVPlan) | Verification and validation plan, including usability and deployment test procedures. |
 
-<None of the files are complete templates.  You will need to add extra
-information.  They are just intended to be a starting point.>
+## Shared Files
 
-<You should select an SRS template.  Three options are available in the repo, or
-you can introduce another template. You should delete any SRS options that you do
-not need. The folder SRS holds a template for Scientific Computing software;
-the folder SRS-Volere holds the Volere template in LaTeX; the folder SRS-Meyer holds
-the template that Dr. Mosser now uses in the third year requirements course.>
+| File | Purpose |
+| ---- | ------- |
+| `Common.text` | Shared LaTeX macros, such as the project name and author list |
+| `Comments.text` | Macros for template and reviewer comments |
+| `Reflection.text` | Reflection prompts reused across deliverables |
+| `SRS_Reflection.text` | Additional reflection questions for the SRS |
 
-<The Makefile assumes the SRS will be in a folder called SRS.  If you use the Makefile
-with a template other than the Scientific Computing template, you will have to delete
-the unnecessary folders and rename your folder to SRS.>
-# Documentation folders
+Shared bibliography entries are in [`../refs`](../refs).
 
-The folders and files for this folder are as follows:
+## Building the Documents
 
-Describe ...
+Each deliverable folder contains a main `.tex` file named after the folder (e.g. `SRS/SRS.tex`). Documents are built automatically by GitHub Actions on every push and pull request. To build locally, run `pdflatex` and `bibtex` from inside the deliverable's folder.
+
+## Conventions
+
+- Requirements, hazards, and use cases use **descriptive IDs** (e.g. `FR_AssignTA`, `SSR_AuditLog`, `H_WrongRole`) instead of numbers.
+- The Hazard Analysis links directly into the published SRS. When renaming an SRS requirement, update the matching `\srsref{...}` entries in `HazardAnalysis/`.
+- Documentation PRs follow the review process in the Development Plan, and each deliverable is checked against the repo checklist and Avenue rubric before submission.
