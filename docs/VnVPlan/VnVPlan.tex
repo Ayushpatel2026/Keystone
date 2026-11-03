@@ -2393,4 +2393,68 @@ graduate attribute of Lifelong Learning.
   
 \end{enumerate}
 
+\textbf{Ahmed:}
+\begin{enumerate}
+  \item What went well while writing this deliverable?
+
+  The number of the NFR system tests and their purpose naturally followed from the SRS.
+  Additionally, writing tests helped with refining NFRs, since good NFRs are ones that
+  can be tested. For example, writing \texttt{T-NFR-SEC-6: Password Storage} helped
+  expose a gap between the SRS and the mental version of the requirement involving the
+  salting of passwords before hashing, which was mentally noted and ended up implicitly
+  described (something along the lines of "same password used by multiple users has a
+  different hash") but not described in the SRS.
+
+  \item What pain points did you experience during this deliverable, and how
+    did you resolve them?
+
+  Usability testing was the most involved and difficult part of the NFR system tests,
+  as it aims to quantify a system quality which is often thought of as a general feel.
+  Writing the SRS partially solved this, since usability requirements approximate the
+  usability of the system through heuristics like first-time use task completion and
+  the ability to use the platform without assistance. However, it was unclear whether
+  this usability test was enough to rule out major issues.
+  
+  This was resolved by ensuring tests have scenarios geared towards the stakeholder being tested,
+  and that the scenario leaned towards being higher in complexity. If the test passes with the more
+  complex scenarios, we can be confident that the simpler ones do not have major usability issues.
+
+  Additionally, browser tests were geared towards usability. Control buttons are tested to be visible,
+  interactable, and sufficiently large. This way, rather than just testing whether the application
+  can run on each browser, the tests can also indirectly provide some redundancy with usability.
+
+  \item What knowledge and skills will the team collectively need to acquire to
+  successfully complete the verification and validation of your project?
+  Examples of possible knowledge and skills include dynamic testing knowledge,
+  static testing knowledge, specific tool usage, Valgrind etc.  You should look to
+  identify at least one item for each team member.
+
+  I will need to understand exactly how to use Playwright and enable browser testing,
+  ensure accessibility tests are following the required standard that needs to be complied
+  with.
+
+  \item For each of the knowledge areas and skills identified in the previous
+  question, what are at least two approaches to acquiring the knowledge or
+  mastering the skill?  Of the identified approaches, which will each team
+  member pursue, and why did they make this choice?
+
+  One approach would be reading the documentation created for Playwright and
+  reading relevant sections until an understanding is reached. Another approach
+  would be to ask an AI model questions specific to what this project will test
+  or even feed it the VnV tests and ask it for guidance.
+
+  The approach I will go with is to read the documentation's relevant sections,
+  but also skim all other major sections which may not be applicable to this project.
+  The reason is simple: Industry standard tools often receive regular updates expanding
+  features and deprecating old ones. AI models often lean into old ways
+  since they train on existing code which is out of date by the time the models are published.
+  Additionally, AI models will simply try to fulfil the task you provide and nothing more.
+  This can be extremely limiting and I've observed this in my experience using AI models to
+  implement new libraries at my job. While they can troubleshoot, provided enough context,
+  they simply lack the ability to follow rapidly changing best practices.
+  Documentation for these tools can often spark new ideas of better ways to use them than
+  were thought of during planning. This is also the reason for skimming "irrelevant" sections.
+
+\end{enumerate}
+
 \end{document}
