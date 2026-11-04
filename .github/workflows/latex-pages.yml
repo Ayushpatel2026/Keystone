@@ -3,10 +3,8 @@ name: Build LaTeX and Deploy PDFs
 on:
   push:
     branches: main
-    paths: [docs/**, refs/**, Makefile, .github/scripts/**, .github/workflows/latex-pages.yml]
   pull_request:
     branches: main
-    paths: [docs/**, refs/**, Makefile, .github/scripts/**, .github/workflows/latex-pages.yml]
   workflow_dispatch:
 
 permissions:
@@ -15,7 +13,58 @@ permissions:
   id-token: write
 
 jobs:
-  build:
+  changes:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    outputs:
+      run_build: ${{ steps.filter.outputs.run_build }}
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Check if LaTeX/Doc files changed
+        id: filter
+        run: |
+          # Compare against the same range GitHub's old `paths:` filter used:
+          # the whole push (before..after) or the whole PR (base..head).
+          case "${{ github.event_name }}" in
+            workflow_dispatch)
+              echo "run_build=true" >> $GITHUB_OUTPUT
+              exit 0
+              ;;
+            pull_request)
+              BASE="${{ github.event.pull_request.base.sha }}"
+              ;;
+            *)
+              BASE="${{ github.event.before }}"
+              ;;
+          esac
+
+          # New branch (all-zero SHA) or empty: fall back to the previous commit
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            BASE=HEAD^
+          fi
+
+          # Force-push can leave BASE missing from history: build to be safe
+          if ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            echo "BASE $BASE not found in history; building to be safe"
+            echo "run_build=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          if git diff --name-only "$BASE" HEAD | grep -qE '^(docs/|refs/|Makefile$|\.github/scripts/|\.github/workflows/latex-pages\.yml$)'; then
+            echo "run_build=true" >> $GITHUB_OUTPUT
+          else
+            echo "No documentation changes detected. Skipping LaTeX build."
+            echo "run_build=false" >> $GITHUB_OUTPUT
+          fi
+
+  build-latex:
+    needs: changes
+    if: needs.changes.outputs.run_build == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Generate App token
@@ -30,6 +79,7 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ steps.app-token.outputs.token }}
+
       - name: Restore PDF cache
         uses: actions/cache@v5
         with:
@@ -37,6 +87,7 @@ jobs:
           key: pdf-cache-${{ github.run_id }}
           restore-keys: |
             pdf-cache-
+
       - name: Seed PDF cache from committed PDFs
         run: |
           # The committed pdfs/ directory is the source of truth, not the
@@ -46,11 +97,20 @@ jobs:
           if [ -d pdfs ]; then
             rsync -av --ignore-existing pdfs/ build-pdf/
           fi
+
       - name: Get changed LaTeX files
         id: latex-files
         run: |
-          BASE=${{ github.event.before }}
-          [ -z "$BASE" ] && BASE=HEAD^
+          case "${{ github.event_name }}" in
+            pull_request) BASE="${{ github.event.pull_request.base.sha }}" ;;
+            *)            BASE="${{ github.event.before }}" ;;
+          esac
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            BASE=HEAD^
+          fi
+          if ! git cat-file -e "$BASE^{commit}" 2>/dev/null; then
+            BASE=HEAD^
+          fi
 
           # Every file under docs/ and refs/ is a candidate, not just .tex and
           # .md: a change to a shared \input, a figure or the bibliography has
@@ -86,6 +146,7 @@ jobs:
             PLURAL_S=''
           fi
           echo "PLURAL_S=$PLURAL_S" >> $GITHUB_ENV
+
       # Installing these with apt takes ~126s, almost all of it unpacking
       # rather than downloading, so caching the installed files (not the
       # .debs) is what saves time. Pinned to a commit: this template is
@@ -97,6 +158,7 @@ jobs:
         with:
           packages: texlive-latex-extra texlive-science texlive-fonts-extra texlive-fonts-recommended texlive-latex-recommended lmodern pandoc
           version: 1.1
+
       - name: Verify the TeX toolchain is usable
         run: |
           # A restored cache that skipped texlive's postinst would leave
@@ -111,7 +173,7 @@ jobs:
           # pdflatex finds lmodern.sty but not the fonts it maps to, failing
           # with "Font rm-lmr7 at 600 not found".
           sudo updmap-sys >/dev/null
-          
+
           if ! command -v bibtex >/dev/null; then
             sudo update-alternatives --install /usr/bin/bibtex bibtex /usr/bin/bibtex.original 100
           fi
@@ -132,6 +194,7 @@ jobs:
             --pdf-engine=pdflatex --toc -V geometry:margin=1in
           test -s "$smoke/smoke.pdf" && echo "pandoc -> PDF smoke test OK"
           rm -rf "$smoke"
+
       - name: Compile LaTeX
         run: |
           PDF_CACHE_DIR="$GITHUB_WORKSPACE/build-pdf"
@@ -171,11 +234,13 @@ jobs:
           # Drop manifest entries for documents that no longer exist
           python3 .github/scripts/record_deps.py --prune .pdf-deps.json .
         #continue-on-error: true # Job continues even if this step fails
+
       - name: Sync PDFs for TA review
         run: |
           rm -rf pdfs
           mkdir -p pdfs
           rsync -av --delete build-pdf/ pdfs/
+
       - name: Commit PDFs to repo
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
@@ -198,6 +263,7 @@ jobs:
             echo "Could not push PDFs after 3 attempts"
             exit 1
           fi
+
       - name: Prepare site
         run: |
           set -euo pipefail
@@ -225,11 +291,39 @@ jobs:
         with:
           path: public
 
+  # This is the job to mark as required in branch protection. It always runs,
+  # so the required check is never left "pending", and it fails if the filter
+  # or the build failed. A plain skipped job would also count as passing when
+  # `changes` itself broke, which would let a broken PR through.
+  build-pdfs:
+    needs: [changes, build-latex]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Verify results
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          RUN_BUILD: ${{ needs.changes.outputs.run_build }}
+          BUILD_RESULT: ${{ needs.build-latex.result }}
+        run: |
+          echo "changes=$CHANGES_RESULT run_build=$RUN_BUILD build-latex=$BUILD_RESULT"
+          if [ "$CHANGES_RESULT" != "success" ]; then
+            echo "Change detection failed"
+            exit 1
+          fi
+          if [ "$RUN_BUILD" = "true" ]; then
+            [ "$BUILD_RESULT" = "success" ] || { echo "LaTeX build did not succeed"; exit 1; }
+          else
+            echo "No documentation changes; nothing to build."
+          fi
+
   deploy:
-    needs: build
+    needs: build-latex
     # Only the real branch publishes. A pull request, especially one from a
     # fork, has a read-only token and cannot deploy, so without this the
-    # deploy job fails on every pull request.
+    # deploy job fails on every pull request. If the build job was skipped
+    # (no doc changes), this job is skipped too and the live site stays as is.
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
