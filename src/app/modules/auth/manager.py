@@ -1,5 +1,6 @@
 import uuid
 from collections.abc import AsyncIterator
+from typing import Annotated
 
 from fastapi import Depends
 from fastapi_users import BaseUserManager, UUIDIDMixin
@@ -12,8 +13,10 @@ from app.core.config import get_settings
 from app.modules.auth.db import get_user_db
 from app.modules.users.models import User
 
-# Argon2
 password_helper = PasswordHelper(PasswordHash((Argon2Hasher(),)))
+
+# Reusable dependency, same pattern as SessionDep in database.py.
+UserDbDep = Annotated[SQLAlchemyUserDatabase, Depends(get_user_db)]
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
@@ -26,7 +29,5 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         return get_settings().secret_key
 
 
-async def get_user_manager(
-    user_db: SQLAlchemyUserDatabase = Depends(get_user_db),
-) -> AsyncIterator[UserManager]:
+async def get_user_manager(user_db: UserDbDep) -> AsyncIterator[UserManager]:
     yield UserManager(user_db, password_helper)

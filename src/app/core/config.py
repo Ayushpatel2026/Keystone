@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     app_name: str = "Keystone"
     environment: str = "development"
     database_url: str = ""
-    secret_key: str = "" # KEYSTONE_SECRET_KEY in .env
+    secret_key: str = ""  # KEYSTONE_SECRET_KEY in .env
     access_token_lifetime_seconds: int = 3600
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="KEYSTONE_", extra="ignore")

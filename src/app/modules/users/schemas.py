@@ -9,6 +9,7 @@ from app.modules.users.models import (
     UserRole,
 )
 
+
 class UserRead(schemas.BaseUser[uuid.UUID]):
     name: str
     role: UserRole
@@ -21,6 +22,7 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
 class UserCreate(schemas.BaseUserCreate):
     name: str
     # No `role` here on purpose: otherwise anyone could register as an instructor.
+
 
 class UserUpdate(schemas.BaseUserUpdate):
     name: str | None = None

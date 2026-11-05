@@ -77,9 +77,7 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
         _enum_column(SupervisorVerificationStatus, "supervisor_verification_status")
     )
 
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
-    )
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
     )
