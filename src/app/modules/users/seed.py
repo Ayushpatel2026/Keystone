@@ -4,13 +4,17 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.database import build_engine
+from app.modules.auth.manager import password_helper
 from app.modules.users.models import (
-    AccountStatus,
     SupervisorType,
     SupervisorVerificationStatus,
     User,
     UserRole,
 )
+
+# Development-only password shared by all seed users.
+# Never run this seed script against a shared or production database.
+SEED_PASSWORD = "dev-password-123"
 
 # Development users for testing the Keystone API.
 SEED_USERS = [
@@ -18,29 +22,29 @@ SEED_USERS = [
         "name": "Alice Student",
         "email": "alice.student@mcmaster.ca",
         "role": UserRole.STUDENT,
-        "account_status": AccountStatus.ACTIVE,
-        "is_admin": False,
+        "is_active": True,
+        "is_superuser": False,
     },
     {
         "name": "Bob TA",
         "email": "bob.ta@mcmaster.ca",
         "role": UserRole.TA,
-        "account_status": AccountStatus.ACTIVE,
-        "is_admin": False,
+        "is_active": True,
+        "is_superuser": False,
     },
     {
         "name": "Carol Instructor",
         "email": "carol.instructor@mcmaster.ca",
         "role": UserRole.INSTRUCTOR,
-        "account_status": AccountStatus.ACTIVE,
-        "is_admin": True,
+        "is_active": True,
+        "is_superuser": True,
     },
     {
         "name": "David Supervisor",
         "email": "david.supervisor@example.com",
         "role": UserRole.SUPERVISOR,
-        "account_status": AccountStatus.ACTIVE,
-        "is_admin": False,
+        "is_active": True,
+        "is_superuser": False,
         "supervisor_type": SupervisorType.INTERNAL,
         "supervisor_verification_status": SupervisorVerificationStatus.VERIFIED,
     },
@@ -48,8 +52,9 @@ SEED_USERS = [
         "name": "Emily External Supervisor",
         "email": "emily.external@example.com",
         "role": UserRole.SUPERVISOR,
-        "account_status": AccountStatus.PENDING,
-        "is_admin": False,
+        # Previously AccountStatus.PENDING: inactive until verified.
+        "is_active": False,
+        "is_superuser": False,
         "supervisor_type": SupervisorType.EXTERNAL,
         "supervisor_verification_status": SupervisorVerificationStatus.UNVERIFIED,
     },
@@ -66,17 +71,15 @@ async def seed_users() -> None:
         expire_on_commit=False,
     )
 
+    # Hash once with Argon2; each user gets their own salted hash below.
     try:
-        # Open a database session.
         async with session_factory() as session:
-            # Iterate over the predefined development users.
             for user_data in SEED_USERS:
                 # Normalize emails before checking uniqueness.
                 email = str(user_data["email"]).lower()
 
                 # Check whether this user already exists.
-                result = await session.execute(select(User).where(User.email == email))
-
+                result = await session.execute(select(User).filter_by(email=email))
                 existing_user = result.scalar_one_or_none()
 
                 # Skip existing users so running the script repeatedly is safe.
@@ -89,10 +92,11 @@ async def seed_users() -> None:
                     **{
                         **user_data,
                         "email": email,
+                        "hashed_password": password_helper.hash(SEED_PASSWORD),
+                        "is_verified": True,
                     }
                 )
 
-                # Add the user to the current transaction.
                 session.add(user)
 
             # Persist all newly added users.

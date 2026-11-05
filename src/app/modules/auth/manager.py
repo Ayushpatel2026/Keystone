@@ -16,7 +16,7 @@ from app.modules.users.models import User
 password_helper = PasswordHelper(PasswordHash((Argon2Hasher(),)))
 
 # Reusable dependency, same pattern as SessionDep in database.py.
-UserDbDep = Annotated[SQLAlchemyUserDatabase, Depends(get_user_db)]
+UserDbDep = Annotated[SQLAlchemyUserDatabase[User, uuid.UUID], Depends(get_user_db)]
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
