@@ -9,6 +9,9 @@ from app.core.database import build_engine
 from app.modules.health.router import router as health_router
 from app.modules.users.router import router as users_router
 
+from app.modules.auth.backend import auth_backend
+from app.modules.auth.users import fastapi_users
+from app.modules.users.schemas import UserCreate, UserRead, UserUpdate
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -45,6 +48,15 @@ def create_app() -> FastAPI:
     # Register the endpoints from the routers
     app.include_router(users_router)
     app.include_router(health_router)
+    # POST /auth/login, POST /auth/logout
+    app.include_router(
+        fastapi_users.get_auth_router(auth_backend), prefix="/auth", tags=["auth"]
+    )
+    # POST /auth/register
+    app.include_router(
+        fastapi_users.get_register_router(UserRead, UserCreate), prefix="/auth", tags=["auth"]
+    )  
+
 
     return app
 

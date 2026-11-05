@@ -1,37 +1,26 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from fastapi_users import schemas
 
 from app.modules.users.models import (
-    AccountStatus,
     SupervisorType,
     SupervisorVerificationStatus,
     UserRole,
 )
 
-
-class UserResponse(BaseModel):
-    # Allow Pydantic to read values directly from SQLAlchemy ORM objects.
-    model_config = ConfigDict(from_attributes=True)
-
-    # Public user information returned by the API.
-    id: uuid.UUID
+class UserRead(schemas.BaseUser[uuid.UUID]):
     name: str
-    email: str
     role: UserRole
-    account_status: AccountStatus
-    is_admin: bool
-
-    # These fields are null for non-supervisors.
-    supervisor_type: SupervisorType | None
-    supervisor_verification_status: SupervisorVerificationStatus | None = Field(
-        default=None,
-        description="Indicates whether an external supervisor's account has been "
-        "verified by the course instructor. "
-        "'unverified' means project proposal has not been approved.",
-    )
-
-    # Database timestamps.
+    supervisor_type: SupervisorType | None = None
+    supervisor_verification_status: SupervisorVerificationStatus | None = None
     created_at: datetime
     updated_at: datetime
+
+
+class UserCreate(schemas.BaseUserCreate):
+    name: str
+    # No `role` here on purpose: otherwise anyone could register as an instructor.
+
+class UserUpdate(schemas.BaseUserUpdate):
+    name: str | None = None
