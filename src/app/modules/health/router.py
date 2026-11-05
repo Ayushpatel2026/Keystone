@@ -5,7 +5,10 @@ from fastapi import APIRouter, Depends
 from app.core.config import Settings, get_settings
 from app.modules.health.schemas import HealthResponse
 
-router = APIRouter(tags=["health"])
+router = APIRouter(
+    prefix="/api",
+    tags=["health"],
+)
 
 
 @router.get("/health", response_model=HealthResponse)
