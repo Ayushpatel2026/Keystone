@@ -8,10 +8,12 @@ class Settings(BaseSettings):
 
     app_name: str = "Keystone"
     environment: str = "development"
+    database_url: str = ""
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="KEYSTONE_", extra="ignore")
 
 
+# cache the settings so that they are only loaded once per process
 @lru_cache
 def get_settings() -> Settings:
     return Settings()

@@ -9,5 +9,5 @@ from app.main import create_app
 @pytest_asyncio.fixture
 async def client() -> AsyncIterator[AsyncClient]:
     app = create_app()
-    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test/api") as c:
         yield c
