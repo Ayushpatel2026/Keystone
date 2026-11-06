@@ -61,7 +61,8 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
         ),
     )
 
-    name: Mapped[str] = mapped_column(String(200))
+    first_name: Mapped[str] = mapped_column(String(100))
+    last_name: Mapped[str] = mapped_column(String(100))
 
     # Defaults to student so public registration never needs to choose a role.
     role: Mapped[UserRole] = mapped_column(

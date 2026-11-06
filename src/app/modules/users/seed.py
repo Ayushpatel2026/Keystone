@@ -19,28 +19,32 @@ SEED_PASSWORD = "dev-password-123"
 # Development users for testing the Keystone API.
 SEED_USERS = [
     {
-        "name": "Alice Student",
+        "first_name": "Alice",
+        "last_name": "Student",
         "email": "alice.student@mcmaster.ca",
         "role": UserRole.STUDENT,
         "is_active": True,
         "is_superuser": False,
     },
     {
-        "name": "Bob TA",
+        "first_name": "Bob",
+        "last_name": "TA",
         "email": "bob.ta@mcmaster.ca",
         "role": UserRole.TA,
         "is_active": True,
         "is_superuser": False,
     },
     {
-        "name": "Carol Instructor",
+        "first_name": "Carol",
+        "last_name": "Instructor",
         "email": "carol.instructor@mcmaster.ca",
         "role": UserRole.INSTRUCTOR,
         "is_active": True,
         "is_superuser": True,
     },
     {
-        "name": "David Supervisor",
+        "first_name": "David",
+        "last_name": "Supervisor",
         "email": "david.supervisor@example.com",
         "role": UserRole.SUPERVISOR,
         "is_active": True,
@@ -49,7 +53,8 @@ SEED_USERS = [
         "supervisor_verification_status": SupervisorVerificationStatus.VERIFIED,
     },
     {
-        "name": "Emily External Supervisor",
+        "first_name": "Emily",
+        "last_name": "External Supervisor",
         "email": "emily.external@example.com",
         "role": UserRole.SUPERVISOR,
         # Previously AccountStatus.PENDING: inactive until verified.

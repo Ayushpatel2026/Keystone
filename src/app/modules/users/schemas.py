@@ -9,9 +9,9 @@ from app.modules.users.models import (
     UserRole,
 )
 
-
 class UserRead(schemas.BaseUser[uuid.UUID]):
-    name: str
+    first_name: str
+    last_name: str
     role: UserRole
     supervisor_type: SupervisorType | None = None
     supervisor_verification_status: SupervisorVerificationStatus | None = None
@@ -20,9 +20,10 @@ class UserRead(schemas.BaseUser[uuid.UUID]):
 
 
 class UserCreate(schemas.BaseUserCreate):
-    name: str
-    # No `role` here on purpose: otherwise anyone could register as an instructor.
+    first_name: str
+    last_name: str
 
 
 class UserUpdate(schemas.BaseUserUpdate):
-    name: str | None = None
+    first_name: str | None = None
+    last_name: str | None = None
