@@ -9,6 +9,7 @@ from app.modules.users.models import (
     UserRole,
 )
 
+
 class UserRead(schemas.BaseUser[uuid.UUID]):
     first_name: str
     last_name: str

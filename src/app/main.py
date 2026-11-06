@@ -6,12 +6,10 @@ from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.core.config import get_settings
 from app.core.database import build_engine
-from app.modules.auth.backend import auth_backend
-from app.modules.auth.users import fastapi_users
+from app.modules.auth.router import router as auth_router
 from app.modules.health.router import router as health_router
 from app.modules.users.router import router as users_router
-from app.modules.users.schemas import UserCreate, UserRead
-from app.modules.auth.router import router as auth_router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
