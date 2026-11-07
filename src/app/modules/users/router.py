@@ -6,14 +6,14 @@ from app.modules.users.schemas import UserRead
 from app.modules.users.service import get_users
 
 router = APIRouter(
-    prefix="/api",
+    prefix="/api/users",
     tags=["users"],
 )
 
 
 # TODO - this is just a random endpoint to test the full workflow of
 # fast api, sqlalchemy, and postgresql. This will be modified in the future.
-@router.get("/getUsers", response_model=list[UserRead])
+@router.get("", response_model=list[UserRead])
 async def get_users_endpoint(session: SessionDep) -> list[User]:
     users = await get_users(session)
     return users
