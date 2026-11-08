@@ -31,3 +31,12 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
 
 async def get_user_manager(user_db: UserDbDep) -> AsyncIterator[UserManager]:
     yield UserManager(user_db, password_helper)
+
+
+# FastAPI dependency alias that resolves the UserManager instance.
+# Annotated allows FastAPI to interpret the Depends metadata while
+# keeping the type as UserManager for static type checking.
+UserManagerDep = Annotated[
+    UserManager,
+    Depends(get_user_manager),
+]
