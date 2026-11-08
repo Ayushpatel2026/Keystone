@@ -1188,8 +1188,10 @@ Student (Priya)
 \textbf{Postconditions}
 \begin{itemize}
   \item The team has an application with the status ``Applied'' and the project's status is
-    unchanged. Either side may then accept (``Supervisor Accepts'' or ``Team Accepts - Supervisor
-    Pending''), and the team is ``Agreed'' once both have. A slot is reserved when the supervisor
+    unchanged. The supervisor may then accept (``Supervisor Accepts''), after which the team may
+    accept the working arrangement to become ``Agreed''. Team acceptance is unavailable before
+    supervisor acceptance; discussion remains available while the application is ``Applied''.
+    A slot is reserved when the supervisor
     accepts, and the project becomes ``Full'' only when all of its slots are reserved.
 \end{itemize}
 
@@ -1645,7 +1647,7 @@ Instructor (Dr. Reyes), Teaching Assistant
               \item[]\reqitem{reqnum}{FR_DeclineTeam} The system shall allow supervisors to accept or decline requests from student teams to work on their proposed projects, and record when both parties agree to the working arrangement. See Figure~\ref{fig:lifecycle}
               Decline decisions shall be communicated using respectful message templates with an optional reason, and the system shall not publish rankings of students or teams.
               \rationale{This reduces confusion by explicitely recording when both parties have understood each other's terms and have formally agreed to work with each other.}
-              \fitcrit{Both the supervisor and students can record a decision to confirm or deny the terms of the project. An agreement is marked after both parties accept.}
+              \fitcrit{The supervisor can accept or decline an application. Only after supervisor acceptance can the team accept the working arrangement, changing its status from Supervisor Accepts to Agreed. Teams may discuss an application or withdraw before accepting.}
 
               % Explicit requirement to amend an agreement?
 
@@ -1846,12 +1848,16 @@ Instructor (Dr. Reyes), Teaching Assistant
   \begin{itemize}
     \item \textbf{Project status:} Draft, Proposal submitted, Proposal changes requested, Proposal
     rejected, Proposal withdrawn, Open, Full, and Closed.
-    \item \textbf{Team-project status:} Applied, Supervisor Accepts, Team Accepts - Supervisor Pending,
+    \item \textbf{Team-project status:} Applied, Supervisor Accepts,
     Agreed, Team project submitted, Team project under review, Team project changes requested,
     Team project rejected, Approved, Approved (change under review), and Declined or withdrawn.
   \end{itemize}
   A team's approval does not change the project's status. A listed project is Open or Full
   depending only on capacity.
+  Selection follows \emph{Applied} $\rightarrow$ \emph{Supervisor Accepts}
+  $\rightarrow$ \emph{Agreed}. Applying expresses interest and allows discussion;
+  the supervisor's acceptance offers the team a reserved slot. The team then accepts
+  the working terms to establish mutual agreement. It cannot accept before the supervisor.
 
   \begin{figure}[h!]
     \centering
@@ -1861,9 +1867,10 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \textbf{Capacity.} Let $C$ be the supervisor's capacity for the project and $R$ the number of
   slots reserved. A listed project is \emph{Open} while $R<C$ and \emph{Full} when $R=C$. A team's
-  application, and a team's acceptance on its own, do not use a slot. A slot is reserved when the
-  supervisor accepts a team (the state \emph{Supervisor Accepts}, or \emph{Agreed} when the team had
-  already accepted), and $R$ increases by one. A reserved slot is released, only if one was
+  application does not use a slot. A slot is reserved when the
+  supervisor accepts a team (the state \emph{Supervisor Accepts}), and $R$ increases by one.
+  Subsequent team acceptance changes the state to \emph{Agreed} without reserving another slot.
+  A reserved slot is released, only if one was
   reserved, when that team is declined or withdraws, when its team project is rejected, or when it
   dissolves after approval. Releasing a slot, or raising $C$, makes a Full project Open. A project
   becomes \emph{Closed} when the selection period ends, whether it is Open or Full. A Closed project
@@ -2055,9 +2062,9 @@ Instructor (Dr. Reyes), Teaching Assistant
       team & Team & Reference to the team that the project application belongs to. \\ \hline
       project & Project & Reference to the Project that the application is for. \\ \hline
       submission\_date & DateTime & When the application was submitted. \\ \hline
-      status & Enum & Team-project status: APPLIED, SUPERVISOR\_ACCEPTS, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING, AGREED, TEAM\_PROJECT\_SUBMITTED, TEAM\_PROJECT\_UNDER\_REVIEW, TEAM\_PROJECT\_CHANGES\_REQUESTED, TEAM\_PROJECT\_REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
+      status & Enum & Team-project status: APPLIED, SUPERVISOR\_ACCEPTS, AGREED, TEAM\_PROJECT\_SUBMITTED, TEAM\_PROJECT\_UNDER\_REVIEW, TEAM\_PROJECT\_CHANGES\_REQUESTED, TEAM\_PROJECT\_REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
       supervisor\_accepted & Boolean & Whether the supervisor has accepted the team. True means a slot is reserved for the team, until the team is declined, withdraws, is rejected, or dissolves. \\ \hline
-      team\_accepted & Boolean & Whether the team has accepted the supervisor. SUPERVISOR\_ACCEPTS means only the supervisor has accepted, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING means only the team has, and AGREED means both have. \\ \hline
+      team\_accepted & Boolean & Whether the team has accepted the working arrangement after supervisor acceptance. False in APPLIED and SUPERVISOR\_ACCEPTS; true in AGREED. May become true only when supervisor\_accepted is already true. \\ \hline
       thread & Thread & Discussion thread for the application (empty until the first post). \\ \hline
       updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
