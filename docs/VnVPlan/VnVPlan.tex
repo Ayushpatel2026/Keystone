@@ -500,7 +500,7 @@ This section covers the tests for project proposal submission and validation, as
 
 \item \label{T-FR-01}\textbf{T-FR-01: Submit a Complete Supervisor Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
@@ -529,7 +529,7 @@ This section covers the tests for project proposal submission and validation, as
 
 \item \label{T-FR-02}\textbf{T-FR-02: Reject Missing Required Fields}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 					
 \textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
@@ -543,7 +543,7 @@ This section covers the tests for project proposal submission and validation, as
 
 \item \label{T-FR-03}\textbf{T-FR-03: Accept Missing Optional Fields}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 					
 \textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
@@ -557,7 +557,7 @@ This section covers the tests for project proposal submission and validation, as
 
 \item \label{T-FR-04}\textbf{T-FR-04: Publish a Student-Proposed Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A student is authenticated and belongs to a team, and
 the proposal submission period is open.
@@ -592,7 +592,7 @@ This section covers FR\_ReviewProposal, including the approval, rejection, and r
 
 \item \label{T-FR-05}\textbf{T-FR-05: Approve a Supervisor Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated instructor has access to an unapproved proposal titled Autonomous Waste Sorting System submitted by an unverified external supervisor. The proposal status is ``Proposal submitted''.
 
@@ -606,7 +606,7 @@ This section covers FR\_ReviewProposal, including the approval, rejection, and r
 
 \item \label{T-FR-06}\textbf{T-FR-06: Request Changes to a Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An instructor has access to a proposal with the ``Proposal submitted'' status, submitted by an unverified external supervisor.
 
@@ -620,7 +620,7 @@ This section covers FR\_ReviewProposal, including the approval, rejection, and r
 
 \item \label{T-FR-07}\textbf{T-FR-07: Reject a Supervisor Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated instructor has access to a proposal with the ``Proposal submitted'' status, submitted by an unverified external supervisor.
 
@@ -634,7 +634,7 @@ This section covers FR\_ReviewProposal, including the approval, rejection, and r
 
 \item \label{T-FR-08}\textbf{T-FR-08: Revise and Resubmit a Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A supervisor proposal has the status ``Proposal changes requested'' and contains instructor feedback asking for clearer project deliverables.
 
@@ -655,7 +655,7 @@ This section covers \texttt{FR\_ViewApprovedProjects} and \texttt{FR\_ViewProjec
 
 \item \label{T-FR-09}\textbf{T-FR-09: Search and Filter Approved Projects}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated student is enrolled in the course. Three approved projects are visible to the student:
 \begin{itemize}
@@ -674,7 +674,7 @@ This section covers \texttt{FR\_ViewApprovedProjects} and \texttt{FR\_ViewProjec
 
 \item \label{T-FR-10}\textbf{T-FR-10: Exclude Unapproved or Unauthorized Projects}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The system contains three projects:
 \begin{itemize}
@@ -694,7 +694,7 @@ A student enrolled in the course, the course instructor, and External Supervisor
 
 \item \label{T-FR-11}\textbf{T-FR-11: Display Project Availability and Capacity}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated student can access two approved projects:
 \begin{itemize}
@@ -713,7 +713,7 @@ A student enrolled in the course, the course instructor, and External Supervisor
 
 \item \label{T-FR-12}\textbf{T-FR-12: Prevent Applications to Full Projects}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated student belongs to a registered team. An approved project has a maximum capacity of one team and its only supervisor slot is reserved, giving it the ``Full'' status.
 
@@ -735,7 +735,7 @@ This section covers \texttt{FR\_StudentProfile}, \texttt{FR\_StudentTeams}, \tex
 
 \item \label{T-FR-13}\textbf{T-FR-13: Create and View a Student Profile}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A student is authenticated and enrolled in the Software Engineering capstone course. The student has not created a profile.
 
@@ -761,7 +761,7 @@ The student saves the profile.
 
 \item \label{T-FR-14}\textbf{T-FR-14: Update an Existing Student Profile}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated student has an existing profile with the skills ``Python, Java, React'' and project preferences ``AI and automation projects'' (Profile provided in T-FR-13).
 
@@ -775,7 +775,7 @@ The student saves the profile.
 
 \item \label{T-FR-15}\textbf{T-FR-15: Create a Student Team and Assign Roles}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Three authenticated students, Student A, Student B, and Student C, are enrolled in the Software Engineering capstone course and do not belong to any existing teams. The course permits teams of 3 to 5 students.
 
@@ -789,7 +789,7 @@ The student saves the profile.
 
 \item \label{T-FR-16}\textbf{T-FR-16: Send and Accept a Team Invitation}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has 3 members and a maximum permitted size of 5 as defined in T-FR-15. Student D is enrolled in the same course and does not belong to another team.
 
@@ -803,7 +803,7 @@ The student saves the profile.
 
 \item \label{T-FR-17}\textbf{T-FR-17: Decline a Team Invitation}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has 3 members and can recruit additional students. Student E is enrolled in the course, has no team, and has received an invitation to join Team Amazing Engineers.
 
@@ -817,7 +817,7 @@ The student saves the profile.
 
 \item \label{T-FR-18}\textbf{T-FR-18: Find and Join an Existing Team}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has 3 members and a maximum permitted size of 5. The team is configured to recruit 2 additional members. Student F is enrolled in the course, is not on a team, and is eligible to join Team Amazing Engineers. Student A is an existing member of Team Amazing
 Engineers.
@@ -832,7 +832,7 @@ Engineers.
 
 \item \label{T-FR-19}\textbf{T-FR-19: Validate Team Size Constraints}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course requires a minimum of 3 students and a maximum of 5 students per team. Team Amazing Engineers contains 2 students, Team Fantastic Coders contains 3 students, and Team Capstone Legends contains 5 students. Team Amazing Engineers is recruiting additional members. Team Amazing Engineers has reached an agreement with the supervisor of Autonomous Waste Sorting System, and its team-project status is ``Agreed''. In-platform approval is enabled, and all other required submission information is complete.
 
@@ -846,7 +846,7 @@ Engineers.
 
 \item \label{T-FR-20}\textbf{T-FR-20: Reject Disallowed Program Combinations}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The course configuration permits teams consisting entirely of Software Engineering students or a combination of Software Engineering and Mechatronics students. Teams combining Software Engineering and Computer Science students are not permitted. The minimum team size is 3. Team A and Team B each initially contain 2 Software Engineering students.
 
@@ -864,7 +864,7 @@ Engineers.
 
 \item \label{T-FR-21}\textbf{T-FR-21: Prevent Duplicate Team Membership}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A is already a member of Team Amazing Engineers. Team Fantastic Coders is an existing team with an available membership slot. Both teams belong to the same capstone course.
 
@@ -878,7 +878,7 @@ Engineers.
 
 \item \label{T-FR-22}\textbf{T-FR-22: Flag Existing Teams After Rule Changes}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A course permits team sizes from 3 to 5 students. Team Amazing Engineers has 3 members, and Team Fantastic Coders has 5 members. Both teams are valid under the existing rules.
 
@@ -892,7 +892,7 @@ Engineers.
 
 \item \label{T-FR-23}\textbf{T-FR-23: Discover Students and Teams Seeking Members}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Students A and B are enrolled in the same course and have not joined a team. Team Amazing Engineers is recruiting 2 additional members, while Team Fantastic Coders is not recruiting.
 
@@ -906,7 +906,7 @@ Engineers.
 
 \item \label{T-FR-24}\textbf{T-FR-24: Create, Update, and View a Team Profile}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers consists of three registered students. The team has not created a shared team profile.
 
@@ -936,7 +936,7 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \item \label{T-FR-25}\textbf{T-FR-25: Recommend Compatible Projects and Teammates}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A has a complete profile containing Python, machine learning, and computer vision skills, with interests in artificial intelligence and automation. Three available projects and two students seeking teammates exist:
 \begin{itemize}
@@ -957,7 +957,7 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \item \label{T-FR-26}\textbf{T-FR-26: Submit an Application to an Open Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers consists of three registered students, has no existing application to Autonomous Waste Sorting System, and has not accepted another project. Autonomous Waste Sorting System has status ``Open'', maximum capacity $C_{\max}=2$, and $R=0$ reserved slots.
 
@@ -971,7 +971,7 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \item \label{T-FR-27}\textbf{T-FR-27: Reserve Capacity When a Supervisor Accepts a Team}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Autonomous Waste Sorting System has maximum capacity $C_{max}=2$ and $R=1$ reserved slot. Team Fantastic Coders has an application with status ``Applied'' and has not been accepted by the supervisor.
 
@@ -985,7 +985,7 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \item \label{T-FR-28}\textbf{T-FR-28: Establish a Mutual Supervisor-Team Agreement}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has applied to Autonomous Waste Sorting System. The supervisor has already accepted the team, reserving one slot. The team-project status is ``Supervisor Accepts''. The team has not yet accepted the arrangement.
 
@@ -999,7 +999,7 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \item \label{T-FR-29}\textbf{T-FR-29: Decline a Team Application}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Fantastic Coders has submitted an application to an ``Open'' project. The application has status ``Applied'', and the supervisor has not accepted the team or reserved a slot.
 
@@ -1013,7 +1013,7 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \item \label{T-FR-30}\textbf{T-FR-30: Release Reserved Capacity After Withdrawal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Autonomous Waste Sorting System has maximum capacity $C_{max}=2$ and $R=2$ reserved slots, giving it status ``Full''. Team Fantastic Coders occupies one reserved slot because its supervisor previously accepted its application.
 
@@ -1028,7 +1028,7 @@ Configure the project with two reserved slots and Team Fantastic Coders as one o
 
 \item \label{T-FR-31}\textbf{T-FR-31: Prevent Supervisor Acceptance Beyond Capacity}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Project Automated Assembly Line has maximum capacity $C_{max} = 1$ and $R = 1$ reserved slot, giving it status ``Full''. Team Amazing Engineers has a previously submitted application with status ``Applied'', created before the project became full.
 
@@ -1042,7 +1042,7 @@ Configure the project with two reserved slots and Team Fantastic Coders as one o
 
 \item \label{T-FR-32}\textbf{T-FR-32: Release Other Reservations After Team Agreement}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has applications to two approved projects:
 \begin{itemize}
@@ -1061,7 +1061,7 @@ Both supervisors have accepted Team Amazing Engineers. The team has not yet acce
 
 \item \label{T-FR-33}\textbf{T-FR-33: Prevent Duplicate Supervisor Acceptance}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A project has maximum capacity $C_{max} = 2$ and $R = 1$ reserved slot. Team Amazing Engineers's application has status ``Supervisor Accepts'', and the supervisor's acceptance has already been recorded.
 
@@ -1084,7 +1084,7 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \item \label{T-FR-34}\textbf{T-FR-34: Create a Discussion Thread on a Project Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Autonomous Waste Sorting System proposal exists with status ``Proposal submitted''. Supervisor A is its owner and is authenticated.
 
@@ -1098,7 +1098,7 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \item \label{T-FR-35}\textbf{T-FR-35: Reply to a Discussion Thread}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Autonomous Waste Sorting System proposal contains a thread titled ``Project Deliverable Requirements'' asking the question proposed in T-FR-34, created by Supervisor A. Instructor A is assigned to the course and is authorized to review the proposal. The thread currently contains no replies.
 
@@ -1112,7 +1112,7 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \item \label{T-FR-36}\textbf{T-FR-36: Communicate Through Team Formation and Application Threads}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers consists of three students, including Student A and Student B. Team Amazing Engineers has an application to Autonomous Waste Sorting System with status ``Applied''. No threads are associated with the team or application.
 
@@ -1131,7 +1131,7 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \item \label{T-FR-37}\textbf{T-FR-37: Notify Thread Participants of a New Reply}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Supervisor A and Instructor A participate in the ``Project Deliverable Requirements'' thread associated with Autonomous Waste Sorting System. Supervisor A previously asked whether student teams must produce a physical prototype or whether a software simulation is sufficient. Both users have valid email addresses and remain authorized to access the thread.
 
@@ -1145,7 +1145,7 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \item \label{T-FR-38}\textbf{T-FR-38: Notify Teams of Supervisor Application Decisions}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has submitted an application to Autonomous Waste Sorting System with status ``Applied''. The supervisor has not made a decision, and Team Amazing Engineers's members have valid registered email addresses.
 
@@ -1159,7 +1159,7 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \item \label{T-FR-39}\textbf{T-FR-39: Notify Students When a Project Becomes Available}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A is authorized to review proposals for the Software Engineering capstone course. The Autonomous Waste Sorting System proposal has status ``Proposal submitted'' and has not yet been published. Student A is enrolled in the course.
 
@@ -1173,7 +1173,7 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \item \label{T-FR-40}\textbf{T-FR-40: Exclude Confidential Information from Email Notifications}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has an application to Autonomous Waste Sorting System. The project contains the confidentiality statement ``Restricted Prototype Specifications'' and an IP field containing ``Confidential Patent Agreement''. The supervisor and Team Amazing Engineers are authorized to receive notifications about the application.
 
@@ -1192,7 +1192,7 @@ It also does not include sensitive details about the project.
 
 \item \label{T-FR-41}\textbf{T-FR-41: Exclude Unauthorized Users from Notification Recipients}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} External Supervisor A owns Autonomous Waste Sorting System. External Supervisor B owns a different project and has no association with Supervisor A's project. Team Amazing Engineers has an application to Supervisor A's project. Supervisor B is not authorized to view that project or its application.
 
@@ -1207,7 +1207,7 @@ Configure both supervisors and Team Amazing Engineers's application. Using Playw
 
 \item \label{T-FR-42}\textbf{T-FR-42: Re-evaluate Notification Recipients After an Authorization Change}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A and Student B are members of Team Amazing Engineers, which has an application to Autonomous Waste Sorting System. Both students initially have access to the associated discussion thread. Student B is subsequently removed from the team through an authorized membership change before a new notification is generated.
 
@@ -1229,7 +1229,7 @@ This section covers \texttt{FR\_RequestApproval}, \texttt{FR\_ApprovalResponse},
 
 \item \label{T-FR-43}\textbf{T-FR-43: Submit an Agreed Team-Project for Approval}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has in-platform approval enabled. Team Amazing Engineers consists of four eligible students and has reached an agreement with the supervisor of Autonomous Waste Sorting System. Its team-project status is ``Agreed''. The team satisfies the course's minimum and maximum team sizes of 3 and 5 students. All project and team information required by the instructor's configuration for the Software Engineering capstone course has been provided, including any course-specific required fields.
 
@@ -1243,7 +1243,7 @@ This section covers \texttt{FR\_RequestApproval}, \texttt{FR\_ApprovalResponse},
 
 \item \label{T-FR-44}\textbf{T-FR-44: Reject Approval Submissions with Incomplete Information}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has in-platform approval enabled. Team Amazing Engineers consists of four valid members and has an agreed project titled Autonomous Waste Sorting System. All required team-project information is initially complete.
 
@@ -1257,7 +1257,7 @@ This section covers \texttt{FR\_RequestApproval}, \texttt{FR\_ApprovalResponse},
 
 \item \label{T-FR-45}\textbf{T-FR-45: Reject Approval Submissions Violating Course Rules}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course requires teams of 3 to 5 students and permits teams consisting of Software Engineering students. In-platform approval is enabled. Team Amazing Engineers has an agreed project and complete project information.
 
@@ -1283,7 +1283,7 @@ Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy t
 
 \item \label{T-FR-46}\textbf{T-FR-46: Approve a Submitted Team-Project In-Platform}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} In-platform approval is enabled. Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval. The application has status ``Team project under review'', and all project and team information satisfies the applicable course rules. Instructor A is authorized to review the submission.
 
@@ -1297,7 +1297,7 @@ Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy t
 
 \item \label{T-FR-47}\textbf{T-FR-47: Request Modifications to a Team-Project Submission In-Platform}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for instructor approval. The submission has status ``Team project under review''. Its project objectives state ``Develop an automated waste sorting system''. Instructor A is authorized to review the submission.
 
@@ -1311,7 +1311,7 @@ Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy t
 
 \item \label{T-FR-48}\textbf{T-FR-48: Revise and Resubmit a Team-Project After Feedback}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System submission has status ``Team project changes requested''. Instructor A previously requested clarification on the types of waste the proposed system will identify and sort. The submission currently lists ``Develop an automated waste sorting system'' as its project objective.
 
@@ -1325,7 +1325,7 @@ Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy t
 
 \item \label{T-FR-49}\textbf{T-FR-49: Reject a Submitted Team-Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for instructor approval. The team-project has status ``Team project under review''. The project has maximum capacity $C_{max} = 2$ and $R = 2$ reserved slots, one of which is held by Team Amazing Engineers. Instructor A is authorized to review the submission.
 
@@ -1353,7 +1353,7 @@ The project therefore becomes ``Open'' again.
 
 \item \label{T-FR-50}\textbf{T-FR-50: Record an Approval Through an External Approval Process}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course uses an external project approval process without an integration adapter. Team Amazing Engineers has an agreed project titled Autonomous Waste Sorting System, and its approval has been confirmed through the external process. Instructor A and TA A are authorized to record approval decisions for the course.
 
@@ -1367,7 +1367,7 @@ The project therefore becomes ``Open'' again.
 
 \item \label{T-FR-51}\textbf{T-FR-51: Preserve Original Approval During a Proposed Project Change}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved''. The approved project objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. Instructor A is authorized to review changes to approved projects.
 
@@ -1381,7 +1381,7 @@ The project therefore becomes ``Open'' again.
 
 \item \label{T-FR-52}\textbf{T-FR-52: Successfully Synchronize Approval Through an External Adapter}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course uses GitLab as its external approval system, connected to \projname{} through an integration adapter. Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval, with status ``Team project submitted''. The integration adapter is configured to associate this with the corresponding GitLab MR approval record.
 
@@ -1395,7 +1395,7 @@ The project therefore becomes ``Open'' again.
 
 \item \label{T-FR-53}\textbf{T-FR-53: Handle a Failed External Approval Synchronization}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course uses an external approval system connected through an integration adapter. Team Amazing Engineers's Autonomous Waste Sorting System application has status ``Team project under review''. The previous successful synchronization occurred at 2026-10-30 14:00:00. The external approval service is configured to return a connection failure during the next synchronization.
 
@@ -1409,7 +1409,7 @@ The project therefore becomes ``Open'' again.
 
 \item \label{T-FR-54}\textbf{T-FR-54: Accept a Revision to an Approved Team-Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved (change under review)''. The original approved objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. The team has submitted a proposed objective: ``Develop a computer vision system capable of identifying and sorting plastic, metal, and paper waste''. Instructor A is authorized to review the proposed change.
 
@@ -1423,7 +1423,7 @@ The project therefore becomes ``Open'' again.
 
 \item \label{T-FR-55}\textbf{T-FR-55: Reject a Revision to an Approved Team-Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved (change under review)''. The original approved objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. The proposed revision would expand the objective to include paper waste. Instructor A is authorized to review the proposed change.
 
@@ -1445,7 +1445,7 @@ This section covers \texttt{FR\_DisableFeatures}, \texttt{FR\_RejectComponentDis
 
 \item \label{T-FR-56}\textbf{T-FR-56: Configure Course Features}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course. Team formation, project proposals, and in-platform project approvals are enabled. No pending actions exist in these components, and the course configuration permits feature changes.
 
@@ -1469,7 +1469,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-57A}\textbf{T-FR-57A: Configure Required and Optional Project Proposal Fields}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has supervisor project proposals enabled. The course instructor is authenticated and has permission to configure proposal requirements. The proposal template contains fields for title, background, objectives, skills/requirements, project impact, and additional project terms.
 
@@ -1483,7 +1483,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-57B}\textbf{T-FR-57B: Configure Course-Specific Team-Project Approval Requirements}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has in-platform team-project approval enabled. Team Amazing Engineers consists of four eligible students and has reached an agreement with the supervisor of Autonomous Waste Sorting System. Its team-project status is ``Agreed''. The team satisfies the configured team formation rules. The course instructor is authenticated and authorized to configure approval submission requirements.
 
@@ -1497,7 +1497,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-57}\textbf{T-FR-57: Prevent Disabling a Component with Pending Actions}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course, which has in-platform project approvals enabled. Team Amazing Engineers has a submission with status ``Team project under review'', awaiting an instructor decision. No other approval submissions are pending.
 
@@ -1511,7 +1511,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-58}\textbf{T-FR-58: Publish Course Reference Materials}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has no published FAQ titled ``Capstone Project Deliverables''. Instructor A is authorized to publish course resources. Student A is enrolled in the course, and External Supervisor A has an account authorized to read course reference materials.
 
@@ -1525,7 +1525,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-59}\textbf{T-FR-59: Update a Published Course Resource}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course contains a published FAQ titled ``Capstone Project Deliverables''. Its answer states ``Project proposals must include objectives and expected deliverables''. TA A is assigned to the course and is authorized to maintain course resources.
 
@@ -1539,7 +1539,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-60}\textbf{T-FR-60: Display Required Actions and Completion States}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A is enrolled in the Software Engineering capstone course and is a member of Team Amazing Engineers. The course requires the student to complete a profile and submit team-project information for instructor approval. Student A has completed their profile, but the team's approval submission has not yet been made.
 
@@ -1553,7 +1553,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-61}\textbf{T-FR-61: Automatically Update a Completed Checklist Action}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A belongs to Team Amazing Engineers, which has reached an agreement with the supervisor of Autonomous Waste Sorting System. The Software Engineering capstone course has in-platform approval enabled. The required actions checklist shows ``Submit team-project for approval'' as incomplete. All submission information satisfies the course rules.
 
@@ -1567,7 +1567,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-62}\textbf{T-FR-62: Send Email Reminders for Outstanding Actions and Deadlines}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has administrative email reminders enabled. The course has a project approval submission deadline of November 15, 2026. Student A has an incomplete ``Submit team-project for approval'' checklist action. Student B has already completed the same action. The reminder is configured to run on November 12, 2026.
 
@@ -1581,7 +1581,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-63}\textbf{T-FR-63: View and Filter Course-Wide Administrative Information}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course. Its records include:
 \begin{itemize}
@@ -1601,7 +1601,7 @@ Each project has an assigned supervisor, and the associated teams have valid mem
 
 \item \label{T-FR-64}\textbf{T-FR-64: Restrict Instructor and TA Access to Authorized Courses}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course contains Team Amazing Engineers and Team Fantastic Coders. Team Amazing Engineers works on Smart Campus Navigation, while Team Fantastic Coders works on Automated Assembly Line. Both teams have project records, approval statuses, and associated discussion threads. Instructor A and TA A are assigned to the Software Engineering capstone course, with TA A specifically assigned to Team Amazing Engineers. A separate Mechatronics capstone course contains Team Capstone Legends. Instructor A is also authorized to access the Mechatronics course, while TA A is assigned only to the Software Engineering Course.
 
@@ -1615,7 +1615,7 @@ Each project has an assigned supervisor, and the associated teams have valid mem
 
 \item \label{T-FR-65}\textbf{T-FR-65: Generate and Export a Course Administration Report}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course. The course contains the following records:
 \begin{itemize}
@@ -1643,7 +1643,7 @@ This section covers \texttt{FR\_ImportEnrollment}, \texttt{FR\_UpdateEnrollment}
 
 \item \label{T-FR-66}\textbf{T-FR-66: Import and Confirm a Course Enrollment List}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course. The current enrollment contains Students A and B. An Avenue to Learn enrollment list contains Students A, B, C, and D, each with a valid and unique student identifier. No import has been applied yet.
 
@@ -1670,7 +1670,7 @@ Thus, the enrollment count remains 2 before confirmation and becomes 4 after con
 
 \item \label{T-FR-67}\textbf{T-FR-67: Reject Invalid Enrollment Import Entries}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course contains Students A and B. Instructor A is authorized to import enrollment lists. A test enrollment file contains the following identifiers:
 \begin{itemize}
@@ -1691,7 +1691,7 @@ The test configuration recognizes the first two identifiers as valid and the fin
 
 \item \label{T-FR-68}\textbf{T-FR-68: Preserve Students Missing from an Enrollment Import}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course contains Students A, B, C, and D. Students A, B, and C belong to Team Amazing Engineers, while Student D has no team. A new Avenue enrollment list contains Students A, C, and D but omits Student B.
 
@@ -1717,7 +1717,7 @@ Student B must therefore be flagged, but their enrollment and team membership mu
 
 \item \label{T-FR-69}\textbf{T-FR-69: Manually Add a Student to Course Enrollment}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has no Avenue integration configured. Students A, B, and C are enrolled. Student D has recently joined the course but has no enrollment record in Keystone. Instructor A is authorized to maintain course enrollment.
 
@@ -1731,7 +1731,7 @@ Student B must therefore be flagged, but their enrollment and team membership mu
 
 \item \label{T-FR-70}\textbf{T-FR-70: Identify Enrolled Students Without Teams}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has six enrolled students. Students A, B, and C belong to Team Amazing Engineers, Student D belongs to Team Fantastic Coders, and Students E and F are not assigned to any team. Instructor A is authorized to view course administration information.
 
@@ -1752,7 +1752,7 @@ Initially, $N=\{E,F\}$. After Student E joins Team Fantastic Coders, $N=\{F\}$. 
 
 \item \label{T-FR-71}\textbf{T-FR-71: Assign a TA to a Student Team}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers consists of four students and is associated with Autonomous Waste Sorting System. No TA is assigned to the team. Instructor A is authorized to assign TAs, and TA A is associated with the Software Engineering capstone course.
 
@@ -1774,7 +1774,7 @@ This section covers \texttt{FR\_MacSSO}, \texttt{FR\_AuthorizationRBAC}, \texttt
 
 \item \label{T-FR-72}\textbf{T-FR-72: Authenticate Users Through Trusted Identity Providers}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A has an active McMaster account associated with the Software Engineering capstone course. External Supervisor A has an account with the configured trusted external authentication provider. Neither user has an active Keystone session.
 
@@ -1788,7 +1788,7 @@ This section covers \texttt{FR\_MacSSO}, \texttt{FR\_AuthorizationRBAC}, \texttt
 
 \item \label{T-FR-73}\textbf{T-FR-73: Deny Course Access When User Role Is Unknown}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} User A has successfully authenticated through a trusted identity provider, but no valid course role can be determined for the account. The Software Engineering course contains student profiles, team records, and project information.
 
@@ -1810,7 +1810,7 @@ This verifies that successful authentication alone does not authorize access.
 
 \item \label{T-FR-74}\textbf{T-FR-74: Update a User's Course Role and Permissions}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Administrator A (is\_admin set) is authorized to manage user roles for the Software Engineering capstone course. User B is associated with the course and currently has the ``Student'' role. User B cannot access instructor-only course configuration features.
 
@@ -1824,7 +1824,7 @@ This verifies that successful authentication alone does not authorize access.
 
 \item \label{T-FR-75}\textbf{T-FR-75: Require Re-verification Before a Sensitive Action}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Supervisor A has an authenticated Keystone session and owns a proposal titled Autonomous Waste Sorting System with status ``Draft''. The proposal contains valid information and has not been deleted.
 
@@ -1838,7 +1838,7 @@ This verifies that successful authentication alone does not authorize access.
 
 \item \label{T-FR-76}\textbf{T-FR-76: Record and Report an External Provider Error}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Keystone is connected to a trusted external authentication provider. Administrator A is authorized to view external-provider errors.
 
@@ -1852,7 +1852,7 @@ This verifies that successful authentication alone does not authorize access.
 
 \item \label{T-FR-77}\textbf{T-FR-77: Display Record Last-Updated Timestamps}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A has a completed student profile and is authorized to update it. The profile currently lists ``Python and Java'' as its skills. Its last updated timestamp is set to 2026-10-30 14:00:00.
 
@@ -1874,7 +1874,7 @@ The expected timestamp difference is one hour, verifying that the profile displa
 
 \item \label{T-FR-78}\textbf{T-FR-78: Recover a Pending Notification After System Interruption}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval. Instructor A is authorized to receive notifications concerning the submission. The notification service is configured with durable pending-notification storage and a controlled test email service.
 
