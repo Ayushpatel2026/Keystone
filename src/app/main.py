@@ -9,6 +9,7 @@ from app.core.database import build_engine
 from app.modules.auth.router import router as auth_router
 from app.modules.courses.router import router as courses_router
 from app.modules.health.router import router as health_router
+from app.modules.projects.router import router as projects_router
 from app.modules.teams.router import router as teams_router
 from app.modules.users.router import router as users_router
 
@@ -51,6 +52,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_router)
     app.include_router(courses_router)
     app.include_router(teams_router)
+    app.include_router(projects_router)
 
     return app
 
