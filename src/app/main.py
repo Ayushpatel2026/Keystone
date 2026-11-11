@@ -10,7 +10,7 @@ from app.modules.auth.router import router as auth_router
 from app.modules.courses.router import router as courses_router
 from app.modules.health.router import router as health_router
 from app.modules.users.router import router as users_router
-
+from app.modules.teams.router import router as teams_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
@@ -49,6 +49,7 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(auth_router)
     app.include_router(courses_router)
+    app.include_router(teams_router)
 
     return app
 
