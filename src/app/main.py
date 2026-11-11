@@ -9,8 +9,9 @@ from app.core.database import build_engine
 from app.modules.auth.router import router as auth_router
 from app.modules.courses.router import router as courses_router
 from app.modules.health.router import router as health_router
-from app.modules.users.router import router as users_router
 from app.modules.teams.router import router as teams_router
+from app.modules.users.router import router as users_router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
