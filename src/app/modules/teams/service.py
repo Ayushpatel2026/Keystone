@@ -54,9 +54,10 @@ async def _require_students(session: AsyncSession, student_ids: list[uuid.UUID])
 
 async def get_team(session: AsyncSession, team_id: uuid.UUID) -> Team | None:
     # populate_existing makes sure we return fresh data after writes.
-    return await session.scalar(
+    result = await session.execute(
         _team_query().where(Team.id == team_id).execution_options(populate_existing=True)
     )
+    return result.scalar_one_or_none()
 
 
 async def list_teams(session: AsyncSession, course_id: uuid.UUID | None = None) -> list[Team]:
@@ -115,9 +116,7 @@ async def add_member(session: AsyncSession, team_id: uuid.UUID, student_id: uuid
 
 async def remove_member(session: AsyncSession, team_id: uuid.UUID, student_id: uuid.UUID) -> None:
     result = await session.execute(
-        delete(TeamMember).where(
-            TeamMember.team_id == team_id, TeamMember.student_id == student_id
-        )
+        delete(TeamMember).where(TeamMember.team_id == team_id, TeamMember.student_id == student_id)
     )
     if result.rowcount == 0:  # type: ignore[attr-defined]
         await session.rollback()
