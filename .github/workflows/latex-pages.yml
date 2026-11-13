@@ -153,11 +153,12 @@ jobs:
       # forked widely and the job has contents: write.
       # texlive-full is avoided deliberately; it is far larger than needed.
       # pandoc drives the Markdown -> PDF rule in the Makefile.
-      - name: Install TeX Live and pandoc
+      # graphviz renders the .dot diagrams (e.g. the MG uses hierarchy).
+      - name: Install TeX Live, pandoc and Graphviz
         uses: awalsh128/cache-apt-pkgs-action@553a35bb8ebd9fcabcb1c9451aa4c98e1b4ca8a9 # v1.6.3
         with:
-          packages: texlive-latex-extra texlive-science texlive-fonts-extra texlive-fonts-recommended texlive-latex-recommended lmodern pandoc
-          version: 1.1
+          packages: texlive-latex-extra texlive-science texlive-fonts-extra texlive-fonts-recommended texlive-latex-recommended lmodern pandoc graphviz
+          version: 1.2
 
       - name: Verify the TeX toolchain is usable
         run: |
@@ -181,6 +182,8 @@ jobs:
 
           pdflatex --version | head -1
           pandoc --version | head -1
+          dot -V
+          command -v acyclic
           kpsewhich article.cls
           kpsewhich amsmath.sty
           # pandoc's default template pulls in packages the .tex documents

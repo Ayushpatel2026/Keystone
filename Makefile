@@ -31,6 +31,19 @@ define COMPILE_BIBTEX
 	cd $(dir $1) && $(BIBTEX_CMD)
 endef
 
+# Render every Graphviz .dot file next to a document into a PDF figure with the
+# same name, so the document can \includegraphics it. Fails if Graphviz is
+# missing, if a diagram does not render, or if a diagram has a cycle (the uses
+# hierarchy must be acyclic).
+define RENDER_DOT
+	cd $(dir $1) && for f in *.dot; do \
+		[ -e "$$f" ] || continue; \
+		command -v dot >/dev/null || { echo "Error: Graphviz is needed to render $$f"; exit 1; }; \
+		acyclic -n "$$f" || { echo "Error: $$f has a cycle"; exit 1; }; \
+		dot -Tpdf "$$f" -o "$${f%.dot}.pdf" || { echo "Error: dot failed for $$f"; exit 1; }; \
+	done
+endef
+
 # Default target: Compile all .tex files if no specific target is given
 all: $(patsubst %.tex, %.pdf, $(wildcard **/*.tex))
 
@@ -45,6 +58,7 @@ all: $(patsubst %.tex, %.pdf, $(wildcard **/*.tex))
 # Rule for compiling .tex to .pdf
 %.pdf: %.tex
 	@echo "Compiling $< to $@"
+	$(call RENDER_DOT,$<)
 	$(call COMPILE_TEX,$<)
 	$(call COMPILE_BIBTEX,$<)
 	$(call COMPILE_TEX,$<)

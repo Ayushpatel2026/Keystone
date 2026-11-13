@@ -1,0 +1,34 @@
+// Uses hierarchy for the Keystone Module Guide (MG.tex, Section "Use Hierarchy
+// Between Modules").
+//
+// An arrow A -> B means "A uses B": A needs a correct B to do its job.
+// Arrows point down. Graphviz works out the layers on its own.
+//
+// The build renders this file to UsesHierarchy.pdf and fails if the graph has
+// a cycle. Preview locally:  dot -Tpdf UsesHierarchy.dot -o UsesHierarchy.pdf
+
+digraph UsesHierarchy {
+  compound = true;     // lets an arrow start or end at a box (cluster)
+  newrank = true;
+  rankdir = TB;
+  nodesep = 0.25;
+  ranksep = 0.45;
+  node [shape = box, style = "rounded,filled", fontname = "Helvetica", fontsize = 11];
+  edge [arrowsize = 0.6, color = "#555555"];
+
+  // ---------- Modules ----------
+  // List each module once, after the colour for its type.
+
+  // Behaviour-Hiding
+  node [fillcolor = "#dce9f7"];
+
+  // Software Decision
+  node [fillcolor = "#fbe3c9"];
+
+  // Hardware-Hiding
+  node [fillcolor = "#e4e4e4"];
+
+  // ---------- Uses ----------
+  // One line per module, listing the modules it uses:
+  M_A -> { M_B M_C };
+}

@@ -1045,9 +1045,26 @@ arrows in the diagram typically correspond to the presence of import statement.}
 
 \wss{If module A uses module B, the arrow is directed from A to B.}
 
+In Figure~\ref{FigUH}, the dashed box groups the request-handling modules. An
+arrow into the box means \idref{M_ClientServerComm} uses every module in it,
+and an arrow out of the box means every module in it uses the target. Blue
+modules are Behaviour-Hiding, orange modules are Software Decision, and the
+grey module is Hardware-Hiding.
+
+Every Software Decision module is used by at least one Behaviour-Hiding module,
+except \idref{M_HealthCheck}. It is used only through
+\idref{M_ClientServerComm}, by whoever monitors the system, so no
+Behaviour-Hiding module needs it.
+
 \begin{figure}[H]
 \centering
 %\includegraphics[width=0.7\textwidth]{UsesHierarchy.png}
+\IfFileExists{UsesHierarchy.pdf}{%
+  \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{UsesHierarchy.pdf}%
+}{%
+  \fbox{\parbox{0.8\textwidth}{\centering UsesHierarchy.pdf is rendered from
+  UsesHierarchy.dot by the build. Install Graphviz to render it locally.}}%
+}
 \caption{Use hierarchy among modules}
 \label{FigUH}
 \end{figure}
