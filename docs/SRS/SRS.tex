@@ -2757,6 +2757,65 @@ Instructor (Dr. Reyes), Teaching Assistant
       \textit{Affected Entities:} Course, Student.
       \textit{Related Requirements:} \rref{FR_ImportEnrollment}, \rref{FR_UpdateEnrollment},
       \rref{FR_EnrollmentDiscrepency}.
+
+      \item[]\reqitem{lcnum}{LC_SignIn}
+      \textbf{Sign-In and Re-Verification.}
+      How users sign in, and which actions require a user to re-verify their identity, may change as
+      security requirements change. This could be due to incidents, legal changes, or other external factors.
+      \textit{Affected Entity:} User.
+      \textit{Related Requirements:} \rref{FR_MacSSO}, \rref{FR_ReverifyUsers}.
+
+      \item[]\reqitem{lcnum}{LC_CourseFeatures}
+      \textbf{Course Features and Settings.}
+      The set of features an instructor can turn off, and the settings a course can configure, may change as features
+      are added and as more courses (such as CS) adopt the platform with different needs.
+      \textit{Affected Entity:} Course.
+      \textit{Related Requirements:} \rref{FR_DisableFeatures}, \rref{FR_RejectComponentDisable}.
+
+      \item[]\reqitem{lcnum}{LC_ProjectSearch}
+      \textbf{Project Search and Filters.}
+      The criteria students can use to search, filter, and sort the project list may change, for example adding a
+      filter on industry or required skills after usability testing.
+      \textit{Affected Entity:} Project.
+      \textit{Related Requirement:} \rref{FR_ViewApprovedProjects}.
+
+      \item[]\reqitem{lcnum}{LC_ProfileFields}
+      \textbf{Profile Fields.}
+      The information collected in student and team profiles may change. Fields may be added if matching uses more
+      criteria (\lcref{LC_Recommendations}), or removed if they are not essential (\nfrref{NFR_EssentialPersonal}).
+      \textit{Affected Entities:} Student Profile, Team Profile.
+      \textit{Related Requirements:} \rref{FR_StudentProfile}, \rref{FR_TeamProfile}.
+
+      \item[]\reqitem{lcnum}{LC_NotificationRules}
+      \textbf{Notification Rules.}
+      Which events cause a notification, who receives it, and how it is delivered may change. Stakeholders want to be
+      notified through channels they already use (\srref{SR_PushNotify}), and may later ask for notification preferences
+      or other channels.
+      \textit{Affected Entity:} Notification.
+      \textit{Related Requirements:} \rref{FR_ThreadsNotify}, \rref{FR_ActionRequiredEmail},
+      \rref{FR_DurableNotifications}.
+
+      \item[]\reqitem{lcnum}{LC_ThreadTargets}
+      \textbf{Discussion Thread Targets.}
+      Which records discussion threads can be attached to, and how many threads each may have, may change. For example,
+      instructors may need course-wide threads to communicate with all supervisors and students in a course.
+      \textit{Affected Entities:} Thread, Project, Project Application, Team, Course.
+      \textit{Related Requirement:} \rref{FR_ProjectThreads}.
+
+      \item[]\reqitem{lcnum}{LC_RequiredActions}
+      \textbf{Required Actions.}
+      Which actions appear on a user's list of required actions (\srref{SR_Checklist}) may change as
+      features are added which contain actions deemed as required.
+      \textit{Affected Entity:} Checklist.
+      \textit{Related Requirements:} \rref{FR_RequiredActionsList}, \rref{FR_ActionRequiredEmail}.
+
+      \item[]\reqitem{lcnum}{LC_CourseReports}
+      \textbf{Course Reports.}
+      The contents of course reports, and the format they are exported in, may change. Each course tracks approval
+      differently (TRON assigns group numbers), so instructors may need different information, or a format their own
+      tools can read.
+      \textit{Affected Entity:} Course.
+      \textit{Related Requirements:} \rref{FR_ReadCourseInformation}, \rref{FR_ExportCourseInformation}.
 \end{itemize}
 
   \plt{Give the unlikely changes.  The design can assume that the changes listed will not occur.}
