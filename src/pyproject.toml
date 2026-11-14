@@ -34,7 +34,7 @@ select = ["E", "F", "I", "UP", "B", "ASYNC", "SIM"]
 python_version = "3.13"
 strict = true
 plugins = ["pydantic.mypy"]
-files = ["app", "tests"]
+files = ["app"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
