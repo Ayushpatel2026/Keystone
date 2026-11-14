@@ -2,7 +2,14 @@ import uuid
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, field_validator
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    StringConstraints,
+    computed_field,
+    field_validator,
+)
 
 from app.modules.projects.models import ProjectStatus
 
@@ -23,6 +30,8 @@ class ProjectCreate(BaseModel):
 
 
 class ProjectRead(BaseModel):
+    # from_attributes lets pydantic read fields off an ORM object (project.title)
+    # instead of requiring a dict.
     model_config = ConfigDict(from_attributes=True)
 
     id: uuid.UUID
@@ -32,6 +41,15 @@ class ProjectRead(BaseModel):
     course_id: uuid.UUID
     supervisor_capacity: int
     status: ProjectStatus
+    slots_reserved: int
+
+    # Derived in the response only, never stored, so it can't drift from slots_reserved.
+    # The client can render "1 of 2 slots free" without doing the arithmetic.
+    @computed_field  # type: ignore[prop-decorator]  # mypy's known false positive for this pattern
+    @property
+    def slots_available(self) -> int:
+        return self.supervisor_capacity - self.slots_reserved
+
     created_at: datetime
     updated_at: datetime
 

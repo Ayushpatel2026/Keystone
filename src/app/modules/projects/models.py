@@ -23,6 +23,14 @@ class Project(Base):
 
     __table_args__ = (
         CheckConstraint("supervisor_capacity > 0", name="positive_supervisor_capacity"),
+        # Last line of defence for the slot counter: Postgres rejects any UPDATE that would
+        # leave it negative or above capacity, even if application code has a bug.
+        # The metadata's naming convention turns this name into
+        # ck_projects_slots_reserved_within_capacity.
+        CheckConstraint(
+            "slots_reserved >= 0 AND slots_reserved <= supervisor_capacity",
+            name="slots_reserved_within_capacity",
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(primary_key=True, default=uuid.uuid4)
@@ -35,8 +43,12 @@ class Project(Base):
 
     supervisor_capacity: Mapped[int] = mapped_column()
 
-    # Application services must update availability in the same transaction as
-    # reservations. No independent reservation counter is introduced here.
+    # Number of slots reserved by supervisor-accepted teams (the R in the lifecycle diagram).
+    # Invariants: 0 <= slots_reserved <= supervisor_capacity, and it equals the number of this
+    # project's applications whose status holds a slot.
+    # default=0 covers Python-side inserts; server_default="0" covers raw SQL and the migration.
+    slots_reserved: Mapped[int] = mapped_column(default=0, server_default="0")
+
     status: Mapped[ProjectStatus] = mapped_column(
         Enum(
             ProjectStatus,
