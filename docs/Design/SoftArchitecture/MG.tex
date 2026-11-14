@@ -259,7 +259,8 @@ The anticipated changes below are a superset of the likely changes in the SRS
 
   \item[]\reqitem{acnum}{AC_NotificationRules}
   \textbf{Notification Rules.}
-  Which events cause a notification, and who receives it, may change.
+  Which events cause a notification, who receives it, and how it is delivered
+  may change.
   \textit{SRS Likely Change:} \srsref{LC_NotificationRules}.
   \textit{Module:} \idref{M_Notifications}.
 
@@ -281,11 +282,6 @@ The anticipated changes below are a superset of the likely changes in the SRS
   The technology used to store \projname{}'s records, and how the records are
   laid out in it, may change.
   \textit{Module:} \idref{M_Persistence}.
-
-  \item[]\reqitem{acnum}{AC_EmailService}
-  \textbf{Email Service.}
-  The service used to deliver email may change.
-  \textit{Module:} \idref{M_EmailDelivery}.
 
   \item[]\reqitem{acnum}{AC_Audit}
   \textbf{Audit Records.}
@@ -379,7 +375,6 @@ actually be implemented.
 \item [\idref{M_Checklist}:] Checklist Module
 \item [\idref{M_CourseReport}:] Course Report Module
 \item [\idref{M_Persistence}:] Persistence Module
-\item [\idref{M_EmailDelivery}:] Email Delivery Module
 \item [\idref{M_AuditLog}:] Audit Log Module
 \end{description}
 
@@ -409,8 +404,7 @@ actually be implemented.
  & \idref{M_CourseReport}\\
 \midrule
 
-\multirow{3}{0.3\textwidth}{Software Decision Module} & \idref{M_Persistence}\\
- & \idref{M_EmailDelivery}\\
+\multirow{2}{0.3\textwidth}{Software Decision Module} & \idref{M_Persistence}\\
  & \idref{M_AuditLog}\\
 \bottomrule
 
@@ -456,7 +450,8 @@ The design decisions made to satisfy the requirements are:
   outside system is reached only through the one module that needs it: identity
   providers through \idref{M_Authentication}, the external approval system
   through \idref{M_ApprovalWorkflow}, the enrollment source through
-  \idref{M_Enrollment}, and the email service through \idref{M_EmailDelivery}.
+  \idref{M_Enrollment}, and any service used to deliver notifications through
+  \idref{M_Notifications}.
   Replacing an outside system therefore changes one module
   (\srsref{FR_MacSSO}, \srsref{FR_ExternalApproval},
   \srsref{FR_ImportEnrollment}).
@@ -625,7 +620,7 @@ to be implemented.
 
 \begin{description}
 \item[Secrets:] How users are notified of events.
-\item[Services:] Decides who to notify about each event, writes the message, and keeps it until delivery is confirmed. Runs timed work, such as deadline reminders and retries of undelivered notifications.
+\item[Services:] Decides who to notify about each event, writes the message, delivers it through an external service, and keeps it until delivery is confirmed. Runs timed work, such as deadline reminders and retries of undelivered notifications.
 \item[Implemented By:] \projname{}
 \item[Type of Module:] Abstract Object
 \end{description}
@@ -671,15 +666,6 @@ to be implemented.
 \item[Type of Module:] Abstract Object
 \end{description}
 
-\subsubsection[Email Delivery Module]{Email Delivery Module (\protect\descriptiveid{M_EmailDelivery})}\label{M_EmailDelivery}
-
-\begin{description}
-\item[Secrets:] How email is sent.
-\item[Services:] Sends an email and reports whether it was delivered.
-\item[Implemented By:] \projname{}
-\item[Type of Module:] Abstract Object
-\end{description}
-
 \subsubsection[Audit Log Module]{Audit Log Module (\protect\descriptiveid{M_AuditLog})}\label{M_AuditLog}
 
 \begin{description}
@@ -717,7 +703,7 @@ changes.
   \srsref{FR_ProjectInterest} & \idref{M_Projects} \\ \hline
   \srsref{FR_DeclineTeam} & \idref{M_Projects} \\ \hline
   \srsref{FR_ProjectThreads} & \idref{M_Threads} \\ \hline
-  \srsref{FR_ThreadsNotify} & \idref{M_Notifications}, \idref{M_EmailDelivery} \\ \hline
+  \srsref{FR_ThreadsNotify} & \idref{M_Notifications} \\ \hline
   \srsref{FR_RequestApproval} & \idref{M_ApprovalWorkflow} \\ \hline
   \srsref{FR_ApprovalResponse} & \idref{M_ApprovalWorkflow} \\ \hline
   \srsref{FR_ExternalApproval} & \idref{M_ApprovalWorkflow} \\ \hline
@@ -726,7 +712,7 @@ changes.
   \srsref{FR_DisableFeatures} & \idref{M_CourseManagement} \\ \hline
   \srsref{FR_ReferenceMaterial} & \idref{M_CourseManagement} \\ \hline
   \srsref{FR_RequiredActionsList} & \idref{M_Checklist} \\ \hline
-  \srsref{FR_ActionRequiredEmail} & \idref{M_Notifications}, \idref{M_Checklist}, \idref{M_EmailDelivery} \\ \hline
+  \srsref{FR_ActionRequiredEmail} & \idref{M_Notifications}, \idref{M_Checklist} \\ \hline
   \srsref{FR_ReadCourseInformation} & \idref{M_CourseReport} \\ \hline
   \srsref{FR_ExportCourseInformation} & \idref{M_CourseReport} \\ \hline
   \srsref{FR_MacSSO} & \idref{M_Authentication} \\ \hline
@@ -806,7 +792,6 @@ changes.
   \idref{AC_RequiredActions} & \idref{M_Checklist} \\ \hline
   \idref{AC_Report} & \idref{M_CourseReport} \\ \hline
   \idref{AC_Persistence} & \idref{M_Persistence} \\ \hline
-  \idref{AC_EmailService} & \idref{M_EmailDelivery} \\ \hline
   \idref{AC_Audit} & \idref{M_AuditLog} \\ \hline
 
   \bottomrule
