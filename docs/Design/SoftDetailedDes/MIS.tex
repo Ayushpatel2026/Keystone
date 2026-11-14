@@ -36,6 +36,8 @@ urlcolor=cyan          % color of external links
 \input{../../Comments.text}
 \input{../../Common.text}
 
+\newcommand{\moduleid}[1]{\texttt{\detokenize{#1}}}
+
 \begin{document}
 
 \title{Module Interface Specification for \projname{}}
@@ -84,45 +86,45 @@ and Module Guide.  The full documentation and implementation can be
 found at \url{...}.  \wss{provide the url for your repo}
 
 \section{Notation}
+\label{SecNotation}
 
-\wss{You should describe your notation.  You can use what is below as
-  a starting point.}
+The module specifications follow \citet{HoffmanAndStrooper1995}, with template
+module conventions adapted from \citet{GhezziEtAl2003}. Each access program
+specifies its inputs, output, state transition, and exception conditions.
 
-The structure of the MIS for modules comes from \citet{HoffmanAndStrooper1995},
-with the addition that template modules have been adapted from
-\cite{GhezziEtAl2003}.  The mathematical notation comes from Chapter 3 of
-\citet{HoffmanAndStrooper1995}.  For instance, the symbol := is used for a
-multiple assignment statement and conditional rules follow the form $(c_1
-\Rightarrow r_1 | c_2 \Rightarrow r_2 | ... | c_n \Rightarrow r_n )$.
-
-The following table summarizes the primitive data types used by \projname.
-
-\begin{center}
-\renewcommand{\arraystretch}{1.2}
-\noindent 
-\begin{tabular}{l l p{7.5cm}} 
-\toprule 
-\textbf{Data Type} & \textbf{Notation} & \textbf{Description}\\ 
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{l X}
+\toprule
+\textbf{Notation} & \textbf{Meaning} \\
 \midrule
-character & char & a single symbol or digit\\
-integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
-natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
-real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
+$\mathbb{B}$ & Boolean values $\{\text{true},\text{false}\}$. \\
+String & Finite sequence of characters where $\epsilon$ is the empty string. \\
+$\emptyset$ & Empty set or map, according to its declared type. \\
+None & Absence of a value where $T\cup\{\text{None}\}$ denotes an optional value. \\
+$x$, $x'$ & Values of state variable $x$ before and after a routine. \\
+$\in$, $\notin$ & Membership and non-membership in a set. \\
+$\ne$ & Not equal. \\
+$\land$, $\neg$ & Logical and, and logical negation (not). \\
+$P\Rightarrow Q$ & If condition $P$ holds, then property or transition $Q$ holds. \\
+$out$, $exc$ & Routine return value and raised exception, respectively. \\
+$\mathcal{V}$, $\mathcal{F}$ & Sets of registered UI view and form names. \\
+-- & No input, program return value, or exported exception, according to column. \\
 \bottomrule
-\end{tabular} 
-\end{center}
+\end{tabularx}
+\caption{Notation used in the module specifications}
+\label{TblNotation}
+\end{table}
 
-\noindent
-The specification of \projname \ uses some derived data types: sequences, strings, and
-tuples. Sequences are lists filled with elements of the same data type. Strings
-are sequences of characters. Tuples contain a list of values, potentially of
-different types. In addition, \projname \ uses functions, which
-are defined by the data types of their inputs and outputs. Local functions are
-described by giving their type signature followed by their specification.
+A transition describes the post-state of a successful call. State variables not mentioned remain unchanged. Unless stated otherwise, an exported exception leaves module state unchanged and produces no normal output. Output denotes a program return value, effects on the screen and other external resources are stated separately.
+
+\newpage
 
 \section{Module Decomposition}
 
-The following table is taken directly from the Module Guide document for this project.
+Table~\ref{TblMH} follows the module hierarchy in the Module Guide~\citep{MG},
+with each module's full name and identifier shown.
 
 \begin{table}[h!]
 \centering
@@ -131,21 +133,26 @@ The following table is taken directly from the Module Guide document for this pr
 \textbf{Level 1} & \textbf{Level 2}\\
 \midrule
 
-{Hardware-Hiding} & ~ \\
+{Hardware-Hiding Module} & Hardware-Hiding Module (\moduleid{M_HardwareHiding}) \\
 \midrule
 
-\multirow{7}{0.3\textwidth}{Behaviour-Hiding} & Input Parameters\\
-& Output Format\\
-& Output Verification\\
-& Temperature ODEs\\
-& Energy Equations\\ 
-& Control Module\\
-& Specification Parameters Module\\
+\multirow{13}{0.3\textwidth}{Behaviour-Hiding Module} & User Interface Module (\moduleid{M_UserInterface})\\
+ & Authentication Module (\moduleid{M_Authentication})\\
+ & Authorization Module (\moduleid{M_Authorization})\\
+ & Course Management Module (\moduleid{M_CourseManagement})\\
+ & Enrollment Module (\moduleid{M_Enrollment})\\
+ & Projects Module (\moduleid{M_Projects})\\
+ & Students and Teams Module (\moduleid{M_StudentsTeams})\\
+ & Recommendation Module (\moduleid{M_Recommendation})\\
+ & Approval Workflow Module (\moduleid{M_ApprovalWorkflow})\\
+ & Threads Module (\moduleid{M_Threads})\\
+ & Notifications Module (\moduleid{M_Notifications})\\
+ & Checklist Module (\moduleid{M_Checklist})\\
+ & Course Report Module (\moduleid{M_CourseReport})\\
 \midrule
 
-\multirow{3}{0.3\textwidth}{Software Decision} & {Sequence Data Structure}\\
-& ODE Solver\\
-& Plotting\\
+\multirow{2}{0.3\textwidth}{Software Decision Module} & Persistence Module (\moduleid{M_Persistence})\\
+ & Audit Log Module (\moduleid{M_AuditLog})\\
 \bottomrule
 
 \end{tabular}
@@ -154,10 +161,130 @@ The following table is taken directly from the Module Guide document for this pr
 \end{table}
 
 \newpage
-~\newpage
 
-\section{MIS of \wss{Module Name}} \label{Module} \wss{Use labels for
-  cross-referencing}
+
+\section{Data Types}
+\label{SecDataTypes}
+
+The following data types are shared across the Keystone modules.
+
+\subsection{Generics}
+
+\subsubsection{bool}
+Boolean value in $\{\text{true}, \text{false}\}$.
+
+\subsubsection{int}
+Integer value ($\mathbb{Z}$).
+
+\subsubsection{float}
+Real-valued number ($\mathbb{R}$).
+
+\subsubsection{string}
+Finite sequence of characters.
+
+\subsubsection{Value}
+A supported form value, such as a string, integer, float, or Boolean.
+
+\subsection{Enums}
+
+\subsubsection{UserRole}
+\begin{enumerate}
+    \item Student: A student participating in a capstone course.
+    \item Supervisor: A user proposing or supervising projects.
+    \item Instructor: A user responsible for managing a capstone course.
+    \item TA: A teaching assistant supporting course management.
+\end{enumerate}
+
+\subsubsection{ProjectStatus}
+\begin{enumerate}
+    \item Draft: Project proposal has not been submitted.
+    \item ProposalSubmitted: Proposal is awaiting review.
+    \item ProposalChangesRequested: Modifications are required.
+    \item ProposalRejected: Project proposal was rejected.
+    \item ProposalWithdrawn: Project proposal was withdrawn.
+    \item Open: Listed project has available capacity.
+    \item Full: Listed project has no remaining capacity.
+    \item Closed: Project selection period has ended.
+\end{enumerate}
+
+\subsubsection{TeamProjectStatus}
+\begin{enumerate}
+    \item Applied: Team has applied to a project.
+    \item SupervisorAccepts: Supervisor has accepted the team.
+    \item Agreed: Team has accepted the working arrangement.
+    \item TeamProjectSubmitted: Team project was submitted for approval.
+    \item TeamProjectUnderReview: Submission is under review.
+    \item TeamProjectChangesRequested: Modifications are required.
+    \item TeamProjectRejected: Team project was rejected.
+    \item Approved: Team project has been approved.
+    \item ApprovedChangeUnderReview: Changes to an approved
+    project are under review.
+    \item DeclinedOrWithdrawn: Application was declined or withdrawn.
+\end{enumerate}
+
+\subsubsection{ApprovalMode}
+\begin{enumerate}
+    \item InPlatform: Approval is performed within Keystone.
+    \item External: Approval occurs externally and is recorded manually.
+    \item Integrated: Approval is synchronized through an external adapter.
+\end{enumerate}
+
+\subsection{Data Structures}
+
+\subsubsection{Dictionary}
+For types $K$ and $V$, a finite mapping from keys of type $K$ to values of type $V$, written $\operatorname{Map}\langle K,V\rangle$.
+
+\subsubsection{List}
+For any type $T$, an ordered collection of elements of type $T$.
+
+\subsubsection{FieldValues}
+\[
+\text{FieldValues} = \operatorname{Map}\langle\text{string},\text{Value}\rangle
+\]
+Maps form field names to entered values.
+
+\subsubsection{FieldErrors}
+\[
+\text{FieldErrors} = \operatorname{Map}\langle\text{string},\text{string}\rangle
+\]
+Maps form field names to error messages.
+
+\subsubsection{ViewData}
+The record or collection supplied by the owning module to populate a view, with fields and types defined in that module's specification.
+
+\subsubsection{User}
+A record representing a Keystone user, including their identity and assigned roles.
+
+\subsubsection{Course}
+A record containing capstone course information, configuration settings, and enrollment information.
+
+\subsubsection{StudentProfile}
+A record containing a student's background, skills, interests, experience, and project preferences.
+
+\subsubsection{Team}
+A record representing a group of students participating in the capstone project selection process.
+
+\subsubsection{TeamProfile}
+A record containing a team's collective skills, interests, goals, and work style.
+
+\subsubsection{Project}
+A record containing project information, supervisor capacity, course association, and ProjectStatus.
+
+\subsubsection{ProjectApplication}
+A record representing a team's application to a project, including the associated TeamProjectStatus.
+
+\subsubsection{Notification}
+A record containing information about an event or action communicated to a user.
+
+\subsubsection{ChecklistItem}
+A record describing a required user action and its completion status.
+
+\subsubsection{Thread}
+A record representing a discussion associated with a project proposal or team.
+
+
+\section[MIS of Hardware-Hiding Module]{MIS of Hardware-Hiding Module (\moduleid{M_HardwareHiding})}
+\label{M_HardwareHiding}
 
 \wss{You can reference SRS labels, such as R\ref{R_Inputs}.}
 
@@ -166,25 +293,25 @@ The following table is taken directly from the Module Guide document for this pr
 \subsection{Module}
 
 \wss{Short name for the module}
+This module provides the platform services used by the system and virtual hardward used by the system, including input/output, file storage, and network connections including HTTPS. This module is provided by the OS, browser, and runtime libraries.
+
+Note: Unlike many other modules listed, this module is entirely externally provided. This will not be explicitely implemented.
 
 \subsection{Uses}
-
+\begin{itemize}
+  \item \textbf{Server Operating System:} File system access, networking, and process execution. 
+  \item \textbf{Python runtime and standard libraries:} Access to OS services for the backend. 
+  \item \textbf{Browser:} Access to OS services for the backend. 
+\end{itemize}
+No Keystone modules.
 
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
+None
 
 \subsubsection{Exported Access Programs}
-
-\begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
-\hline
-\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
-\hline
-\wss{accessProg} & - & - & - \\
-\hline
-\end{tabular}
-\end{center}
+None. Provided by the OS, browser, and runtime libraries.
 
 \subsection{Semantics}
 
@@ -192,33 +319,34 @@ The following table is taken directly from the Module Guide document for this pr
 
 \wss{Not all modules will have state variables.  State variables give the module
   a memory.}
+Platform state managed by the OS, browser, and runtime libraries.
 
 \subsubsection{Environment Variables}
 
 \wss{This section is not necessary for all modules.  Its purpose is to capture
   when the module has external interaction with the environment, such as for a
   device driver, screen interface, keyboard, file, etc.}
+File system, network connections, user input devices, and browser display.
 
 \subsubsection{Assumptions}
 
 \wss{Try to minimize assumptions and anticipate programmer errors via
   exceptions, but for practical purposes assumptions are sometimes appropriate.}
 
-\subsubsection{Access Routine Semantics}
-
-\noindent \wss{accessProg}():
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+  \item A supported OS, Python runtime, and browser are available.
+  \item Required filesystem and network permissions are configured.
+  \item HTTPS is configured for the deployed browser-server communication system. 
 \end{itemize}
 
+\subsubsection{Access Routine Semantics}
 \wss{A module without environment variables or state variables is unlikely to
   have a state transition.  In this case a state transition can only occur if
   the module is changing the state of another module.}
 
 \wss{Modules rarely have both a transition and an output.  In most cases you
   will have one or the other.}
+None
 
 \subsubsection{Local Functions}
 
@@ -226,6 +354,185 @@ The following table is taken directly from the Module Guide document for this pr
   They are not necessarily something that is going to be implemented
   explicitly.  Even if they are implemented, they are not exported; they only
   have local scope.}
+None
+
+\newpage
+
+\section[MIS of User Interface Module]{MIS of User Interface Module (\moduleid{M_UserInterface})}
+\label{M_UserInterface}
+
+\subsection{Module}
+
+This module manages Keystone's user interface and views, displaying pages and forms, collecting user input, and presenting results and error messages. It handles presentation but delegates business logic and authorization to the appropriate modules.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_HardwareHiding
+    \item M\_Authentication
+    \item M\_Authorization
+    \item M\_CourseManagement
+    \item M\_Enrollment
+    \item M\_Projects
+    \item M\_StudentsTeams
+    \item M\_Recommendation
+    \item M\_ApprovalWorkflow
+    \item M\_Threads
+    \item M\_Notifications
+    \item M\_Checklist
+    \item M\_CourseReport
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+These proposed interfaces handle presentation and input only. Business operations remain in their owning modules.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.25\textwidth}
+                  >{\raggedright\arraybackslash}p{0.32\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{displayView} & viewName: String, data: ViewData & -- & UnknownView \\
+\texttt{displayForm} & formName: String, initialValues: FieldValues & -- & UnknownForm \\
+\texttt{readForm} & -- & FieldValues & NoActiveForm \\
+\texttt{displayFieldErrors} & errors: FieldErrors & -- & -- \\
+\texttt{showMessage} & text: String & -- & -- \\
+\texttt{setLoading} & waiting: $\mathbb{B}$ & -- & -- \\
+\bottomrule
+\caption{Exported access programs of the User Interface module}
+\label{TblUIAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+\begin{itemize}
+  \item $\mathit{currentView}:\text{String}$ - current view which is initially SignIn.
+  \item $\mathit{displayedData}:\text{ViewData}$ - values supplied for the view and initially empty.
+  \item $\mathit{currentForm}:\text{String}\cup\{\text{None}\}$ - active form which is initially None.
+  \item $\mathit{formValues}:\text{FieldValues}$ - map of field names to entered values and the set is initially $\emptyset$.
+  \item $\mathit{fieldErrors}:\text{FieldErrors}$ - map of field names to error messages and the set is initially $\emptyset$.
+  \item $\mathit{message}:\text{String}$ - feedback which initially $\epsilon$.
+  \item $\mathit{loading}:\mathbb{B}$ - waiting indicator and initially false.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+Browser display, keyboard, mouse or touch input, file-selection controls, and browser network facilities. The environment variables are external resources instead of application configuration variables.
+
+\subsubsection{Assumptions}
+\begin{itemize}
+  \item A supported browser is available.
+  \item Views cover the tasks assigned to the UI by the MG. The caller supplies data matching the selected view/form schema and the owning module's types.
+  \item Server modules authorize displayed data and independently validate submitted inputs and enforce business rules.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+Equations follow Section~\ref{SecNotation}. Successful transitions are rendered in the browser. All routines have no program output or exception unless stated.
+
+\paragraph{\texttt{displayView(viewName, data)}}
+\begin{itemize}
+  \item transition:
+  \[
+  viewName\in\mathcal{V}\Rightarrow
+  \left\{
+  \begin{aligned}
+    \mathit{currentView}' &= viewName, & \mathit{displayedData}' &= data,\\
+    \mathit{currentForm}' &= \text{None}, & \mathit{formValues}' &= \emptyset,\\
+    \mathit{fieldErrors}' &= \emptyset, & \mathit{message}' &= \epsilon,\\
+    \mathit{loading}' &= \text{false}. &&
+  \end{aligned}
+  \right.
+  \]
+  \item output: None.
+  \item exception:
+  $viewName\notin\mathcal{V}\Rightarrow exc=\text{UnknownView}$.
+\end{itemize}
+
+\paragraph{\texttt{displayForm(formName, initialValues)}}
+\begin{itemize}
+  \item transition:
+  \[
+  formName\in\mathcal{F}\Rightarrow
+  \left\{
+  \begin{aligned}
+    \mathit{currentForm}' &= formName, & \mathit{formValues}' &= initialValues,\\
+    \mathit{fieldErrors}' &= \emptyset, & \mathit{message}' &= \epsilon.
+  \end{aligned}
+  \right.
+  \]
+  Render the form and mark required fields without submitting values.
+  \item output: None.
+  \item exception:
+  $formName\notin\mathcal{F}\Rightarrow exc=\text{UnknownForm}$.
+\end{itemize}
+
+\paragraph{\texttt{readForm()}}
+\begin{itemize}
+  \item transition: None since values are neither cleared nor submitted.
+  \item output:
+  $\mathit{currentForm}\ne\text{None}\Rightarrow out=\mathit{formValues}$.
+  \item exception:
+  $\mathit{currentForm}=\text{None}\Rightarrow exc=\text{NoActiveForm}$.
+\end{itemize}
+
+\paragraph{\texttt{displayFieldErrors(errors)}}
+\begin{itemize}
+  \item transition:
+  \[
+    \mathit{fieldErrors}'=errors
+    \land \mathit{formValues}'=\mathit{formValues}.
+  \]
+  Display messages beside visible fields and in an accessible summary, including errors for hidden fields.
+  \item output: None.
+  \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{showMessage(text)}}
+\begin{itemize}
+  \item transition: $\mathit{message}'=text$. Display accessible feedback and $text=\epsilon\Rightarrow$ clear the message. Exclude credentials, tokens, and restricted details.
+  \item output: None.
+  \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{setLoading(waiting)}}
+\begin{itemize}
+  \item transition: $\mathit{loading}'=waiting$, with browser effects:
+  \[
+  \begin{aligned}
+    waiting &\Rightarrow (\text{indicator shown}\land
+                          \text{conflicting submissions disabled}),\\
+    \neg waiting &\Rightarrow (\text{indicator hidden}\land
+                          \text{otherwise permitted controls restored}).
+  \end{aligned}
+  \]
+  \item output: None.
+  \item exception: None.
+\end{itemize}
+
+\subsubsection{Local Functions}
+\begin{description}
+  \item[renderCurrentView():] Renders the current view and controls from UI state.
+  \item[collectFormValues():] Reads browser input into $\mathit{formValues}$ on input events.
+\end{description}
 
 \newpage
 
