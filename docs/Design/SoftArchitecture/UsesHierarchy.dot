@@ -21,8 +21,8 @@ digraph UsesHierarchy {
 
   // Behaviour-Hiding
   node [fillcolor = "#dce9f7"];
-  M_UserInterface; M_Authentication; M_Authorization; M_CourseConfigs;
-  M_TeamRules; M_Notifications;
+  M_UserInterface; M_Authentication; M_Authorization; M_CourseManagement;
+  M_Notifications;
 
   // Request-handling modules (also Behaviour-Hiding). Every module in this box
   // uses the three modules the box's outgoing arrows point to.
@@ -31,16 +31,13 @@ digraph UsesHierarchy {
     fontname = "Helvetica"; fontsize = 11;
     style = "rounded,dashed"; color = "#888888";
 
-    M_Projects; M_ProjectCatalog; M_ProposalTemplates; M_Teams; M_Profiles;
-    M_Recommendation; M_ApprovalWorkflow; M_Threads; M_Checklist;
-    M_CourseReport; M_CourseResources; M_Enrollment;
+    M_Projects; M_StudentsTeams; M_Recommendation; M_ApprovalWorkflow;
+    M_Threads; M_Checklist; M_CourseReport; M_Enrollment;
   }
 
   // Software Decision
   node [fillcolor = "#fbe3c9"];
-  M_ClientServerComm; M_HealthCheck; M_CourseMemberships; M_Persistence;
-  M_IdentityProviderAdapter; M_EmailDelivery; M_ExternalApprovalAdapter;
-  M_EnrollmentSourceAdapter; M_AuditLog; M_PasswordHashing; M_Scheduler;
+  M_Persistence; M_EmailDelivery; M_AuditLog;
 
   // Hardware-Hiding
   node [fillcolor = "#e4e4e4"];
@@ -50,81 +47,60 @@ digraph UsesHierarchy {
   // One line per module, listing the modules it uses:
   //   M_A -> { M_B M_C };
 
-  M_UserInterface    -> { M_ClientServerComm M_HardwareHiding };
-
-  M_ClientServerComm -> { M_Authentication M_Authorization M_CourseConfigs
-                          M_CourseMemberships M_HealthCheck M_HardwareHiding };
-  // Into the box: M_ClientServerComm uses every request-handling module.
-  M_ClientServerComm -> M_Projects [lhead = cluster_features];
+  M_UserInterface    -> { M_Authentication M_Authorization M_CourseManagement
+                          M_HardwareHiding };
+  // Into the box: M_UserInterface uses every request-handling module.
+  M_UserInterface    -> M_Checklist [lhead = cluster_features];
 
   // Out of the box: every request-handling module uses these.
-  M_Projects -> M_Authorization [ltail = cluster_features];
-  M_Projects -> M_CourseConfigs [ltail = cluster_features];
-  M_Projects -> M_AuditLog      [ltail = cluster_features];
+  M_Projects -> M_Authorization    [ltail = cluster_features];
+  M_Projects -> M_CourseManagement [ltail = cluster_features];
+  M_Projects -> M_AuditLog         [ltail = cluster_features];
 
   // Request-handling modules, beyond the shared uses above. Only modules that
   // keep their own records use M_Persistence; the others read records through
   // the modules that own them.
-  M_Projects          -> { M_ProposalTemplates M_Teams M_Notifications M_Persistence };
-  M_ProposalTemplates -> { M_Persistence };
-  M_ProjectCatalog    -> { M_Projects };
-  M_Teams             -> { M_TeamRules M_Profiles M_CourseMemberships M_Notifications
-                           M_Persistence };
-  M_Profiles          -> { M_Persistence };
-  M_Recommendation    -> { M_Profiles M_Teams M_Projects };
-  M_ApprovalWorkflow  -> { M_Projects M_Teams M_TeamRules M_Profiles
-                           M_ExternalApprovalAdapter M_Notifications M_Persistence };
-  M_Threads           -> { M_Projects M_Teams M_Notifications M_Persistence };
-  M_Checklist         -> { M_Projects M_Teams M_ApprovalWorkflow
-                           M_Notifications M_Scheduler };
-  M_CourseReport      -> { M_Projects M_Teams M_CourseMemberships M_Authentication };
-  M_CourseResources   -> { M_Persistence };
-  M_Enrollment        -> { M_EnrollmentSourceAdapter M_CourseMemberships M_Teams
-                           M_Persistence };
+  M_Projects          -> { M_StudentsTeams M_Notifications M_Persistence };
+  M_StudentsTeams     -> { M_Notifications M_Persistence };
+  M_Recommendation    -> { M_StudentsTeams M_Projects };
+  M_ApprovalWorkflow  -> { M_Projects M_StudentsTeams M_Notifications
+                           M_Persistence M_HardwareHiding };
+  M_Threads           -> { M_Projects M_StudentsTeams M_Notifications M_Persistence };
+  M_Checklist         -> { M_Projects M_StudentsTeams M_ApprovalWorkflow
+                           M_Notifications };
+  M_CourseReport      -> { M_Projects M_StudentsTeams M_Authentication };
+  M_Enrollment        -> { M_StudentsTeams M_Persistence M_HardwareHiding };
 
   // Other modules.
-  M_Authentication    -> { M_IdentityProviderAdapter M_PasswordHashing
-                           M_CourseMemberships M_AuditLog M_Persistence };
-  M_Authorization     -> { M_CourseMemberships };
-  M_CourseConfigs     -> { M_AuditLog M_Persistence };
-  M_TeamRules         -> { M_Persistence };
-  M_Notifications     -> { M_Authentication M_CourseMemberships M_EmailDelivery
-                           M_Scheduler M_Persistence };
-  M_CourseMemberships -> { M_AuditLog M_Persistence };
-  M_HealthCheck       -> { M_Persistence M_IdentityProviderAdapter M_EmailDelivery
-                           M_ExternalApprovalAdapter M_EnrollmentSourceAdapter
-                           M_Scheduler };
+  M_Authentication    -> { M_Authorization M_AuditLog M_Persistence
+                           M_HardwareHiding };
+  M_Authorization     -> { M_AuditLog M_Persistence };
+  M_CourseManagement  -> { M_AuditLog M_Persistence };
+  M_Notifications     -> { M_Authentication M_Authorization M_EmailDelivery
+                           M_Persistence M_HardwareHiding };
 
-  M_IdentityProviderAdapter -> { M_AuditLog M_HardwareHiding };
-  M_EmailDelivery           -> { M_AuditLog M_HardwareHiding };
-  M_ExternalApprovalAdapter -> { M_AuditLog M_HardwareHiding };
-  M_EnrollmentSourceAdapter -> { M_AuditLog M_HardwareHiding };
-
-  M_AuditLog    -> { M_Persistence };
-  M_Persistence -> { M_HardwareHiding };
-  M_Scheduler   -> { M_HardwareHiding };
+  M_EmailDelivery -> { M_AuditLog M_HardwareHiding };
+  M_AuditLog      -> { M_Persistence };
+  M_Persistence   -> { M_HardwareHiding };
 
   // ---------- Layout only (no effect on the uses relation) ----------
   // Rows, top to bottom. Keep each row to about four modules, and put every
   // module in a row below all the modules that use it, so arrows point down.
   // The invisible arrows keep the rows in this order.
   { rank = same; M_UserInterface; }
-  { rank = same; M_ClientServerComm; }
   { rank = same; M_Checklist; M_Recommendation; M_CourseReport; }
-  { rank = same; M_ApprovalWorkflow; M_Threads; M_ProjectCatalog; M_CourseResources; }
-  { rank = same; M_Projects; M_Enrollment; }
-  { rank = same; M_Teams; M_ProposalTemplates; }
-  { rank = same; M_Profiles; }
-  { rank = same; M_HealthCheck; M_Notifications; M_TeamRules; }
-  { rank = same; M_Authentication; M_Authorization; M_CourseConfigs; }
-  { rank = same; M_CourseMemberships; M_IdentityProviderAdapter; M_EmailDelivery; M_PasswordHashing; }
-  { rank = same; M_ExternalApprovalAdapter; M_EnrollmentSourceAdapter; M_Scheduler; }
+  { rank = same; M_ApprovalWorkflow; M_Threads; M_Enrollment; }
+  { rank = same; M_Projects; }
+  { rank = same; M_StudentsTeams; }
+  { rank = same; M_Notifications; M_CourseManagement; }
+  { rank = same; M_Authentication; M_EmailDelivery; }
+  { rank = same; M_Authorization; }
   { rank = same; M_AuditLog; }
   { rank = same; M_Persistence; }
   { rank = same; M_HardwareHiding; }
 
-  M_UserInterface -> M_ClientServerComm -> M_Checklist -> M_ApprovalWorkflow
-    -> M_Projects -> M_Teams -> M_Profiles -> M_Notifications
-    -> M_Authorization -> M_CourseMemberships -> M_ExternalApprovalAdapter
-    -> M_AuditLog -> M_Persistence -> M_HardwareHiding [style = invis];
+  M_UserInterface -> M_Checklist -> M_ApprovalWorkflow -> M_Projects
+    -> M_StudentsTeams -> M_Notifications -> M_Authentication
+    -> M_Authorization -> M_AuditLog -> M_Persistence -> M_HardwareHiding
+    [style = invis];
 }
