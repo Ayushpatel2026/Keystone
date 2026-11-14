@@ -4,12 +4,15 @@ and what does it do to the project's slots?" and then does the database work.
 """
 
 import enum
+import uuid
+from collections import defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 from types import MappingProxyType
 
 # applications -> projects is the allowed dependency direction. We only need the enum,
 # to describe project snapshots for the invariant checker.
+from app.modules.projects.models import ProjectStatus
 
 
 class ApplicationStatus(enum.StrEnum):
@@ -141,6 +144,7 @@ _EDGES: list[tuple[S, E, S, set[Actor]]] = [
     (S.SUPERVISOR_ACCEPTS, E.TEAM_ACCEPT, S.AGREED, {A.TEAM}),
     (S.SUPERVISOR_ACCEPTS, E.SUPERVISOR_DECLINE, S.DECLINED_OR_WITHDRAWN, {A.SUPERVISOR}),
     (S.SUPERVISOR_ACCEPTS, E.TEAM_WITHDRAW, S.DECLINED_OR_WITHDRAWN, {A.TEAM}),
+    (S.SUPERVISOR_ACCEPTS, E.SYSTEM_CLOSE, S.DECLINED_OR_WITHDRAWN, {A.SYSTEM}),
     # --- Approval: submission and review ---
     # In external approval mode the instructor or TA records the submission by hand,
     # which is why INSTRUCTOR and TA are also allowed here.
@@ -220,3 +224,150 @@ def apply_event(
     # Derived slot delta: bool -> int is 1/0, so the difference is +1, 0 or -1.
     delta = int(holds_slot(transition.target)) - int(holds_slot(current))
     return TransitionOutcome(new_status=transition.target, slot_delta=delta)
+
+
+# ---------------------------------------------------------------------------
+# Invariant checker: the PoC success criteria as a function.
+# It works on plain snapshots so it stays pure; the service loads them from the database.
+# ---------------------------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ProjectSnapshot:
+    id: uuid.UUID
+    capacity: int
+    slots_reserved: int
+    status: ProjectStatus
+
+
+@dataclass(frozen=True)
+class ApplicationSnapshot:
+    team_id: uuid.UUID
+    project_id: uuid.UUID
+    status: ApplicationStatus
+
+
+class ViolationType(enum.IntEnum):
+    SLOT_COUNT_MISMATCH = enum.auto()  # projects.slots_reserved != number of slot-holding apps
+    OUTSIDE_CAPACITY_RANGE = enum.auto()  # slots_reserved < 0 or > capacity
+    STATUS_CAPACITY_MISMATCH = enum.auto()  # status disagrees with reserved vs capacity
+    FULL_WITH_PENDING_APPS = enum.auto()  # a full project still has applications waiting
+    MULTIPLE_AGREEMENTS = enum.auto()  # a team is committed to more than one project
+    AGREED_BUT_HOLDS_SLOT = enum.auto()  # an agreed team still holds a slot on another project
+    AGREED_WITH_PENDING_APPS = enum.auto()  # an agreed team still has applications waiting
+
+
+# frozen=True makes instances immutable and comparable, which keeps test assertions simple.
+@dataclass(frozen=True)
+class Violation:
+    type: ViolationType
+    # The project id for project-level rules, the team id for team-level rules.
+    entity_id: uuid.UUID
+    message: str
+
+
+# only called in tests right now, but maybe a modified version of this could be used after
+# every action to assert the invariant holds.
+def find_violations(
+    projects: Iterable[ProjectSnapshot],
+    applications: Iterable[ApplicationSnapshot],
+) -> list[Violation]:
+    # Returns every broken rule; an empty list means the state is consistent.
+    # Run it after every action in the PoC demo and tests.
+    violations: list[Violation] = []
+
+    # Group applications once so each project/team check below is a dictionary lookup.
+    # defaultdict(list) returns an empty list for ids with no applications.
+    by_project: dict[uuid.UUID, list[ApplicationSnapshot]] = defaultdict(list)
+    by_team: dict[uuid.UUID, list[ApplicationSnapshot]] = defaultdict(list)
+    for app in applications:
+        by_project[app.project_id].append(app)
+        by_team[app.team_id].append(app)
+
+    for project in projects:
+        apps = by_project[project.id]
+        holding = sum(1 for a in apps if holds_slot(a.status))
+
+        # the stored counter equals the number of slot-holding applications.
+        if project.slots_reserved != holding:
+            violations.append(
+                Violation(
+                    ViolationType.SLOT_COUNT_MISMATCH,
+                    project.id,
+                    f"slots_reserved={project.slots_reserved} but {holding} apps hold a slot",
+                )
+            )
+
+        # never over capacity (or negative).
+        if not 0 <= project.slots_reserved <= project.capacity:
+            violations.append(
+                Violation(
+                    ViolationType.OUTSIDE_CAPACITY_RANGE,
+                    project.id,
+                    f"slots_reserved={project.slots_reserved} outside 0..{project.capacity}",
+                )
+            )
+
+        # open exactly when reserved < capacity, full otherwise.
+        # CLOSED is set by the selection deadline, not by capacity, so it is exempt.
+        if project.status != ProjectStatus.CLOSED:
+            expected = (
+                ProjectStatus.FULL
+                if project.slots_reserved >= project.capacity
+                else ProjectStatus.OPEN
+            )
+            if project.status != expected:
+                violations.append(
+                    Violation(
+                        ViolationType.STATUS_CAPACITY_MISMATCH,
+                        project.id,
+                        f"status is {project.status.value}, expected {expected.value}",
+                    )
+                )
+
+        # a full project has no pending applications.
+        if project.status == ProjectStatus.FULL and any(is_pending(a.status) for a in apps):
+            violations.append(
+                Violation(
+                    ViolationType.FULL_WITH_PENDING_APPS,
+                    project.id,
+                    "project is full but has pending applications",
+                )
+            )
+
+    for team_id, apps in by_team.items():
+        agreed = [a for a in apps if has_agreement(a.status)]
+        # at most one agreed project per team.
+        if len(agreed) > 1:
+            violations.append(
+                Violation(
+                    ViolationType.MULTIPLE_AGREEMENTS,
+                    team_id,
+                    f"team has {len(agreed)} agreements",
+                )
+            )
+
+        if agreed:
+            # An agreed team holds no slot anywhere else. A slot-holding application that is
+            # not itself an agreement can only be a lingering SUPERVISOR_ACCEPTS.
+            lingering = [a for a in apps if holds_slot(a.status) and not has_agreement(a.status)]
+            if lingering:
+                violations.append(
+                    Violation(
+                        ViolationType.AGREED_BUT_HOLDS_SLOT,
+                        team_id,
+                        "team has an agreement but still holds a slot on another project",
+                    )
+                )
+
+            # an agreed team has no pending applications.
+            if any(is_pending(a.status) for a in apps):
+                violations.append(
+                    Violation(
+                        ViolationType.AGREED_WITH_PENDING_APPS,
+                        team_id,
+                        "team has an agreement but still has pending applications",
+                    )
+                )
+
+    return violations
