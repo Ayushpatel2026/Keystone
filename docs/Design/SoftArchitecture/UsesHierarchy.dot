@@ -37,7 +37,7 @@ digraph UsesHierarchy {
 
   // Software Decision
   node [fillcolor = "#fbe3c9"];
-  M_Persistence; M_EmailDelivery; M_AuditLog;
+  M_Persistence; M_AuditLog;
 
   // Hardware-Hiding
   node [fillcolor = "#e4e4e4"];
@@ -76,10 +76,9 @@ digraph UsesHierarchy {
                            M_HardwareHiding };
   M_Authorization     -> { M_AuditLog M_Persistence };
   M_CourseManagement  -> { M_AuditLog M_Persistence };
-  M_Notifications     -> { M_Authentication M_Authorization M_EmailDelivery
+  M_Notifications     -> { M_Authentication M_Authorization M_AuditLog
                            M_Persistence M_HardwareHiding };
 
-  M_EmailDelivery -> { M_AuditLog M_HardwareHiding };
   M_AuditLog      -> { M_Persistence };
   M_Persistence   -> { M_HardwareHiding };
 
@@ -93,7 +92,7 @@ digraph UsesHierarchy {
   { rank = same; M_Projects; }
   { rank = same; M_StudentsTeams; }
   { rank = same; M_Notifications; M_CourseManagement; }
-  { rank = same; M_Authentication; M_EmailDelivery; }
+  { rank = same; M_Authentication; }
   { rank = same; M_Authorization; }
   { rank = same; M_AuditLog; }
   { rank = same; M_Persistence; }
