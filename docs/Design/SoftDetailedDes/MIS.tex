@@ -111,6 +111,7 @@ $P\Rightarrow Q$ & If condition $P$ holds, then property or transition $Q$ holds
 $out$, $exc$ & Routine return value and raised exception, respectively. \\
 $\mathcal{V}$, $\mathcal{F}$ & Sets of registered UI view and form names. \\
 $\operatorname{Map}\langle K,V\rangle$ & Mapping from keys of type $K$ to values of type $V$. \\
+$\operatorname{Set}\langle T\rangle$ & Set of values of type $T$. \\
 $k\mapsto v$ & Associates key $k$ with value $v$. \\
 $\operatorname{dom}(M)$ & Set of keys in mapping $M$. \\
 $M[k]$ & Value associated with key $k$ in mapping $M$. \\
@@ -194,10 +195,30 @@ A supported form value, such as a string, integer, float, or Boolean.
 
 \subsection{Enums}
 
+\subsubsection{Action}
+\begin{enumerate}
+    \item Create, Read, Update, Delete: Create, view, modify, or remove a record.
+    \item Submit, Apply, Withdraw: Submit a record or application, apply to a project, or withdraw it.
+    \item Approve, Reject, RequestChanges: Record an approval decision or request revisions.
+    \item Accept, Decline: Accept or decline a project or agreement.
+    \item Import, ConfirmImport, Export: Import, confirm an enrollment import, or export course information.
+    \item Assign, Verify: Assign a course role or verify an external supervisor.
+    \item Configure, Enable, Disable: Change course settings or enable or disable a feature.
+    \item AddMember, RemoveMember, LeaveTeam, DissolveTeam: Manage team membership.
+    \item ChangeCredentials, ChangeEmail, LinkAuthentication, ChangeCourseAssociation: Change account credentials, email, linked sign-in, or course association.
+    \item SendMessage, ViewReport: Send a discussion message or view a course report.
+\end{enumerate}
+
 \subsubsection{AuthProvider}
 \begin{enumerate}
     \item McMasterSSO: Authentication provider for McMaster users.
     \item ExternalProvider: Trusted authentication provider for external supervisors.
+\end{enumerate}
+
+\subsubsection{SupervisorVerification}
+\begin{enumerate}
+    \item Unverified: External supervisor role assigned at sign-in until an instructor approves that user's project proposal.
+    \item Verified: External supervisor role after an instructor approves that user's project proposal.
 \end{enumerate}
 
 \subsubsection{UserRole}
@@ -632,20 +653,20 @@ McMaster SSO, the external authentication provider, server network connections, 
 
 \paragraph{\texttt{signIn(provider, proof)}}
 \begin{itemize}
-    \item transition: If the provider successfully verifies the proof, find the linked Keystone user. If no linked user exists, reject sign-in with AuthenticationFailed. Otherwise generate a unique session identifier $s$:
+    \item transition: If the provider successfully verifies the proof, find the linked Keystone user or create one. For a first-time external-provider sign-in, assign the external supervisor role with Unverified status. Generate a unique session identifier $s$:
     \[
     \begin{aligned}
         \mathit{sessions}' &=
         \mathit{sessions}\cup\{s\mapsto user\}.
     \end{aligned}
     \]
-    Store new identity information through M\_Persistence. A first-time external supervisor is not automatically granted verified-supervisor permissions.
+    Store new identity and account information through M\_Persistence. The new external supervisor has only the unverified access scope in the SRS.
 
     \item output: $out=s$.
 
     \item exception:
     \begin{itemize}
-        \item AuthenticationFailed if identity verification fails or no linked Keystone user exists.
+        \item AuthenticationFailed if identity verification fails or account creation fails.
         \item ProviderUnavailable if the provider cannot be reached.
     \end{itemize}
 \end{itemize}
@@ -700,8 +721,7 @@ McMaster SSO, the external authentication provider, server network connections, 
     \operatorname{verifyProof}
     (\mathit{sessions}[session],proof).
     \]
-    Re-verification must succeed before the requesting
-    module performs a high-risk action.
+    The requesting module calls re-verification for the triggers listed in \texttt{FR\_ReverifyUsers}. The proof uses re-entered credentials, an email code, an MFA challenge, or an SSO challenge.
 
     \item exception:
     \begin{itemize}
@@ -718,6 +738,170 @@ McMaster SSO, the external authentication provider, server network connections, 
     \item[hashPassword(password: String): String] Returns a salted Argon2id hash of the password.
     \item[verifyPassword(password: String, hash: String): $\mathbb{B}$] Returns true if the password matches the stored hash without storing the plaintext password.
 \end{description}
+
+\newpage
+
+\section[MIS of Authorization Module]{MIS of Authorization Module (\moduleid{M_Authorization})}
+\label{M_Authorization}
+
+\subsection{Module}
+
+This module manages user roles and access permissions. It determines whether authenticated users may perform actions or access records based on their roles, course permissions, and external supervisor verification status. It also handles authorized changes to user roles and verification status.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Persistence
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{hasAccess} & user: User, course: Course, action: Action, record: Value & bool & -- \\
+\texttt{getRole} & user: User, course: Course & UserRole & RoleNotFound \\
+\texttt{updateRole} & actor: User, user: User, course: Course, role: UserRole & -- & Unauthorized \\
+\texttt{verifyExternalSupervisor} & user: User, project: Project & -- & InvalidVerification \\
+\bottomrule
+\caption{Exported access programs of the Authorization module}
+\label{TblAuthorizationAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{roles}:
+    \operatorname{Map}\langle
+    \text{User},
+    \operatorname{Map}\langle\text{Course},\text{UserRole}\rangle
+    \rangle$
+    - assigned course roles, initially loaded from
+    M\_Persistence.
+
+    \item $\mathit{verification}:
+    \operatorname{Map}\langle
+    \text{User},\text{SupervisorVerification}\rangle$
+    - external supervisor verification states, initially
+    loaded from M\_Persistence.
+
+    \item $\mathit{administrators}:
+    \operatorname{Map}\langle\text{User},\mathbb{B}\rangle$
+    - administrative permissions, initially loaded
+    from M\_Persistence.
+
+    \item $\mathit{permittedActions}:\operatorname{Map}\langle\text{UserRole},\operatorname{Set}\langle\text{Action}\rangle\rangle$ - actions allowed for each role, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+Persistent user roles, course associations, supervisor
+verification records, and administrator permissions.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item User identities are authenticated through M\_Authentication before authorization checks.
+
+    \item Access decisions follow the role permissions and visibility requirements defined in the SRS.
+
+    \item Requests to change roles or verification status originate from authenticated users or trusted internal modules.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{hasAccess(user, course, action, record)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: $out=(course\in\operatorname{dom}(\mathit{roles}[user]))\land(action\in\mathit{permittedActions}[\mathit{roles}[user][course]])\land\operatorname{recordVisible}(user,course,record)$. If the user has no course role, the result is false.
+
+    \item exception: None.
+\end{itemize}
+
+\paragraph{Record visibility}
+$\operatorname{recordVisible}(user,course,record)$ is true only when the record belongs to the course and the user may view it under the SRS visibility rules. An unverified external supervisor may read course reference material, proposal templates, and their own proposals, projects, and threads. A verified external supervisor may also read applications to their own projects with applicant team profiles, student and team profiles, and student-proposed projects. Neither may read another supervisor's proposals or projects. Such records must appear as not found and must not be revealed through catalogs, searches, counts, statuses, or notifications.
+
+\paragraph{\texttt{getRole(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output:
+    \[
+    course\in\operatorname{dom}(\mathit{roles}[user])
+    \Rightarrow
+    out=\mathit{roles}[user][course].
+    \]
+
+    \item exception: RoleNotFound if the user has
+    no assigned role in the specified course.
+\end{itemize}
+
+\paragraph{\texttt{updateRole(actor, user, course, role)}}
+\begin{itemize}
+    \item transition: If the actor has administrator permission and has successfully completed the required re-verification:
+    \[
+    \mathit{roles}' =
+    \mathit{roles}\oplus
+    \left\{
+    user\mapsto
+    \left(
+    \mathit{roles}[user]\oplus
+    \{course\mapsto role\}
+    \right)
+    \right\}.
+    \]
+    The change is persisted and audited.
+
+    \item output: None.
+
+    \item exception: Unauthorized if the actor lacks the required permission or re-verification.
+\end{itemize}
+
+\paragraph{\texttt{verifyExternalSupervisor(user, project)}}
+\begin{itemize}
+    \item transition: If the user is an external supervisor and an instructor has approved a project proposal submitted by that user:
+    \[
+    \mathit{verification}' =
+    \mathit{verification}\oplus
+    \{user\mapsto\text{Verified}\}.
+    \]
+    The change is persisted and audited.
+
+    Approval of a proposal submitted by another user, a request for changes, or rejection does not verify the supervisor. Withdrawal of an approved proposal does not reverse verification.
+
+    \item output: None.
+
+    \item exception: InvalidVerification if the required approval conditions are not satisfied.
+\end{itemize}
+
+\subsubsection{Local Functions}
+None.
+
+\newpage
 
 \newpage
 
