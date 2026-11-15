@@ -110,6 +110,13 @@ $\land$, $\neg$ & Logical and, and logical negation (not). \\
 $P\Rightarrow Q$ & If condition $P$ holds, then property or transition $Q$ holds. \\
 $out$, $exc$ & Routine return value and raised exception, respectively. \\
 $\mathcal{V}$, $\mathcal{F}$ & Sets of registered UI view and form names. \\
+$\operatorname{Map}\langle K,V\rangle$ & Mapping from keys of type $K$ to values of type $V$. \\
+$k\mapsto v$ & Associates key $k$ with value $v$. \\
+$\operatorname{dom}(M)$ & Set of keys in mapping $M$. \\
+$M[k]$ & Value associated with key $k$ in mapping $M$. \\
+$M\cup\{k\mapsto v\}$ & Adds a new key-value pair to mapping $M$. \\
+$M\setminus\{k\mapsto v\}$ & Removes a key-value pair from mapping $M$. \\
+$M\oplus\{k\mapsto v\}$ & Adds or replaces the value associated with key $k$ in mapping $M$. \\
 -- & No input, program return value, or exported exception, according to column. \\
 \bottomrule
 \end{tabularx}
@@ -187,6 +194,12 @@ A supported form value, such as a string, integer, float, or Boolean.
 
 \subsection{Enums}
 
+\subsubsection{AuthProvider}
+\begin{enumerate}
+    \item McMasterSSO: Authentication provider for McMaster users.
+    \item ExternalProvider: Trusted authentication provider for external supervisors.
+\end{enumerate}
+
 \subsubsection{UserRole}
 \begin{enumerate}
     \item Student: A student participating in a capstone course.
@@ -236,6 +249,12 @@ For types $K$ and $V$, a finite mapping from keys of type $K$ to values of type 
 
 \subsubsection{List}
 For any type $T$, an ordered collection of elements of type $T$.
+
+\subsubsection{SessionID}
+A string that uniquely identifies an authenticated session.
+
+\subsubsection{AuthProof}
+Credentials, a verification code, or an identity provider response submitted to verify a user's identity.
 
 \subsubsection{FieldValues}
 \[
@@ -530,8 +549,174 @@ Equations follow Section~\ref{SecNotation}. Successful transitions are rendered 
 
 \subsubsection{Local Functions}
 \begin{description}
-  \item[renderCurrentView():] Renders the current view and controls from UI state.
-  \item[collectFormValues():] Reads browser input into $\mathit{formValues}$ on input events.
+  \item[renderCurrentView(): --] Renders the current view and controls from UI state.
+  \item[collectFormValues(): FieldValues] Returns the current browser form values and updates $\mathit{formValues}$.
+\end{description}
+
+\newpage
+
+
+\section[MIS of Authentication Module]{MIS of Authentication Module (\moduleid{M_Authentication})}
+\label{M_Authentication}
+
+\subsection{Module}
+
+This module authenticates Keystone users through McMaster SSO or a trusted external provider. It maintains user identities and authenticated sessions, verifies credentials, and re-verifies users before high-risk actions. Role-based permissions are handled by M\_Authorization.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_HardwareHiding
+    \item M\_Persistence
+    \item M\_Authorization
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{signIn} & provider: AuthProvider, proof: AuthProof & SessionID & AuthenticationFailed, ProviderUnavailable \\
+\texttt{signOut} & session: SessionID & -- & InvalidSession \\
+\texttt{isAuthenticated} & session: SessionID & bool & -- \\
+\texttt{getIdentity} & session: SessionID & User & InvalidSession \\
+\texttt{reverify} & session: SessionID, proof: AuthProof & bool & InvalidSession, ProviderUnavailable \\
+\bottomrule
+\caption{Exported access programs of the Authentication module}
+\label{TblAuthenticationAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{sessions}:\operatorname{Map}\langle\text{SessionID},\text{User}\rangle$ - active authenticated sessions, initially $\emptyset$.
+
+    \item $\mathit{identities}:\operatorname{Map}\langle\text{String},\text{User}\rangle$ - stored user identities indexed by linked provider account, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+McMaster SSO, the external authentication provider, server network connections, and persistent identity storage.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Trusted identity providers authenticate users and return verifiable identity information.
+    \item All authentication communication uses HTTPS.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{signIn(provider, proof)}}
+\begin{itemize}
+    \item transition: If the provider successfully verifies the proof, find the linked Keystone user. If no linked user exists, reject sign-in with AuthenticationFailed. Otherwise generate a unique session identifier $s$:
+    \[
+    \begin{aligned}
+        \mathit{sessions}' &=
+        \mathit{sessions}\cup\{s\mapsto user\}.
+    \end{aligned}
+    \]
+    Store new identity information through M\_Persistence. A first-time external supervisor is not automatically granted verified-supervisor permissions.
+
+    \item output: $out=s$.
+
+    \item exception:
+    \begin{itemize}
+        \item AuthenticationFailed if identity verification fails or no linked Keystone user exists.
+        \item ProviderUnavailable if the provider cannot be reached.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{signOut(session)}}
+\begin{itemize}
+    \item transition:
+    \[
+    \mathit{sessions}'=
+        \mathit{sessions}\setminus\{session\mapsto\mathit{sessions}[session]\}.
+    \]
+    \item output: None.
+    \item exception:
+    $session\notin\operatorname{dom}(\mathit{sessions})\Rightarrow exc=\text{InvalidSession}$.
+\end{itemize}
+
+\paragraph{\texttt{isAuthenticated(session)}}
+\begin{itemize}
+    \item transition: None.
+    \item output:
+    \[
+    out=
+    \begin{cases}
+        \text{true}, & \operatorname{validSession}(session),\\
+        \text{false}, & \text{otherwise}.
+    \end{cases}
+    \]
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{getIdentity(session)}}
+\begin{itemize}
+    \item transition: None.
+    \item output:
+    \[
+    \operatorname{validSession}(session)
+    \Rightarrow out=\mathit{sessions}[session].
+    \]
+    \item exception:
+    \[
+    \neg\operatorname{validSession}(session)
+    \Rightarrow exc=\text{InvalidSession}.
+    \]
+\end{itemize}
+
+\paragraph{\texttt{reverify(session, proof)}}
+\begin{itemize}
+    \item transition: None.
+    \item output:
+    \[
+    out=
+    \operatorname{verifyProof}
+    (\mathit{sessions}[session],proof).
+    \]
+    Re-verification must succeed before the requesting
+    module performs a high-risk action.
+
+    \item exception:
+    \begin{itemize}
+    \item InvalidSession if the session is invalid.
+    \item ProviderUnavailable if external verification cannot be completed.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[validSession(session: SessionID): $\mathbb{B}$] Returns true if the session exists and remains valid.
+    \item[verifyProof(user: User, proof: AuthProof): $\mathbb{B}$] Returns true if the proof verifies for the specified user.
+    \item[hashPassword(password: String): String] Returns a salted Argon2id hash of the password.
+    \item[verifyPassword(password: String, hash: String): $\mathbb{B}$] Returns true if the password matches the stored hash without storing the plaintext password.
 \end{description}
 
 \newpage
