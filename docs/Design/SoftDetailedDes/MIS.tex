@@ -99,7 +99,7 @@ specifies its inputs, output, state transition, and exception conditions.
 \toprule
 \textbf{Notation} & \textbf{Meaning} \\
 \midrule
-$\mathbb{B}$ & Boolean values $\{\text{true},\text{false}\}$. \\
+bool & Boolean values $\{\text{true},\text{false}\}$. \\
 String & Finite sequence of characters where $\epsilon$ is the empty string. \\
 $\emptyset$ & Empty set or map, according to its declared type. \\
 None & Absence of a value where $T\cup\{\text{None}\}$ denotes an optional value. \\
@@ -175,24 +175,6 @@ with each module's full name and identifier shown.
 \label{SecDataTypes}
 
 The following data types are shared across the Keystone modules.
-
-\subsection{Generics}
-
-\subsubsection{bool}
-Boolean value in $\{\text{true}, \text{false}\}$.
-
-\subsubsection{int}
-Integer value ($\mathbb{Z}$).
-
-\subsubsection{float}
-Real-valued number ($\mathbb{R}$).
-
-\subsubsection{string}
-Finite sequence of characters.
-
-\subsubsection{Value}
-A supported form value, such as a string, integer, float, or Boolean.
-
 \subsection{Enums}
 
 \subsubsection{Action}
@@ -365,15 +347,15 @@ A record representing a discussion associated with a project proposal or team.
 \subsection{Module}
 
 \wss{Short name for the module}
-This module provides the platform services used by the system and virtual hardward used by the system, including input/output, file storage, and network connections including HTTPS. This module is provided by the OS, browser, and runtime libraries.
+This module provides the platform services used by the system and virtual hardware used by the system, including input/output, file storage, and network connections including HTTPS. This module is provided by the OS, browser, and runtime libraries.
 
-Note: Unlike many other modules listed, this module is entirely externally provided. This will not be explicitely implemented.
+Note: Unlike many other modules listed, this module is entirely externally provided. This will not be explicitly implemented.
 
 \subsection{Uses}
 \begin{itemize}
   \item \textbf{Server Operating System:} File system access, networking, and process execution. 
   \item \textbf{Python runtime and standard libraries:} Access to OS services for the backend. 
-  \item \textbf{Browser:} Access to OS services for the backend. 
+  \item \textbf{Browser:} Provides access to OS services such as display, user input, and network facilities.
 \end{itemize}
 No Keystone modules.
 
@@ -455,6 +437,8 @@ This module manages Keystone's user interface and views, displaying pages and fo
     \item M\_CourseReport
 \end{itemize}
 
+The UI makes API calls to every backend module listed above to retrieve data and perform the actions available in its views and forms. It displays the results and errors returned by those calls. The access routines below abstract this interaction into presentation and input operations rather than listing each API call separately. The UI uses Hardware Hiding for browser display, input, and networking facilities.
+
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
@@ -486,7 +470,7 @@ These proposed interfaces handle presentation and input only. Business operation
 \texttt{readForm} & -- & FieldValues & NoActiveForm \\
 \texttt{displayFieldErrors} & errors: FieldErrors & -- & -- \\
 \texttt{showMessage} & text: String & -- & -- \\
-\texttt{setLoading} & waiting: $\mathbb{B}$ & -- & -- \\
+\texttt{setLoading} & waiting: bool & -- & -- \\
 \bottomrule
 \caption{Exported access programs of the User Interface module}
 \label{TblUIAccessPrograms}
@@ -503,7 +487,7 @@ These proposed interfaces handle presentation and input only. Business operation
   \item $\mathit{formValues}:\text{FieldValues}$ - map of field names to entered values and the set is initially $\emptyset$.
   \item $\mathit{fieldErrors}:\text{FieldErrors}$ - map of field names to error messages and the set is initially $\emptyset$.
   \item $\mathit{message}:\text{String}$ - feedback which initially $\epsilon$.
-  \item $\mathit{loading}:\mathbb{B}$ - waiting indicator and initially false.
+  \item $\mathit{loading}:\text{bool}$ - waiting indicator and initially false.
 \end{itemize}
 
 \subsubsection{Environment Variables}
@@ -765,10 +749,10 @@ McMaster SSO, the external authentication provider, server network connections, 
 \subsubsection{Local Functions}
 
 \begin{description}
-    \item[validSession(session: SessionID): $\mathbb{B}$] Returns true if the session exists and remains valid.
-    \item[verifyProof(user: User, proof: AuthProof): $\mathbb{B}$] Returns true if the proof verifies for the specified user.
+    \item[validSession(session: SessionID): bool] Returns true if the session exists and remains valid.
+    \item[verifyProof(user: User, proof: AuthProof): bool] Returns true if the proof verifies for the specified user.
     \item[hashPassword(password: String): String] Returns a salted Argon2id hash of the password.
-    \item[verifyPassword(password: String, hash: String): $\mathbb{B}$] Returns true if the password matches the stored hash without storing the plaintext password.
+    \item[verifyPassword(password: String, hash: String): bool] Returns true if the password matches the stored hash without storing the plaintext password.
 \end{description}
 
 \newpage
@@ -841,7 +825,7 @@ None.
     loaded from M\_Persistence.
 
     \item $\mathit{administrators}:
-    \operatorname{Map}\langle\text{User},\mathbb{B}\rangle$
+    \operatorname{Map}\langle\text{User},\text{bool}\rangle$
     - the SRS \texttt{is\_admin} permission flag for Instructor and TA accounts. It is not a separate role and is initially loaded from M\_Persistence.
 
     \item $\mathit{permittedActions}:\operatorname{Map}\langle\text{UserRole},\operatorname{Set}\langle\text{Action}\rangle\rangle$ - actions allowed for each role, initially loaded from M\_Persistence.
@@ -873,7 +857,7 @@ Persistent user roles, course associations, supervisor verification records, and
 \end{itemize}
 
 \paragraph{Record scope}
-$\operatorname{recordInScope}(user:User,course:Course,action:Action,record:Value):\mathbb{B}$ returns true when the record belongs to the course and the action is allowed for that record under the SRS permissions and visibility rules. For reads, an unverified external supervisor may access course reference material, proposal templates, and their own proposals, projects, and threads. A verified external supervisor may also access applications to their own projects with applicant team profiles, student and team profiles, and student-proposed projects. Neither may access another supervisor's proposals or projects, which must not be revealed in responses, catalogs, searches, counts, statuses, or notifications.
+$\operatorname{recordInScope}(user:User,course:Course,action:Action,record:Value):\text{bool}$ returns true when the record belongs to the course and the action is allowed for that record under the SRS permissions and visibility rules (see SRS Tables~\ref{tab:Visibility} and~\ref{tab:ExternalAccess}). For reads, an unverified external supervisor may access course reference material, proposal templates, and their own proposals, projects, and threads. A verified external supervisor may also access applications to their own projects with applicant team profiles, student and team profiles, and student-proposed projects. Neither may access another supervisor's proposals or projects, which must not be revealed in responses, catalogs, searches, counts, statuses, or notifications.
 
 \paragraph{\texttt{getRole(user, course)}}
 \begin{itemize}
@@ -1015,7 +999,7 @@ None.
     \item $\mathit{features}:
     \operatorname{Map}\langle
     \text{Course},
-    \operatorname{Map}\langle\text{Feature},\mathbb{B}\rangle
+    \operatorname{Map}\langle\text{Feature},\text{bool}\rangle
     \rangle$
     - enabled states of supported features for each
     course, initially loaded from M\_Persistence.
@@ -1229,7 +1213,7 @@ outstanding work records, and course resource storage.
 
 \begin{description}
     \item[validSetting(course: Course, key: String, value: Value): bool] Returns true if the setting exists and the supplied value satisfies its constraints.
-    \item[requiresReverification(key: String): $\mathbb{B}$] Returns true when the setting changes course rules or the approval mode, as required by \texttt{FR\_ReverifyUsers}.
+    \item[requiresReverification(key: String): bool] Returns true when the setting changes course rules or the approval mode, as required by \texttt{FR\_ReverifyUsers}.
 
     \item[validResource(resource: CourseResource): bool] Returns true if the resource contains the required information and valid content.
 \end{description}
