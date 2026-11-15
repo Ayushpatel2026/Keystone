@@ -215,6 +215,13 @@ A supported form value, such as a string, integer, float, or Boolean.
     \item ExternalProvider: Trusted authentication provider for external supervisors.
 \end{enumerate}
 
+\subsubsection{Feature}
+\begin{enumerate}
+    \item TeamFormation: Team formation functionality.
+    \item ProjectApprovals: Project approval functionality.
+    \item ProjectProposals: Project proposal functionality.
+\end{enumerate}
+
 \subsubsection{SupervisorVerification}
 \begin{enumerate}
     \item Unverified: External supervisor role assigned at sign-in until an instructor approves that user's project proposal.
@@ -270,6 +277,9 @@ For types $K$ and $V$, a finite mapping from keys of type $K$ to values of type 
 
 \subsubsection{List}
 For any type $T$, an ordered collection of elements of type $T$.
+
+\subsubsection{CourseResource}
+A course document or link with an identifier, course association, and publication status.
 
 \subsubsection{SessionID}
 A string that uniquely identifies an authenticated session.
@@ -902,6 +912,293 @@ $\operatorname{recordVisible}(user,course,record)$ is true only when the record 
 None.
 
 \newpage
+
+\section[MIS of Course Management Module]{MIS of Course Management Module (\moduleid{M_CourseManagement})}
+\label{M_CourseManagement}
+
+\subsection{Module}
+
+This module manages course-specific settings, enabled
+features, and reference materials. It allows instructors
+to configure course functionality, prevents features
+from being disabled when outstanding work exists,
+and allows instructors and TAs to maintain and publish
+course resources for students and supervisors.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Authorization
+    \item M\_Persistence
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{getSettings} & user: User, course: Course & Dictionary & Unauthorized \\
+\texttt{updateSetting} & user: User, course: Course, key: String, value: Value & -- & Unauthorized, InvalidSetting \\
+\texttt{isFeatureEnabled} & course: Course, feature: Feature & bool & -- \\
+\texttt{setFeatureEnabled} & user: User, course: Course, feature: Feature, enabled: bool & -- & Unauthorized, PendingWork \\
+\texttt{getPendingWork} & user: User, course: Course, feature: Feature & List & Unauthorized \\
+\texttt{recordPendingWork} & course: Course, feature: Feature, recordID: String, pending: bool & -- & -- \\
+\texttt{saveResource} & user: User, course: Course, resource: CourseResource & -- & Unauthorized, InvalidResource \\
+\texttt{publishResource} & user: User, course: Course, resourceID: String & -- & Unauthorized, ResourceNotFound \\
+\texttt{getResources} & user: User, course: Course & $\operatorname{List}\langle\text{CourseResource}\rangle$ & Unauthorized \\
+\bottomrule
+\caption{Exported access programs of the Course Management module}
+\label{TblCourseManagementAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{settings}:
+    \operatorname{Map}\langle
+    \text{Course},\text{Dictionary}\rangle$
+    - course-specific configuration values, initially
+    loaded from M\_Persistence.
+
+    \item $\mathit{features}:
+    \operatorname{Map}\langle
+    \text{Course},
+    \operatorname{Map}\langle\text{Feature},\mathbb{B}\rangle
+    \rangle$
+    - enabled states of supported features for each
+    course, initially loaded from M\_Persistence.
+
+    \item $\mathit{pendingWork}:
+    \operatorname{Map}\langle
+    \text{Course},
+    \operatorname{Map}\langle
+            \text{Feature},\operatorname{Set}\langle\text{String}\rangle
+    \rangle\rangle$
+    - identifiers of outstanding records associated
+    with each feature, initially loaded from
+    M\_Persistence.
+
+    \item $\mathit{resources}:
+    \operatorname{Map}\langle
+    \text{String},\text{CourseResource}\rangle$
+    - stored course resources indexed by their
+    identifiers, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+Persistent course configuration, feature states,
+outstanding work records, and course resource storage.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item M\_Authorization determines user permissions for course configuration and resource management.
+    \item Changes to course rules and approval modes require successful re-verification through M\_Authentication.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{getSettings(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: If the user is authorized:
+    \[
+    out=\mathit{settings}[course].
+    \]
+
+    \item exception: Unauthorized if the user lacks
+    permission to view the course settings.
+\end{itemize}
+
+\paragraph{\texttt{updateSetting(user, course, key, value)}}
+\begin{itemize}
+    \item transition: If the user is an authorized course instructor, the setting is supported, and the value satisfies its constraints:
+    \[
+    \mathit{settings}'=
+    \mathit{settings}\oplus
+    \left\{
+    course\mapsto
+    \left(
+    \mathit{settings}[course]\oplus
+    \{key\mapsto value\}
+    \right)
+    \right\}.
+    \]
+    Changes to course rules or approval mode require successful re-verification before the update. Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if the user lacks permission or required re-verification.
+        \item InvalidSetting if the setting is unsupported or the value is invalid.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{isFeatureEnabled(course, feature)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output:
+    \[
+    out=\mathit{features}[course][feature].
+    \]
+
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{setFeatureEnabled(user, course, feature, enabled)}}
+\begin{itemize}
+    \item transition: If the user is an authorized course instructor and disabling the feature will not strand outstanding work:
+    \[
+    \mathit{features}'=
+    \mathit{features}\oplus
+    \left\{
+    course\mapsto
+    \left(
+    \mathit{features}[course]\oplus
+    \{feature\mapsto enabled\}
+    \right)
+    \right\}.
+    \]
+    Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if the user is not
+        authorized to configure the course.
+        \item PendingWork if
+        \[
+        \neg enabled\land
+        \mathit{pendingWork}[course][feature]
+        \ne\emptyset.
+        \]
+    \end{itemize}
+    When PendingWork occurs, no feature state
+    changes. The caller may use getPendingWork
+    to display the outstanding records.
+\end{itemize}
+
+\paragraph{\texttt{getPendingWork(user, course, feature)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: For an authorized course instructor,
+    return the outstanding record identifiers:
+    \[
+    out=\operatorname{List}
+    (\mathit{pendingWork}[course][feature]).
+    \]
+
+    \item exception: Unauthorized if the user lacks course configuration permission.
+\end{itemize}
+
+\paragraph{\texttt{recordPendingWork(course, feature, recordID, pending)}}
+\begin{itemize}
+    \item transition: Called only by a trusted Keystone workflow module. Let
+    \[
+    W=\mathit{pendingWork}[course][feature].
+    \]
+    Then:
+    \[
+    W'=
+    \begin{cases}
+        W\cup\{recordID\}, & pending,\\
+        W\setminus\{recordID\}, & \neg pending.
+    \end{cases}
+    \]
+    Replace the corresponding pending-work entry with $W'$ and persist the change.
+
+    \item output: None.
+
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{saveResource(user, course, resource)}}
+\begin{itemize}
+    \item transition: If the user is an instructor or TA authorized for the course, and the resource is valid:
+    \[
+    \mathit{resources}'=
+    \mathit{resources}\oplus
+    \{resource.id\mapsto resource\}.
+    \]
+    The resource is associated with the supplied course. New resources remain unpublished until explicitly published. Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if the user lacks resource management permission.
+        \item InvalidResource if required resource information is invalid.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{publishResource(user, course, resourceID)}}
+\begin{itemize}
+    \item transition: If the user is an authorized instructor or TA, and the resource belongs to the course:
+    \[
+    \mathit{resources}'[resourceID].published
+    =\text{true}.
+    \]
+    Other resource fields remain unchanged. Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if the user lacks resource management permission.
+        \item ResourceNotFound if the resource does not exist in the course.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{getResources(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: For an authorized user, return the list of published resources belonging to the requested course:
+    \[
+    out=[r\mid r\in\mathit{resources},
+    \ r.course=course\land r.published].
+    \]
+    Unpublished resources are not returned to students or supervisors.
+
+    \item exception: Unauthorized if the user lacks permission to read course resources.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[validSetting(course: Course, key: String, value: Value): bool] Returns true if the setting exists and the supplied value satisfies its constraints.
+
+    \item[validResource(resource: CourseResource): bool] Returns true if the resource contains the required information and valid content.
+\end{description}
 
 \newpage
 
