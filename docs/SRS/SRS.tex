@@ -67,7 +67,10 @@
 % Counters are retained only for internal ordering; readers see stable mnemonic IDs.
 \newcommand{\descriptiveid}[1]{\texttt{\detokenize{#1}}}
 \newcommand{\idref}[1]{\hyperref[#1]{\descriptiveid{#1}}}
-\newcommand{\idlabel}[1]{\hypertarget{#1}{\descriptiveid{#1}}}
+\newcommand{\idlabel}[1]{%
+  \phantomsection%
+  \hypertarget{#1}{\descriptiveid{#1}}
+}
 \newcommand{\reqitem}[2]{\refstepcounter{#1}\label{#2}\idlabel{#2}}
 
 \newcounter{srnum} % Stakeholder requirement ordering
@@ -2150,6 +2153,8 @@ Instructor (Dr. Reyes), Teaching Assistant
     \item[]\reqitem{dprnum}{DPR_VisibilityMatrix} The system shall restrict who can read a record according to its type and state, as shown in Table~\ref{tab:Visibility}, on every channel through which the record can be read.
   \end{enumerate}
 
+
+  \phantomsection\hypertarget{TAB-Visibility}{}
   \begin{longtable}{|p{4.6cm}|p{9.2cm}|}
     \hline
     \textbf{Record} & \textbf{Who can read it} \\ \hline
@@ -2166,6 +2171,7 @@ Instructor (Dr. Reyes), Teaching Assistant
     \caption{Visibility by record type and state} \label{tab:Visibility}
   \end{longtable}
 
+  \phantomsection\hypertarget{TAB-ExternalAccess}{}
   \begin{longtable}{|p{5.2cm}|p{4.2cm}|p{4.2cm}|}
     \hline
     \textbf{Record} & \textbf{Unverified external supervisor} & \textbf{Verified external supervisor} \\ \hline
