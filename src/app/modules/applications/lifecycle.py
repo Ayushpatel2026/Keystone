@@ -180,7 +180,7 @@ _EDGES: list[tuple[S, E, S, set[Actor]]] = [
         S.APPROVED_CHANGE_UNDER_REVIEW,
         E.TEAM_DISSOLVE,
         S.DECLINED_OR_WITHDRAWN,
-        {A.INSTRUCTOR, A.TA},
+        {A.INSTRUCTOR},
     ),
 ]
 

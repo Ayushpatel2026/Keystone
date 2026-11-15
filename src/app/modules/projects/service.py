@@ -204,8 +204,12 @@ def reserve_slot(project: Project) -> None:
     # "SET slots_reserved = slots_reserved + 1". SQLAlchemy reads the value into Python, adds
     # one, and emits "SET slots_reserved = <slots_reserved + 1>". Without the row lock, two requests
     # could both read 1 and both write 2, losing an update.
+    if project.status == ProjectStatus.CLOSED:
+        raise ProjectNotOpenError(project.status.value)
+
     if project.slots_reserved >= project.supervisor_capacity:
         raise ProjectCapacityFullError(str(project.id))
+
     project.slots_reserved += 1
     # Recompute the status from the new count, so the counter and the status always move
     # together. Nothing is written yet, so if the transaction rolls back,
@@ -220,6 +224,9 @@ def release_slot(project: Project) -> None:
     # Same locking rules as reserve_slot. The applications service calls this exactly when
     # an application leaves the set of slot-holding statuses, which is how withdraw and
     # every other exit path stays consistent.
+
+    # Note that we do not check for CLOSED here. Closed implies that selection period is over
+    # a team may still withdraw from a project.
     if project.slots_reserved <= 0:
         # Releasing when nothing is reserved means a caller released twice or released for
         # an application that never held a slot

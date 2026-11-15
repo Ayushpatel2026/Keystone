@@ -107,12 +107,15 @@ async def apply_to_project(
     try:
         application = await _apply(session, data, student_id)
         await session.commit()  # INSERT happens at commit/flush; all locks released here
-    except IntegrityError as exc:
-        # This is raised when the unique constraint on (team_id, project_id) fired.
-        # The pre-check should already have caught it, so this only triggers on a
-        #  bug or a bypass of the team lock.
+    except IntegrityError as exc:  # broad wrapper for any database integrity error
         await session.rollback()
-        raise DuplicateApplicationError(str(data.project_id)) from exc
+
+        # PostgreSQL code '23505' stands for unique_violation
+        if getattr(exc.orig, "pgcode", None) == "23505":
+            raise DuplicateApplicationError(str(data.project_id)) from exc
+        else:
+            raise
+
     except Exception:
         # Any domain error above (not open, not a member, ...) arrives here. Roll back
         # explicitly so the row locks are released now rather than when the session closes.
