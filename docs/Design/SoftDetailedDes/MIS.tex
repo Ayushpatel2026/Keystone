@@ -33,6 +33,12 @@ urlcolor=cyan          % color of external links
 
 \externaldocument{../../SRS/SRS}
 
+\newcommand{\descriptiveid}[1]{\texttt{\detokenize{#1}}}
+% Link into the published SRS PDF. Works in a browser/PDF viewer and on
+% GitHub, unlike a relative-path link. Usage: \srsref{FR_AssignTA}
+\newcommand{\srsurl}{https://ayushpatel2026.github.io/Keystone/pdfs/SRS/SRS.pdf}
+\newcommand{\srsref}[1]{\href{\srsurl\#nameddest=#1}{\descriptiveid{#1}}}
+
 \input{../../Comments.text}
 \input{../../Common.text}
 
@@ -782,9 +788,9 @@ None.
 \small
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.2}
-\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.28\textwidth}
                   >{\raggedright\arraybackslash}p{0.34\textwidth}
-                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.12\textwidth}
                   >{\raggedright\arraybackslash}p{0.16\textwidth}}
 \toprule
 \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
@@ -857,7 +863,7 @@ Persistent user roles, course associations, supervisor verification records, and
 \end{itemize}
 
 \paragraph{Record scope}
-$\operatorname{recordInScope}(user:User,course:Course,action:Action,record:Value):\text{bool}$ returns true when the record belongs to the course and the action is allowed for that record under the SRS permissions and visibility rules (see SRS Tables~\ref{tab:Visibility} and~\ref{tab:ExternalAccess}). For reads, an unverified external supervisor may access course reference material, proposal templates, and their own proposals, projects, and threads. A verified external supervisor may also access applications to their own projects with applicant team profiles, student and team profiles, and student-proposed projects. Neither may access another supervisor's proposals or projects, which must not be revealed in responses, catalogs, searches, counts, statuses, or notifications.
+$\operatorname{recordInScope}(user:User,course:Course,action:Action,record:Value):\text{bool}$ returns true when the record belongs to the course and the action is allowed for that record under the SRS permissions and visibility rules (see SRS tables \srsref{TAB-Visibility} and \srsref{TAB-ExternalAccess}). For reads, an unverified external supervisor may access course reference material, proposal templates, and their own proposals, projects, and threads. A verified external supervisor may also access applications to their own projects with applicant team profiles, student and team profiles, and student-proposed projects. Neither may access another supervisor's proposals or projects, which must not be revealed in responses, catalogs, searches, counts, statuses, or notifications.
 
 \paragraph{\texttt{getRole(user, course)}}
 \begin{itemize}
