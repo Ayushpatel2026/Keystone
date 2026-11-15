@@ -19,6 +19,7 @@
 \usepackage[section]{placeins}
 \usepackage{caption}
 \usepackage{fullpage}
+\usepackage{parskip}
 
 \hypersetup{
 bookmarks=true,     % show bookmarks bar?
@@ -36,7 +37,7 @@ urlcolor=cyan          % color of external links
 \newcommand{\descriptiveid}[1]{\texttt{\detokenize{#1}}}
 % Link into the published SRS PDF. Works in a browser/PDF viewer and on
 % GitHub, unlike a relative-path link. Usage: \srsref{FR_AssignTA}
-\newcommand{\srsurl}{https://ayushpatel2026.github.io/Keystone/pdfs/SRS/SRS.pdf}
+\newcommand{\srsurl}{https://ayushpatel2026.github.io/Keystone/SRS/SRS.pdf}
 \newcommand{\srsref}[1]{\href{\srsurl\#nameddest=#1}{\descriptiveid{#1}}}
 
 \input{../../Comments.text}
@@ -70,7 +71,7 @@ Date 2 & 1.1 & Notes\\
 
 \section{Symbols, Abbreviations and Acronyms}
 
-See SRS Documentation at \wss{give url}
+See SRS Documentation at \url{https://ayushpatel2026.github.io/Keystone/SRS/SRS.pdf}
 
 \wss{Also add any additional symbols, abbreviations or acronyms}
 
@@ -84,12 +85,12 @@ See SRS Documentation at \wss{give url}
 
 \section{Introduction}
 
-The following document details the Module Interface Specifications for
-\wss{Fill in your project name and description}
+The following document details the Module Interface Specifications for \projname{},
+a capstone project discovery and management platform.
 
 Complementary documents include the System Requirement Specifications
 and Module Guide.  The full documentation and implementation can be
-found at \url{...}.  \wss{provide the url for your repo}
+found at \url{https://github.com/Ayushpatel2026/Keystone}.
 
 \section{Notation}
 \label{SecNotation}
