@@ -1,3 +1,6 @@
 {
-    "recommendations": ["James-Yu.latex-workshop"]
+    "recommendations": [
+        "James-Yu.latex-workshop",
+        "tintinweb.graphviz-interactive-preview"
+    ]
 }

@@ -7,6 +7,9 @@
 \usepackage{tabularx}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{xstring}
 \usepackage{hyperref}
 \hypersetup{
     colorlinks,
@@ -19,17 +22,27 @@
 \input{../../Comments.text}
 \input{../../Common.text}
 
-\newcounter{acnum}
-\newcommand{\actheacnum}{AC\theacnum}
-\newcommand{\acref}[1]{AC\ref{#1}}
+% Descriptive identifiers (same convention as the SRS and Hazard Analysis).
+\newcommand{\descriptiveid}[1]{{\noexpandarg\StrSubstitute{#1}{_}{\textunderscore\allowbreak}[\idtmp]\texttt{\idtmp}}}
+\newcommand{\idref}[1]{\hyperref[#1]{\descriptiveid{#1}}}
+\newcommand{\idlabel}[1]{\descriptiveid{#1}}
+\newcommand{\reqitem}[2]{\refstepcounter{#1}\label{#2}\idlabel{#2}}
 
-\newcounter{ucnum}
+% Link into the published SRS PDF.
+\newcommand{\srsurl}{https://github.com/Ayushpatel2026/Keystone/raw/main/pdfs/SRS/SRS.pdf}
+\newcommand{\srsref}[1]{\href{\srsurl\#nameddest=#1}{\descriptiveid{#1}}}
+
+\newcounter{acnum} % anticipated change ordering
+\newcommand{\actheacnum}{AC\theacnum}
+\newcommand{\acref}[1]{\idref{#1}}
+
+\newcounter{ucnum} % unlikely change ordering
 \newcommand{\uctheucnum}{UC\theucnum}
-\newcommand{\uref}[1]{UC\ref{#1}}
+\newcommand{\uref}[1]{\idref{#1}}
 
 \newcounter{mnum}
 \newcommand{\mthemnum}{M\themnum}
-\newcommand{\mref}[1]{M\ref{#1}}
+\newcommand{\mref}[1]{\idref{#1}}
 
 \begin{document}
 
@@ -46,8 +59,8 @@
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
-Date 1 & 1.0 & Notes\\
-Date 2 & 1.1 & Notes\\
+Nov. 12, 2026 & -1.0 & Added Revision -1 content: LC, UC, Modules, SRS Traceability\\
+Nov. 13, 2026 & -1.1 & Addressed review for Rev -1 content\\
 \bottomrule
 \end{tabularx}
 
@@ -66,14 +79,18 @@ This section records information for easy reference.
   \midrule 
   AC & Anticipated Change\\
   DAG & Directed Acyclic Graph \\
+  FR & Functional Requirement\\
+  \projname & Platform for capstone team formation and project selection\\
+  LC & Likely Change (from the SRS)\\
   M & Module \\
   MG & Module Guide \\
+  MGUC & Module Guide Unlikely Change \\
+  NFR & Non-Functional Requirement\\
   OS & Operating System \\
-  R & Requirement\\
-  SC & Scientific Computing \\
   SRS & Software Requirements Specification\\
-  \projname & Explanation of program name\\
-  UC & Unlikely Change \\
+  SSO & Single Sign-On\\
+  TA & Teaching Assistant\\
+  UI & User Interface\\
   \wss{etc.} & \wss{...}\\
   \bottomrule
 \end{tabular}\\
@@ -97,11 +114,10 @@ software.  A module is a work assignment for a programmer or programming
 team~\citep{ParnasEtAl1984}.  We advocate a decomposition
 based on the principle of information hiding~\citep{Parnas1972a}.  This
 principle supports design for change, because the ``secrets'' that each module
-hides represent likely future changes.  Design for change is valuable in SC,
-where modifications are frequent, especially during initial development as the
-solution space is explored.  
+hides represent likely future changes.  Design for change is valuable in \projname{},
+since each course may need different rules and processes.  
 
-Our design follows the rules layed out by \citet{ParnasEtAl1984}, as follows:
+Our design follows the rules laid out by \citet{ParnasEtAl1984}, as follows:
 \begin{itemize}
 \item System details that are likely to change independently should be the
   secrets of separate modules.
@@ -136,9 +152,10 @@ requirements. Section \ref{SecMH} summarizes the module decomposition that
 was constructed according to the likely changes. Section \ref{SecConnection}
 specifies the connections between the software requirements and the
 modules. Section \ref{SecMD} gives a detailed description of the
-modules. Section \ref{SecTM} includes two traceability matrices. One checks
-the completeness of the design against the requirements provided in the SRS. The
-other shows the relation between anticipated changes and the modules. Section
+modules. Section \ref{SecTM} includes three traceability matrices. Two check
+the completeness of the design against the functional and non-functional
+requirements in the SRS. The third shows the relation between anticipated
+changes and the modules. Section
 \ref{SecUse} describes the use relation between modules.
 
 \section{Anticipated and Unlikely Changes} \label{SecChange}
@@ -156,13 +173,122 @@ require changing the one module that hides the associated decision. The approach
 adapted here is called design for
 change.
 
-\begin{description}
-\item[\refstepcounter{acnum} \actheacnum \label{acHardware}:] The specific
-  hardware on which the software is running.
-\item[\refstepcounter{acnum} \actheacnum \label{acInput}:] The format of the
-  initial input data.
-\item ...
-\end{description}
+The anticipated changes below are a superset of the likely changes in the SRS
+\citep{SRS}. Anticipated changes sourced directly from the SRS are identified.
+
+\noindent \begin{itemize}
+  \item[]\reqitem{acnum}{AC_Hardware}
+  \textbf{Hardware Platform.}
+  The operating system, browser, and container runtime on which \projname{} is
+  run and accessed may change, for example a new hosting environment or new
+  browser versions (\srsref{NFR_Browsers}, \srsref{NFR_Container}).
+  \textit{Module:} \idref{M_HardwareHiding}.
+
+  \item[]\reqitem{acnum}{AC_UserInterface}
+  \textbf{User Interface.}
+  The appearance, layout, and navigation of the platform's views may
+  change, for example after usability testing.
+  \textit{Module:} \idref{M_UserInterface}.
+
+  \item[]\reqitem{acnum}{AC_SignInProcedure}
+  \textbf{Sign-In Procedure.}
+  How a user signs in, including the identity providers used (McMaster SSO and
+  a provider for external supervisors) and the protocols for reaching them, and
+  which actions require the user to re-authenticate, may change.
+  \textit{SRS Likely Change:} \srsref{LC_SignIn}.
+  \textit{Module:} \idref{M_Authentication}.
+
+  \item[]\reqitem{acnum}{AC_RolePermissions}
+  \textbf{Role Permissions.}
+  What each role may see and do may change, and new roles may be added.
+  \textit{SRS Likely Change:} \srsref{LC_Users}.
+  \textit{Module:} \idref{M_Authorization}.
+
+  \item[]\reqitem{acnum}{AC_CourseConfig}
+  \textbf{Course Configuration.}
+  The set of course features that can be switched on and off, and the course
+  parameters an instructor can set, may change.
+  \textit{SRS Likely Change:} \srsref{LC_CourseFeatures}.
+  \textit{Module:} \idref{M_CourseManagement}.
+
+  \item[]\reqitem{acnum}{AC_EnrollmentSource}
+  \textbf{Enrollment Source.}
+  Where enrollment data comes from (Avenue to Learn, an uploaded file), and the
+  format it arrives in, may change.
+  \textit{Module:} \idref{M_Enrollment}.
+
+  \item[]\reqitem{acnum}{AC_ProposalTemplate}
+  \textbf{Proposal Template.}
+  The fields of a project proposal, and which of them are required or optional,
+  may change and may differ between courses.
+  \textit{SRS Likely Change:} \srsref{LC_ProposalTemplates}.
+  \textit{Module:} \idref{M_Projects}.
+
+  \item[]\reqitem{acnum}{AC_TeamFormation}
+  \textbf{Team Formation.}
+  How students form teams may change and may differ between courses. This
+  includes the information collected in student and team profiles, and the
+  rules a team must satisfy in a course (size limits, permitted program
+  combinations, eligibility of students from other departments).
+  \textit{SRS Likely Changes:} \srsref{LC_ProfileFields},
+  \srsref{LC_TeamCourseRestrictions}.
+  \textit{Module:} \idref{M_StudentsTeams}.
+
+  \item[]\reqitem{acnum}{AC_Recommendation}
+  \textbf{Recommendation Method.}
+  How teammates, teams, and projects are matched may change, be extended to
+  more criteria, or be removed.
+  \textit{SRS Likely Change:} \srsref{LC_Recommendations}.
+  \textit{Module:} \idref{M_Recommendation}.
+
+  \item[]\reqitem{acnum}{AC_ApprovalWorkflow}
+  \textbf{Approval Process.}
+  The steps, approvers, and mode (in-platform, external, or integrated) by
+  which a course approves team projects may change and may differ between
+  courses. This includes the external system a course uses (e.g.: a GitLab
+  merge request) and its interface.
+  \textit{SRS Likely Change:} \srsref{LC_ApprovalWorkflows}.
+  \textit{Module:} \idref{M_ApprovalWorkflow}.
+
+  \item[]\reqitem{acnum}{AC_ThreadTargets}
+  \textbf{Discussion Thread Targets.}
+  Which records a discussion thread can be attached to, and how many threads
+  each may have, may change.
+  \textit{SRS Likely Change:} \srsref{LC_ThreadTargets}.
+  \textit{Module:} \idref{M_Threads}.
+
+  \item[]\reqitem{acnum}{AC_NotificationRules}
+  \textbf{Notification Rules.}
+  Which events cause a notification, who receives it, and how it is delivered
+  may change.
+  \textit{SRS Likely Change:} \srsref{LC_NotificationRules}.
+  \textit{Module:} \idref{M_Notifications}.
+
+  \item[]\reqitem{acnum}{AC_RequiredActions}
+  \textbf{Required Actions.}
+  Which actions appear on a user's checklist of required actions may change.
+  \textit{SRS Likely Change:} \srsref{LC_RequiredActions}.
+  \textit{Module:} \idref{M_Checklist}.
+
+  \item[]\reqitem{acnum}{AC_Report}
+  \textbf{Course Reports.}
+  The contents of course reports, and the format they are exported in, may
+  change.
+  \textit{SRS Likely Change:} \srsref{LC_CourseReports}.
+  \textit{Module:} \idref{M_CourseReport}.
+
+  \item[]\reqitem{acnum}{AC_Persistence}
+  \textbf{Data Storage.}
+  The technology used to store \projname{}'s records, and how the records are
+  laid out in it, may change.
+  \textit{Module:} \idref{M_Persistence}.
+
+  \item[]\reqitem{acnum}{AC_Audit}
+  \textbf{Audit Records.}
+  How audit records are stored at rest, including the
+  tamper-evident mechanism, may change.
+  \textit{Module:} \idref{M_AuditLog}.
+\end{itemize}
 
 \wss{Anticipated changes relate to changes that would be made in requirements,
 design or implementation choices.  They are not related to changes that are made
@@ -177,11 +303,54 @@ these decision should later need to be changed, then many parts of the design
 will potentially need to be modified. Hence, it is not intended that these
 decisions will be changed.
 
-\begin{description}
-\item[\refstepcounter{ucnum} \uctheucnum \label{ucIO}:] Input/Output devices
-  (Input: File and/or Keyboard, Output: File, Memory, and/or Screen).
-\item ...
-\end{description}
+
+\noindent \begin{itemize}
+  \item[]\reqitem{ucnum}{MGUC_CoreRoles}
+  \textbf{Core Roles.}
+  The four core roles (Student, Supervisor, Instructor, and TA) will not change,
+  since they are the primary users of the system.
+  \textit{SRS Unlikely Change:} Core Stakeholder Roles.
+
+  \item[]\reqitem{ucnum}{MGUC_HumanApproval}
+  \textbf{Human Approval.}
+  Approval decisions on proposals and team projects will always be made by a
+  person, never automatically.
+  \textit{SRS Unlikely Change:} Human-centered approval.
+
+  \item[]\reqitem{ucnum}{MGUC_CourseOrganization}
+  \textbf{Course Organization.}
+  Students, instructors, TAs, projects, and teams will remain organized by
+  course.
+  \textit{SRS Unlikely Change:} Course Organization.
+
+  \item[]\reqitem{ucnum}{MGUC_OverallFlow}
+  \textbf{Overall Flow.}
+  Students may browse projects at any time, with or without a team, and form
+  teams based on their interests. A student must be in a team to apply for or
+  propose a project, and the team's project is then approved.
+  \textit{SRS Unlikely Change:} Vision and Overall Flow.
+
+  \item[]\reqitem{ucnum}{MGUC_ProjectAssignment}
+  \textbf{Project Assignment.}
+  A project will move from proposal, to approval, to being open for
+  applications, to being taken by teams. A team will apply to a project and
+  then reach agreement with its supervisor. These states of a project and of an
+  application will not change.
+
+  \item[]\reqitem{ucnum}{MGUC_IO}
+  \textbf{Input and Output Devices.}
+  Input will come from users through a web browser (keyboard, pointer, and
+  uploaded files), and output will go to the browser screen and to email.
+
+  \item[]\reqitem{ucnum}{MGUC_WebDelivery}
+  \textbf{Web Delivery.}
+  \projname{} will be delivered as a web application, with a user interface in
+  the browser and the rest of the system on a server.
+
+  \item[]\reqitem{ucnum}{MGUC_SingleInstitution}
+  \textbf{Single Institution.}
+  Each deployment of \projname{} will serve one institution.
+\end{itemize}
 
 \section{Module Hierarchy} \label{SecMH}
 
@@ -191,34 +360,52 @@ below, which are leaves in the hierarchy tree, are the modules that will
 actually be implemented.
 
 \begin{description}
-\item [\refstepcounter{mnum} \mthemnum \label{mHH}:] Hardware-Hiding Module
-\item ...
+\item [\idref{M_HardwareHiding}:] Hardware-Hiding Module
+\item [\idref{M_UserInterface}:] User Interface Module
+\item [\idref{M_Authentication}:] Authentication Module
+\item [\idref{M_Authorization}:] Authorization Module
+\item [\idref{M_CourseManagement}:] Course Management Module
+\item [\idref{M_Enrollment}:] Enrollment Module
+\item [\idref{M_Projects}:] Projects Module
+\item [\idref{M_StudentsTeams}:] Students and Teams Module
+\item [\idref{M_Recommendation}:] Recommendation Module
+\item [\idref{M_ApprovalWorkflow}:] Approval Workflow Module
+\item [\idref{M_Threads}:] Threads Module
+\item [\idref{M_Notifications}:] Notifications Module
+\item [\idref{M_Checklist}:] Checklist Module
+\item [\idref{M_CourseReport}:] Course Report Module
+\item [\idref{M_Persistence}:] Persistence Module
+\item [\idref{M_AuditLog}:] Audit Log Module
 \end{description}
 
 
-\begin{table}[h!]
+\begin{table}[H]
 \centering
 \begin{tabular}{p{0.3\textwidth} p{0.6\textwidth}}
 \toprule
 \textbf{Level 1} & \textbf{Level 2}\\
 \midrule
 
-{Hardware-Hiding Module} & ~ \\
+{Hardware-Hiding Module} & \idref{M_HardwareHiding} \\
 \midrule
 
-\multirow{7}{0.3\textwidth}{Behaviour-Hiding Module} & ?\\
-& ?\\
-& ?\\
-& ?\\
-& ?\\
-& ?\\
-& ?\\ 
-& ?\\
+\multirow{13}{0.3\textwidth}{Behaviour-Hiding Module} & \idref{M_UserInterface}\\
+ & \idref{M_Authentication}\\
+ & \idref{M_Authorization}\\
+ & \idref{M_CourseManagement}\\
+ & \idref{M_Enrollment}\\
+ & \idref{M_Projects}\\
+ & \idref{M_StudentsTeams}\\
+ & \idref{M_Recommendation}\\
+ & \idref{M_ApprovalWorkflow}\\
+ & \idref{M_Threads}\\
+ & \idref{M_Notifications}\\
+ & \idref{M_Checklist}\\
+ & \idref{M_CourseReport}\\
 \midrule
 
-\multirow{3}{0.3\textwidth}{Software Decision Module} & {?}\\
-& ?\\
-& ?\\
+\multirow{2}{0.3\textwidth}{Software Decision Module} & \idref{M_Persistence}\\
+ & \idref{M_AuditLog}\\
 \bottomrule
 
 \end{tabular}
@@ -239,6 +426,68 @@ between requirements and modules is listed in Table~\ref{TblRT}.
   requirements, a specific design decision may be made to satisfy those
   requirements with a password.}
 
+The design decisions made to satisfy the requirements are:
+
+\begin{itemize}
+  \item \textbf{Access checks.} Every user signs in through
+  \idref{M_Authentication} before doing anything, and every action is checked by
+  \idref{M_Authorization} against the user's role in that course
+  (\srsref{NFR_Authenticate}, \srsref{NFR_Authorize},
+  \srsref{FR_AuthorizationRBAC}).
+
+  \item \textbf{Supervisor verification as a role.} An unverified external
+  supervisor holds a separate role. Verifying them is a role change in
+  \idref{M_Authorization}, so all access rules stay in one module
+  (\srsref{FR_ExternalSupervisorVerification},
+  \srsref{FR_ExternalSupervisorScope}).
+
+  \item \textbf{Course settings as data.} Each course's enabled features and
+  settings are stored as data in \idref{M_CourseManagement}, not written into the
+  code. This lets a feature be turned off on a live system
+  (\srsref{FR_DisableFeatures}, \srsref{NFR_LiveDisable}).
+
+  \item \textbf{External services hidden by the module that uses them.} Each
+  outside system is reached only through the one module that needs it: identity
+  providers through \idref{M_Authentication}, the external approval system
+  through \idref{M_ApprovalWorkflow}, the enrollment source through
+  \idref{M_Enrollment}, and any service used to deliver notifications through
+  \idref{M_Notifications}.
+  Replacing an outside system therefore changes one module
+  (\srsref{FR_MacSSO}, \srsref{FR_ExternalApproval},
+  \srsref{FR_ImportEnrollment}).
+
+  \item \textbf{Stored notifications.} A notification is stored before it is
+  sent, and \idref{M_Notifications} retries it until delivery is confirmed
+  (\srsref{FR_DurableNotifications}, \srsref{FR_ActionRequiredEmail}).
+
+  \item \textbf{One audit log.} User actions and errors from external services
+  are all recorded through \idref{M_AuditLog}, which hides how the records are
+  made tamper-evident (\srsref{NFR_AuditLog}, \srsref{NFR_AuditTamper},
+  \srsref{FR_LogExternalErrors}).
+
+  \item \textbf{One path to storage.} All records are saved and read through
+  \idref{M_Persistence}, which handles concurrent changes, encryption at rest,
+  and backups (\srsref{NFR_ConcurrencySafety}, \srsref{NFR_EncryptRest},
+  \srsref{NFR_Recoverable}). All changes resulting from one user action are
+  saved in a single transaction: either all of them are saved or none are. For
+  example, rejecting a team's project and releasing the project slot reserved
+  for that team either both succeed or neither is saved.
+
+  \item \textbf{Passwords never stored in plain text.} Passwords are only
+  stored as hashes, produced inside \idref{M_Authentication}
+  (\srsref{NFR_PasswordHash}).
+
+  \item \textbf{Encrypted connections.} The user interface and the server talk
+  only over an encrypted (HTTPS) connection, provided by the web framework and
+  operating system behind \idref{M_HardwareHiding}
+  (\srsref{NFR_EncryptTransit}).
+
+  \item \textbf{Web application.} The user interface runs in the browser and
+  the rest of the system runs on a server (\idref{MGUC_WebDelivery}), so the
+  system works on any supported browser and screen size
+  (\srsref{NFR_Browsers}, \srsref{NFR_ScreenSize}).
+\end{itemize}
+
 \section{Module Decomposition} \label{SecMD}
 
 Modules are decomposed according to the principle of ``information hiding''
@@ -255,14 +504,11 @@ Only the leaf modules in the hierarchy have to be implemented. If a dash
 (\emph{--}) is shown, this means that the module is not a leaf and will not have
 to be implemented.
 
-\subsection{Hardware Hiding Modules (\mref{mHH})}
+\subsection[Hardware-Hiding Module]{Hardware-Hiding Module (\protect\descriptiveid{M_HardwareHiding})}\label{M_HardwareHiding}
 
 \begin{description}
-\item[Secrets:]The data structure and algorithm used to implement the virtual
-  hardware.
-\item[Services:]Serves as a virtual hardware used by the rest of the
-  system. This module provides the interface between the hardware and the
-  software. So, the system can use it to display outputs or to accept inputs.
+\item[Secrets:] The platform the system runs on.
+\item[Services:] Serves as a virtual hardware used by the rest of the system, so the system can accept input, display output, store files, and make network connections, including encrypted (HTTPS) connections between the browser and the server.
 \item[Implemented By:] OS
 \end{description}
 
@@ -273,23 +519,129 @@ to be implemented.
 \item[Services:]Includes programs that provide externally visible behaviour of
   the system as specified in the software requirements specification (SRS)
   documents. This module serves as a communication layer between the
-  hardware-hiding module and the software decision module. The programs in this
-  module will need to change if there are changes in the SRS.
+  hardware-hiding module and the software decision module. Changes in the SRS
+  will need to be reflected here.
 \item[Implemented By:] --
 \end{description}
 
-\subsubsection{Input Format Module (\mref{mInput})}
+\wss{Template example of a leaf module. Input Format Module: Secrets: The format and structure of the input data. Services: Converts the input data into the data structure used by the input parameters module. Implemented By: [Your Program Name Here]. Type of Module: [Record, Library, Abstract Object, or Abstract Data Type] [Information to include for leaf modules in the decomposition by secrets tree.]}
+
+\subsubsection[User Interface Module]{User Interface Module (\protect\descriptiveid{M_UserInterface})}\label{M_UserInterface}
 
 \begin{description}
-\item[Secrets:]The format and structure of the input data.
-\item[Services:]Converts the input data into the data structure used by the
-  input parameters module.
-\item[Implemented By:] [Your Program Name Here]
-\item[Type of Module:] [Record, Library, Abstract Object, or Abstract Data Type]
-  [Information to include for leaf modules in the decomposition by secrets tree.]
+\item[Secrets:] The design of each view.
+\item[Services:] Shows information to the user and collects their input for every user task.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
 \end{description}
 
-\subsubsection{Etc.}
+\subsubsection[Authentication Module]{Authentication Module (\protect\descriptiveid{M_Authentication})}\label{M_Authentication}
+
+\begin{description}
+\item[Secrets:] How a user is identified and verified.
+\item[Services:] Signs users in through McMaster SSO or the provider used by external supervisors, keeps each user's identity (name, email, and linked sign-in account), stores passwords only as hashes and checks passwords against them, and re-verifies users before high-risk actions.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Authorization Module]{Authorization Module (\protect\descriptiveid{M_Authorization})}\label{M_Authorization}
+
+\begin{description}
+\item[Secrets:] What each user is allowed to do.
+\item[Services:] Records, changes, and looks up each user's role, and decides whether a user may take an action or see a record based on that role. An unverified external supervisor holds a separate role, so verifying them is a role change.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Course Management Module]{Course Management Module (\protect\descriptiveid{M_CourseManagement})}\label{M_CourseManagement}
+
+\begin{description}
+\item[Secrets:] The setup of each course.
+\item[Services:] Stores each course's settings and enabled features, keeps track of which features have pending work, and refuses to turn off a feature that has pending work. Lets instructors and TAs publish and update course material, and lets students and supervisors read it.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Enrollment Module]{Enrollment Module (\protect\descriptiveid{M_Enrollment})}\label{M_Enrollment}
+
+\begin{description}
+\item[Secrets:] How a course's student list is obtained.
+\item[Services:] Reads an enrollment list from Avenue to Learn or an uploaded file, previews it against the current course list, applies it after confirmation, adds single students, and flags students missing from the latest list.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Projects Module]{Projects Module (\protect\descriptiveid{M_Projects})}\label{M_Projects}
+
+\begin{description}
+\item[Secrets:] The project records and their life cycle.
+\item[Services:] Gives the proposal form for a course and checks that a proposal has every required field. Records proposals and their review, tracks how many teams a project can take, and records team applications, supervisor decisions, and agreements. Reserves and releases project slots, and withdraws competing applications when a team reaches agreement. Returns the projects a user may see, searched, filtered, and sorted as requested.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Students and Teams Module]{Students and Teams Module (\protect\descriptiveid{M_StudentsTeams})}\label{M_StudentsTeams}
+
+\begin{description}
+\item[Secrets:] How students form teams.
+\item[Services:] Creates, updates, and shows student and team profiles. Creates teams, handles invitations and joining, records member roles and the assigned TA, and lists students without a team. Stores each course's team rules, checks a team against them, and reports any rule it breaks.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Recommendation Module]{Recommendation Module (\protect\descriptiveid{M_Recommendation})}\label{M_Recommendation}
+
+\begin{description}
+\item[Secrets:] The method used to match students, teams, and projects.
+\item[Services:] Suggests teammates, teams, and projects for a student or team.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Library
+\end{description}
+
+\subsubsection[Approval Workflow Module]{Approval Workflow Module (\protect\descriptiveid{M_ApprovalWorkflow})}\label{M_ApprovalWorkflow}
+
+\begin{description}
+\item[Secrets:] The approval process of each course.
+\item[Services:] Checks a submission before it is sent, sends it to the approvers (in the platform or in an external system such as a GitLab merge request), and records their decision. Handles changes to approved projects without replacing the existing approval until the changes are accepted.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Threads Module]{Threads Module (\protect\descriptiveid{M_Threads})}\label{M_Threads}
+
+\begin{description}
+\item[Secrets:] The records that discussion threads can be attached to.
+\item[Services:] Creates threads on records that allow them, adds replies, and lists a record's threads.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Notifications Module]{Notifications Module (\protect\descriptiveid{M_Notifications})}\label{M_Notifications}
+
+\begin{description}
+\item[Secrets:] How users are notified of events.
+\item[Services:] Decides who to notify about each event, writes the message, delivers it through an external service, and keeps it until delivery is confirmed. Runs timed work, such as deadline reminders and retries of undelivered notifications.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Checklist Module]{Checklist Module (\protect\descriptiveid{M_Checklist})}\label{M_Checklist}
+
+\begin{description}
+\item[Secrets:] How a user's required actions are worked out.
+\item[Services:] Lists a user's required actions and whether each one is done.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Library
+\end{description}
+
+\subsubsection[Course Report Module]{Course Report Module (\protect\descriptiveid{M_CourseReport})}\label{M_CourseReport}
+
+\begin{description}
+\item[Secrets:] The course report format.
+\item[Services:] Shows instructors and TAs the status of projects, teams, and supervisors in their courses, and exports a report.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Library
+\end{description}
 
 
 \subsection{Software Decision Module}
@@ -305,61 +657,150 @@ to be implemented.
 \item[Implemented By:] --
 \end{description}
 
-\subsubsection{Etc.}
+\subsubsection[Persistence Module]{Persistence Module (\protect\descriptiveid{M_Persistence})}\label{M_Persistence}
+
+\begin{description}
+\item[Secrets:] How records are stored.
+\item[Services:] Saves, reads, and changes records safely when several users act at once, saving all changes from one user action in a single transaction, keeps records encrypted, and restores them from backups.
+\item[Implemented By:] \projname{} (on PostgreSQL)
+\item[Type of Module:] Abstract Object
+\end{description}
+
+\subsubsection[Audit Log Module]{Audit Log Module (\protect\descriptiveid{M_AuditLog})}\label{M_AuditLog}
+
+\begin{description}
+\item[Secrets:] How audit records are kept.
+\item[Services:] Records each user action and each error from an external service, and lets authorized users read the records.
+\item[Implemented By:] \projname{}
+\item[Type of Module:] Abstract Object
+\end{description}
 
 \section{Traceability Matrix} \label{SecTM}
 
-This section shows two traceability matrices: between the modules and the
-requirements and between the modules and the anticipated changes.
+This section shows three traceability matrices: between the modules and the
+functional requirements, the non-functional requirements, and the anticipated
+changes.
 
 % the table should use mref, the requirements should be named, use something
 % like fref
-\begin{table}[H]
-\centering
-\begin{tabular}{p{0.2\textwidth} p{0.6\textwidth}}
-\toprule
-\textbf{Req.} & \textbf{Modules}\\
-\midrule
-R1 & \mref{mHH}, \mref{mInput}, \mref{mParams}, \mref{mControl}\\
-R2 & \mref{mInput}, \mref{mParams}\\
-R3 & \mref{mVerify}\\
-R4 & \mref{mOutput}, \mref{mControl}\\
-R5 & \mref{mOutput}, \mref{mODEs}, \mref{mControl}, \mref{mSeqDS}, \mref{mSolver}, \mref{mPlot}\\
-R6 & \mref{mOutput}, \mref{mODEs}, \mref{mControl}, \mref{mSeqDS}, \mref{mSolver}, \mref{mPlot}\\
-R7 & \mref{mOutput}, \mref{mEnergy}, \mref{mControl}, \mref{mSeqDS}, \mref{mPlot}\\
-R8 & \mref{mOutput}, \mref{mEnergy}, \mref{mControl}, \mref{mSeqDS}, \mref{mPlot}\\
-R9 & \mref{mVerifyOut}\\
-R10 & \mref{mOutput}, \mref{mODEs}, \mref{mControl}\\
-R11 & \mref{mOutput}, \mref{mODEs}, \mref{mEnergy}, \mref{mControl}\\
-\bottomrule
-\end{tabular}
-\caption{Trace Between Requirements and Modules}
-\label{TblRT}
-\end{table}
+\begin{longtable}{p{0.45\textwidth} p{0.50\textwidth}}
 
-\begin{table}[H]
-\centering
-\begin{tabular}{p{0.2\textwidth} p{0.6\textwidth}}
-\toprule
-\textbf{AC} & \textbf{Modules}\\
-\midrule
-\acref{acHardware} & \mref{mHH}\\
-\acref{acInput} & \mref{mInput}\\
-\acref{acParams} & \mref{mParams}\\
-\acref{acVerify} & \mref{mVerify}\\
-\acref{acOutput} & \mref{mOutput}\\
-\acref{acVerifyOut} & \mref{mVerifyOut}\\
-\acref{acODEs} & \mref{mODEs}\\
-\acref{acEnergy} & \mref{mEnergy}\\
-\acref{acControl} & \mref{mControl}\\
-\acref{acSeqDS} & \mref{mSeqDS}\\
-\acref{acSolver} & \mref{mSolver}\\
-\acref{acPlot} & \mref{mPlot}\\
-\bottomrule
-\end{tabular}
-\caption{Trace Between Anticipated Changes and Modules}
-\label{TblACT}
-\end{table}
+  \toprule
+  Functional Requirement & Modules \\
+  \midrule
+  \srsref{FR_SupervisorProposal} & \idref{M_Projects} \\ \hline
+  \srsref{FR_ProposalOptionalFields} & \idref{M_Projects} \\ \hline
+  \srsref{FR_StudentProposal} & \idref{M_Projects} \\ \hline
+  \srsref{FR_ReviewProposal} & \idref{M_Projects} \\ \hline
+  \srsref{FR_ViewApprovedProjects} & \idref{M_Projects} \\ \hline
+  \srsref{FR_ViewProjectStatus} & \idref{M_Projects} \\ \hline
+  \srsref{FR_StudentProfile} & \idref{M_StudentsTeams} \\ \hline
+  \srsref{FR_StudentTeams} & \idref{M_StudentsTeams} \\ \hline
+  \srsref{FR_ValidateTeamRules} & \idref{M_StudentsTeams} \\ \hline
+  \srsref{FR_TeamDiscovery} & \idref{M_StudentsTeams} \\ \hline
+  \srsref{FR_TeamProfile} & \idref{M_StudentsTeams} \\ \hline
+  \srsref{FR_TeamRecommend} & \idref{M_Recommendation} \\ \hline
+  \srsref{FR_ProjectInterest} & \idref{M_Projects} \\ \hline
+  \srsref{FR_DeclineTeam} & \idref{M_Projects} \\ \hline
+  \srsref{FR_ProjectThreads} & \idref{M_Threads} \\ \hline
+  \srsref{FR_ThreadsNotify} & \idref{M_Notifications} \\ \hline
+  \srsref{FR_RequestApproval} & \idref{M_ApprovalWorkflow} \\ \hline
+  \srsref{FR_ApprovalResponse} & \idref{M_ApprovalWorkflow} \\ \hline
+  \srsref{FR_ExternalApproval} & \idref{M_ApprovalWorkflow} \\ \hline
+  \srsref{FR_ApprovalPreflightValidate} & \idref{M_ApprovalWorkflow}, \idref{M_StudentsTeams} \\ \hline
+  \srsref{FR_ApprovalRevision} & \idref{M_ApprovalWorkflow} \\ \hline
+  \srsref{FR_DisableFeatures} & \idref{M_CourseManagement} \\ \hline
+  \srsref{FR_ReferenceMaterial} & \idref{M_CourseManagement} \\ \hline
+  \srsref{FR_RequiredActionsList} & \idref{M_Checklist} \\ \hline
+  \srsref{FR_ActionRequiredEmail} & \idref{M_Notifications}, \idref{M_Checklist} \\ \hline
+  \srsref{FR_ReadCourseInformation} & \idref{M_CourseReport} \\ \hline
+  \srsref{FR_ExportCourseInformation} & \idref{M_CourseReport} \\ \hline
+  \srsref{FR_MacSSO} & \idref{M_Authentication} \\ \hline
+  \srsref{FR_AuthorizationRBAC} & \idref{M_Authorization} \\ \hline
+  \srsref{FR_UpdateRoles} & \idref{M_Authorization} \\ \hline
+  \srsref{FR_ExternalSupervisorVerification} & \idref{M_Authorization}, \idref{M_Authentication} \\ \hline
+  \srsref{FR_ExternalSupervisorScope} & \idref{M_Authorization} \\ \hline
+  \srsref{FR_LogExternalErrors} & \idref{M_AuditLog}, \idref{M_Notifications} \\ \hline
+  \srsref{FR_RejectComponentDisable} & \idref{M_CourseManagement} \\ \hline
+  \srsref{FR_DisplayTimestamps} & \idref{M_UserInterface}, \idref{M_Persistence} \\ \hline
+  \srsref{FR_DurableNotifications} & \idref{M_Notifications} \\ \hline
+  \srsref{FR_ReverifyUsers} & \idref{M_Authentication} \\ \hline
+  \srsref{FR_ImportEnrollment} & \idref{M_Enrollment} \\ \hline
+  \srsref{FR_UpdateEnrollment} & \idref{M_Enrollment} \\ \hline
+  \srsref{FR_EnrollmentDiscrepency} & \idref{M_Enrollment} \\ \hline
+  \srsref{FR_NeedsGroup} & \idref{M_StudentsTeams} \\ \hline
+  \srsref{FR_AssignTA} & \idref{M_StudentsTeams} \\ \hline
+
+  \bottomrule
+
+  \caption{Trace Between Functional Requirements and Modules}
+  \label{TblRT}
+\end{longtable}
+
+\begin{longtable}{p{0.45\textwidth} p{0.50\textwidth}}
+
+  \toprule
+  Non-Functional Requirement & Modules \\
+  \midrule
+  \srsref{NFR_ScreenSize} & \idref{M_UserInterface} \\ \hline
+  \srsref{NFR_UsabilityFirstSuccess} & \idref{M_UserInterface} \\ \hline
+  \srsref{NFR_LearnUnassisted} & \idref{M_UserInterface} \\ \hline
+  \srsref{NFR_AccessibilityWCAG} & \idref{M_UserInterface} \\ \hline
+  \srsref{NFR_PerfTail} & \idref{M_HardwareHiding}, \idref{M_Persistence} \\ \hline
+  \srsref{NFR_Uptime} & \idref{M_HardwareHiding} \\ \hline
+  \srsref{NFR_Recoverable} & \idref{M_Persistence} \\ \hline
+  \srsref{NFR_PeakUsers} & \idref{M_HardwareHiding}, \idref{M_Persistence} \\ \hline
+  \srsref{NFR_Browsers} & \idref{M_HardwareHiding}, \idref{M_UserInterface} \\ \hline
+  \srsref{NFR_Container} & \idref{M_HardwareHiding} \\ \hline
+  \srsref{NFR_DeployUnassisted} & \idref{M_HardwareHiding} \\ \hline
+  \srsref{NFR_ChangeEffort} & All modules \\ \hline
+  \srsref{NFR_LiveDisable} & \idref{M_CourseManagement} \\ \hline
+  \srsref{NFR_Authenticate} & \idref{M_Authentication} \\ \hline
+  \srsref{NFR_Authorize} & \idref{M_Authorization} \\ \hline
+  \srsref{NFR_ConcurrencySafety} & \idref{M_Persistence} \\ \hline
+  \srsref{NFR_EssentialPersonal} & \idref{M_StudentsTeams}, \idref{M_Authentication} \\ \hline
+  \srsref{NFR_EncryptTransit} & \idref{M_HardwareHiding} \\ \hline
+  \srsref{NFR_EncryptRest} & \idref{M_Persistence} \\ \hline
+  \srsref{NFR_PasswordHash} & \idref{M_Authentication} \\ \hline
+  \srsref{NFR_AuditLog} & \idref{M_AuditLog} \\ \hline
+  \srsref{NFR_AuditTamper} & \idref{M_AuditLog} \\ \hline
+  \srsref{NFR_ComplianceAODA} & \idref{M_UserInterface} \\ \hline
+
+  \bottomrule
+
+  \caption{Trace Between Non-Functional Requirements and Modules}
+  \label{TblNFRT}
+\end{longtable}
+
+\begin{longtable}{p{0.45\textwidth} p{0.50\textwidth}}
+
+  \toprule
+  Anticipated Change & Module \\
+  \midrule
+  \idref{AC_Hardware} & \idref{M_HardwareHiding} \\ \hline
+  \idref{AC_UserInterface} & \idref{M_UserInterface} \\ \hline
+  \idref{AC_SignInProcedure} & \idref{M_Authentication} \\ \hline
+  \idref{AC_RolePermissions} & \idref{M_Authorization} \\ \hline
+  \idref{AC_CourseConfig} & \idref{M_CourseManagement} \\ \hline
+  \idref{AC_EnrollmentSource} & \idref{M_Enrollment} \\ \hline
+  \idref{AC_ProposalTemplate} & \idref{M_Projects} \\ \hline
+  \idref{AC_TeamFormation} & \idref{M_StudentsTeams} \\ \hline
+  \idref{AC_Recommendation} & \idref{M_Recommendation} \\ \hline
+  \idref{AC_ApprovalWorkflow} & \idref{M_ApprovalWorkflow} \\ \hline
+  \idref{AC_ThreadTargets} & \idref{M_Threads} \\ \hline
+  \idref{AC_NotificationRules} & \idref{M_Notifications} \\ \hline
+  \idref{AC_RequiredActions} & \idref{M_Checklist} \\ \hline
+  \idref{AC_Report} & \idref{M_CourseReport} \\ \hline
+  \idref{AC_Persistence} & \idref{M_Persistence} \\ \hline
+  \idref{AC_Audit} & \idref{M_AuditLog} \\ \hline
+
+  \bottomrule
+
+  \caption{Trace Between Anticipated Changes and Modules}
+  \label{TblACT}
+\end{longtable}
+
+Each module maps to an anticipated change.
 
 \section{Use Hierarchy Between Modules} \label{SecUse}
 
@@ -383,9 +824,23 @@ arrows in the diagram typically correspond to the presence of import statement.}
 
 \wss{If module A uses module B, the arrow is directed from A to B.}
 
+In Figure~\ref{FigUH}, the dashed box groups the request-handling modules. An
+arrow into the box means \idref{M_UserInterface} uses every module in it,
+and an arrow out of the box means every module in it uses the target. Blue
+modules are Behaviour-Hiding, orange modules are Software Decision, and the
+grey module is Hardware-Hiding.
+
+Every Software Decision module is used by at least one Behaviour-Hiding module.
+
 \begin{figure}[H]
 \centering
 %\includegraphics[width=0.7\textwidth]{UsesHierarchy.png}
+\IfFileExists{UsesHierarchy.pdf}{%
+  \includegraphics[width=\textwidth,height=0.8\textheight,keepaspectratio]{UsesHierarchy.pdf}%
+}{%
+  \fbox{\parbox{0.8\textwidth}{\centering UsesHierarchy.pdf is rendered from
+  UsesHierarchy.dot by the build. Install Graphviz to render it locally.}}%
+}
 \caption{Use hierarchy among modules}
 \label{FigUH}
 \end{figure}
@@ -394,10 +849,14 @@ arrows in the diagram typically correspond to the presence of import statement.}
 
 \section{User Interfaces}
 
+...to be completed in Revision 0.
+
 \wss{Design of user interface for software and hardware.  Attach an appendix if
 needed. Drawings, Sketches, Figma}
 
 \section{Design of Communication Protocols}
+
+...to be completed in Revision 0.
 
 \wss{If there is communication between hardware and software, it may be necessary 
 to explain the design of the communication protocol.  This section should be filled 
@@ -405,11 +864,15 @@ in with NA if it is not appropriate for a given project.}
 
 \section{Database Design}
 
+...to be completed in Revision 0.
+
 \wss{If a database is a significant component of the project, the database
 design should be summarized here.  This section should be filled in with NA if
 it is not appropriate for a given project.}
 
 \section{Timeline}
+
+...to be completed in Revision 0.
 
 \wss{Schedule of tasks and who is responsible}
 

@@ -500,7 +500,7 @@ This section covers the tests for project proposal submission and validation, as
 
 \item \label{T-FR-01}\textbf{T-FR-01: Submit a Complete Supervisor Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
@@ -529,7 +529,7 @@ This section covers the tests for project proposal submission and validation, as
 
 \item \label{T-FR-02}\textbf{T-FR-02: Reject Missing Required Fields}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 					
 \textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
@@ -543,7 +543,7 @@ This section covers the tests for project proposal submission and validation, as
 
 \item \label{T-FR-03}\textbf{T-FR-03: Accept Missing Optional Fields}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 					
 \textbf{Initial State:} A supervisor is authenticated, has permission to submit proposals, and the proposal submission period is open.
 					
@@ -557,7 +557,7 @@ This section covers the tests for project proposal submission and validation, as
 
 \item \label{T-FR-04}\textbf{T-FR-04: Publish a Student-Proposed Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A student is authenticated and belongs to a team, and
 the proposal submission period is open.
@@ -592,7 +592,7 @@ This section covers FR\_ReviewProposal, including the approval, rejection, and r
 
 \item \label{T-FR-05}\textbf{T-FR-05: Approve a Supervisor Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated instructor has access to an unapproved proposal titled Autonomous Waste Sorting System submitted by an unverified external supervisor. The proposal status is ``Proposal submitted''.
 
@@ -606,7 +606,7 @@ This section covers FR\_ReviewProposal, including the approval, rejection, and r
 
 \item \label{T-FR-06}\textbf{T-FR-06: Request Changes to a Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An instructor has access to a proposal with the ``Proposal submitted'' status, submitted by an unverified external supervisor.
 
@@ -620,7 +620,7 @@ This section covers FR\_ReviewProposal, including the approval, rejection, and r
 
 \item \label{T-FR-07}\textbf{T-FR-07: Reject a Supervisor Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated instructor has access to a proposal with the ``Proposal submitted'' status, submitted by an unverified external supervisor.
 
@@ -634,7 +634,7 @@ This section covers FR\_ReviewProposal, including the approval, rejection, and r
 
 \item \label{T-FR-08}\textbf{T-FR-08: Revise and Resubmit a Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A supervisor proposal has the status ``Proposal changes requested'' and contains instructor feedback asking for clearer project deliverables.
 
@@ -655,7 +655,7 @@ This section covers \texttt{FR\_ViewApprovedProjects} and \texttt{FR\_ViewProjec
 
 \item \label{T-FR-09}\textbf{T-FR-09: Search and Filter Approved Projects}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated student is enrolled in the course. Three approved projects are visible to the student:
 \begin{itemize}
@@ -674,7 +674,7 @@ This section covers \texttt{FR\_ViewApprovedProjects} and \texttt{FR\_ViewProjec
 
 \item \label{T-FR-10}\textbf{T-FR-10: Exclude Unapproved or Unauthorized Projects}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The system contains three projects:
 \begin{itemize}
@@ -694,7 +694,7 @@ A student enrolled in the course, the course instructor, and External Supervisor
 
 \item \label{T-FR-11}\textbf{T-FR-11: Display Project Availability and Capacity}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated student can access two approved projects:
 \begin{itemize}
@@ -713,7 +713,7 @@ A student enrolled in the course, the course instructor, and External Supervisor
 
 \item \label{T-FR-12}\textbf{T-FR-12: Prevent Applications to Full Projects}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated student belongs to a registered team. An approved project has a maximum capacity of one team and its only supervisor slot is reserved, giving it the ``Full'' status.
 
@@ -735,7 +735,7 @@ This section covers \texttt{FR\_StudentProfile}, \texttt{FR\_StudentTeams}, \tex
 
 \item \label{T-FR-13}\textbf{T-FR-13: Create and View a Student Profile}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A student is authenticated and enrolled in the Software Engineering capstone course. The student has not created a profile.
 
@@ -761,7 +761,7 @@ The student saves the profile.
 
 \item \label{T-FR-14}\textbf{T-FR-14: Update an Existing Student Profile}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} An authenticated student has an existing profile with the skills ``Python, Java, React'' and project preferences ``AI and automation projects'' (Profile provided in T-FR-13).
 
@@ -775,7 +775,7 @@ The student saves the profile.
 
 \item \label{T-FR-15}\textbf{T-FR-15: Create a Student Team and Assign Roles}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Three authenticated students, Student A, Student B, and Student C, are enrolled in the Software Engineering capstone course and do not belong to any existing teams. The course permits teams of 3 to 5 students.
 
@@ -789,7 +789,7 @@ The student saves the profile.
 
 \item \label{T-FR-16}\textbf{T-FR-16: Send and Accept a Team Invitation}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has 3 members and a maximum permitted size of 5 as defined in T-FR-15. Student D is enrolled in the same course and does not belong to another team.
 
@@ -803,7 +803,7 @@ The student saves the profile.
 
 \item \label{T-FR-17}\textbf{T-FR-17: Decline a Team Invitation}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has 3 members and can recruit additional students. Student E is enrolled in the course, has no team, and has received an invitation to join Team Amazing Engineers.
 
@@ -817,7 +817,7 @@ The student saves the profile.
 
 \item \label{T-FR-18}\textbf{T-FR-18: Find and Join an Existing Team}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has 3 members and a maximum permitted size of 5. The team is configured to recruit 2 additional members. Student F is enrolled in the course, is not on a team, and is eligible to join Team Amazing Engineers. Student A is an existing member of Team Amazing
 Engineers.
@@ -832,7 +832,7 @@ Engineers.
 
 \item \label{T-FR-19}\textbf{T-FR-19: Validate Team Size Constraints}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course requires a minimum of 3 students and a maximum of 5 students per team. Team Amazing Engineers contains 2 students, Team Fantastic Coders contains 3 students, and Team Capstone Legends contains 5 students. Team Amazing Engineers is recruiting additional members. Team Amazing Engineers has reached an agreement with the supervisor of Autonomous Waste Sorting System, and its team-project status is ``Agreed''. In-platform approval is enabled, and all other required submission information is complete.
 
@@ -846,7 +846,7 @@ Engineers.
 
 \item \label{T-FR-20}\textbf{T-FR-20: Reject Disallowed Program Combinations}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The course configuration permits teams consisting entirely of Software Engineering students or a combination of Software Engineering and Mechatronics students. Teams combining Software Engineering and Computer Science students are not permitted. The minimum team size is 3. Team A and Team B each initially contain 2 Software Engineering students.
 
@@ -864,7 +864,7 @@ Engineers.
 
 \item \label{T-FR-21}\textbf{T-FR-21: Prevent Duplicate Team Membership}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A is already a member of Team Amazing Engineers. Team Fantastic Coders is an existing team with an available membership slot. Both teams belong to the same capstone course.
 
@@ -878,7 +878,7 @@ Engineers.
 
 \item \label{T-FR-22}\textbf{T-FR-22: Flag Existing Teams After Rule Changes}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A course permits team sizes from 3 to 5 students. Team Amazing Engineers has 3 members, and Team Fantastic Coders has 5 members. Both teams are valid under the existing rules.
 
@@ -892,7 +892,7 @@ Engineers.
 
 \item \label{T-FR-23}\textbf{T-FR-23: Discover Students and Teams Seeking Members}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Students A and B are enrolled in the same course and have not joined a team. Team Amazing Engineers is recruiting 2 additional members, while Team Fantastic Coders is not recruiting.
 
@@ -906,7 +906,7 @@ Engineers.
 
 \item \label{T-FR-24}\textbf{T-FR-24: Create, Update, and View a Team Profile}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers consists of three registered students. The team has not created a shared team profile.
 
@@ -936,7 +936,7 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \item \label{T-FR-25}\textbf{T-FR-25: Recommend Compatible Projects and Teammates}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A has a complete profile containing Python, machine learning, and computer vision skills, with interests in artificial intelligence and automation. Three available projects and two students seeking teammates exist:
 \begin{itemize}
@@ -957,7 +957,7 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \item \label{T-FR-26}\textbf{T-FR-26: Submit an Application to an Open Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers consists of three registered students, has no existing application to Autonomous Waste Sorting System, and has not accepted another project. Autonomous Waste Sorting System has status ``Open'', maximum capacity $C_{\max}=2$, and $R=0$ reserved slots.
 
@@ -971,7 +971,7 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \item \label{T-FR-27}\textbf{T-FR-27: Reserve Capacity When a Supervisor Accepts a Team}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Autonomous Waste Sorting System has maximum capacity $C_{max}=2$ and $R=1$ reserved slot. Team Fantastic Coders has an application with status ``Applied'' and has not been accepted by the supervisor.
 
@@ -983,24 +983,9 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \textbf{How Test Will Be Performed:} Configure the project and Team Fantastic Coders's pending application. Using Playwright, authenticate as the supervisor and accept Team Fantastic Coders. Verify the updated team-project status, acceptance record, reserved slot count, and project availability.
 
-% TODO: Need to evaluate and resolve the redundancy issue in "Applied" and "Team Accepts - Supervisor Pending" States - https://github.com/Ayushpatel2026/Keystone/issues/138
-\item \label{T-FR-28}\textbf{T-FR-28: Record Team Acceptance Before Supervisor Acceptance}\\
+\item \label{T-FR-28}\textbf{T-FR-28: Establish a Mutual Supervisor-Team Agreement}\\
 
-\textbf{Type:} Automatic
-
-\textbf{Initial State:} Team Amazing Engineers has an application to Autonomous Waste Sorting System with status ``Applied''. The project has maximum capacity $C_{max}=2$, $R=0$ reserved slots, and status ``Open''.
-
-\textbf{Input:} Team Amazing Engineers accepts the proposed working arrangement before receiving supervisor acceptance.
-
-\textbf{Output:} The team-project status becomes ``Team Accepts - Supervisor Pending''. The team's acceptance is recorded, but the arrangement is not marked ``Agreed''. No supervisor slot is reserved, so $R=0$ and the project remains ``Open''.
-
-\textbf{Test Case Derivation:} Derived from \texttt{FR\_DeclineTeam} and the status lifecycle in Section 7.2 of the SRS. Team acceptance alone must not reserve project capacity or establish a mutual agreement.
-
-\textbf{How Test Will Be Performed:} Using Playwright, authenticate as an authorized Team Amazing Engineers member and record the team's acceptance. Verify the pending-supervisor status and confirm that the project capacity and availability remain unchanged.
-
-\item \label{T-FR-29}\textbf{T-FR-29: Establish a Mutual Supervisor-Team Agreement}\\
-
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has applied to Autonomous Waste Sorting System. The supervisor has already accepted the team, reserving one slot. The team-project status is ``Supervisor Accepts''. The team has not yet accepted the arrangement.
 
@@ -1012,9 +997,9 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \textbf{How Test Will Be Performed:} Prepare the application with the supervisor's acceptance already recorded. Using Playwright, authenticate as Team Amazing Engineers and accept the arrangement. Verify the ``Agreed'' status, both acceptance records, and unchanged reserved-slot count.
 
-\item \label{T-FR-30}\textbf{T-FR-30: Decline a Team Application}\\
+\item \label{T-FR-29}\textbf{T-FR-29: Decline a Team Application}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Fantastic Coders has submitted an application to an ``Open'' project. The application has status ``Applied'', and the supervisor has not accepted the team or reserved a slot.
 
@@ -1026,9 +1011,9 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 
 \textbf{How Test Will Be Performed:} Using Playwright, authenticate as the supervisor, decline Team Fantastic Coders's application, and enter the specified reason. Verify the updated status, recorded reason, notification, and unchanged project capacity. Confirm that the message uses the system's respectful decline template.
 
-\item \label{T-FR-31}\textbf{T-FR-31: Release Reserved Capacity After Withdrawal}\\
+\item \label{T-FR-30}\textbf{T-FR-30: Release Reserved Capacity After Withdrawal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Autonomous Waste Sorting System has maximum capacity $C_{max}=2$ and $R=2$ reserved slots, giving it status ``Full''. Team Fantastic Coders occupies one reserved slot because its supervisor previously accepted its application.
 
@@ -1041,9 +1026,9 @@ This section covers \texttt{FR\_TeamRecommend}, \texttt{FR\_ProjectInterest}, an
 \textbf{How Test Will Be Performed:}
 Configure the project with two reserved slots and Team Fantastic Coders as one of the accepted teams. Using Playwright, authenticate as Team Fantastic Coders and withdraw its application. Verify the withdrawal status, released slot, and change from ``Full'' to ``Open''.
 
-\item \label{T-FR-32}\textbf{T-FR-32: Prevent Supervisor Acceptance Beyond Capacity}\\
+\item \label{T-FR-31}\textbf{T-FR-31: Prevent Supervisor Acceptance Beyond Capacity}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Project Automated Assembly Line has maximum capacity $C_{max} = 1$ and $R = 1$ reserved slot, giving it status ``Full''. Team Amazing Engineers has a previously submitted application with status ``Applied'', created before the project became full.
 
@@ -1055,9 +1040,9 @@ Configure the project with two reserved slots and Team Fantastic Coders as one o
 
 \textbf{How Test Will Be Performed:} Prepare the full project and an existing pending application. Using Playwright, authenticate as the supervisor and attempt acceptance. Verify that the action is blocked and that neither the reservation count nor the existing team assignments change.
 
-\item \label{T-FR-33}\textbf{T-FR-33: Release Other Reservations After Team Agreement}\\
+\item \label{T-FR-32}\textbf{T-FR-32: Release Other Reservations After Team Agreement}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has applications to two approved projects:
 \begin{itemize}
@@ -1074,9 +1059,9 @@ Both supervisors have accepted Team Amazing Engineers. The team has not yet acce
 
 \textbf{How Test Will Be Performed:} Configure both projects with Team Amazing Engineers's supervisor-accepted applications. Using Playwright, authenticate as Team Amazing Engineers and accept Project A. Verify the ``Agreed'' status on Project A, withdrawal of the Project B application, and restoration of Project B's availability.
 
-\item \label{T-FR-34}\textbf{T-FR-34: Prevent Duplicate Supervisor Acceptance}\\
+\item \label{T-FR-33}\textbf{T-FR-33: Prevent Duplicate Supervisor Acceptance}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} A project has maximum capacity $C_{max} = 2$ and $R = 1$ reserved slot. Team Amazing Engineers's application has status ``Supervisor Accepts'', and the supervisor's acceptance has already been recorded.
 
@@ -1097,9 +1082,9 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \begin{enumerate}
 
-\item \label{T-FR-35}\textbf{T-FR-35: Create a Discussion Thread on a Project Proposal}\\
+\item \label{T-FR-34}\textbf{T-FR-34: Create a Discussion Thread on a Project Proposal}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Autonomous Waste Sorting System proposal exists with status ``Proposal submitted''. Supervisor A is its owner and is authenticated.
 
@@ -1111,11 +1096,11 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \textbf{How Test Will Be Performed:} Using Playwright, authenticate as Supervisor A, navigate to the proposal, and create the specified thread. Verify that the thread appears under the correct proposal and that its subject, content, author, and timestamp match the submitted information.
 
-\item \label{T-FR-36}\textbf{T-FR-36: Reply to a Discussion Thread}\\
+\item \label{T-FR-35}\textbf{T-FR-35: Reply to a Discussion Thread}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
-\textbf{Initial State:} The Autonomous Waste Sorting System proposal contains a thread titled ``Project Deliverable Requirements'' asking the question proposed in T-FR-35, created by Supervisor A. Instructor A is assigned to the course and is authorized to review the proposal. The thread currently contains no replies.
+\textbf{Initial State:} The Autonomous Waste Sorting System proposal contains a thread titled ``Project Deliverable Requirements'' asking the question proposed in T-FR-34, created by Supervisor A. Instructor A is assigned to the course and is authorized to review the proposal. The thread currently contains no replies.
 
 \textbf{Input:} Instructor A replies: ``Student teams may develop either a physical prototype or a software simulation, depending on the project's scope and learning objectives. The expected deliverables should be clearly specified in the proposal.''
 
@@ -1125,9 +1110,9 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A, open the existing thread, and submit the reply. Verify that both messages are visible, the reply is attributed to Instructor A, and the original message is preserved.
 
-\item \label{T-FR-37}\textbf{T-FR-37: Communicate Through Team Formation and Application Threads}\\
+\item \label{T-FR-36}\textbf{T-FR-36: Communicate Through Team Formation and Application Threads}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers consists of three students, including Student A and Student B. Team Amazing Engineers has an application to Autonomous Waste Sorting System with status ``Applied''. No threads are associated with the team or application.
 
@@ -1144,9 +1129,9 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \textbf{How Test Will Be Performed:} Using Playwright, authenticate as Student A and create both threads. Authenticate as Student B to reply to the team formation thread. Verify the content, authors, replies, and correct record associations.
 
-\item \label{T-FR-38}\textbf{T-FR-38: Notify Thread Participants of a New Reply}\\
+\item \label{T-FR-37}\textbf{T-FR-37: Notify Thread Participants of a New Reply}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Supervisor A and Instructor A participate in the ``Project Deliverable Requirements'' thread associated with Autonomous Waste Sorting System. Supervisor A previously asked whether student teams must produce a physical prototype or whether a software simulation is sufficient. Both users have valid email addresses and remain authorized to access the thread.
 
@@ -1158,9 +1143,9 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \textbf{How Test Will Be Performed:} Configure the existing discussion thread and its participants. Using Playwright, authenticate as Instructor A and post the specified reply. Verify that the reply appears in the thread with the correct author and timestamp. Capture outgoing email using a controlled test email service and verify that Supervisor A receives a notification containing the event summary and valid discussion link, without confidential project information.
 
-\item \label{T-FR-39}\textbf{T-FR-39: Notify Teams of Supervisor Application Decisions}\\
+\item \label{T-FR-38}\textbf{T-FR-38: Notify Teams of Supervisor Application Decisions}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has submitted an application to Autonomous Waste Sorting System with status ``Applied''. The supervisor has not made a decision, and Team Amazing Engineers's members have valid registered email addresses.
 
@@ -1172,9 +1157,9 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \textbf{How Test Will Be Performed:} Using Playwright, authenticate as the supervisor and accept the application. Capture outgoing emails using the test email service. Verify the event summary, application link, recipient, and corresponding application status.
 
-\item \label{T-FR-40}\textbf{T-FR-40: Notify Students When a Project Becomes Available}\\
+\item \label{T-FR-39}\textbf{T-FR-39: Notify Students When a Project Becomes Available}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A is authorized to review proposals for the Software Engineering capstone course. The Autonomous Waste Sorting System proposal has status ``Proposal submitted'' and has not yet been published. Student A is enrolled in the course.
 
@@ -1186,9 +1171,9 @@ This section covers \texttt{FR\_ProjectThreads} and \texttt{FR\_ThreadsNotify} i
 
 \textbf{How Test Will Be Performed:} Configure the submitted proposal and enrolled student. Using Playwright, authenticate as Instructor A and approve the proposal. Verify the project appears in the catalog and that the test email service captures the notification sent to Student A.
 
-\item \label{T-FR-41}\textbf{T-FR-41: Exclude Confidential Information from Email Notifications}\\
+\item \label{T-FR-40}\textbf{T-FR-40: Exclude Confidential Information from Email Notifications}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has an application to Autonomous Waste Sorting System. The project contains the confidentiality statement ``Restricted Prototype Specifications'' and an IP field containing ``Confidential Patent Agreement''. The supervisor and Team Amazing Engineers are authorized to receive notifications about the application.
 
@@ -1205,9 +1190,9 @@ It also does not include sensitive details about the project.
 
 \textbf{How Test Will Be Performed:} Populate the corresponding records with the specified values. Using Playwright, trigger the supervisor acceptance and capture the resulting email. Inspect the subject and body, including any generated preview content. Verify the event summary and link are present and that none of the protected values appear in the email.
 
-\item \label{T-FR-42}\textbf{T-FR-42: Exclude Unauthorized Users from Notification Recipients}\\
+\item \label{T-FR-41}\textbf{T-FR-41: Exclude Unauthorized Users from Notification Recipients}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} External Supervisor A owns Autonomous Waste Sorting System. External Supervisor B owns a different project and has no association with Supervisor A's project. Team Amazing Engineers has an application to Supervisor A's project. Supervisor B is not authorized to view that project or its application.
 
@@ -1220,9 +1205,9 @@ It also does not include sensitive details about the project.
 \textbf{How Test Will Be Performed:}
 Configure both supervisors and Team Amazing Engineers's application. Using Playwright, trigger the acceptance decision. Inspect the outgoing email records and verify that only authorized recipients receive project-related notifications. Confirm that Supervisor B's was not sent any messages related to the event.
 
-\item \label{T-FR-43}\textbf{T-FR-43: Re-evaluate Notification Recipients After an Authorization Change}\\
+\item \label{T-FR-42}\textbf{T-FR-42: Re-evaluate Notification Recipients After an Authorization Change}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A and Student B are members of Team Amazing Engineers, which has an application to Autonomous Waste Sorting System. Both students initially have access to the associated discussion thread. Student B is subsequently removed from the team through an authorized membership change before a new notification is generated.
 
@@ -1242,9 +1227,9 @@ This section covers \texttt{FR\_RequestApproval}, \texttt{FR\_ApprovalResponse},
 
 \begin{enumerate}
 
-\item \label{T-FR-44}\textbf{T-FR-44: Submit an Agreed Team-Project for Approval}\\
+\item \label{T-FR-43}\textbf{T-FR-43: Submit an Agreed Team-Project for Approval}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has in-platform approval enabled. Team Amazing Engineers consists of four eligible students and has reached an agreement with the supervisor of Autonomous Waste Sorting System. Its team-project status is ``Agreed''. The team satisfies the course's minimum and maximum team sizes of 3 and 5 students. All project and team information required by the instructor's configuration for the Software Engineering capstone course has been provided, including any course-specific required fields.
 
@@ -1256,9 +1241,9 @@ This section covers \texttt{FR\_RequestApproval}, \texttt{FR\_ApprovalResponse},
 
 \textbf{How Test Will Be Performed:} Configure the agreed team-project with complete information and enable in-platform approval. Using Playwright, authenticate as a member of Team Amazing Engineers and submit the team-project for approval. Verify the updated status, saved submission information, and visibility in the instructor's approval interface.
 
-\item \label{T-FR-45}\textbf{T-FR-45: Reject Approval Submissions with Incomplete Information}\\
+\item \label{T-FR-44}\textbf{T-FR-44: Reject Approval Submissions with Incomplete Information}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has in-platform approval enabled. Team Amazing Engineers consists of four valid members and has an agreed project titled Autonomous Waste Sorting System. All required team-project information is initially complete.
 
@@ -1270,9 +1255,9 @@ This section covers \texttt{FR\_RequestApproval}, \texttt{FR\_ApprovalResponse},
 
 \textbf{How Test Will Be Performed:} Prepare an otherwise valid agreed team-project. Using Playwright, remove each required field individually and attempt submission. Verify that the corresponding validation message appears, no approval submission is created, and the original application status remains unchanged.
 
-\item \label{T-FR-46}\textbf{T-FR-46: Reject Approval Submissions Violating Course Rules}\\
+\item \label{T-FR-45}\textbf{T-FR-45: Reject Approval Submissions Violating Course Rules}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course requires teams of 3 to 5 students and permits teams consisting of Software Engineering students. In-platform approval is enabled. Team Amazing Engineers has an agreed project and complete project information.
 
@@ -1296,9 +1281,9 @@ Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy t
 
 \textbf{How Test Will Be Performed:} Independently configure the four team membership scenarios using test fixtures. For each scenario, authenticate as an authorized team member and attempt submission. Verify the expected acceptance or rejection and ensure rejected submissions do not create instructor review records.
 
-\item \label{T-FR-47}\textbf{T-FR-47: Approve a Submitted Team-Project In-Platform}\\
+\item \label{T-FR-46}\textbf{T-FR-46: Approve a Submitted Team-Project In-Platform}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} In-platform approval is enabled. Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval. The application has status ``Team project under review'', and all project and team information satisfies the applicable course rules. Instructor A is authorized to review the submission.
 
@@ -1310,9 +1295,9 @@ Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy t
 
 \textbf{How Test Will Be Performed:} Configure the submitted application under instructor review. Using Playwright, authenticate as Instructor A and approve the submission. Verify the ``Approved'' status, recorded decision, updated course information, and unchanged reserved-slot count.
 
-\item \label{T-FR-48}\textbf{T-FR-48: Request Modifications to a Team-Project Submission In-Platform}\\
+\item \label{T-FR-47}\textbf{T-FR-47: Request Modifications to a Team-Project Submission In-Platform}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for instructor approval. The submission has status ``Team project under review''. Its project objectives state ``Develop an automated waste sorting system''. Instructor A is authorized to review the submission.
 
@@ -1324,9 +1309,9 @@ Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy t
 
 \textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A, open Team Amazing Engineers's submission, and request the specified modifications. Verify the updated status, preserved feedback, and absence of an approval decision.
 
-\item \label{T-FR-49}\textbf{T-FR-49: Revise and Resubmit a Team-Project After Feedback}\\
+\item \label{T-FR-48}\textbf{T-FR-48: Revise and Resubmit a Team-Project After Feedback}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System submission has status ``Team project changes requested''. Instructor A previously requested clarification on the types of waste the proposed system will identify and sort. The submission currently lists ``Develop an automated waste sorting system'' as its project objective.
 
@@ -1338,9 +1323,9 @@ Therefore, $n=2$ and $n=6$ must fail validation, while $n=3$ and $n=5$ satisfy t
 
 \textbf{How Test Will Be Performed:} Configure the change request and feedback. Using Playwright, authenticate as an authorized Team Amazing Engineers member, update the project objective, and resubmit. Verify the updated objective, submission status, and preservation of the previous feedback.
 
-\item \label{T-FR-50}\textbf{T-FR-50: Reject a Submitted Team-Project}\\
+\item \label{T-FR-49}\textbf{T-FR-49: Reject a Submitted Team-Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for instructor approval. The team-project has status ``Team project under review''. The project has maximum capacity $C_{max} = 2$ and $R = 2$ reserved slots, one of which is held by Team Amazing Engineers. Instructor A is authorized to review the submission.
 
@@ -1366,9 +1351,9 @@ The project therefore becomes ``Open'' again.
 
 \textbf{How Test Will Be Performed:} Configure the project and submitted team-project with the specified capacity values. Using Playwright, authenticate as Instructor A and reject the submission. Verify the rejection status, recorded feedback, released reservation, and project availability.
 
-\item \label{T-FR-51}\textbf{T-FR-51: Record an Approval Through an External Approval Process}\\
+\item \label{T-FR-50}\textbf{T-FR-50: Record an Approval Through an External Approval Process}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course uses an external project approval process without an integration adapter. Team Amazing Engineers has an agreed project titled Autonomous Waste Sorting System, and its approval has been confirmed through the external process. Instructor A and TA A are authorized to record approval decisions for the course.
 
@@ -1380,9 +1365,9 @@ The project therefore becomes ``Open'' again.
 
 \textbf{How Test Will Be Performed:} Configure the course to use external approvals without an adapter. Using Playwright, authenticate as Instructor A and record Team Amazing Engineers's approval. Verify the saved approval decision and its association with the correct team and project.
 
-\item \label{T-FR-52}\textbf{T-FR-52: Preserve Original Approval During a Proposed Project Change}\\
+\item \label{T-FR-51}\textbf{T-FR-51: Preserve Original Approval During a Proposed Project Change}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved''. The approved project objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. Instructor A is authorized to review changes to approved projects.
 
@@ -1394,9 +1379,9 @@ The project therefore becomes ``Open'' again.
 
 \textbf{How Test Will Be Performed:} Configure the approved team-project with its original objective. Using Playwright, authenticate as an authorized Team Amazing Engineers member and submit the proposed change. Verify the pending-change status, preservation of the original approved objective, and availability of the proposed objective for instructor review.
 
-\item \label{T-FR-53}\textbf{T-FR-53: Successfully Synchronize Approval Through an External Adapter}\\
+\item \label{T-FR-52}\textbf{T-FR-52: Successfully Synchronize Approval Through an External Adapter}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course uses GitLab as its external approval system, connected to \projname{} through an integration adapter. Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval, with status ``Team project submitted''. The integration adapter is configured to associate this with the corresponding GitLab MR approval record.
 
@@ -1408,9 +1393,9 @@ The project therefore becomes ``Open'' again.
 
 \textbf{How Test Will Be Performed:} Configure a controlled GitLab integration environment and associate \projname{} submission with its corresponding GitLab approval record. Using Playwright, submit the team-project through \projname{} and verify that the adapter transfers the relevant information to GitLab. Record an approval decision in GitLab and trigger synchronization. Verify that the decision updates only the corresponding \projname{} team-project to ``Approved'' and that the last successful synchronization timestamp is displayed.
 
-\item \label{T-FR-54}\textbf{T-FR-54: Handle a Failed External Approval Synchronization}\\
+\item \label{T-FR-53}\textbf{T-FR-53: Handle a Failed External Approval Synchronization}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course uses an external approval system connected through an integration adapter. Team Amazing Engineers's Autonomous Waste Sorting System application has status ``Team project under review''. The previous successful synchronization occurred at 2026-10-30 14:00:00. The external approval service is configured to return a connection failure during the next synchronization.
 
@@ -1422,9 +1407,9 @@ The project therefore becomes ``Open'' again.
 
 \textbf{How Test Will Be Performed:} Configure a controlled external test service to fail during synchronization. Trigger the adapter and verify that Keystone displays a failure indicator. Confirm that the team-project status remains unchanged, no approval decision is incorrectly recorded, and the last successful synchronization timestamp is preserved.
 
-\item \label{T-FR-55}\textbf{T-FR-55: Accept a Revision to an Approved Team-Project}\\
+\item \label{T-FR-54}\textbf{T-FR-54: Accept a Revision to an Approved Team-Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved (change under review)''. The original approved objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. The team has submitted a proposed objective: ``Develop a computer vision system capable of identifying and sorting plastic, metal, and paper waste''. Instructor A is authorized to review the proposed change.
 
@@ -1436,9 +1421,9 @@ The project therefore becomes ``Open'' again.
 
 \textbf{How Test Will Be Performed:} Configure the approved project with the original objective and pending revision. Using Playwright, authenticate as Instructor A and accept the proposed change. Verify that the revised objective becomes the approved value, the status returns to ``Approved'', and the decision is recorded.
 
-\item \label{T-FR-56}\textbf{T-FR-56: Reject a Revision to an Approved Team-Project}\\
+\item \label{T-FR-55}\textbf{T-FR-55: Reject a Revision to an Approved Team-Project}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers's Autonomous Waste Sorting System project has status ``Approved (change under review)''. The original approved objective is ``Develop a computer vision system capable of identifying and sorting plastic and metal waste''. The proposed revision would expand the objective to include paper waste. Instructor A is authorized to review the proposed change.
 
@@ -1458,9 +1443,9 @@ This section covers \texttt{FR\_DisableFeatures}, \texttt{FR\_RejectComponentDis
 
 \begin{enumerate}
 
-\item \label{T-FR-57}\textbf{T-FR-57: Configure Course Features}\\
+\item \label{T-FR-56}\textbf{T-FR-56: Configure Course Features}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course. Team formation, project proposals, and in-platform project approvals are enabled. No pending actions exist in these components, and the course configuration permits feature changes.
 
@@ -1484,7 +1469,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-57A}\textbf{T-FR-57A: Configure Required and Optional Project Proposal Fields}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has supervisor project proposals enabled. The course instructor is authenticated and has permission to configure proposal requirements. The proposal template contains fields for title, background, objectives, skills/requirements, project impact, and additional project terms.
 
@@ -1498,7 +1483,7 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \item \label{T-FR-57B}\textbf{T-FR-57B: Configure Course-Specific Team-Project Approval Requirements}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has in-platform team-project approval enabled. Team Amazing Engineers consists of four eligible students and has reached an agreement with the supervisor of Autonomous Waste Sorting System. Its team-project status is ``Agreed''. The team satisfies the configured team formation rules. The course instructor is authenticated and authorized to configure approval submission requirements.
 
@@ -1510,9 +1495,9 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \textbf{How Test Will Be Performed:} Using Playwright, authenticate as the instructor and configure the required approval submission fields. Save the configuration and authenticate as a member of Team Amazing Engineers. Complete the project description and team information but omit the required GitHub link. Attempt submission and verify that validation prevents the status transition. Enter a valid GitHub link, leave the optional notes empty, and resubmit. Verify that the submission succeeds and the team-project status becomes ``Team project submitted''.
 
-\item \label{T-FR-58}\textbf{T-FR-58: Prevent Disabling a Component with Pending Actions}\\
+\item \label{T-FR-57}\textbf{T-FR-57: Prevent Disabling a Component with Pending Actions}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course, which has in-platform project approvals enabled. Team Amazing Engineers has a submission with status ``Team project under review'', awaiting an instructor decision. No other approval submissions are pending.
 
@@ -1524,9 +1509,9 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \textbf{How Test Will Be Performed:} Configure the course with one pending team-project approval. Using Playwright, authenticate as Instructor A and attempt to disable the approval feature. Verify the error message and displayed pending submission. Confirm that the component remains enabled and the submission is unchanged.
 
-\item \label{T-FR-59}\textbf{T-FR-59: Publish Course Reference Materials}\\
+\item \label{T-FR-58}\textbf{T-FR-58: Publish Course Reference Materials}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has no published FAQ titled ``Capstone Project Deliverables''. Instructor A is authorized to publish course resources. Student A is enrolled in the course, and External Supervisor A has an account authorized to read course reference materials.
 
@@ -1538,9 +1523,9 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \textbf{How Test Will Be Performed:} Using Playwright, authenticate as Instructor A and publish the specified FAQ. Verify that it appears in the course resources. Authenticate separately as Student A and External Supervisor A and confirm that both can retrieve the resource with its original content.
 
-\item \label{T-FR-60}\textbf{T-FR-60: Update a Published Course Resource}\\
+\item \label{T-FR-59}\textbf{T-FR-59: Update a Published Course Resource}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course contains a published FAQ titled ``Capstone Project Deliverables''. Its answer states ``Project proposals must include objectives and expected deliverables''. TA A is assigned to the course and is authorized to maintain course resources.
 
@@ -1552,9 +1537,9 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \textbf{How Test Will Be Performed:} Configure the published FAQ. Using Playwright, authenticate as TA A, edit the answer, and save. Retrieve the resource as an enrolled student and as an authorized external supervisor. Verify the revised content and confirm that only one current FAQ record is displayed.
 
-\item \label{T-FR-61}\textbf{T-FR-61: Display Required Actions and Completion States}\\
+\item \label{T-FR-60}\textbf{T-FR-60: Display Required Actions and Completion States}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A is enrolled in the Software Engineering capstone course and is a member of Team Amazing Engineers. The course requires the student to complete a profile and submit team-project information for instructor approval. Student A has completed their profile, but the team's approval submission has not yet been made.
 
@@ -1566,9 +1551,9 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \textbf{How Test Will Be Performed:} Configure Student A's completed profile and pending team-project submission. Using Playwright, authenticate as Student A and open the checklist. Verify that both required actions are displayed with their expected completion states.
 
-\item \label{T-FR-62}\textbf{T-FR-62: Automatically Update a Completed Checklist Action}\\
+\item \label{T-FR-61}\textbf{T-FR-61: Automatically Update a Completed Checklist Action}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A belongs to Team Amazing Engineers, which has reached an agreement with the supervisor of Autonomous Waste Sorting System. The Software Engineering capstone course has in-platform approval enabled. The required actions checklist shows ``Submit team-project for approval'' as incomplete. All submission information satisfies the course rules.
 
@@ -1580,9 +1565,9 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \textbf{How Test Will Be Performed:} Configure the agreed team-project and incomplete checklist action. Using Playwright, authenticate as an authorized Team Amazing Engineers member and submit the project for approval. Verify the successful submission, refresh the checklist, and confirm that the action is marked completed.
 
-\item \label{T-FR-63}\textbf{T-FR-63: Send Email Reminders for Outstanding Actions and Deadlines}\\
+\item \label{T-FR-62}\textbf{T-FR-62: Send Email Reminders for Outstanding Actions and Deadlines}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has administrative email reminders enabled. The course has a project approval submission deadline of November 15, 2026. Student A has an incomplete ``Submit team-project for approval'' checklist action. Student B has already completed the same action. The reminder is configured to run on November 12, 2026.
 
@@ -1594,9 +1579,9 @@ This verifies that disabling one feature does not unintentionally disable others
 
 \textbf{How Test Will Be Performed:} Configure the reminder, deadline, and student checklist states. Run the notification process using a controlled test clock and capture outgoing email through a test email service. Verify that Student A's reminder identifies the correct action and deadline, and that Student B is not described as having the same outstanding action.
 
-\item \label{T-FR-64}\textbf{T-FR-64: View and Filter Course-Wide Administrative Information}\\
+\item \label{T-FR-63}\textbf{T-FR-63: View and Filter Course-Wide Administrative Information}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course. Its records include:
 \begin{itemize}
@@ -1614,9 +1599,9 @@ Each project has an assigned supervisor, and the associated teams have valid mem
 
 \textbf{How Test Will Be Performed:} Populate the course with the specified records. Using Playwright, authenticate as Instructor A and apply the ``Approved'' approval-status filter. Verify that exactly two approved team-projects appear and that their administrative details are accessible.
 
-\item \label{T-FR-65}\textbf{T-FR-65: Restrict Instructor and TA Access to Authorized Courses}\\
+\item \label{T-FR-64}\textbf{T-FR-64: Restrict Instructor and TA Access to Authorized Courses}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course contains Team Amazing Engineers and Team Fantastic Coders. Team Amazing Engineers works on Smart Campus Navigation, while Team Fantastic Coders works on Automated Assembly Line. Both teams have project records, approval statuses, and associated discussion threads. Instructor A and TA A are assigned to the Software Engineering capstone course, with TA A specifically assigned to Team Amazing Engineers. A separate Mechatronics capstone course contains Team Capstone Legends. Instructor A is also authorized to access the Mechatronics course, while TA A is assigned only to the Software Engineering Course.
 
@@ -1628,9 +1613,9 @@ Each project has an assigned supervisor, and the associated teams have valid mem
 
 \textbf{How Test Will Be Performed:} Configure the courses, teams, projects, and user assignments as specified. Using Playwright, authenticate as Instructor A and verify access to Team Amazing Engineers and Team Fantastic Coders, including their project statuses and relevant discussions. Verify that Team Capstone Legends' administrative records are accessible as well. Repeat the procedure as TA A and confirm that both Software Engineering teams are accessible despite TA A's individual assignment to Team Amazing Engineers. Attempt to access Team Capstone Legends' records directly as TA A and verify that access is denied.
 
-\item \label{T-FR-66}\textbf{T-FR-66: Generate and Export a Course Administration Report}\\
+\item \label{T-FR-65}\textbf{T-FR-65: Generate and Export a Course Administration Report}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course. The course contains the following records:
 \begin{itemize}
@@ -1656,9 +1641,9 @@ This section covers \texttt{FR\_ImportEnrollment}, \texttt{FR\_UpdateEnrollment}
 
 \begin{enumerate}
 
-\item \label{T-FR-67}\textbf{T-FR-67: Import and Confirm a Course Enrollment List}\\
+\item \label{T-FR-66}\textbf{T-FR-66: Import and Confirm a Course Enrollment List}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Instructor A manages the Software Engineering capstone course. The current enrollment contains Students A and B. An Avenue to Learn enrollment list contains Students A, B, C, and D, each with a valid and unique student identifier. No import has been applied yet.
 
@@ -1683,9 +1668,9 @@ Thus, the enrollment count remains 2 before confirmation and becomes 4 after con
 \textbf{How Test Will Be Performed:} Configure the existing enrollment and the Avenue enrollment source. Using Playwright, authenticate as Instructor A and initiate the import. Verify the preview identifies Students C and D and that no records have changed. Complete re-verification and confirm the import. Verify all four unique students are enrolled.
 
 
-\item \label{T-FR-68}\textbf{T-FR-68: Reject Invalid Enrollment Import Entries}\\
+\item \label{T-FR-67}\textbf{T-FR-67: Reject Invalid Enrollment Import Entries}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course contains Students A and B. Instructor A is authorized to import enrollment lists. A test enrollment file contains the following identifiers:
 \begin{itemize}
@@ -1704,9 +1689,9 @@ The test configuration recognizes the first two identifiers as valid and the fin
 
 \textbf{How Test Will Be Performed:} Prepare the enrollment file with the specified entries. Using Playwright, upload the file and inspect the preview. Verify that both problems are displayed and confirmation cannot proceed. Confirm that no enrollment records are added or removed.
 
-\item \label{T-FR-69}\textbf{T-FR-69: Preserve Students Missing from an Enrollment Import}\\
+\item \label{T-FR-68}\textbf{T-FR-68: Preserve Students Missing from an Enrollment Import}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course contains Students A, B, C, and D. Students A, B, and C belong to Team Amazing Engineers, while Student D has no team. A new Avenue enrollment list contains Students A, C, and D but omits Student B.
 
@@ -1730,9 +1715,9 @@ Student B must therefore be flagged, but their enrollment and team membership mu
 
 \textbf{How Test Will Be Performed:} Configure the existing enrollment and team memberships. Using Playwright, import the updated list and inspect the preview. Verify that Student B is flagged. Confirm that Student B remains in the course and Team Amazing Engineers without a separate removal confirmation.
 
-\item \label{T-FR-70}\textbf{T-FR-70: Manually Add a Student to Course Enrollment}\\
+\item \label{T-FR-69}\textbf{T-FR-69: Manually Add a Student to Course Enrollment}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has no Avenue integration configured. Students A, B, and C are enrolled. Student D has recently joined the course but has no enrollment record in Keystone. Instructor A is authorized to maintain course enrollment.
 
@@ -1744,9 +1729,9 @@ Student B must therefore be flagged, but their enrollment and team membership mu
 
 \textbf{How Test Will Be Performed:} Configure the course without Avenue integration. Using Playwright, authenticate as Instructor A and manually add Student D. Verify that the student appears in the course enrollment with the correct identifier and association.
 
-\item \label{T-FR-71}\textbf{T-FR-71: Identify Enrolled Students Without Teams}\\
+\item \label{T-FR-70}\textbf{T-FR-70: Identify Enrolled Students Without Teams}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} The Software Engineering capstone course has six enrolled students. Students A, B, and C belong to Team Amazing Engineers, Student D belongs to Team Fantastic Coders, and Students E and F are not assigned to any team. Instructor A is authorized to view course administration information.
 
@@ -1765,9 +1750,9 @@ Initially, $N=\{E,F\}$. After Student E joins Team Fantastic Coders, $N=\{F\}$. 
 \textbf{How Test Will Be Performed:} Configure the specified enrollment and team associations. Using Playwright, authenticate as Instructor A and verify the initial list. Assign Student E to Team Fantastic Coders through the supported team workflow, refresh the list, and verify that only Student F remains.
 
 
-\item \label{T-FR-72}\textbf{T-FR-72: Assign a TA to a Student Team}\\
+\item \label{T-FR-71}\textbf{T-FR-71: Assign a TA to a Student Team}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers consists of four students and is associated with Autonomous Waste Sorting System. No TA is assigned to the team. Instructor A is authorized to assign TAs, and TA A is associated with the Software Engineering capstone course.
 
@@ -1787,9 +1772,9 @@ This section covers \texttt{FR\_MacSSO}, \texttt{FR\_AuthorizationRBAC}, \texttt
 
 \begin{enumerate}
 
-\item \label{T-FR-73}\textbf{T-FR-73: Authenticate Users Through Trusted Identity Providers}\\
+\item \label{T-FR-72}\textbf{T-FR-72: Authenticate Users Through Trusted Identity Providers}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A has an active McMaster account associated with the Software Engineering capstone course. External Supervisor A has an account with the configured trusted external authentication provider. Neither user has an active Keystone session.
 
@@ -1801,9 +1786,9 @@ This section covers \texttt{FR\_MacSSO}, \texttt{FR\_AuthorizationRBAC}, \texttt
 
 \textbf{How Test Will Be Performed:} Configure controlled test accounts with the corresponding identity providers. Using Playwright, execute each sign-in workflow. Verify successful authentication, the resulting account identity, and access to the functions permitted by each user's role.
 
-\item \label{T-FR-74}\textbf{T-FR-74: Deny Course Access When User Role Is Unknown}\\
+\item \label{T-FR-73}\textbf{T-FR-73: Deny Course Access When User Role Is Unknown}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} User A has successfully authenticated through a trusted identity provider, but no valid course role can be determined for the account. The Software Engineering course contains student profiles, team records, and project information.
 
@@ -1823,9 +1808,9 @@ This verifies that successful authentication alone does not authorize access.
 
 \textbf{How Test Will Be Performed:} Configure an authenticated user without a valid course role. Using Playwright, attempt to access the specified course interfaces and direct record links. Verify that all requests are denied without disclosing course data.
 
-\item \label{T-FR-75}\textbf{T-FR-75: Update a User's Course Role and Permissions}\\
+\item \label{T-FR-74}\textbf{T-FR-74: Update a User's Course Role and Permissions}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Administrator A (is\_admin set) is authorized to manage user roles for the Software Engineering capstone course. User B is associated with the course and currently has the ``Student'' role. User B cannot access instructor-only course configuration features.
 
@@ -1837,9 +1822,9 @@ This verifies that successful authentication alone does not authorize access.
 
 \textbf{How Test Will Be Performed:} Using Playwright, authenticate as Administrator A and update User B's role after completing re-verification. Verify that the updated role is saved. Authenticate as User B and confirm access to an authorized TA function while verifying that instructor-only configuration remains inaccessible.
 
-\item \label{T-FR-76}\textbf{T-FR-76: Require Re-verification Before a Sensitive Action}\\
+\item \label{T-FR-75}\textbf{T-FR-75: Require Re-verification Before a Sensitive Action}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Supervisor A has an authenticated Keystone session and owns a proposal titled Autonomous Waste Sorting System with status ``Draft''. The proposal contains valid information and has not been deleted.
 
@@ -1851,9 +1836,9 @@ This verifies that successful authentication alone does not authorize access.
 
 \textbf{How Test Will Be Performed:} Configure Supervisor A and the draft proposal. Using Playwright, authenticate as Supervisor A and initiate deletion. Verify the re-verification challenge appears. Cancel or fail the challenge and verify that the proposal remains accessible and unchanged.
 
-\item \label{T-FR-77}\textbf{T-FR-77: Record and Report an External Provider Error}\\
+\item \label{T-FR-76}\textbf{T-FR-76: Record and Report an External Provider Error}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Keystone is connected to a trusted external authentication provider. Administrator A is authorized to view external-provider errors.
 
@@ -1865,9 +1850,9 @@ This verifies that successful authentication alone does not authorize access.
 
 \textbf{How Test Will Be Performed:} Configure the controlled provider to return a service-unavailable error. Trigger an authentication request and verify the resulting error record. Authenticate as Administrator A and inspect the external-provider error log. Verify that the event is recorded and that a notification is generated for an authorized recipient.
 
-\item \label{T-FR-78}\textbf{T-FR-78: Display Record Last-Updated Timestamps}\\
+\item \label{T-FR-77}\textbf{T-FR-77: Display Record Last-Updated Timestamps}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Student A has a completed student profile and is authorized to update it. The profile currently lists ``Python and Java'' as its skills. Its last updated timestamp is set to 2026-10-30 14:00:00.
 
@@ -1887,9 +1872,9 @@ The expected timestamp difference is one hour, verifying that the profile displa
 
 \textbf{How Test Will Be Performed:} Configure the profile and controlled test clock. Using Playwright, authenticate as Student A, modify the skills field, and save. Verify the revised profile content and displayed last-updated timestamp.
 
-\item \label{T-FR-79}\textbf{T-FR-79: Recover a Pending Notification After System Interruption}\\
+\item \label{T-FR-78}\textbf{T-FR-78: Recover a Pending Notification After System Interruption}\\
 
-\textbf{Type:} Automatic
+\textbf{Control:} Automatic
 
 \textbf{Initial State:} Team Amazing Engineers has submitted Autonomous Waste Sorting System for approval. Instructor A is authorized to receive notifications concerning the submission. The notification service is configured with durable pending-notification storage and a controlled test email service.
 
@@ -2586,45 +2571,45 @@ by consensus. Any column that is not mapped has a GitHub issue tracking it.
     \rref{FR_SupervisorProposal} & \hyperref[T-FR-01]{T-FR-01}, \hyperref[T-FR-57A]{T-FR-57A} \\ \hline
     \rref{FR_ProposalOptionalFields} & \hyperref[T-FR-02]{T-FR-02}, \hyperref[T-FR-03]{T-FR-03}, \hyperref[T-FR-57A]{T-FR-57A} \\ \hline
     \rref{FR_StudentProposal} & \hyperref[T-FR-04]{T-FR-04} \\ \hline
-    \rref{FR_ReviewProposal} & \hyperref[T-FR-05]{T-FR-05}, \hyperref[T-FR-06]{T-FR-06}, \hyperref[T-FR-07]{T-FR-07}, \hyperref[T-FR-08]{T-FR-08}, \hyperref[T-FR-40]{T-FR-40} \\ \hline
+    \rref{FR_ReviewProposal} & \hyperref[T-FR-05]{T-FR-05}, \hyperref[T-FR-06]{T-FR-06}, \hyperref[T-FR-07]{T-FR-07}, \hyperref[T-FR-08]{T-FR-08}, \hyperref[T-FR-39]{T-FR-39} \\ \hline
     \rref{FR_ViewApprovedProjects} & \hyperref[T-FR-09]{T-FR-09}, \hyperref[T-FR-10]{T-FR-10} \\ \hline
     \rref{FR_ViewProjectStatus} & \hyperref[T-FR-11]{T-FR-11}, \hyperref[T-FR-12]{T-FR-12} \\ \hline
     \rref{FR_StudentProfile} & \hyperref[T-FR-13]{T-FR-13}, \hyperref[T-FR-14]{T-FR-14} \\ \hline
     \rref{FR_StudentTeams} & \hyperref[T-FR-15]{T-FR-15}, \hyperref[T-FR-16]{T-FR-16}, \hyperref[T-FR-17]{T-FR-17}, \hyperref[T-FR-18]{T-FR-18} \\ \hline
-    \rref{FR_ValidateTeamRules} & \hyperref[T-FR-19]{T-FR-19}, \hyperref[T-FR-20]{T-FR-20}, \hyperref[T-FR-21]{T-FR-21}, \hyperref[T-FR-22]{T-FR-22}, \hyperref[T-FR-46]{T-FR-46} \\ \hline
+    \rref{FR_ValidateTeamRules} & \hyperref[T-FR-19]{T-FR-19}, \hyperref[T-FR-20]{T-FR-20}, \hyperref[T-FR-21]{T-FR-21}, \hyperref[T-FR-22]{T-FR-22}, \hyperref[T-FR-45]{T-FR-45} \\ \hline
     \rref{FR_TeamDiscovery} & \hyperref[T-FR-23]{T-FR-23} \\ \hline
     \rref{FR_TeamProfile} & \hyperref[T-FR-24]{T-FR-24} \\ \hline
     \rref{FR_TeamRecommend} & \hyperref[T-FR-25]{T-FR-25} \\ \hline
     \rref{FR_ProjectInterest} & \hyperref[T-FR-26]{T-FR-26} \\ \hline
-    \rref{FR_DeclineTeam} & \hyperref[T-FR-27]{T-FR-27}, \hyperref[T-FR-28]{T-FR-28}, \hyperref[T-FR-29]{T-FR-29}, \hyperref[T-FR-30]{T-FR-30}, \hyperref[T-FR-31]{T-FR-31}, \hyperref[T-FR-32]{T-FR-32}, \hyperref[T-FR-33]{T-FR-33}, \hyperref[T-FR-34]{T-FR-34}, \hyperref[T-FR-39]{T-FR-39} \\ \hline
-    \rref{FR_ProjectThreads} & \hyperref[T-FR-35]{T-FR-35}, \hyperref[T-FR-36]{T-FR-36}, \hyperref[T-FR-37]{T-FR-37} \\ \hline
-    \rref{FR_ThreadsNotify} & \hyperref[T-FR-38]{T-FR-38}, \hyperref[T-FR-39]{T-FR-39}, \hyperref[T-FR-40]{T-FR-40}, \hyperref[T-FR-41]{T-FR-41}, \hyperref[T-FR-42]{T-FR-42}, \hyperref[T-FR-43]{T-FR-43} \\ \hline
-    \rref{FR_RequestApproval} & \hyperref[T-FR-44]{T-FR-44}, \hyperref[T-FR-49]{T-FR-49}, \hyperref[T-FR-57B]{T-FR-57B}, \hyperref[T-FR-62]{T-FR-62} \\ \hline
-    \rref{FR_ApprovalResponse} & \hyperref[T-FR-47]{T-FR-47}, \hyperref[T-FR-48]{T-FR-48}, \hyperref[T-FR-49]{T-FR-49}, \hyperref[T-FR-50]{T-FR-50} \\ \hline
-    \rref{FR_ExternalApproval} & \hyperref[T-FR-51]{T-FR-51}, \hyperref[T-FR-53]{T-FR-53}, \hyperref[T-FR-54]{T-FR-54} \\ \hline
-    \rref{FR_ApprovalPreflightValidate} & \hyperref[T-FR-19]{T-FR-19}, \hyperref[T-FR-44]{T-FR-44}, \hyperref[T-FR-45]{T-FR-45}, \hyperref[T-FR-46]{T-FR-46}, \hyperref[T-FR-57B]{T-FR-57B} \\ \hline
-    \rref{FR_ApprovalRevision} & \hyperref[T-FR-52]{T-FR-52}, \hyperref[T-FR-55]{T-FR-55}, \hyperref[T-FR-56]{T-FR-56} \\ \hline
-    \rref{FR_DisableFeatures} & \hyperref[T-FR-57]{T-FR-57}, \hyperref[T-FR-57A]{T-FR-57A}, \hyperref[T-FR-57B]{T-FR-57B} \\ \hline
-    \rref{FR_ReferenceMaterial} & \hyperref[T-FR-59]{T-FR-59}, \hyperref[T-FR-60]{T-FR-60} \\ \hline
-    \rref{FR_RequiredActionsList} & \hyperref[T-FR-61]{T-FR-61}, \hyperref[T-FR-62]{T-FR-62} \\ \hline
-    \rref{FR_ActionRequiredEmail} & \hyperref[T-FR-63]{T-FR-63} \\ \hline
-    \rref{FR_ReadCourseInformation} & \hyperref[T-FR-64]{T-FR-64}, \hyperref[T-FR-65]{T-FR-65} \\ \hline
-    \rref{FR_ExportCourseInformation} & \hyperref[T-FR-66]{T-FR-66} \\ \hline
-    \rref{FR_MacSSO} & \hyperref[T-FR-73]{T-FR-73} \\ \hline
-    \rref{FR_AuthorizationRBAC} & \hyperref[T-FR-65]{T-FR-65}, \hyperref[T-FR-73]{T-FR-73}, \hyperref[T-FR-74]{T-FR-74}, \hyperref[T-FR-75]{T-FR-75} \\ \hline
-    \rref{FR_UpdateRoles} & \hyperref[T-FR-75]{T-FR-75} \\ \hline
+    \rref{FR_DeclineTeam} & \hyperref[T-FR-27]{T-FR-27}, \hyperref[T-FR-28]{T-FR-28}, \hyperref[T-FR-29]{T-FR-29}, \hyperref[T-FR-30]{T-FR-30}, \hyperref[T-FR-31]{T-FR-31}, \hyperref[T-FR-32]{T-FR-32}, \hyperref[T-FR-33]{T-FR-33}, \hyperref[T-FR-38]{T-FR-38} \\ \hline
+    \rref{FR_ProjectThreads} & \hyperref[T-FR-34]{T-FR-34}, \hyperref[T-FR-35]{T-FR-35}, \hyperref[T-FR-36]{T-FR-36} \\ \hline
+    \rref{FR_ThreadsNotify} & \hyperref[T-FR-37]{T-FR-37}, \hyperref[T-FR-38]{T-FR-38}, \hyperref[T-FR-39]{T-FR-39}, \hyperref[T-FR-40]{T-FR-40}, \hyperref[T-FR-41]{T-FR-41}, \hyperref[T-FR-42]{T-FR-42} \\ \hline
+    \rref{FR_RequestApproval} & \hyperref[T-FR-43]{T-FR-43}, \hyperref[T-FR-48]{T-FR-48}, \hyperref[T-FR-57B]{T-FR-57B}, \hyperref[T-FR-61]{T-FR-61} \\ \hline
+    \rref{FR_ApprovalResponse} & \hyperref[T-FR-46]{T-FR-46}, \hyperref[T-FR-47]{T-FR-47}, \hyperref[T-FR-48]{T-FR-48}, \hyperref[T-FR-49]{T-FR-49} \\ \hline
+    \rref{FR_ExternalApproval} & \hyperref[T-FR-50]{T-FR-50}, \hyperref[T-FR-52]{T-FR-52}, \hyperref[T-FR-53]{T-FR-53} \\ \hline
+    \rref{FR_ApprovalPreflightValidate} & \hyperref[T-FR-19]{T-FR-19}, \hyperref[T-FR-43]{T-FR-43}, \hyperref[T-FR-44]{T-FR-44}, \hyperref[T-FR-45]{T-FR-45}, \hyperref[T-FR-57B]{T-FR-57B} \\ \hline
+    \rref{FR_ApprovalRevision} & \hyperref[T-FR-51]{T-FR-51}, \hyperref[T-FR-54]{T-FR-54}, \hyperref[T-FR-55]{T-FR-55} \\ \hline
+    \rref{FR_DisableFeatures} & \hyperref[T-FR-56]{T-FR-56}, \hyperref[T-FR-57A]{T-FR-57A}, \hyperref[T-FR-57B]{T-FR-57B} \\ \hline
+    \rref{FR_ReferenceMaterial} & \hyperref[T-FR-58]{T-FR-58}, \hyperref[T-FR-59]{T-FR-59} \\ \hline
+    \rref{FR_RequiredActionsList} & \hyperref[T-FR-60]{T-FR-60}, \hyperref[T-FR-61]{T-FR-61} \\ \hline
+    \rref{FR_ActionRequiredEmail} & \hyperref[T-FR-62]{T-FR-62} \\ \hline
+    \rref{FR_ReadCourseInformation} & \hyperref[T-FR-63]{T-FR-63}, \hyperref[T-FR-64]{T-FR-64} \\ \hline
+    \rref{FR_ExportCourseInformation} & \hyperref[T-FR-65]{T-FR-65} \\ \hline
+    \rref{FR_MacSSO} & \hyperref[T-FR-72]{T-FR-72} \\ \hline
+    \rref{FR_AuthorizationRBAC} & \hyperref[T-FR-64]{T-FR-64}, \hyperref[T-FR-72]{T-FR-72}, \hyperref[T-FR-73]{T-FR-73}, \hyperref[T-FR-74]{T-FR-74} \\ \hline
+    \rref{FR_UpdateRoles} & \hyperref[T-FR-74]{T-FR-74} \\ \hline
     \rref{FR_ExternalSupervisorVerification} & \hyperref[T-FR-05]{T-FR-05}, \hyperref[T-FR-06]{T-FR-06}, \hyperref[T-FR-07]{T-FR-07} \\ \hline
-    \rref{FR_ExternalSupervisorScope} & \hyperref[T-FR-10]{T-FR-10}, \hyperref[T-FR-42]{T-FR-42} \\ \hline
-    \rref{FR_LogExternalErrors} & \hyperref[T-FR-77]{T-FR-77} \\ \hline
-    \rref{FR_RejectComponentDisable} & \hyperref[T-FR-58]{T-FR-58} \\ \hline
-    \rref{FR_DisplayTimestamps} & \hyperref[T-FR-78]{T-FR-78} \\ \hline
-    \rref{FR_DurableNotifications} & \hyperref[T-FR-79]{T-FR-79} \\ \hline
-    \rref{FR_ReverifyUsers} & \hyperref[T-FR-67]{T-FR-67}, \hyperref[T-FR-75]{T-FR-75}, \hyperref[T-FR-76]{T-FR-76} \\ \hline
-    \rref{FR_ImportEnrollment} & \hyperref[T-FR-67]{T-FR-67}, \hyperref[T-FR-68]{T-FR-68} \\ \hline
-    \rref{FR_UpdateEnrollment} & \hyperref[T-FR-70]{T-FR-70} \\ \hline
-    \rref{FR_EnrollmentDiscrepency} & \hyperref[T-FR-69]{T-FR-69} \\ \hline
-    \rref{FR_NeedsGroup} & \hyperref[T-FR-71]{T-FR-71} \\ \hline
-    \rref{FR_AssignTA} & \hyperref[T-FR-72]{T-FR-72} \\ \hline
+    \rref{FR_ExternalSupervisorScope} & \hyperref[T-FR-10]{T-FR-10}, \hyperref[T-FR-41]{T-FR-41} \\ \hline
+    \rref{FR_LogExternalErrors} & \hyperref[T-FR-76]{T-FR-76} \\ \hline
+    \rref{FR_RejectComponentDisable} & \hyperref[T-FR-57]{T-FR-57} \\ \hline
+    \rref{FR_DisplayTimestamps} & \hyperref[T-FR-77]{T-FR-77} \\ \hline
+    \rref{FR_DurableNotifications} & \hyperref[T-FR-78]{T-FR-78} \\ \hline
+    \rref{FR_ReverifyUsers} & \hyperref[T-FR-66]{T-FR-66}, \hyperref[T-FR-74]{T-FR-74}, \hyperref[T-FR-75]{T-FR-75} \\ \hline
+    \rref{FR_ImportEnrollment} & \hyperref[T-FR-66]{T-FR-66}, \hyperref[T-FR-67]{T-FR-67} \\ \hline
+    \rref{FR_UpdateEnrollment} & \hyperref[T-FR-69]{T-FR-69} \\ \hline
+    \rref{FR_EnrollmentDiscrepency} & \hyperref[T-FR-68]{T-FR-68} \\ \hline
+    \rref{FR_NeedsGroup} & \hyperref[T-FR-70]{T-FR-70} \\ \hline
+    \rref{FR_AssignTA} & \hyperref[T-FR-71]{T-FR-71} \\ \hline
 
     \bottomrule
 

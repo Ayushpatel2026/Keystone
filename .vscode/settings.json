@@ -1,5 +1,5 @@
 {
-    "editor.formatOnSave": true,
+    "editor.formatOnSave": false,
     "latex-workshop.formatting.latex": "latexindent",
     "latex-workshop.formatting.latexindent.args": [
         "-c",
@@ -9,5 +9,6 @@
         "-m",
         "-l",
         "%WORKSPACE_FOLDER%/.latexindent.yaml"
-    ]
+    ],
+    "python-envs.defaultEnvManager": "ms-python.python:system"
 }

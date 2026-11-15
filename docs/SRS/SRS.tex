@@ -159,6 +159,7 @@ Oct 19th 2026 & 1.3 & Non-functional Requirements\\
 Oct 28th 2026 & 1.4 & Add more requirements after peer review and interviews\\
 Oct 29th 2026 & 1.5 & NFR re-organization, additions \\
 Oct 30th 2026 & 1.5 & Addressed conflicts in defintions and acronyms, added likely changes, and added more requirements after peer review and interviews\\
+Nov 13th 2026 & 1.6 & Updated Likely Changes section to match the Module Guide review\\
 \bottomrule
   \end{tabularx}
 
@@ -1188,8 +1189,10 @@ Student (Priya)
 \textbf{Postconditions}
 \begin{itemize}
   \item The team has an application with the status ``Applied'' and the project's status is
-    unchanged. Either side may then accept (``Supervisor Accepts'' or ``Team Accepts - Supervisor
-    Pending''), and the team is ``Agreed'' once both have. A slot is reserved when the supervisor
+    unchanged. The supervisor may then accept (``Supervisor Accepts''), after which the team may
+    accept the working arrangement to become ``Agreed''. Team acceptance is unavailable before
+    supervisor acceptance; discussion remains available while the application is ``Applied''.
+    A slot is reserved when the supervisor
     accepts, and the project becomes ``Full'' only when all of its slots are reserved.
 \end{itemize}
 
@@ -1645,7 +1648,7 @@ Instructor (Dr. Reyes), Teaching Assistant
               \item[]\reqitem{reqnum}{FR_DeclineTeam} The system shall allow supervisors to accept or decline requests from student teams to work on their proposed projects, and record when both parties agree to the working arrangement. See Figure~\ref{fig:lifecycle}
               Decline decisions shall be communicated using respectful message templates with an optional reason, and the system shall not publish rankings of students or teams.
               \rationale{This reduces confusion by explicitely recording when both parties have understood each other's terms and have formally agreed to work with each other.}
-              \fitcrit{Both the supervisor and students can record a decision to confirm or deny the terms of the project. An agreement is marked after both parties accept.}
+              \fitcrit{The supervisor can accept or decline an application. Only after supervisor acceptance can the team accept the working arrangement, changing its status from Supervisor Accepts to Agreed. Teams may discuss an application or withdraw before accepting.}
 
               % Explicit requirement to amend an agreement?
 
@@ -1846,12 +1849,16 @@ Instructor (Dr. Reyes), Teaching Assistant
   \begin{itemize}
     \item \textbf{Project status:} Draft, Proposal submitted, Proposal changes requested, Proposal
     rejected, Proposal withdrawn, Open, Full, and Closed.
-    \item \textbf{Team-project status:} Applied, Supervisor Accepts, Team Accepts - Supervisor Pending,
+    \item \textbf{Team-project status:} Applied, Supervisor Accepts,
     Agreed, Team project submitted, Team project under review, Team project changes requested,
     Team project rejected, Approved, Approved (change under review), and Declined or withdrawn.
   \end{itemize}
   A team's approval does not change the project's status. A listed project is Open or Full
   depending only on capacity.
+  Selection follows \emph{Applied} $\rightarrow$ \emph{Supervisor Accepts}
+  $\rightarrow$ \emph{Agreed}. Applying expresses interest and allows discussion;
+  the supervisor's acceptance offers the team a reserved slot. The team then accepts
+  the working terms to establish mutual agreement. It cannot accept before the supervisor.
 
   \begin{figure}[h!]
     \centering
@@ -1861,9 +1868,10 @@ Instructor (Dr. Reyes), Teaching Assistant
 
   \textbf{Capacity.} Let $C$ be the supervisor's capacity for the project and $R$ the number of
   slots reserved. A listed project is \emph{Open} while $R<C$ and \emph{Full} when $R=C$. A team's
-  application, and a team's acceptance on its own, do not use a slot. A slot is reserved when the
-  supervisor accepts a team (the state \emph{Supervisor Accepts}, or \emph{Agreed} when the team had
-  already accepted), and $R$ increases by one. A reserved slot is released, only if one was
+  application does not use a slot. A slot is reserved when the
+  supervisor accepts a team (the state \emph{Supervisor Accepts}), and $R$ increases by one.
+  Subsequent team acceptance changes the state to \emph{Agreed} without reserving another slot.
+  A reserved slot is released, only if one was
   reserved, when that team is declined or withdraws, when its team project is rejected, or when it
   dissolves after approval. Releasing a slot, or raising $C$, makes a Full project Open. A project
   becomes \emph{Closed} when the selection period ends, whether it is Open or Full. A Closed project
@@ -2055,9 +2063,9 @@ Instructor (Dr. Reyes), Teaching Assistant
       team & Team & Reference to the team that the project application belongs to. \\ \hline
       project & Project & Reference to the Project that the application is for. \\ \hline
       submission\_date & DateTime & When the application was submitted. \\ \hline
-      status & Enum & Team-project status: APPLIED, SUPERVISOR\_ACCEPTS, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING, AGREED, TEAM\_PROJECT\_SUBMITTED, TEAM\_PROJECT\_UNDER\_REVIEW, TEAM\_PROJECT\_CHANGES\_REQUESTED, TEAM\_PROJECT\_REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
+      status & Enum & Team-project status: APPLIED, SUPERVISOR\_ACCEPTS, AGREED, TEAM\_PROJECT\_SUBMITTED, TEAM\_PROJECT\_UNDER\_REVIEW, TEAM\_PROJECT\_CHANGES\_REQUESTED, TEAM\_PROJECT\_REJECTED, APPROVED, APPROVED\_CHANGE\_UNDER\_REVIEW, or DECLINED\_OR\_WITHDRAWN (see Section~\ref{sec:lifecycle}). \\ \hline
       supervisor\_accepted & Boolean & Whether the supervisor has accepted the team. True means a slot is reserved for the team, until the team is declined, withdraws, is rejected, or dissolves. \\ \hline
-      team\_accepted & Boolean & Whether the team has accepted the supervisor. SUPERVISOR\_ACCEPTS means only the supervisor has accepted, TEAM\_ACCEPTS\_SUPERVISOR\_PENDING means only the team has, and AGREED means both have. \\ \hline
+      team\_accepted & Boolean & Whether the team has accepted the working arrangement after supervisor acceptance. False in APPLIED and SUPERVISOR\_ACCEPTS; true in AGREED. May become true only when supervisor\_accepted is already true. \\ \hline
       thread & Thread & Discussion thread for the application (empty until the first post). \\ \hline
       updated\_at & DateTime & Date and time when the record was most recently modified. \\ \hline
 
@@ -2743,13 +2751,57 @@ Instructor (Dr. Reyes), Teaching Assistant
       \textit{Affected Entities:} Student Profile, Team Profile, Project.
       \textit{Related Requirement:} \rref{FR_TeamRecommend}.
 
-      \item[]\reqitem{lcnum}{LC_Enrollment}
-      \textbf{Enrollment Source.}
-      How enrollment is obtained may change if access to Avenue to Learn data is restricted or changed, or if a course
-      (especially ones outside McMaster) use a different source of enrollment data.
-      \textit{Affected Entities:} Course, Student.
-      \textit{Related Requirements:} \rref{FR_ImportEnrollment}, \rref{FR_UpdateEnrollment},
-      \rref{FR_EnrollmentDiscrepency}.
+      \item[]\reqitem{lcnum}{LC_SignIn}
+      \textbf{Sign-In and Re-Verification.}
+      How users sign in, and which actions require a user to re-verify their identity, may change as
+      security requirements change. This could be due to incidents, legal changes, or other external factors.
+      \textit{Affected Entity:} User.
+      \textit{Related Requirements:} \rref{FR_MacSSO}, \rref{FR_ReverifyUsers}.
+
+      \item[]\reqitem{lcnum}{LC_CourseFeatures}
+      \textbf{Course Features and Settings.}
+      The set of features an instructor can turn off, and the settings a course can configure, may change as features
+      are added and as more courses (such as CS) adopt the platform with different needs.
+      \textit{Affected Entity:} Course.
+      \textit{Related Requirements:} \rref{FR_DisableFeatures}, \rref{FR_RejectComponentDisable}.
+
+      \item[]\reqitem{lcnum}{LC_ProfileFields}
+      \textbf{Profile Fields.}
+      The information collected in student and team profiles may change. Fields may be added if matching uses more
+      criteria (\lcref{LC_Recommendations}), or removed if they are not essential (\nfrref{NFR_EssentialPersonal}).
+      \textit{Affected Entities:} Student Profile, Team Profile.
+      \textit{Related Requirements:} \rref{FR_StudentProfile}, \rref{FR_TeamProfile}.
+
+      \item[]\reqitem{lcnum}{LC_NotificationRules}
+      \textbf{Notification Rules.}
+      Which events cause a notification, who receives it, and how it is delivered may change. Stakeholders want to be
+      notified through channels they already use (\srref{SR_PushNotify}), and may later ask for notification preferences
+      or other channels.
+      \textit{Affected Entity:} Notification.
+      \textit{Related Requirements:} \rref{FR_ThreadsNotify}, \rref{FR_ActionRequiredEmail},
+      \rref{FR_DurableNotifications}.
+
+      \item[]\reqitem{lcnum}{LC_ThreadTargets}
+      \textbf{Discussion Thread Targets.}
+      Which records discussion threads can be attached to, and how many threads each may have, may change. For example,
+      instructors may need course-wide threads to communicate with all supervisors and students in a course.
+      \textit{Affected Entities:} Thread, Project, Project Application, Team, Course.
+      \textit{Related Requirement:} \rref{FR_ProjectThreads}.
+
+      \item[]\reqitem{lcnum}{LC_RequiredActions}
+      \textbf{Required Actions.}
+      Which actions appear on a user's list of required actions (\srref{SR_Checklist}) may change as
+      features are added which contain actions deemed as required.
+      \textit{Affected Entity:} Checklist.
+      \textit{Related Requirements:} \rref{FR_RequiredActionsList}, \rref{FR_ActionRequiredEmail}.
+
+      \item[]\reqitem{lcnum}{LC_CourseReports}
+      \textbf{Course Reports.}
+      The contents of course reports, and the format they are exported in, may change. Each course tracks approval
+      differently (TRON assigns group numbers), so instructors may need different information, or a format their own
+      tools can read.
+      \textit{Affected Entity:} Course.
+      \textit{Related Requirements:} \rref{FR_ReadCourseInformation}, \rref{FR_ExportCourseInformation}.
 \end{itemize}
 
   \plt{Give the unlikely changes.  The design can assume that the changes listed will not occur.}
@@ -2767,8 +2819,9 @@ Instructor (Dr. Reyes), Teaching Assistant
     \textbf{Course Organization.} Course Organization where students, instructors, projects, and teams will remain with their 
     associated course and their respective roles/relationships in this environemnt will not change.
     \item
-    \textbf{Vision and Overall Flow.} The general workflow where students find and select teams, then propose or browse 
-    projects, and finally obtain instructor approval will remain as this is the high-level idea.
+    \textbf{Vision and Overall Flow.} The general workflow will remain unchanged: students may
+    browse projects at any time, with or without a team, and form teams based on their interests. A student must be in
+    a team to apply for or propose a project, and the team's project then obtains instructor approval.
   \end{itemize}
 
   \newpage{}

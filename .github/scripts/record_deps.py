@@ -71,6 +71,13 @@ def deps_from_fls(fls_path, stem_pdf, repo_root):
                     continue
                 if os.path.normpath(rel) == os.path.normpath(stem_pdf):
                     continue
+                # A figure rendered from a Graphviz source (the Makefile turns
+                # X.dot into X.pdf) is not committed, so record the .dot that a
+                # push would actually change.
+                stem, ext = os.path.splitext(rel)
+                if ext == ".pdf" and os.path.exists(
+                        os.path.join(repo_root, stem + ".dot")):
+                    rel = stem + ".dot"
                 found.add(rel)
     return found
 
