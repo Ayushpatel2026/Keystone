@@ -224,8 +224,21 @@ A supported form value, such as a string, integer, float, or Boolean.
 
 \subsubsection{SupervisorVerification}
 \begin{enumerate}
-    \item Unverified: External supervisor role assigned at sign-in until an instructor approves that user's project proposal.
-    \item Verified: External supervisor role after an instructor approves that user's project proposal.
+    \item Unverified: External supervisor account state at sign-in until an instructor approves that user's project proposal.
+    \item Verified: External supervisor account state after an instructor approves that user's project proposal.
+\end{enumerate}
+
+
+\subsubsection{EnrollmentStatus}
+\begin{enumerate}
+    \item Enrolled: Student is enrolled in the course.
+    \item Flagged: Student is absent from the latest imported enrollment list and requires review.
+\end{enumerate}
+
+\subsubsection{EnrollmentSource}
+\begin{enumerate}
+    \item Avenue: Enrollment data obtained from Avenue to Learn.
+    \item UploadedFile: Enrollment data provided through a file.
 \end{enumerate}
 
 \subsubsection{UserRole}
@@ -298,6 +311,15 @@ Maps form field names to entered values.
 \text{FieldErrors} = \operatorname{Map}\langle\text{string},\text{string}\rangle
 \]
 Maps form field names to error messages.
+
+\subsubsection{EnrollmentEntry}
+A record containing a student's name, email or MacID, program, and associated course. These are the minimum fields required for enrollment import by the SRS.
+
+\subsubsection{EnrollmentPreview}
+A record containing the proposed enrollment additions, existing matches, students absent from the imported list, validation errors, and an identifier for the pending import.
+
+\subsubsection{ImportID}
+A unique string identifying a pending enrollment import.
 
 \subsubsection{ViewData}
 The record or collection supplied by the owning module to populate a view, with fields and types defined in that module's specification.
@@ -820,16 +842,14 @@ None.
 
     \item $\mathit{administrators}:
     \operatorname{Map}\langle\text{User},\mathbb{B}\rangle$
-    - administrative permissions, initially loaded
-    from M\_Persistence.
+    - the SRS \texttt{is\_admin} permission flag for Instructor and TA accounts. It is not a separate role and is initially loaded from M\_Persistence.
 
     \item $\mathit{permittedActions}:\operatorname{Map}\langle\text{UserRole},\operatorname{Set}\langle\text{Action}\rangle\rangle$ - actions allowed for each role, initially loaded from M\_Persistence.
 \end{itemize}
 
 \subsubsection{Environment Variables}
 
-Persistent user roles, course associations, supervisor
-verification records, and administrator permissions.
+Persistent user roles, course associations, supervisor verification records, and the \texttt{is\_admin} permission flags for Instructor and TA accounts.
 
 \subsubsection{Assumptions}
 
@@ -838,7 +858,7 @@ verification records, and administrator permissions.
 
     \item Access decisions follow the role permissions and visibility requirements defined in the SRS.
 
-    \item Requests to change roles or verification status originate from authenticated users or trusted internal modules.
+    \item The requesting module authenticates the actor and completes any required re-verification before requesting a role change.
 \end{itemize}
 
 \subsubsection{Access Routine Semantics}
@@ -847,13 +867,13 @@ verification records, and administrator permissions.
 \begin{itemize}
     \item transition: None.
 
-    \item output: $out=(course\in\operatorname{dom}(\mathit{roles}[user]))\land(action\in\mathit{permittedActions}[\mathit{roles}[user][course]])\land\operatorname{recordVisible}(user,course,record)$. If the user has no course role, the result is false.
+    \item output: $out=(course\in\operatorname{dom}(\mathit{roles}[user]))\land(action\in\mathit{permittedActions}[\mathit{roles}[user][course]])\land\operatorname{recordInScope}(user,course,action,record)$. If the user has no course role, the result is false.
 
     \item exception: None.
 \end{itemize}
 
-\paragraph{Record visibility}
-$\operatorname{recordVisible}(user,course,record)$ is true only when the record belongs to the course and the user may view it under the SRS visibility rules. An unverified external supervisor may read course reference material, proposal templates, and their own proposals, projects, and threads. A verified external supervisor may also read applications to their own projects with applicant team profiles, student and team profiles, and student-proposed projects. Neither may read another supervisor's proposals or projects. Such records must appear as not found and must not be revealed through catalogs, searches, counts, statuses, or notifications.
+\paragraph{Record scope}
+$\operatorname{recordInScope}(user:User,course:Course,action:Action,record:Value):\mathbb{B}$ returns true when the record belongs to the course and the action is allowed for that record under the SRS permissions and visibility rules. For reads, an unverified external supervisor may access course reference material, proposal templates, and their own proposals, projects, and threads. A verified external supervisor may also access applications to their own projects with applicant team profiles, student and team profiles, and student-proposed projects. Neither may access another supervisor's proposals or projects, which must not be revealed in responses, catalogs, searches, counts, statuses, or notifications.
 
 \paragraph{\texttt{getRole(user, course)}}
 \begin{itemize}
@@ -872,7 +892,10 @@ $\operatorname{recordVisible}(user,course,record)$ is true only when the record 
 
 \paragraph{\texttt{updateRole(actor, user, course, role)}}
 \begin{itemize}
-    \item transition: If the actor has administrator permission and has successfully completed the required re-verification:
+    \item transition: If the requesting module has authenticated and re-verified the actor as required by \texttt{FR\_ReverifyUsers}, and
+    \[
+    \operatorname{hasAccess}(actor,course,\text{Update},user)=\text{true},
+    \]
     \[
     \mathit{roles}' =
     \mathit{roles}\oplus
@@ -884,16 +907,21 @@ $\operatorname{recordVisible}(user,course,record)$ is true only when the record 
     \right)
     \right\}.
     \]
-    The change is persisted and audited.
+    If the user's current role in the course is Supervisor and the new role is not, set
+    \[
+    \mathit{verification}'=\mathit{verification}\oplus\{user\mapsto\text{Unverified}\}.
+    \]
+    Otherwise, $\mathit{verification}'=\mathit{verification}$.
+    Changing a verified external supervisor's role away from Supervisor resets their verification state to Unverified, reversing their verified supervisor access. Persist and audit both changes.
 
     \item output: None.
 
-    \item exception: Unauthorized if the actor lacks the required permission or re-verification.
+    \item exception: Unauthorized if the actor is not authorized or the required authentication or re-verification has not succeeded.
 \end{itemize}
 
 \paragraph{\texttt{verifyExternalSupervisor(user, project)}}
 \begin{itemize}
-    \item transition: If the user is an external supervisor and an instructor has approved a project proposal submitted by that user:
+    \item transition: If the user is an external supervisor and an instructor approves a project proposal submitted by that user:
     \[
     \mathit{verification}' =
     \mathit{verification}\oplus
@@ -929,6 +957,7 @@ course resources for students and supervisors.
 
 \begin{itemize}
     \item M\_Authorization
+    \item M\_Authentication
     \item M\_Persistence
     \item M\_AuditLog
 \end{itemize}
@@ -958,8 +987,8 @@ None.
 \endhead
 \endfoot
 \texttt{getSettings} & user: User, course: Course & Dictionary & Unauthorized \\
-\texttt{updateSetting} & user: User, course: Course, key: String, value: Value & -- & Unauthorized, InvalidSetting \\
-\texttt{isFeatureEnabled} & course: Course, feature: Feature & bool & -- \\
+\texttt{updateSetting} & user: User, course: Course, key: String, value: Value, session: SessionID, proof: AuthProof & -- & Unauthorized, InvalidSetting \\
+\texttt{isFeatureEnabled} & user: User, course: Course, feature: Feature & bool & Unauthorized \\
 \texttt{setFeatureEnabled} & user: User, course: Course, feature: Feature, enabled: bool & -- & Unauthorized, PendingWork \\
 \texttt{getPendingWork} & user: User, course: Course, feature: Feature & List & Unauthorized \\
 \texttt{recordPendingWork} & course: Course, feature: Feature, recordID: String, pending: bool & -- & -- \\
@@ -1026,18 +1055,25 @@ outstanding work records, and course resource storage.
 \begin{itemize}
     \item transition: None.
 
-    \item output: If the user is authorized:
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$:
     \[
     out=\mathit{settings}[course].
     \]
 
-    \item exception: Unauthorized if the user lacks
-    permission to view the course settings.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
 \end{itemize}
 
-\paragraph{\texttt{updateSetting(user, course, key, value)}}
+\paragraph{\texttt{updateSetting(user, course, key, value, session, proof)}}
 \begin{itemize}
-    \item transition: If the user is an authorized course instructor, the setting is supported, and the value satisfies its constraints:
+    \item transition: If
+    \[
+    \begin{aligned}
+    &\operatorname{hasAccess}(user,course,\text{Update},course)=\text{true}
+    \land validSetting(course,key,value)\\
+    &\land (\operatorname{requiresReverification}(key)\Rightarrow
+    \operatorname{reverify}(session,proof)=\text{true}),
+    \end{aligned}
+    \]
     \[
     \mathit{settings}'=
     \mathit{settings}\oplus
@@ -1049,32 +1085,32 @@ outstanding work records, and course resource storage.
     \right)
     \right\}.
     \]
-    Changes to course rules or approval mode require successful re-verification before the update. Persist and audit the change.
+    Persist and audit the change.
 
     \item output: None.
 
     \item exception:
     \begin{itemize}
-        \item Unauthorized if the user lacks permission or required re-verification.
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Update},course)=\text{false}$ or the required re-verification fails.
         \item InvalidSetting if the setting is unsupported or the value is invalid.
     \end{itemize}
 \end{itemize}
 
-\paragraph{\texttt{isFeatureEnabled(course, feature)}}
+\paragraph{\texttt{isFeatureEnabled(user, course, feature)}}
 \begin{itemize}
     \item transition: None.
 
-    \item output:
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$:
     \[
     out=\mathit{features}[course][feature].
     \]
 
-    \item exception: None.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
 \end{itemize}
 
 \paragraph{\texttt{setFeatureEnabled(user, course, feature, enabled)}}
 \begin{itemize}
-    \item transition: If the user is an authorized course instructor and disabling the feature will not strand outstanding work:
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Configure},course)=\text{true}$ and disabling the feature will not strand outstanding work:
     \[
     \mathit{features}'=
     \mathit{features}\oplus
@@ -1092,8 +1128,7 @@ outstanding work records, and course resource storage.
 
     \item exception:
     \begin{itemize}
-        \item Unauthorized if the user is not
-        authorized to configure the course.
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Configure},course)=\text{false}$.
         \item PendingWork if
         \[
         \neg enabled\land
@@ -1101,23 +1136,21 @@ outstanding work records, and course resource storage.
         \ne\emptyset.
         \]
     \end{itemize}
-    When PendingWork occurs, no feature state
-    changes. The caller may use getPendingWork
-    to display the outstanding records.
+    When PendingWork occurs, no feature state changes. The caller may use getPendingWork to display the outstanding records.
 \end{itemize}
 
 \paragraph{\texttt{getPendingWork(user, course, feature)}}
 \begin{itemize}
     \item transition: None.
 
-    \item output: For an authorized course instructor,
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$,
     return the outstanding record identifiers:
     \[
     out=\operatorname{List}
     (\mathit{pendingWork}[course][feature]).
     \]
 
-    \item exception: Unauthorized if the user lacks course configuration permission.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
 \end{itemize}
 
 \paragraph{\texttt{recordPendingWork(course, feature, recordID, pending)}}
@@ -1143,7 +1176,7 @@ outstanding work records, and course resource storage.
 
 \paragraph{\texttt{saveResource(user, course, resource)}}
 \begin{itemize}
-    \item transition: If the user is an instructor or TA authorized for the course, and the resource is valid:
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{true}$ and the resource is valid:
     \[
     \mathit{resources}'=
     \mathit{resources}\oplus
@@ -1155,14 +1188,14 @@ outstanding work records, and course resource storage.
 
     \item exception:
     \begin{itemize}
-        \item Unauthorized if the user lacks resource management permission.
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{false}$.
         \item InvalidResource if required resource information is invalid.
     \end{itemize}
 \end{itemize}
 
 \paragraph{\texttt{publishResource(user, course, resourceID)}}
 \begin{itemize}
-    \item transition: If the user is an authorized instructor or TA, and the resource belongs to the course:
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Update},resourceID)=\text{true}$ and the resource belongs to the course:
     \[
     \mathit{resources}'[resourceID].published
     =\text{true}.
@@ -1173,7 +1206,7 @@ outstanding work records, and course resource storage.
 
     \item exception:
     \begin{itemize}
-        \item Unauthorized if the user lacks resource management permission.
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Update},resourceID)=\text{false}$.
         \item ResourceNotFound if the resource does not exist in the course.
     \end{itemize}
 \end{itemize}
@@ -1182,22 +1215,270 @@ outstanding work records, and course resource storage.
 \begin{itemize}
     \item transition: None.
 
-    \item output: For an authorized user, return the list of published resources belonging to the requested course:
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$, return the list of published resources belonging to the requested course:
     \[
     out=[r\mid r\in\mathit{resources},
     \ r.course=course\land r.published].
     \]
     Unpublished resources are not returned to students or supervisors.
 
-    \item exception: Unauthorized if the user lacks permission to read course resources.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
 \end{itemize}
 
 \subsubsection{Local Functions}
 
 \begin{description}
     \item[validSetting(course: Course, key: String, value: Value): bool] Returns true if the setting exists and the supplied value satisfies its constraints.
+    \item[requiresReverification(key: String): $\mathbb{B}$] Returns true when the setting changes course rules or the approval mode, as required by \texttt{FR\_ReverifyUsers}.
 
     \item[validResource(resource: CourseResource): bool] Returns true if the resource contains the required information and valid content.
+\end{description}
+
+
+\newpage
+
+\section[MIS of Enrollment Module]{MIS of Enrollment Module (\moduleid{M_Enrollment})}
+\label{M_Enrollment}
+
+\subsection{Module}
+
+This module manages course enrollment records. It imports student lists from Avenue to Learn or uploaded files, validates and previews enrollment changes, and applies imports only after confirmation. It also supports manual enrollment updates and flags students missing from the latest imported list without automatically removing them.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_StudentsTeams
+    \item M\_CourseManagement
+    \item M\_HardwareHiding
+    \item M\_AuditLog
+    \item M\_Persistence
+    \item M\_Authorization
+    \item M\_Authentication
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{previewImport} & user: User, course: Course, source: EnrollmentSource, entries: List & EnrollmentPreview & Unauthorized, InvalidSource \\
+\texttt{confirmImport} & user: User, course: Course, importID: ImportID, session: SessionID, proof: AuthProof & -- & Unauthorized, InvalidImport, ValidationFailed \\
+\texttt{addStudent} & user: User, course: Course, entry: EnrollmentEntry, session: SessionID, proof: AuthProof & -- & Unauthorized, InvalidEntry, DuplicateStudent \\
+\texttt{getEnrollment} & user: User, course: Course & List & Unauthorized \\
+\texttt{getDiscrepancies} & user: User, course: Course & List & Unauthorized \\
+\texttt{confirmRemoval} & user: User, course: Course, student: User, session: SessionID, proof: AuthProof & -- & Unauthorized, StudentNotFlagged \\
+\bottomrule
+\caption{Exported access programs of the Enrollment module}
+\label{TblEnrollmentAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{enrollment}:
+    \operatorname{Map}\langle
+    \text{Course},
+    \operatorname{Map}\langle
+    \text{User},\text{EnrollmentStatus}
+    \rangle\rangle$
+    - current enrollment records and statuses,
+    initially loaded from M\_Persistence.
+
+    \item $\mathit{pendingImports}:
+    \operatorname{Map}\langle
+    \text{ImportID},\text{EnrollmentPreview}\rangle$
+    - validated previews awaiting confirmation,
+    initially $\emptyset$.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+Avenue to Learn, uploaded enrollment files, persistent enrollment records, and server network connections.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Enrollment data contains only the fields permitted by DPR\_MinimalEnrollmentData.
+    \item Enrollment calls M\_Authentication.reverify before an enrollment import is confirmed.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{previewImport(user, course, source, entries)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Import},course)=\text{true}$, retrieve the enrollment list using the specified source and compare its entries with the existing enrollment.
+
+    For a valid import, generate a unique identifier
+    $i$ and preview $p$:
+    \[
+    \mathit{pendingImports}' =
+    \mathit{pendingImports}
+    \cup\{i\mapsto p\}.
+    \]
+
+    The preview identifies new students, matching students, students missing from the imported list, duplicate identifiers, and malformed entries.
+
+    No enrollment records are changed.
+
+    \item output: $out=p$.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Import},course)=\text{false}$.
+        \item InvalidSource if the requested source cannot provide a readable enrollment list.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{confirmImport(user, course, importID, session, proof)}}
+\begin{itemize}
+    \item transition: If
+    \[
+    \begin{aligned}
+    &\operatorname{hasAccess}(user,course,\text{ConfirmImport},importID)=\text{true}
+    \land \operatorname{reverify}(session,proof)=\text{true}\\
+    &\land importID\in\operatorname{dom}(\mathit{pendingImports})
+    \land \mathit{pendingImports}[importID].course=course,
+    \end{aligned}
+    \]
+    apply the validated import.
+
+    Let $I$ be the set of students in the import
+    and $E$ the set of currently enrolled students.
+
+    For every $u\in I$:
+    \[
+    \mathit{enrollment}'[course][u]
+    =\text{Enrolled}.
+    \]
+
+    For every $u\in E\setminus I$:
+    \[
+    \mathit{enrollment}'[course][u]
+    =\text{Flagged}.
+    \]
+
+    Students absent from the import remain associated with the course and retain their team memberships.
+
+    The changes are saved atomically, audited, and the completed import is removed from pendingImports.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{ConfirmImport},importID)=\text{false}$ or $\operatorname{reverify}(session,proof)=\text{false}$.
+        \item InvalidImport if the preview does not exist, belongs to another course, or is no longer current.
+        \item ValidationFailed if the import contains unresolved duplicate or malformed identifiers.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{addStudent(user, course, entry, session, proof)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{true}\land\operatorname{reverify}(session,proof)=\text{true}$ and the entry is valid, add the student to the specified course.
+
+    For the identified student $s$:
+    \[
+    \mathit{enrollment}'[course]
+    =
+    \mathit{enrollment}[course]
+    \oplus\{s\mapsto\text{Enrolled}\}.
+    \]
+
+    A previously flagged student may be
+    restored to Enrolled status.
+    Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{false}$ or $\operatorname{reverify}(session,proof)=\text{false}$.
+        \item InvalidEntry if the supplied enrollment information is malformed or incomplete.
+        \item DuplicateStudent if the student is already enrolled in the course.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{getEnrollment(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$, return the course's
+    student enrollment records and statuses:
+    \[
+    out=\operatorname{List}
+    (\mathit{enrollment}[course]).
+    \]
+
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{getDiscrepancies(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$, return students requiring review:
+    \[
+    out=[
+    u\mid
+    u\in\operatorname{dom}(\mathit{enrollment}[course])
+    \land
+    \mathit{enrollment}[course][u]
+    =\text{Flagged}
+    ].
+    \]
+
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{confirmRemoval(user, course, student, session, proof)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Delete},student)=\text{true}\land\operatorname{reverify}(session,proof)=\text{true}$ and the student has Flagged status, confirm the discrepancy and initiate the authorized removal of the student's course association.
+
+    The operation must coordinate with modules managing course roles and team memberships. No team membership is silently removed.
+
+    Persist and audit the confirmed change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Delete},student)=\text{false}$ or $\operatorname{reverify}(session,proof)=\text{false}$.
+        \item StudentNotFlagged if the student has no flagged enrollment discrepancy in the specified course.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[validEntry(entry: EnrollmentEntry): bool]
+    Returns true if the entry contains valid student identification, program, and course information.
+
+    \item[findDuplicates(entries: List): List]
+    Returns entries with duplicate student identifiers.
+
+    \item[compareEnrollment(course: Course, entries: List): EnrollmentPreview]
+    Compares the imported list with current enrollment and produces the proposed additions, matches, missing students, and validation errors.
 \end{description}
 
 \newpage
