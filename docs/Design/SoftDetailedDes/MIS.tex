@@ -36,6 +36,8 @@ urlcolor=cyan          % color of external links
 \input{../../Comments.text}
 \input{../../Common.text}
 
+\newcommand{\moduleid}[1]{\texttt{\detokenize{#1}}}
+
 \begin{document}
 
 \title{Module Interface Specification for \projname{}}
@@ -84,45 +86,53 @@ and Module Guide.  The full documentation and implementation can be
 found at \url{...}.  \wss{provide the url for your repo}
 
 \section{Notation}
+\label{SecNotation}
 
-\wss{You should describe your notation.  You can use what is below as
-  a starting point.}
+The module specifications follow \citet{HoffmanAndStrooper1995}, with template
+module conventions adapted from \citet{GhezziEtAl2003}. Each access program
+specifies its inputs, output, state transition, and exception conditions.
 
-The structure of the MIS for modules comes from \citet{HoffmanAndStrooper1995},
-with the addition that template modules have been adapted from
-\cite{GhezziEtAl2003}.  The mathematical notation comes from Chapter 3 of
-\citet{HoffmanAndStrooper1995}.  For instance, the symbol := is used for a
-multiple assignment statement and conditional rules follow the form $(c_1
-\Rightarrow r_1 | c_2 \Rightarrow r_2 | ... | c_n \Rightarrow r_n )$.
-
-The following table summarizes the primitive data types used by \projname.
-
-\begin{center}
-\renewcommand{\arraystretch}{1.2}
-\noindent 
-\begin{tabular}{l l p{7.5cm}} 
-\toprule 
-\textbf{Data Type} & \textbf{Notation} & \textbf{Description}\\ 
+\begin{table}[H]
+\centering
+\renewcommand{\arraystretch}{1.15}
+\begin{tabularx}{\textwidth}{l X}
+\toprule
+\textbf{Notation} & \textbf{Meaning} \\
 \midrule
-character & char & a single symbol or digit\\
-integer & $\mathbb{Z}$ & a number without a fractional component in (-$\infty$, $\infty$) \\
-natural number & $\mathbb{N}$ & a number without a fractional component in [1, $\infty$) \\
-real & $\mathbb{R}$ & any number in (-$\infty$, $\infty$)\\
+bool & Boolean values $\{\text{true},\text{false}\}$. \\
+String & Finite sequence of characters where $\epsilon$ is the empty string. \\
+$\emptyset$ & Empty set or map, according to its declared type. \\
+None & Absence of a value where $T\cup\{\text{None}\}$ denotes an optional value. \\
+$x$, $x'$ & Values of state variable $x$ before and after a routine. \\
+$\in$, $\notin$ & Membership and non-membership in a set. \\
+$\ne$ & Not equal. \\
+$\land$, $\neg$ & Logical and, and logical negation (not). \\
+$P\Rightarrow Q$ & If condition $P$ holds, then property or transition $Q$ holds. \\
+$out$, $exc$ & Routine return value and raised exception, respectively. \\
+$\mathcal{V}$, $\mathcal{F}$ & Sets of registered UI view and form names. \\
+$\operatorname{Map}\langle K,V\rangle$ & Mapping from keys of type $K$ to values of type $V$. \\
+$\operatorname{Set}\langle T\rangle$ & Set of values of type $T$. \\
+$k\mapsto v$ & Associates key $k$ with value $v$. \\
+$\operatorname{dom}(M)$ & Set of keys in mapping $M$. \\
+$M[k]$ & Value associated with key $k$ in mapping $M$. \\
+$M\cup\{k\mapsto v\}$ & Adds a new key-value pair to mapping $M$. \\
+$M\setminus\{k\mapsto v\}$ & Removes a key-value pair from mapping $M$. \\
+$M\oplus\{k\mapsto v\}$ & Adds or replaces the value associated with key $k$ in mapping $M$. \\
+-- & No input, program return value, or exported exception, according to column. \\
 \bottomrule
-\end{tabular} 
-\end{center}
+\end{tabularx}
+\caption{Notation used in the module specifications}
+\label{TblNotation}
+\end{table}
 
-\noindent
-The specification of \projname \ uses some derived data types: sequences, strings, and
-tuples. Sequences are lists filled with elements of the same data type. Strings
-are sequences of characters. Tuples contain a list of values, potentially of
-different types. In addition, \projname \ uses functions, which
-are defined by the data types of their inputs and outputs. Local functions are
-described by giving their type signature followed by their specification.
+A transition describes the post-state of a successful call. State variables not mentioned remain unchanged. Unless stated otherwise, an exported exception leaves module state unchanged and produces no normal output. Output denotes a program return value, effects on the screen and other external resources are stated separately.
+
+\newpage
 
 \section{Module Decomposition}
 
-The following table is taken directly from the Module Guide document for this project.
+Table~\ref{TblMH} follows the module hierarchy in the Module Guide~\citep{MG},
+with each module's full name and identifier shown.
 
 \begin{table}[h!]
 \centering
@@ -131,21 +141,26 @@ The following table is taken directly from the Module Guide document for this pr
 \textbf{Level 1} & \textbf{Level 2}\\
 \midrule
 
-{Hardware-Hiding} & ~ \\
+{Hardware-Hiding Module} & Hardware-Hiding Module (\moduleid{M_HardwareHiding}) \\
 \midrule
 
-\multirow{7}{0.3\textwidth}{Behaviour-Hiding} & Input Parameters\\
-& Output Format\\
-& Output Verification\\
-& Temperature ODEs\\
-& Energy Equations\\ 
-& Control Module\\
-& Specification Parameters Module\\
+\multirow{13}{0.3\textwidth}{Behaviour-Hiding Module} & User Interface Module (\moduleid{M_UserInterface})\\
+ & Authentication Module (\moduleid{M_Authentication})\\
+ & Authorization Module (\moduleid{M_Authorization})\\
+ & Course Management Module (\moduleid{M_CourseManagement})\\
+ & Enrollment Module (\moduleid{M_Enrollment})\\
+ & Projects Module (\moduleid{M_Projects})\\
+ & Students and Teams Module (\moduleid{M_StudentsTeams})\\
+ & Recommendation Module (\moduleid{M_Recommendation})\\
+ & Approval Workflow Module (\moduleid{M_ApprovalWorkflow})\\
+ & Threads Module (\moduleid{M_Threads})\\
+ & Notifications Module (\moduleid{M_Notifications})\\
+ & Checklist Module (\moduleid{M_Checklist})\\
+ & Course Report Module (\moduleid{M_CourseReport})\\
 \midrule
 
-\multirow{3}{0.3\textwidth}{Software Decision} & {Sequence Data Structure}\\
-& ODE Solver\\
-& Plotting\\
+\multirow{2}{0.3\textwidth}{Software Decision Module} & Persistence Module (\moduleid{M_Persistence})\\
+ & Audit Log Module (\moduleid{M_AuditLog})\\
 \bottomrule
 
 \end{tabular}
@@ -154,10 +169,176 @@ The following table is taken directly from the Module Guide document for this pr
 \end{table}
 
 \newpage
-~\newpage
 
-\section{MIS of \wss{Module Name}} \label{Module} \wss{Use labels for
-  cross-referencing}
+
+\section{Data Types}
+\label{SecDataTypes}
+
+The following data types are shared across the Keystone modules.
+\subsection{Enums}
+
+\subsubsection{Action}
+\begin{enumerate}
+    \item Create, Read, Update, Delete: Create, view, modify, or remove a record.
+    \item Submit, Apply, Withdraw: Submit a record or application, apply to a project, or withdraw it.
+    \item Approve, Reject, RequestChanges: Record an approval decision or request revisions.
+    \item Accept, Decline: Accept or decline a project or agreement.
+    \item Import, ConfirmImport, Export: Import, confirm an enrollment import, or export course information.
+    \item Assign, Verify: Assign a course role or verify an external supervisor.
+    \item Configure, Enable, Disable: Change course settings or enable or disable a feature.
+    \item AddMember, RemoveMember, LeaveTeam, DissolveTeam: Manage team membership.
+    \item ChangeCredentials, ChangeEmail, LinkAuthentication, ChangeCourseAssociation: Change account credentials, email, linked sign-in, or course association.
+    \item SendMessage, ViewReport: Send a discussion message or view a course report.
+\end{enumerate}
+
+\subsubsection{AuthProvider}
+\begin{enumerate}
+    \item McMasterSSO: Authentication provider for McMaster users.
+    \item ExternalProvider: Trusted authentication provider for external supervisors.
+\end{enumerate}
+
+\subsubsection{Feature}
+\begin{enumerate}
+    \item TeamFormation: Team formation functionality.
+    \item ProjectApprovals: Project approval functionality.
+    \item ProjectProposals: Project proposal functionality.
+\end{enumerate}
+
+\subsubsection{SupervisorVerification}
+\begin{enumerate}
+    \item Unverified: External supervisor account state at sign-in until an instructor approves that user's project proposal.
+    \item Verified: External supervisor account state after an instructor approves that user's project proposal.
+\end{enumerate}
+
+
+\subsubsection{EnrollmentStatus}
+\begin{enumerate}
+    \item Enrolled: Student is enrolled in the course.
+    \item Flagged: Student is absent from the latest imported enrollment list and requires review.
+\end{enumerate}
+
+\subsubsection{EnrollmentSource}
+\begin{enumerate}
+    \item Avenue: Enrollment data obtained from Avenue to Learn.
+    \item UploadedFile: Enrollment data provided through a file.
+\end{enumerate}
+
+\subsubsection{UserRole}
+\begin{enumerate}
+    \item Student: A student participating in a capstone course.
+    \item Supervisor: A user proposing or supervising projects.
+    \item Instructor: A user responsible for managing a capstone course.
+    \item TA: A teaching assistant supporting course management.
+\end{enumerate}
+
+\subsubsection{ProjectStatus}
+\begin{enumerate}
+    \item Draft: Project proposal has not been submitted.
+    \item ProposalSubmitted: Proposal is awaiting review.
+    \item ProposalChangesRequested: Modifications are required.
+    \item ProposalRejected: Project proposal was rejected.
+    \item ProposalWithdrawn: Project proposal was withdrawn.
+    \item Open: Listed project has available capacity.
+    \item Full: Listed project has no remaining capacity.
+    \item Closed: Project selection period has ended.
+\end{enumerate}
+
+\subsubsection{TeamProjectStatus}
+\begin{enumerate}
+    \item Applied: Team has applied to a project.
+    \item SupervisorAccepts: Supervisor has accepted the team.
+    \item Agreed: Team has accepted the working arrangement.
+    \item TeamProjectSubmitted: Team project was submitted for approval.
+    \item TeamProjectUnderReview: Submission is under review.
+    \item TeamProjectChangesRequested: Modifications are required.
+    \item TeamProjectRejected: Team project was rejected.
+    \item Approved: Team project has been approved.
+    \item ApprovedChangeUnderReview: Changes to an approved
+    project are under review.
+    \item DeclinedOrWithdrawn: Application was declined or withdrawn.
+\end{enumerate}
+
+\subsubsection{ApprovalMode}
+\begin{enumerate}
+    \item InPlatform: Approval is performed within Keystone.
+    \item External: Approval occurs externally and is recorded manually.
+    \item Integrated: Approval is synchronized through an external adapter.
+\end{enumerate}
+
+\subsection{Data Structures}
+
+\subsubsection{Dictionary}
+For types $K$ and $V$, a finite mapping from keys of type $K$ to values of type $V$, written $\operatorname{Map}\langle K,V\rangle$.
+
+\subsubsection{List}
+For any type $T$, an ordered collection of elements of type $T$.
+
+\subsubsection{CourseResource}
+A course document or link with an identifier, course association, and publication status.
+
+\subsubsection{SessionID}
+A string that uniquely identifies an authenticated session.
+
+\subsubsection{AuthProof}
+Credentials, a verification code, or an identity provider response submitted to verify a user's identity.
+
+\subsubsection{FieldValues}
+\[
+\text{FieldValues} = \operatorname{Map}\langle\text{string},\text{Value}\rangle
+\]
+Maps form field names to entered values.
+
+\subsubsection{FieldErrors}
+\[
+\text{FieldErrors} = \operatorname{Map}\langle\text{string},\text{string}\rangle
+\]
+Maps form field names to error messages.
+
+\subsubsection{EnrollmentEntry}
+A record containing a student's name, email or MacID, program, and associated course. These are the minimum fields required for enrollment import by the SRS.
+
+\subsubsection{EnrollmentPreview}
+A record containing the proposed enrollment additions, existing matches, students absent from the imported list, validation errors, and an identifier for the pending import.
+
+\subsubsection{ImportID}
+A unique string identifying a pending enrollment import.
+
+\subsubsection{ViewData}
+The record or collection supplied by the owning module to populate a view, with fields and types defined in that module's specification.
+
+\subsubsection{User}
+A record representing a Keystone user, including their identity and assigned roles.
+
+\subsubsection{Course}
+A record containing capstone course information, configuration settings, and enrollment information.
+
+\subsubsection{StudentProfile}
+A record containing a student's background, skills, interests, experience, and project preferences.
+
+\subsubsection{Team}
+A record representing a group of students participating in the capstone project selection process.
+
+\subsubsection{TeamProfile}
+A record containing a team's collective skills, interests, goals, and work style.
+
+\subsubsection{Project}
+A record containing project information, supervisor capacity, course association, and ProjectStatus.
+
+\subsubsection{ProjectApplication}
+A record representing a team's application to a project, including the associated TeamProjectStatus.
+
+\subsubsection{Notification}
+A record containing information about an event or action communicated to a user.
+
+\subsubsection{ChecklistItem}
+A record describing a required user action and its completion status.
+
+\subsubsection{Thread}
+A record representing a discussion associated with a project proposal or team.
+
+
+\section[MIS of Hardware-Hiding Module]{MIS of Hardware-Hiding Module (\moduleid{M_HardwareHiding})}
+\label{M_HardwareHiding}
 
 \wss{You can reference SRS labels, such as R\ref{R_Inputs}.}
 
@@ -166,25 +347,25 @@ The following table is taken directly from the Module Guide document for this pr
 \subsection{Module}
 
 \wss{Short name for the module}
+This module provides the platform services used by the system and virtual hardware used by the system, including input/output, file storage, and network connections including HTTPS. This module is provided by the OS, browser, and runtime libraries.
+
+Note: Unlike many other modules listed, this module is entirely externally provided. This will not be explicitly implemented.
 
 \subsection{Uses}
-
+\begin{itemize}
+  \item \textbf{Server Operating System:} File system access, networking, and process execution. 
+  \item \textbf{Python runtime and standard libraries:} Access to OS services for the backend. 
+  \item \textbf{Browser:} Provides access to OS services such as display, user input, and network facilities.
+\end{itemize}
+No Keystone modules.
 
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
+None
 
 \subsubsection{Exported Access Programs}
-
-\begin{center}
-\begin{tabular}{p{2cm} p{4cm} p{4cm} p{2cm}}
-\hline
-\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
-\hline
-\wss{accessProg} & - & - & - \\
-\hline
-\end{tabular}
-\end{center}
+None. Provided by the OS, browser, and runtime libraries.
 
 \subsection{Semantics}
 
@@ -192,33 +373,34 @@ The following table is taken directly from the Module Guide document for this pr
 
 \wss{Not all modules will have state variables.  State variables give the module
   a memory.}
+Platform state managed by the OS, browser, and runtime libraries.
 
 \subsubsection{Environment Variables}
 
 \wss{This section is not necessary for all modules.  Its purpose is to capture
   when the module has external interaction with the environment, such as for a
   device driver, screen interface, keyboard, file, etc.}
+File system, network connections, user input devices, and browser display.
 
 \subsubsection{Assumptions}
 
 \wss{Try to minimize assumptions and anticipate programmer errors via
   exceptions, but for practical purposes assumptions are sometimes appropriate.}
 
-\subsubsection{Access Routine Semantics}
-
-\noindent \wss{accessProg}():
 \begin{itemize}
-\item transition: \wss{if appropriate} 
-\item output: \wss{if appropriate} 
-\item exception: \wss{if appropriate} 
+  \item A supported OS, Python runtime, and browser are available.
+  \item Required filesystem and network permissions are configured.
+  \item HTTPS is configured for the deployed browser-server communication system. 
 \end{itemize}
 
+\subsubsection{Access Routine Semantics}
 \wss{A module without environment variables or state variables is unlikely to
   have a state transition.  In this case a state transition can only occur if
   the module is changing the state of another module.}
 
 \wss{Modules rarely have both a transition and an output.  In most cases you
   will have one or the other.}
+None
 
 \subsubsection{Local Functions}
 
@@ -226,6 +408,1062 @@ The following table is taken directly from the Module Guide document for this pr
   They are not necessarily something that is going to be implemented
   explicitly.  Even if they are implemented, they are not exported; they only
   have local scope.}
+None
+
+\newpage
+
+\section[MIS of User Interface Module]{MIS of User Interface Module (\moduleid{M_UserInterface})}
+\label{M_UserInterface}
+
+\subsection{Module}
+
+This module manages Keystone's user interface and views, displaying pages and forms, collecting user input, and presenting results and error messages. It handles presentation but delegates business logic and authorization to the appropriate modules.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_HardwareHiding
+    \item M\_Authentication
+    \item M\_Authorization
+    \item M\_CourseManagement
+    \item M\_Enrollment
+    \item M\_Projects
+    \item M\_StudentsTeams
+    \item M\_Recommendation
+    \item M\_ApprovalWorkflow
+    \item M\_Threads
+    \item M\_Notifications
+    \item M\_Checklist
+    \item M\_CourseReport
+\end{itemize}
+
+The UI makes API calls to every backend module listed above to retrieve data and perform the actions available in its views and forms. It displays the results and errors returned by those calls. The access routines below abstract this interaction into presentation and input operations rather than listing each API call separately. The UI uses Hardware Hiding for browser display, input, and networking facilities.
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+These proposed interfaces handle presentation and input only. Business operations remain in their owning modules.
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.25\textwidth}
+                  >{\raggedright\arraybackslash}p{0.32\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{displayView} & viewName: String, data: ViewData & -- & UnknownView \\
+\texttt{displayForm} & formName: String, initialValues: FieldValues & -- & UnknownForm \\
+\texttt{readForm} & -- & FieldValues & NoActiveForm \\
+\texttt{displayFieldErrors} & errors: FieldErrors & -- & -- \\
+\texttt{showMessage} & text: String & -- & -- \\
+\texttt{setLoading} & waiting: bool & -- & -- \\
+\bottomrule
+\caption{Exported access programs of the User Interface module}
+\label{TblUIAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+\begin{itemize}
+  \item $\mathit{currentView}:\text{String}$ - current view which is initially SignIn.
+  \item $\mathit{displayedData}:\text{ViewData}$ - values supplied for the view and initially empty.
+  \item $\mathit{currentForm}:\text{String}\cup\{\text{None}\}$ - active form which is initially None.
+  \item $\mathit{formValues}:\text{FieldValues}$ - map of field names to entered values and the set is initially $\emptyset$.
+  \item $\mathit{fieldErrors}:\text{FieldErrors}$ - map of field names to error messages and the set is initially $\emptyset$.
+  \item $\mathit{message}:\text{String}$ - feedback which initially $\epsilon$.
+  \item $\mathit{loading}:\text{bool}$ - waiting indicator and initially false.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+Browser display, keyboard, mouse or touch input, file-selection controls, and browser network facilities. The environment variables are external resources instead of application configuration variables.
+
+\subsubsection{Assumptions}
+\begin{itemize}
+  \item A supported browser is available.
+  \item Views cover the tasks assigned to the UI by the MG. The caller supplies data matching the selected view/form schema and the owning module's types.
+  \item Server modules authorize displayed data and independently validate submitted inputs and enforce business rules.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+Equations follow Section~\ref{SecNotation}. Successful transitions are rendered in the browser. All routines have no program output or exception unless stated.
+
+\paragraph{\texttt{displayView(viewName, data)}}
+\begin{itemize}
+  \item transition:
+  \[
+  viewName\in\mathcal{V}\Rightarrow
+  \left\{
+  \begin{aligned}
+    \mathit{currentView}' &= viewName, & \mathit{displayedData}' &= data,\\
+    \mathit{currentForm}' &= \text{None}, & \mathit{formValues}' &= \emptyset,\\
+    \mathit{fieldErrors}' &= \emptyset, & \mathit{message}' &= \epsilon,\\
+    \mathit{loading}' &= \text{false}. &&
+  \end{aligned}
+  \right.
+  \]
+  \item output: None.
+  \item exception:
+  $viewName\notin\mathcal{V}\Rightarrow exc=\text{UnknownView}$.
+\end{itemize}
+
+\paragraph{\texttt{displayForm(formName, initialValues)}}
+\begin{itemize}
+  \item transition:
+  \[
+  formName\in\mathcal{F}\Rightarrow
+  \left\{
+  \begin{aligned}
+    \mathit{currentForm}' &= formName, & \mathit{formValues}' &= initialValues,\\
+    \mathit{fieldErrors}' &= \emptyset, & \mathit{message}' &= \epsilon.
+  \end{aligned}
+  \right.
+  \]
+  Render the form and mark required fields without submitting values.
+  \item output: None.
+  \item exception:
+  $formName\notin\mathcal{F}\Rightarrow exc=\text{UnknownForm}$.
+\end{itemize}
+
+\paragraph{\texttt{readForm()}}
+\begin{itemize}
+  \item transition: None since values are neither cleared nor submitted.
+  \item output:
+  $\mathit{currentForm}\ne\text{None}\Rightarrow out=\mathit{formValues}$.
+  \item exception:
+  $\mathit{currentForm}=\text{None}\Rightarrow exc=\text{NoActiveForm}$.
+\end{itemize}
+
+\paragraph{\texttt{displayFieldErrors(errors)}}
+\begin{itemize}
+  \item transition:
+  \[
+    \mathit{fieldErrors}'=errors
+    \land \mathit{formValues}'=\mathit{formValues}.
+  \]
+  Display messages beside visible fields and in an accessible summary, including errors for hidden fields.
+  \item output: None.
+  \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{showMessage(text)}}
+\begin{itemize}
+  \item transition: $\mathit{message}'=text$. Display accessible feedback and $text=\epsilon\Rightarrow$ clear the message. Exclude credentials, tokens, and restricted details.
+  \item output: None.
+  \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{setLoading(waiting)}}
+\begin{itemize}
+  \item transition: $\mathit{loading}'=waiting$, with browser effects:
+  \[
+  \begin{aligned}
+    waiting &\Rightarrow (\text{indicator shown}\land
+                          \text{conflicting submissions disabled}),\\
+    \neg waiting &\Rightarrow (\text{indicator hidden}\land
+                          \text{otherwise permitted controls restored}).
+  \end{aligned}
+  \]
+  \item output: None.
+  \item exception: None.
+\end{itemize}
+
+\subsubsection{Local Functions}
+\begin{description}
+  \item[renderCurrentView(): --] Renders the current view and controls from UI state.
+  \item[collectFormValues(): FieldValues] Returns the current browser form values and updates $\mathit{formValues}$.
+\end{description}
+
+\newpage
+
+
+\section[MIS of Authentication Module]{MIS of Authentication Module (\moduleid{M_Authentication})}
+\label{M_Authentication}
+
+\subsection{Module}
+
+This module authenticates Keystone users through McMaster SSO or a trusted external provider. It maintains user identities and authenticated sessions, verifies credentials, and re-verifies users before high-risk actions. Role-based permissions are handled by M\_Authorization.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_HardwareHiding
+    \item M\_Persistence
+    \item M\_Authorization
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{signIn} & provider: AuthProvider, proof: AuthProof & SessionID & AuthenticationFailed, ProviderUnavailable \\
+\texttt{signOut} & session: SessionID & -- & InvalidSession \\
+\texttt{isAuthenticated} & session: SessionID & bool & -- \\
+\texttt{getIdentity} & session: SessionID & User & InvalidSession \\
+\texttt{reverify} & session: SessionID, proof: AuthProof & bool & InvalidSession, ProviderUnavailable \\
+\bottomrule
+\caption{Exported access programs of the Authentication module}
+\label{TblAuthenticationAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{sessions}:\operatorname{Map}\langle\text{SessionID},\text{User}\rangle$ - active authenticated sessions, initially $\emptyset$.
+
+    \item $\mathit{identities}:\operatorname{Map}\langle\text{String},\text{User}\rangle$ - stored user identities indexed by linked provider account, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+McMaster SSO, the external authentication provider, server network connections, and persistent identity storage.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Trusted identity providers authenticate users and return verifiable identity information.
+    \item All authentication communication uses HTTPS.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{signIn(provider, proof)}}
+\begin{itemize}
+    \item transition: If the provider successfully verifies the proof, find the linked Keystone user or create one. For a first-time external-provider sign-in, assign the external supervisor role with Unverified status. Generate a unique session identifier $s$:
+    \[
+    \begin{aligned}
+        \mathit{sessions}' &=
+        \mathit{sessions}\cup\{s\mapsto user\}.
+    \end{aligned}
+    \]
+    Store new identity and account information through M\_Persistence. The new external supervisor has only the unverified access scope in the SRS.
+
+    \item output: $out=s$.
+
+    \item exception:
+    \begin{itemize}
+        \item AuthenticationFailed if identity verification fails or account creation fails.
+        \item ProviderUnavailable if the provider cannot be reached.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{signOut(session)}}
+\begin{itemize}
+    \item transition:
+    \[
+    \mathit{sessions}'=
+        \mathit{sessions}\setminus\{session\mapsto\mathit{sessions}[session]\}.
+    \]
+    \item output: None.
+    \item exception:
+    $session\notin\operatorname{dom}(\mathit{sessions})\Rightarrow exc=\text{InvalidSession}$.
+\end{itemize}
+
+\paragraph{\texttt{isAuthenticated(session)}}
+\begin{itemize}
+    \item transition: None.
+    \item output:
+    \[
+    out=
+    \begin{cases}
+        \text{true}, & \operatorname{validSession}(session),\\
+        \text{false}, & \text{otherwise}.
+    \end{cases}
+    \]
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{getIdentity(session)}}
+\begin{itemize}
+    \item transition: None.
+    \item output:
+    \[
+    \operatorname{validSession}(session)
+    \Rightarrow out=\mathit{sessions}[session].
+    \]
+    \item exception:
+    \[
+    \neg\operatorname{validSession}(session)
+    \Rightarrow exc=\text{InvalidSession}.
+    \]
+\end{itemize}
+
+\paragraph{\texttt{reverify(session, proof)}}
+\begin{itemize}
+    \item transition: None.
+    \item output:
+    \[
+    out=
+    \operatorname{verifyProof}
+    (\mathit{sessions}[session],proof).
+    \]
+    The requesting module calls re-verification for the triggers listed in \texttt{FR\_ReverifyUsers}. The proof uses re-entered credentials, an email code, an MFA challenge, or an SSO challenge.
+
+    \item exception:
+    \begin{itemize}
+    \item InvalidSession if the session is invalid.
+    \item ProviderUnavailable if external verification cannot be completed.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[validSession(session: SessionID): bool] Returns true if the session exists and remains valid.
+    \item[verifyProof(user: User, proof: AuthProof): bool] Returns true if the proof verifies for the specified user.
+    \item[hashPassword(password: String): String] Returns a salted Argon2id hash of the password.
+    \item[verifyPassword(password: String, hash: String): bool] Returns true if the password matches the stored hash without storing the plaintext password.
+\end{description}
+
+\newpage
+
+\section[MIS of Authorization Module]{MIS of Authorization Module (\moduleid{M_Authorization})}
+\label{M_Authorization}
+
+\subsection{Module}
+
+This module manages user roles and access permissions. It determines whether authenticated users may perform actions or access records based on their roles, course permissions, and external supervisor verification status. It also handles authorized changes to user roles and verification status.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Persistence
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{hasAccess} & user: User, course: Course, action: Action, record: Value & bool & -- \\
+\texttt{getRole} & user: User, course: Course & UserRole & RoleNotFound \\
+\texttt{updateRole} & actor: User, user: User, course: Course, role: UserRole & -- & Unauthorized \\
+\texttt{verifyExternalSupervisor} & user: User, project: Project & -- & InvalidVerification \\
+\bottomrule
+\caption{Exported access programs of the Authorization module}
+\label{TblAuthorizationAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{roles}:
+    \operatorname{Map}\langle
+    \text{User},
+    \operatorname{Map}\langle\text{Course},\text{UserRole}\rangle
+    \rangle$
+    - assigned course roles, initially loaded from
+    M\_Persistence.
+
+    \item $\mathit{verification}:
+    \operatorname{Map}\langle
+    \text{User},\text{SupervisorVerification}\rangle$
+    - external supervisor verification states, initially
+    loaded from M\_Persistence.
+
+    \item $\mathit{administrators}:
+    \operatorname{Map}\langle\text{User},\text{bool}\rangle$
+    - the SRS \texttt{is\_admin} permission flag for Instructor and TA accounts. It is not a separate role and is initially loaded from M\_Persistence.
+
+    \item $\mathit{permittedActions}:\operatorname{Map}\langle\text{UserRole},\operatorname{Set}\langle\text{Action}\rangle\rangle$ - actions allowed for each role, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+Persistent user roles, course associations, supervisor verification records, and the \texttt{is\_admin} permission flags for Instructor and TA accounts.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item User identities are authenticated through M\_Authentication before authorization checks.
+
+    \item Access decisions follow the role permissions and visibility requirements defined in the SRS.
+
+    \item The requesting module authenticates the actor and completes any required re-verification before requesting a role change.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{hasAccess(user, course, action, record)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: $out=(course\in\operatorname{dom}(\mathit{roles}[user]))\land(action\in\mathit{permittedActions}[\mathit{roles}[user][course]])\land\operatorname{recordInScope}(user,course,action,record)$. If the user has no course role, the result is false.
+
+    \item exception: None.
+\end{itemize}
+
+\paragraph{Record scope}
+$\operatorname{recordInScope}(user:User,course:Course,action:Action,record:Value):\text{bool}$ returns true when the record belongs to the course and the action is allowed for that record under the SRS permissions and visibility rules (see SRS Tables~\ref{tab:Visibility} and~\ref{tab:ExternalAccess}). For reads, an unverified external supervisor may access course reference material, proposal templates, and their own proposals, projects, and threads. A verified external supervisor may also access applications to their own projects with applicant team profiles, student and team profiles, and student-proposed projects. Neither may access another supervisor's proposals or projects, which must not be revealed in responses, catalogs, searches, counts, statuses, or notifications.
+
+\paragraph{\texttt{getRole(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output:
+    \[
+    course\in\operatorname{dom}(\mathit{roles}[user])
+    \Rightarrow
+    out=\mathit{roles}[user][course].
+    \]
+
+    \item exception: RoleNotFound if the user has
+    no assigned role in the specified course.
+\end{itemize}
+
+\paragraph{\texttt{updateRole(actor, user, course, role)}}
+\begin{itemize}
+    \item transition: If the requesting module has authenticated and re-verified the actor as required by \texttt{FR\_ReverifyUsers}, and
+    \[
+    \operatorname{hasAccess}(actor,course,\text{Update},user)=\text{true},
+    \]
+    \[
+    \mathit{roles}' =
+    \mathit{roles}\oplus
+    \left\{
+    user\mapsto
+    \left(
+    \mathit{roles}[user]\oplus
+    \{course\mapsto role\}
+    \right)
+    \right\}.
+    \]
+    If the user's current role in the course is Supervisor and the new role is not, set
+    \[
+    \mathit{verification}'=\mathit{verification}\oplus\{user\mapsto\text{Unverified}\}.
+    \]
+    Otherwise, $\mathit{verification}'=\mathit{verification}$.
+    Changing a verified external supervisor's role away from Supervisor resets their verification state to Unverified, reversing their verified supervisor access. Persist and audit both changes.
+
+    \item output: None.
+
+    \item exception: Unauthorized if the actor is not authorized or the required authentication or re-verification has not succeeded.
+\end{itemize}
+
+\paragraph{\texttt{verifyExternalSupervisor(user, project)}}
+\begin{itemize}
+    \item transition: If the user is an external supervisor and an instructor approves a project proposal submitted by that user:
+    \[
+    \mathit{verification}' =
+    \mathit{verification}\oplus
+    \{user\mapsto\text{Verified}\}.
+    \]
+    The change is persisted and audited.
+
+    Approval of a proposal submitted by another user, a request for changes, or rejection does not verify the supervisor. Withdrawal of an approved proposal does not reverse verification.
+
+    \item output: None.
+
+    \item exception: InvalidVerification if the required approval conditions are not satisfied.
+\end{itemize}
+
+\subsubsection{Local Functions}
+None.
+
+\newpage
+
+\section[MIS of Course Management Module]{MIS of Course Management Module (\moduleid{M_CourseManagement})}
+\label{M_CourseManagement}
+
+\subsection{Module}
+
+This module manages course-specific settings, enabled
+features, and reference materials. It allows instructors
+to configure course functionality, prevents features
+from being disabled when outstanding work exists,
+and allows instructors and TAs to maintain and publish
+course resources for students and supervisors.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Authorization
+    \item M\_Authentication
+    \item M\_Persistence
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{getSettings} & user: User, course: Course & Dictionary & Unauthorized \\
+\texttt{updateSetting} & user: User, course: Course, key: String, value: Value, session: SessionID, proof: AuthProof & -- & Unauthorized, InvalidSetting \\
+\texttt{isFeatureEnabled} & user: User, course: Course, feature: Feature & bool & Unauthorized \\
+\texttt{setFeatureEnabled} & user: User, course: Course, feature: Feature, enabled: bool & -- & Unauthorized, PendingWork \\
+\texttt{getPendingWork} & user: User, course: Course, feature: Feature & List & Unauthorized \\
+\texttt{recordPendingWork} & course: Course, feature: Feature, recordID: String, pending: bool & -- & -- \\
+\texttt{saveResource} & user: User, course: Course, resource: CourseResource & -- & Unauthorized, InvalidResource \\
+\texttt{publishResource} & user: User, course: Course, resourceID: String & -- & Unauthorized, ResourceNotFound \\
+\texttt{getResources} & user: User, course: Course & $\operatorname{List}\langle\text{CourseResource}\rangle$ & Unauthorized \\
+\bottomrule
+\caption{Exported access programs of the Course Management module}
+\label{TblCourseManagementAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{settings}:
+    \operatorname{Map}\langle
+    \text{Course},\text{Dictionary}\rangle$
+    - course-specific configuration values, initially
+    loaded from M\_Persistence.
+
+    \item $\mathit{features}:
+    \operatorname{Map}\langle
+    \text{Course},
+    \operatorname{Map}\langle\text{Feature},\text{bool}\rangle
+    \rangle$
+    - enabled states of supported features for each
+    course, initially loaded from M\_Persistence.
+
+    \item $\mathit{pendingWork}:
+    \operatorname{Map}\langle
+    \text{Course},
+    \operatorname{Map}\langle
+            \text{Feature},\operatorname{Set}\langle\text{String}\rangle
+    \rangle\rangle$
+    - identifiers of outstanding records associated
+    with each feature, initially loaded from
+    M\_Persistence.
+
+    \item $\mathit{resources}:
+    \operatorname{Map}\langle
+    \text{String},\text{CourseResource}\rangle$
+    - stored course resources indexed by their
+    identifiers, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+Persistent course configuration, feature states,
+outstanding work records, and course resource storage.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item M\_Authorization determines user permissions for course configuration and resource management.
+    \item Changes to course rules and approval modes require successful re-verification through M\_Authentication.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{getSettings(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$:
+    \[
+    out=\mathit{settings}[course].
+    \]
+
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{updateSetting(user, course, key, value, session, proof)}}
+\begin{itemize}
+    \item transition: If
+    \[
+    \begin{aligned}
+    &\operatorname{hasAccess}(user,course,\text{Update},course)=\text{true}
+    \land validSetting(course,key,value)\\
+    &\land (\operatorname{requiresReverification}(key)\Rightarrow
+    \operatorname{reverify}(session,proof)=\text{true}),
+    \end{aligned}
+    \]
+    \[
+    \mathit{settings}'=
+    \mathit{settings}\oplus
+    \left\{
+    course\mapsto
+    \left(
+    \mathit{settings}[course]\oplus
+    \{key\mapsto value\}
+    \right)
+    \right\}.
+    \]
+    Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Update},course)=\text{false}$ or the required re-verification fails.
+        \item InvalidSetting if the setting is unsupported or the value is invalid.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{isFeatureEnabled(user, course, feature)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$:
+    \[
+    out=\mathit{features}[course][feature].
+    \]
+
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{setFeatureEnabled(user, course, feature, enabled)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Configure},course)=\text{true}$ and disabling the feature will not strand outstanding work:
+    \[
+    \mathit{features}'=
+    \mathit{features}\oplus
+    \left\{
+    course\mapsto
+    \left(
+    \mathit{features}[course]\oplus
+    \{feature\mapsto enabled\}
+    \right)
+    \right\}.
+    \]
+    Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Configure},course)=\text{false}$.
+        \item PendingWork if
+        \[
+        \neg enabled\land
+        \mathit{pendingWork}[course][feature]
+        \ne\emptyset.
+        \]
+    \end{itemize}
+    When PendingWork occurs, no feature state changes. The caller may use getPendingWork to display the outstanding records.
+\end{itemize}
+
+\paragraph{\texttt{getPendingWork(user, course, feature)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$,
+    return the outstanding record identifiers:
+    \[
+    out=\operatorname{List}
+    (\mathit{pendingWork}[course][feature]).
+    \]
+
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{recordPendingWork(course, feature, recordID, pending)}}
+\begin{itemize}
+    \item transition: Called only by a trusted Keystone workflow module. Let
+    \[
+    W=\mathit{pendingWork}[course][feature].
+    \]
+    Then:
+    \[
+    W'=
+    \begin{cases}
+        W\cup\{recordID\}, & pending,\\
+        W\setminus\{recordID\}, & \neg pending.
+    \end{cases}
+    \]
+    Replace the corresponding pending-work entry with $W'$ and persist the change.
+
+    \item output: None.
+
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{saveResource(user, course, resource)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{true}$ and the resource is valid:
+    \[
+    \mathit{resources}'=
+    \mathit{resources}\oplus
+    \{resource.id\mapsto resource\}.
+    \]
+    The resource is associated with the supplied course. New resources remain unpublished until explicitly published. Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{false}$.
+        \item InvalidResource if required resource information is invalid.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{publishResource(user, course, resourceID)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Update},resourceID)=\text{true}$ and the resource belongs to the course:
+    \[
+    \mathit{resources}'[resourceID].published
+    =\text{true}.
+    \]
+    Other resource fields remain unchanged. Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Update},resourceID)=\text{false}$.
+        \item ResourceNotFound if the resource does not exist in the course.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{getResources(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$, return the list of published resources belonging to the requested course:
+    \[
+    out=[r\mid r\in\mathit{resources},
+    \ r.course=course\land r.published].
+    \]
+    Unpublished resources are not returned to students or supervisors.
+
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[validSetting(course: Course, key: String, value: Value): bool] Returns true if the setting exists and the supplied value satisfies its constraints.
+    \item[requiresReverification(key: String): bool] Returns true when the setting changes course rules or the approval mode, as required by \texttt{FR\_ReverifyUsers}.
+
+    \item[validResource(resource: CourseResource): bool] Returns true if the resource contains the required information and valid content.
+\end{description}
+
+
+\newpage
+
+\section[MIS of Enrollment Module]{MIS of Enrollment Module (\moduleid{M_Enrollment})}
+\label{M_Enrollment}
+
+\subsection{Module}
+
+This module manages course enrollment records. It imports student lists from Avenue to Learn or uploaded files, validates and previews enrollment changes, and applies imports only after confirmation. It also supports manual enrollment updates and flags students missing from the latest imported list without automatically removing them.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_StudentsTeams
+    \item M\_CourseManagement
+    \item M\_HardwareHiding
+    \item M\_AuditLog
+    \item M\_Persistence
+    \item M\_Authorization
+    \item M\_Authentication
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{previewImport} & user: User, course: Course, source: EnrollmentSource, entries: List & EnrollmentPreview & Unauthorized, InvalidSource \\
+\texttt{confirmImport} & user: User, course: Course, importID: ImportID, session: SessionID, proof: AuthProof & -- & Unauthorized, InvalidImport, ValidationFailed \\
+\texttt{addStudent} & user: User, course: Course, entry: EnrollmentEntry, session: SessionID, proof: AuthProof & -- & Unauthorized, InvalidEntry, DuplicateStudent \\
+\texttt{getEnrollment} & user: User, course: Course & List & Unauthorized \\
+\texttt{getDiscrepancies} & user: User, course: Course & List & Unauthorized \\
+\texttt{confirmRemoval} & user: User, course: Course, student: User, session: SessionID, proof: AuthProof & -- & Unauthorized, StudentNotFlagged \\
+\bottomrule
+\caption{Exported access programs of the Enrollment module}
+\label{TblEnrollmentAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{enrollment}:
+    \operatorname{Map}\langle
+    \text{Course},
+    \operatorname{Map}\langle
+    \text{User},\text{EnrollmentStatus}
+    \rangle\rangle$
+    - current enrollment records and statuses,
+    initially loaded from M\_Persistence.
+
+    \item $\mathit{pendingImports}:
+    \operatorname{Map}\langle
+    \text{ImportID},\text{EnrollmentPreview}\rangle$
+    - validated previews awaiting confirmation,
+    initially $\emptyset$.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+Avenue to Learn, uploaded enrollment files, persistent enrollment records, and server network connections.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Enrollment data contains only the fields permitted by DPR\_MinimalEnrollmentData.
+    \item Enrollment calls M\_Authentication.reverify before an enrollment import is confirmed.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{previewImport(user, course, source, entries)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Import},course)=\text{true}$, retrieve the enrollment list using the specified source and compare its entries with the existing enrollment.
+
+    For a valid import, generate a unique identifier
+    $i$ and preview $p$:
+    \[
+    \mathit{pendingImports}' =
+    \mathit{pendingImports}
+    \cup\{i\mapsto p\}.
+    \]
+
+    The preview identifies new students, matching students, students missing from the imported list, duplicate identifiers, and malformed entries.
+
+    No enrollment records are changed.
+
+    \item output: $out=p$.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Import},course)=\text{false}$.
+        \item InvalidSource if the requested source cannot provide a readable enrollment list.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{confirmImport(user, course, importID, session, proof)}}
+\begin{itemize}
+    \item transition: If
+    \[
+    \begin{aligned}
+    &\operatorname{hasAccess}(user,course,\text{ConfirmImport},importID)=\text{true}
+    \land \operatorname{reverify}(session,proof)=\text{true}\\
+    &\land importID\in\operatorname{dom}(\mathit{pendingImports})
+    \land \mathit{pendingImports}[importID].course=course,
+    \end{aligned}
+    \]
+    apply the validated import.
+
+    Let $I$ be the set of students in the import
+    and $E$ the set of currently enrolled students.
+
+    For every $u\in I$:
+    \[
+    \mathit{enrollment}'[course][u]
+    =\text{Enrolled}.
+    \]
+
+    For every $u\in E\setminus I$:
+    \[
+    \mathit{enrollment}'[course][u]
+    =\text{Flagged}.
+    \]
+
+    Students absent from the import remain associated with the course and retain their team memberships.
+
+    The changes are saved atomically, audited, and the completed import is removed from pendingImports.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{ConfirmImport},importID)=\text{false}$ or $\operatorname{reverify}(session,proof)=\text{false}$.
+        \item InvalidImport if the preview does not exist, belongs to another course, or is no longer current.
+        \item ValidationFailed if the import contains unresolved duplicate or malformed identifiers.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{addStudent(user, course, entry, session, proof)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{true}\land\operatorname{reverify}(session,proof)=\text{true}$ and the entry is valid, add the student to the specified course.
+
+    For the identified student $s$:
+    \[
+    \mathit{enrollment}'[course]
+    =
+    \mathit{enrollment}[course]
+    \oplus\{s\mapsto\text{Enrolled}\}.
+    \]
+
+    A previously flagged student may be
+    restored to Enrolled status.
+    Persist and audit the change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{false}$ or $\operatorname{reverify}(session,proof)=\text{false}$.
+        \item InvalidEntry if the supplied enrollment information is malformed or incomplete.
+        \item DuplicateStudent if the student is already enrolled in the course.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{getEnrollment(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$, return the course's
+    student enrollment records and statuses:
+    \[
+    out=\operatorname{List}
+    (\mathit{enrollment}[course]).
+    \]
+
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{getDiscrepancies(user, course)}}
+\begin{itemize}
+    \item transition: None.
+
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$, return students requiring review:
+    \[
+    out=[
+    u\mid
+    u\in\operatorname{dom}(\mathit{enrollment}[course])
+    \land
+    \mathit{enrollment}[course][u]
+    =\text{Flagged}
+    ].
+    \]
+
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{confirmRemoval(user, course, student, session, proof)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Delete},student)=\text{true}\land\operatorname{reverify}(session,proof)=\text{true}$ and the student has Flagged status, confirm the discrepancy and initiate the authorized removal of the student's course association.
+
+    The operation must coordinate with modules managing course roles and team memberships. No team membership is silently removed.
+
+    Persist and audit the confirmed change.
+
+    \item output: None.
+
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Delete},student)=\text{false}$ or $\operatorname{reverify}(session,proof)=\text{false}$.
+        \item StudentNotFlagged if the student has no flagged enrollment discrepancy in the specified course.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[validEntry(entry: EnrollmentEntry): bool]
+    Returns true if the entry contains valid student identification, program, and course information.
+
+    \item[findDuplicates(entries: List): List]
+    Returns entries with duplicate student identifiers.
+
+    \item[compareEnrollment(course: Course, entries: List): EnrollmentPreview]
+    Compares the imported list with current enrollment and produces the proposed additions, matches, missing students, and validation errors.
+\end{description}
 
 \newpage
 

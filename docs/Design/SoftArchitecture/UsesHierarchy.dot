@@ -48,7 +48,7 @@ digraph UsesHierarchy {
   //   M_A -> { M_B M_C };
 
   M_UserInterface    -> { M_Authentication M_Authorization M_CourseManagement
-                          M_HardwareHiding };
+                          M_HardwareHiding M_Notifications };
   // Into the box: M_UserInterface uses every request-handling module.
   M_UserInterface    -> M_Checklist [lhead = cluster_features];
 
@@ -69,13 +69,15 @@ digraph UsesHierarchy {
   M_Checklist         -> { M_Projects M_StudentsTeams M_ApprovalWorkflow
                            M_Notifications };
   M_CourseReport      -> { M_Projects M_StudentsTeams M_Authentication };
-  M_Enrollment        -> { M_StudentsTeams M_Persistence M_HardwareHiding };
+  M_Enrollment        -> { M_StudentsTeams M_Persistence M_HardwareHiding
+                           M_Authentication };
 
   // Other modules.
   M_Authentication    -> { M_Authorization M_AuditLog M_Persistence
                            M_HardwareHiding };
   M_Authorization     -> { M_AuditLog M_Persistence };
-  M_CourseManagement  -> { M_AuditLog M_Persistence };
+  M_CourseManagement  -> { M_Authentication M_Authorization M_AuditLog
+                           M_Persistence };
   M_Notifications     -> { M_Authentication M_Authorization M_AuditLog
                            M_Persistence M_HardwareHiding };
 
