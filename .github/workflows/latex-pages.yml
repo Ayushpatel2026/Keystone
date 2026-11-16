@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   changes:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
     outputs:
@@ -65,7 +65,7 @@ jobs:
   build-latex:
     needs: changes
     if: needs.changes.outputs.run_build == 'true'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Generate App token
         id: app-token
@@ -306,7 +306,7 @@ jobs:
   build-pdfs:
     needs: [changes, build-latex]
     if: always()
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions: {}
     steps:
       - name: Verify results
@@ -333,7 +333,7 @@ jobs:
     # deploy job fails on every pull request. If the build job was skipped
     # (no doc changes), this job is skipped too and the live site stays as is.
     if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
