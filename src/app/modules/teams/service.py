@@ -122,3 +122,35 @@ async def remove_member(session: AsyncSession, team_id: uuid.UUID, student_id: u
         await session.rollback()
         raise TeamMemberNotFoundError(str(student_id))
     await session.commit()
+
+
+async def lock_team(session: AsyncSession, team_id: uuid.UUID) -> Team:
+    # Load a team and lock its row until the transaction ends. The applications service uses
+    # this to serialise everything one team does (applying, agreeing, withdrawing), so two
+    # simultaneous requests from the same team can't both pass a check and both write.
+    query = (
+        select(Team)
+        # key_share=True emits FOR NO KEY UPDATE instead of FOR UPDATE. It still conflicts with
+        # other writers of this team's actions, but doesn't block unrelated inserts into
+        # team_members, which take a weaker FOR KEY SHARE lock on the team row for their FK check.
+        .where(Team.id == team_id)
+        .with_for_update(key_share=True)
+        # Overwrite any stale copy of this row already sitting in the session's identity map.
+        .execution_options(populate_existing=True)
+    )
+    team = await session.scalar(query)
+    if team is None:
+        raise TeamNotFoundError(str(team_id))
+    return team
+
+
+async def is_member(session: AsyncSession, team_id: uuid.UUID, student_id: uuid.UUID) -> bool:
+    # Selecting just the id column (not the TeamMember entity) avoids TeamMember's
+    # joined-loaded `user` relationship, so this is one cheap indexed lookup on the primary key.
+    found = await session.scalar(
+        select(TeamMember.student_id).where(
+            TeamMember.team_id == team_id,
+            TeamMember.student_id == student_id,
+        )
+    )
+    return found is not None
