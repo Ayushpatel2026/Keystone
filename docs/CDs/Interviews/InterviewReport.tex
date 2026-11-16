@@ -1,0 +1,910 @@
+\documentclass{article}
+
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage[margin=1in]{geometry}
+\usepackage[round]{natbib}
+\usepackage{hyperref}
+\hypersetup{colorlinks=true, linkcolor=red, citecolor=blue, urlcolor=blue}
+
+\setlist{nosep, leftmargin=*}
+
+\title{Interview Report\\\projname}
+
+\author{\authname}
+
+\date{}
+
+\input{../../Comments.text}
+\input{../../Common.text}
+
+\newcommand{\intlink}[3]{\hyperref[int:#1-#2]{#3}}
+\newcommand{\intref}[2]{\intlink{#1}{#2}{#1, #2}}
+
+% Link into the published SRS PDF (same convention as the other documents)
+\newcommand{\srsurl}{https://ayushpatel2026.github.io/Keystone/SRS/SRS.pdf}
+\newcommand{\srsref}[1]{\href{\srsurl\#nameddest=#1}{\texttt{\detokenize{#1}}}}
+
+% Empathy map: caption, label, says, thinks, does, feels
+\newcommand{\empathymap}[6]{%
+    \begin{longtable}{|p{0.465\textwidth}|p{0.465\textwidth}|}
+    \caption{#1}\label{#2}\\
+    \hline
+    \textbf{Says} & \textbf{Thinks}\\ \hline
+    \endfirsthead
+    \hline
+    \textbf{Says} & \textbf{Thinks}\\ \hline
+    \endhead
+    #3 & #4 \\ \hline
+    \textbf{Does} & \textbf{Feels}\\ \hline
+    #5 & #6 \\ \hline
+    \end{longtable}}
+
+\begin{document}
+
+    \maketitle
+
+    \begin{table}[hp]
+        \caption{Revision History} \label{TblRevisionHistory}
+        \begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Date} & \textbf{Developer(s)} & \textbf{Change}\\
+\midrule
+Nov 16 2026 & Ayush Patel & First version of interview report \\
+\bottomrule
+        \end{tabularx}
+    \end{table}
+
+    \newpage
+    \tableofcontents
+    \newpage
+
+    \section{Purpose}
+
+    This report is the fall custom document for \projname{}. It describes the
+    interviews we held with stakeholders of the capstone project selection and
+    approval process. It describes what we asked, who we asked, what we heard, how we analysed
+    it, and what it led to. The Software Requirements Specification (SRS) already
+    traces each interview statement to the stakeholder requirements it shaped
+    (SRS Appendix A). This report records the evidence behind those requirements
+    and the reasoning from interview to requirement. It also records the
+    limits of that evidence, so that readers can judge how far to trust it.
+
+    \section{Methodology}
+
+    \subsection{Interview type}
+
+    We ran semi-structured interviews. We prepared a guide of questions for each
+    stakeholder type and used it as a starting point. We did not ask every
+    interviewee every question. Instead we followed what each person told us and
+    probed areas where they had experience or strong opinions. This suited our
+    goal, which was to learn how each stakeholder experiences the current process
+    and which problems matter most to them, not to collect comparable answers to a
+    fixed questionnaire.
+
+    \subsection{Procedure}
+
+    \begin{itemize}
+        \item We held six interviews between October 1 and October 30, 2026,
+        covering seven people (Section~\ref{sec:subjects}). One interview was a
+        joint session with two external supervisors.
+        \item At least two members of the team attended every interview, and all
+        four attended most of them. At least two members took notes in each
+        interview.
+        \item The guide opened with a short statement of who we are, what
+        \projname{} is meant to do, and the purpose of the interview. The statement
+        said that there were no right or wrong answers and that we wanted honest
+        experiences. The guide moved from the interviewee's overall experience to
+        specific parts of the process, and then asked what works well and what they
+        would change.
+        \item Interviews were not audio or video recorded, and we did not make
+        transcripts.
+        \item The guide was written in early October and then revised after
+        feedback from our TA on October 13 (Section~\ref{sec:questions}). The
+        interview with Dr.~Smith (October 1) took place before the guide was
+        written, and the internal supervisor interview (October 7) took place
+        before the TA's feedback. Both were therefore less structured than the
+        later interviews.
+        \item The internal supervisor interview was held in person, all others were on Microsoft Teams.
+    \end{itemize}
+
+    \subsection{Data preparation}
+
+    Because we have notes and no transcripts, the notes are our primary data.
+    After each interview we cleaned the notes. We fixed wording for clarity and
+    removed interviewee names for students and supervisors. We separated what
+    the interviewee said from our own comments, which are marked as
+    \emph{interviewer notes} in Section~\ref{sec:raw}. We then
+    tagged each statement with a code for the stakeholder group and a number or short name.
+    The codes are CI (CS instructor), S (student), ES (external supervisor),
+    IS (internal supervisor), SEI (SE instructor), and TI (TRON instructor). The SRS stakeholder
+    requirements cite these tags, which is how the requirements trace back to specific
+    statements. The notes record what we understood the interviewee to say. They are not
+    verbatim quotes, and the statements in this report are paraphrases.
+
+    \subsection{Analysis method: empathy map}
+
+    We analysed the notes with an empathy map, a design thinking tool that
+    sorts what is known about a group of people into four quadrants
+    \citep{gray2010gamestorming, gibbons2018empathy}:
+
+    \begin{itemize}
+        \item \textbf{Says:} what they stated directly.
+        \item \textbf{Thinks:} the beliefs and priorities behind what they said.
+        \item \textbf{Does:} what they reported doing in their own work.
+        \item \textbf{Feels:} the reactions and concerns they expressed.
+    \end{itemize}
+
+    We chose an empathy map for three reasons. First, it separates what people
+    said and did, which we observed, from what they think and feel, which we
+    infer. That distinction matters for note-based data, because it keeps our
+    interpretation visible and checkable. Second, it gives each stakeholder
+    group the same structure, which makes it easy to compare groups whose
+    priorities conflict. Third, it focuses on needs and behaviour rather than
+    on solutions. Stakeholders often proposed solutions (a newsletter, a
+    template), and the map helps us ask what need is behind each one.
+
+    We built one map per stakeholder group (Section~\ref{sec:maps}) from the cleaned
+    notes after the interviews. The Says and Does quadrants come directly from
+    the notes. The Thinks and Feels quadrants are our interpretation of the
+    notes, and we have only included an entry where the notes give a clear basis
+    for it. We then grouped the content of all six maps into cross-cutting themes
+    (Section~\ref{sec:themes}), looking for problems raised independently by
+    several groups and for places where groups disagree.
+
+    \section{Subjects}
+    \label{sec:subjects}
+
+    We interviewed one or two people from each stakeholder group in Table~\ref{tab:subjects}.
+    Participants were not sampled randomly. We interviewed stakeholders who were
+    available to us. Names of students and supervisors are withheld. The course
+    instructors are named because the course they run identifies them.
+
+    \begin{table}[h!]
+        \centering
+        \renewcommand{\arraystretch}{1.2}
+        \begin{tabularx}{\textwidth}{l l >{\raggedright\arraybackslash}X l}
+            \toprule
+            \textbf{Tag} & \textbf{Date (2026)} & \textbf{Interviewee} & \textbf{ID}\\
+            \midrule
+            SEI & October 1 & Dr.~Spencer Smith, instructor of the Software Engineering (SE) capstone course and our supervisor & \intlink{SEI}{1}{SEI, 1}\\
+            IS & October 7 & Internal supervisor: a McMaster professor who supervises teams in all three capstone courses and submits proposals each year. Interviewed in person. & \intlink{IS}{1}{IS, 1}\\
+            S & October 13 & Student who chose a project from the supervisor list and went through the SE (GitLab merge request) approval process & \intlink{S}{1}{S, 1}\\
+            ES & October 13 & Two external supervisors from an industry consulting company, interviewed together. It was their first time supervising capstone teams, and one had previously been a capstone judge. They supervised eight teams. & \intlink{ES}{1}{ES, 1}\\
+            TI & October 27 & Dr.~Alan Wassyng, instructor of the Mechatronics (TRON) capstone course & \intlink{TI}{1}{TI, 1}\\
+            CI & October 30 & Dr.~Mehdi Moradi, instructor of the Computer Science (CS) capstone course & \intlink{CI}{1}{CI, 1}\\
+            \bottomrule
+        \end{tabularx}
+        \caption{Interview subjects}
+        \label{tab:subjects}
+    \end{table}
+
+    We did not interview a TA, although the question guide has a TA section.
+    TA input to this report comes only from our own TA's feedback on the
+    question guide. This gap is discussed in Section~\ref{sec:limits}.
+
+    \section{Questions}
+    \label{sec:questions}
+
+    \subsection{Questions asked in the session}
+
+    We prepared a guide with a set of general questions and extra questions for each
+    stakeholder type. The guide is recorded in the following Github issue:
+    \href{https://github.com/Ayushpatel2026/Keystone/issues/3}{Draft Questions for Stakeholder Interviews}.
+    The questions below are the guide as drafted. Our TA gave feedback on October 13, and we
+    reworded some questions in response. The reworded versions were not saved
+    separately, so this section shows the draft. The TA's feedback was to:
+
+    \begin{itemize}
+        \item start with open questions about the interviewee's experience, and ask
+        about problems afterwards;
+        \item avoid leading wording (for example, ask ``Was anything confusing?''
+        instead of ``What was confusing?'') and balance questions about
+        problems with questions about what went smoothly;
+        \item order questions to match the interviewee's experience, and tell
+        the interviewee what the next set of questions is about;
+        \item ask supervisors about their experience first (for example, how many
+        times they have supervised), and ask a follow-up about how they handled
+        a misunderstanding;
+        \item add questions about how supervisors are found and how TAs choose
+        their teams, and shorten the instructor guide to fit a 20--30 minute
+        interview.
+    \end{itemize}
+
+    \subsubsection*{Introduction (all interviewees)}
+
+    The guide opened with a statement along these lines. We are a capstone team
+    at McMaster developing a centralized platform to streamline project
+    selection and approval, which currently uses several disconnected tools. The
+    interview aims to understand the interviewee's experience, the challenges they
+    have met, and their needs. There are no right or wrong answers.
+
+    \subsubsection*{General questions}
+    \begin{itemize}
+        \item Can you describe your overall experience with the current capstone project selection and management process?
+        \item Have you encountered situations where a lack of information, communication, or transparency caused difficulties?
+        \item What information do you find yourself repeatedly searching for or requesting from others?
+        \item If you could make one improvement to the current process, what would it be?
+        \item Is there anything about the process that works particularly well and that you would not want changed?
+    \end{itemize}
+
+    \subsubsection*{Students}
+    \textit{Project selection}
+    \begin{itemize}
+        \item Can you walk us through how you found your capstone project, from initially looking for opportunities to getting your project approved?
+        \item How did you find out which projects were available, and how did you determine which ones interested you?
+        \item Was the information in project descriptions sufficient to decide whether a project was a good fit? What was missing?
+        \item What information about a project would be most useful when deciding whether to pursue it?
+        \item Did you ever pursue a project and later find out it was taken, unavailable, or different from its description? What happened?
+        \item How did you contact supervisors, and how long did they take to reply?
+        \item What would make you feel more confident that a project and its supervisor are a good fit for your team?
+    \end{itemize}
+    \textit{Team selection}
+    \begin{itemize}
+        \item How did you find your teammates? Did you already know the people you wanted to work with, or did you have to find them?
+        \item What factors matter most to you when choosing teammates?
+        \item Did anyone you know end up in a mismatched team? What went wrong?
+    \end{itemize}
+    \textit{Project approval}
+    \begin{itemize}
+        \item (SE) What was the GitLab merge request process like? (Tron/CS) What was your approval process like? Was anything confusing?
+        \item After approval, did you change anything (supervisor contact, team name, GitHub link)? How did you report it, and was it clear how?
+    \end{itemize}
+
+    \subsubsection*{Supervisors}
+    \textit{Submitting a project}
+    \begin{itemize}
+        \item Can you walk us through how you currently propose a capstone project and get it approved?
+        \item What aspects of submitting and managing a capstone project require the most time or administrative effort?
+        \item What would help you describe a project accurately (templates, examples, guidance on scope and skills)?
+        \item Have confidentiality, intellectual property, or feasibility requirements created challenges during approval?
+        \item If your project was not chosen, how did you find out? What would you want to be told, and when?
+        \item What would make you more or less likely to offer a project again next year?
+    \end{itemize}
+    \textit{Working with student teams}
+    \begin{itemize}
+        \item How do you communicate with students who express interest in your project?
+        \item How do you decide which team or teams to work with when several are interested?
+        \item What information do you need from students before agreeing to supervise a team?
+        \item How do you stay informed about the status and progress of your project and team during the year?
+        \item Have you experienced difficulties with the submission process, such as unclear requirements, missing information, or repeated communication with course instructors?
+        \item Have students misunderstood the scope, requirements, or deliverables of your project? What happened?
+        \item How easy is it to keep track of interested teams, communicate with them, and know whether a project has been taken?
+        \item What communication or administrative tasks do you find repetitive?
+    \end{itemize}
+
+    \subsubsection*{Course instructors}
+    \begin{itemize}
+        \item Walk us through how you handle project selection and approval for your program, from the project list to confirmed teams.
+        \item Which tools and records do you use to track projects and teams? Who has access?
+        \item How do you know which projects your students have taken?
+        \item What are the rules for your students (hardware requirement, working with other programs, team size)? Who enforces them?
+        \item How do you coordinate with the other instructors? What do you need from them, and what do they need from you?
+        \item How do you handle projects chosen by teams from more than one program?
+        \item How do you communicate with supervisors during the year? What takes the most time?
+        \item What criteria do you use to judge the feasibility, suitability, and academic value of a proposed project?
+        \item Which parts of approval need your direct judgment, and which follow standard rules?
+        \item How do you handle changes to project descriptions, supervisors, team members, or other details after approval?
+        \item What information or reports would help you make administrative decisions or find issues earlier?
+        \item Which parts of the current workflow would you want to keep, even with a centralized platform?
+    \end{itemize}
+
+    \subsubsection*{TAs}
+    The guide asked TAs what capstone tasks they do, how long these take and which
+    are repetitive, and what the most common student and supervisor mistakes or
+    questions are. We did not hold a TA interview.
+
+    \subsection{Coverage of topics}
+
+    Because the interviews were semi-structured, each one covered a different
+    subset of the guide. Table~\ref{tab:coverage} shows which topics each interview reached,
+    based on the notes. A dash means the topic does not appear in the notes. It does not
+    necessarily mean the topic was not raised.
+
+    \begin{table}[h!]
+        \centering
+        \small
+        \renewcommand{\arraystretch}{1.15}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}X c c c c c c}
+            \toprule
+            \textbf{Topic} & \textbf{SEI} & \textbf{IS} & \textbf{S} & \textbf{ES} & \textbf{TI} & \textbf{CI}\\
+            \midrule
+            Overall experience of the process & Yes & Yes & Yes & Yes & Yes & Yes\\
+            Proposals and project descriptions & Yes & Yes & Yes & Yes & Part & Part\\
+            Project availability and status & Part & -- & Yes & Yes & -- & Yes\\
+            Team formation and student backgrounds & Part & Part & Yes & Part & Yes & Yes\\
+            Supervisor--team communication and agreement & Yes & Part & Yes & Yes & -- & Part\\
+            Approval process & Yes & Yes & Yes & -- & Yes & Yes\\
+            Changes and records after approval & Yes & -- & -- & -- & -- & --\\
+            Course information and timelines for supervisors & Yes & Yes & Part & Yes & Part & --\\
+            Tools and records in use & Yes & -- & Part & Part & Yes & Yes\\
+            Platform scope and what to keep & Yes & Yes & -- & Part & Yes & Yes\\
+            \bottomrule
+        \end{tabularx}
+        \caption{Topics covered by each interview (Yes: covered in detail; Part: touched on; --: not in the notes)}
+        \label{tab:coverage}
+    \end{table}
+
+    \section{Raw Data}
+    \label{sec:raw}
+
+    We have notes and no transcripts. This section gives the cleaned notes for each interview.
+    The SRS (Appendix A) holds the same statements, tagged and numbered, and the stakeholder
+    requirements cite them. The notes here keep more context (for example the interviewee's
+    background and the sequence of the process they described). Text marked
+    \emph{interviewer note} is our comment and not the interviewee's statement.
+
+    \subsection{SE course instructor (Dr.~Smith), October 1}
+    \label{int:SEI-1}
+
+    \textbf{Current process}
+    \begin{itemize}
+        \item In early summer, Dr.~Smith emails industry contacts and faculty to ask for
+        project ideas. Interested supervisors fill out an MS Form (title, organization, contact, 100--200 word
+        description, confidentiality, IP concerns, whether the project involves hardware).
+        \item The responses go to a spreadsheet, and a script turns them into a LaTeX list.
+        Projects with hardware are labelled TRON, and the rest are labelled SE/CS. The resulting
+        PDF is sent to SE, CS, and TRON students. A second email tells supervisors that
+        students will contact them.
+        \item Student steps are informal. Students form a team, then either pick a project
+        and email its supervisor, or propose their own. Picking from the list means
+        contacting and meeting the supervisor, who must agree to work with the team. Teams can be rejected and
+        have to look for another project. Student-proposed projects need enough complexity and
+        design for four or five final-year students, and real stakeholders. A supervisor is
+        recommended when domain expertise is needed, and some teams open a request without one.
+        \item Teams open a GitLab merge request with two JSON files (project and team information) and a
+        Markdown project description. Once approved, CI merges the files and updates
+        \texttt{TeamComposition.csv}, which is his one-stop record of every team's project,
+        contacts, and links.
+        \item He assigns TAs to teams with the TAs, in a JSON file that CI uses to update the team files.
+    \end{itemize}
+
+    \textbf{Pain points}
+    \begin{itemize}
+        \item He checks many items by hand and gives the same feedback to many teams: a
+        non-generic team name, a public GitHub repo from the template with him added as collaborator
+        and Pages enabled, appropriate custom documents, valid stakeholders, and a supervisor where one is needed.
+        The GitLab checklist is not fully accurate, and teams do not use it. He wants to keep judging
+        feasibility, complexity, and scope himself, based on experience.
+        \item Teams change titles, repository names, supervisors, or descriptions after approval without opening
+        another merge request, so \texttt{TeamComposition.csv} drifts out of date. Teams update only
+        their custom document choice, because it is marked.
+        \item He knows which projects SE students chose, but not which projects TRON and CS students
+        chose, so he cannot send thank-you emails to supervisors whose projects were not selected.
+        \item He sends four emails to supervisors: a call for projects, an initial contact, a request to confirm
+        willingness to supervise (because some students claim an agreement that the supervisor does not
+        recall), and a welcome with course information. The last one addresses many supervisor questions,
+        but it arrives after teams and projects are settled.
+        \item Descriptions vary in quality. Standards could help, but a burdensome form could scare away good
+        project ideas.
+        \item \emph{Interviewer note:} our own team's first project was described as a new application but was
+        about 80\% built.
+    \end{itemize}
+
+    \textbf{Preferences for the new platform}
+    \begin{itemize}
+        \item Features should be modular and extensible, so that an instructor can turn them off and the platform
+        can serve other courses and universities.
+        \item The platform should keep the GitLab merge request workflow and integrate with Git for the SE course.
+        \item AI agents should not make approvals. Summaries or automated replies to repeated issues
+        could be considered. Algorithmic matching of teams to projects could be interesting if it can be turned
+        off and the overhead is worth it.
+    \end{itemize}
+
+    \subsection{Internal supervisor, October 7}
+    \label{int:IS-1}
+
+    \begin{itemize}
+        \item Mostly acts as a supervisor. He submits proposals each year, waits to see what else is on the list,
+        and interviews and supervises teams in all three courses. He attends lectures when possible and helps
+        with presentations and Expo posters. He often feels outside the course.
+        \item Once a supervisor submits the proposal form, the timing of approval is not known to supervisors.
+        There is no standard procedure: when a student should start thinking about capstone, how to
+        find a team, and how to find a supervisor for their own idea.
+        \item Project schedules and due dates are confusing. Teams often lack the time to finish a project and do
+        proper user testing and validation. Supervisors with teams in several courses do not know that
+        each course has different timelines and requirements. The three courses are not well coordinated.
+        \item He is unsure how student-proposed projects will be handled. He would like to see them.
+        \item Descriptions are 100--200 words. He finds standardizing them hard and is unsure what the standard
+        should be. One team delivered something related to, but very different from, the proposal.
+        \item He wants a low-effort way to submit feedback at the end. One instructor sends feedback emails,
+        but he does not recall other instructors asking.
+        \item He wants to know who the TAs are for his teams and wants student skills to guide discussions.
+        He would like the capstone process in one place, but is unsure that works across professors.
+        \item \emph{Interviewer note:} Dr.~Smith does send a schedule and asks for feedback several times,
+        and we do not know whether the other two instructors do.
+    \end{itemize}
+
+    \subsection{Student, October 13}
+    \label{int:S-1}
+
+    The student chose a project from the supervisor list and went through the SE (GitLab) process.
+    \begin{itemize}
+        \item Formed a team of classmates over the summer and had project ideas before term. In hindsight, picking
+        the project before the teammates might have given a better experience, since teammates with shared
+        interests would be working on their preferred project.
+        \item Each member chose their top five projects after reading them all, and the team settled on a top three
+        in case some were unavailable.
+        \item Project descriptions were often vague, and some were ignored and only the title was read.
+        Information on hardware, software stack, and industry would help.
+        \item One supervisor held a meeting with all interested teams right before the deadline, which added
+        uncertainty. Another team competed for the same project, and losing it was frustrating. There was
+        considerable uncertainty and worry about not having a project.
+        \item A template, guidelines, or an FAQ for proposing their own project would reduce uncertainty about size,
+        scope, and content requirements.
+        \item They want to know when a project is taken, open, or dropped, and suggested a newsletter.
+        \item Communication with supervisors is unclear (an agenda, who leads, how often). Meetings were useful for
+        clearing a backlog of questions with an expert. Email is preferred for simple questions, and suggested
+        meetings aligned with deliverables would help teams know whether they are on track.
+        \item The GitLab process was intuitive because of prior GitHub/GitLab experience, and the JSON files
+        were a hassle but not a problem.
+        \item Finding where things are is time consuming and needs many open tabs. Google Calendar was helpful
+        but would benefit from more information. Having everything in one place, like Avenue, would help.
+    \end{itemize}
+
+    \subsection{External supervisors, October 13}
+    \label{int:ES-1}
+
+    Two supervisors from an industry consulting company, interviewed together. It was their first time supervising
+    capstone teams. One had been a capstone judge, so they knew a little about the course. They supervised eight
+    teams.
+    \begin{itemize}
+        \item The proposal and the first meetings with a professor and the team went smoothly. Knowing project
+        statuses was a challenge, and they wanted to know who is talking to whom.
+        \item They wanted to keep selection fair. Each meeting with a team shared new information, so one of them
+        sent summaries of the meetings to all the teams by hand. They suggested a shared place for meeting notes
+        and a template for summaries.
+        \item They were unsure when to reply to students, whether to rush, and whether to speak to everyone who
+        emailed. With eight teams there was a lot of administration through emails and team meetings.
+        Groups usually had one representative email with the members in CC, which made emails hard to search.
+        With many names and no group numbers, they defaulted to the first person who emailed.
+        \item A template with more structure would be better than an open-ended description box. It is hard to
+        know what a capstone team is expected to do, so they took a best-effort approach. They wanted
+        examples of recent capstone projects.
+        \item They wanted the documents from the welcome email (course outline, course and project expectations,
+        timelines, and deadlines) before submitting a proposal. More information up front would avoid
+        back-and-forth with the instructor over processes, expectations, and IP.
+        \item They wanted a schedule, and suggested meeting times, to clear up expectations. Some teams come early
+        and some late.
+        \item They knew nothing about students before the first meeting and relied on gut feeling. They looked up some
+        students on LinkedIn, but some had no useful profile. They were confused about the difference between
+        CS and SE students, and wanted to see a team bio and skills. They did not know that the final decision
+        was theirs. They also wanted teams matched to projects by preferences and skills.
+        \item After a supervisor meeting, students can also say no. The platform should record whether both
+        sides agreed before the process goes to instructor approval.
+        \item Being notified of tasks is fine, but having to remember to open the platform would be terrible.
+        Email notifications and a checklist are preferred. Too many platforms to log in to is tedious, but a
+        new application is fine.
+        \item \emph{Interviewer note:} when students contact supervisors through the platform, discussion should
+        stay in the context of an application or student post, like comments and replies on a pull request, and
+        not full messaging. Meetings will happen outside the platform.
+    \end{itemize}
+
+    \subsection{TRON course instructor (Dr.~Wassyng), October 27}
+    \label{int:TI-1}
+
+    \begin{itemize}
+        \item The TRON course was separated from the SE course because of growing class size. The TRON and CS
+        courses run differently, and the TRON course is more flexible than SE. He emphasizes personal
+        responsibility and meets each team informally every week. Teams meet in person during class.
+        \item Most of the course runs on Microsoft Teams, with a private channel per team plus general channels
+        and shared files. Avenue holds grades, submissions, and deliverables. Deliverables are due at the end
+        of the week and accepted without penalty until the following Tuesday.
+        \item The beginning of the capstone courses is the most similar part across courses, and they have a similar
+        number of deliverables.
+        \item Projects are approved on Teams: a project is approved when its team receives a group number.
+        \item He receives the list of students, marks off those who are in a group by hand, and contacts the rest.
+        He tries not to force students into groups, so some are delayed. One student joined very late and the
+        situation went to the undergraduate advisor.
+        \item Teams channels must be created and populated from Avenue or by hand, and students are removed if they
+        are not on Avenue. Populating a platform with student information is not trivial. An Avenue course is
+        optional and created on request.
+        \item SE students on TRON projects are treated as TRON students, and their grades are sent to the SE
+        instructor. TRON students cannot join software-only projects. ECE students on TRON projects must be graded
+        by an ECE professor, and cross-discipline capstones such as iBioMed need extra involvement. Accreditation
+        is a concern.
+        \item Projects are collected over the summer through the SE instructor and his contacts, and kept in a
+        LaTeX document. Many TRON projects are student-proposed, and these are often high quality and
+        people-centred.
+        \item The capstone is student-centred. Students own the project, even if stakeholders are involved, and
+        the main rule is that students must be able to talk about it (presentations, Expo). Supervisor-only
+        deliverables are secondary and should not overwhelm students. He sends supervisors a list of the previous
+        year's deliverables.
+        \item Open question: how involved the platform will be in the capstone process.
+    \end{itemize}
+
+    \subsection{CS course instructor (Dr.~Moradi), October 30}
+    \label{int:CI-1}
+
+    \begin{itemize}
+        \item Projects from other professors are collected through the form that the SE instructor sends out.
+        Most communication about projects happens in August. He would like to widen who receives the form
+        for external projects.
+        \item He wants project state kept up to date automatically, since supervisors currently have to report it.
+        A project accepted by a team should become unavailable.
+        \item Listed projects are accepted automatically since he has already seen them. More than half of teams
+        define their own project, which is handled on a discussion board. A board of proposals that he can approve
+        would be less disorganized.
+        \item Students struggle with team formation, which relies on talking to friends. Features that help students
+        communicate would help.
+        \item He does not use GitLab. Students keep GitHub repositories and share them with him. Assignment submission
+        should stay where it is, and instructor and TA access should be configurable.
+        \item He does not want engagement past the selection stage and expects supervisors to contact him if there
+        is a problem. Features should be optional, intuitive, and not create extra work.
+        \item Open question: whether data can stay internal to the university when external supervisors are involved,
+        and whether internal hosting would prevent them from using the platform.
+        \item He also asked for a way to book two meetings per term with teams and remind teams of missed meetings,
+        supervisor--instructor communication for each project, and record keeping between students and supervisors
+        or instructors.
+    \end{itemize}
+
+    \section{Analysis}
+
+    \subsection{Empathy maps}
+    \label{sec:maps}
+
+    The maps below summarize each stakeholder group. Says and Does come directly from the notes in
+    Section~\ref{sec:raw}. Thinks and Feels are our interpretation of those notes.
+
+    \empathymap{Empathy map: student (\intref{S}{1})}{tab:map-student}
+    {\begin{itemize}
+         \item Descriptions are vague, and some projects were judged by title only.
+         \item Wants to know a project's hardware, software stack, and industry.
+         \item Wants to know when a project is taken, open, or dropped.
+         \item Wants a template and guidelines for proposing their own project.
+         \item Communication with supervisors is unclear. Suggested meetings aligned to deliverables would help.
+         \item Wants everything in one place.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Picking a project before choosing teammates might have worked better.
+         \item A ranked backup list is needed because projects may be unavailable.
+         \item Meetings with an expert are valuable for closing knowledge gaps.
+         \item The GitLab approval process was intuitive, and the JSON files were a minor hassle.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Formed a team with known classmates over the summer.
+         \item Each member read all projects and chose a top five, and the team agreed a top three.
+         \item Competed with another team for a project.
+         \item Used many tabs and Google Calendar to find information.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Uncertain and worried about ending up without a project.
+         \item Frustrated at losing a project to another team.
+         \item Unsure whether supervisors would have time to meet.
+         \item Unsettled by a supervisor's meeting with all interested teams just before the deadline.
+    \end{itemize}}
+
+    \empathymap{Empathy map: external supervisors (\intref{ES}{1})}{tab:map-es}
+    {\begin{itemize}
+         \item Wants a template rather than an open box, examples of past projects, and course information
+         before proposing.
+         \item Wants to know student backgrounds, a team bio, and who is talking to whom.
+         \item Wants notifications and a checklist so they do not have to remember to check a platform.
+         \item Wants the agreement of both sides recorded before instructor approval.
+         \item Wants a shared place for meeting notes and project status.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Selection should be fair, and information shared with one team should reach all teams.
+         \item Information about the course would reduce back-and-forth with the instructor.
+         \item A new platform is acceptable, but another place to log in to is a cost.
+         \item They believed they had to accept whichever team asked, until told otherwise.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Supervised eight teams through email and team meetings.
+         \item Sent summaries of team meetings to all teams by hand.
+         \item Looked up students on LinkedIn.
+         \item Replied to the first person who emailed when groups had many names and no group number.
+         \item Wrote proposals on a best-effort basis.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Lost about the timeline: how fast to reply and whether to talk to everyone.
+         \item Took a leap of faith in agreeing to a team they knew nothing about.
+         \item Burdened by the administration of managing eight teams.
+         \item Confused about the difference between CS and SE students.
+    \end{itemize}}
+
+    \empathymap{Empathy map: internal supervisor (\intref{IS}{1})}{tab:map-is}
+    {\begin{itemize}
+         \item The three courses are not well coordinated, and their timelines differ.
+         \item The timing and method of approval are not known to supervisors.
+         \item There is no standard procedure, for example for finding a supervisor for a student idea.
+         \item Wants a low-effort way to give end-of-term feedback and wants to know each team's TA.
+         \item Wants the capstone process in one place, if that works with other professors.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Standardizing project descriptions is hard, and it is unclear what the standard should be.
+         \item Teams often lack the time to finish and to validate properly.
+         \item Student skills would help guide discussions.
+         \item The supervisor's role is on the outside of the course.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Submits proposals each year, then waits to see what else is listed.
+         \item Interviews and supervises teams in all three courses.
+         \item Attends lectures, presentations, and Expo.
+         \item Sends feedback on each team to the instructors without being asked.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Confused about what is due and when.
+         \item Unsure how student-proposed projects will be handled.
+         \item Not sure that other professors would agree to a single platform.
+    \end{itemize}}
+
+    \empathymap{Empathy map: SE course instructor (\intref{SEI}{1})}{tab:map-sei}
+    {\begin{itemize}
+         \item The same feedback goes to many teams.
+         \item Wants to know which projects were not selected, in order to thank their supervisors.
+         \item Wants coordination and records generated automatically.
+         \item Wants the platform to be modular and to keep the GitLab merge request workflow.
+         \item No AI agents making approvals.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Judging feasibility, scope, and complexity needs his experience and should stay with him.
+         \item Pull requests teach students about CI and allow discussion with students.
+         \item Standards could discourage good projects, so optional questions may help.
+         \item Matching is interesting only if it can be turned off and the overhead is worth it.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Recruits projects each summer and runs the form, script, and four emails.
+         \item Reviews each merge request by hand and assigns TAs with the TAs.
+         \item Uses \texttt{TeamComposition.csv} as his single record.
+         \item Confirms with supervisors that they agreed to supervise a team.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Frustrated at spending time on repeated feedback.
+         \item Concerned that records drift out of date after approval.
+         \item Concerned that supervisors get key course information too late.
+         \item Wary of putting burden on supervisors with a long form.
+    \end{itemize}}
+
+    \empathymap{Empathy map: TRON course instructor (\intref{TI}{1})}{tab:map-ti}
+    {\begin{itemize}
+         \item Many TRON projects are proposed by students, and they are often high quality.
+         \item Populating a platform with student information is not trivial.
+         \item Cross-discipline rules are complex: SE, ECE, iBioMed.
+         \item Supervisor-only deliverables should not overwhelm students.
+         \item Open question: how involved the platform will be.
+    \end{itemize}}
+    {\begin{itemize}
+         \item The capstone belongs to the students, and students must be able to talk about their project.
+         \item The course should stay flexible and run on personal responsibility.
+         \item Accreditation matters in cross-discipline projects.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Runs the course on Teams, with Avenue for grades and submissions.
+         \item Marks students off a roster by hand and contacts those without a group.
+         \item Approves a project when a team receives a group number.
+         \item Meets each team informally every week.
+         \item Sends supervisors the previous year's deliverables.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Reluctant to force students into groups.
+         \item Concerned about students who join groups late.
+         \item Uncertain how much a platform would change a course that already works for him.
+    \end{itemize}}
+
+    \empathymap{Empathy map: CS course instructor (\intref{CI}{1})}{tab:map-ci}
+    {\begin{itemize}
+         \item Wants project state kept up to date automatically, and wants taken projects shown as unavailable.
+         \item Wants a board of proposals he can approve in place of the discussion board.
+         \item Students struggle with team formation.
+         \item Features should be optional, intuitive, and not add work.
+         \item Does not want engagement past the selection stage.
+         \item Asked whether data can stay internal when external supervisors are involved.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Listed projects need no review because he has already seen them.
+         \item Supervisors will contact him if a problem arises.
+         \item Assignment submission should stay where it is.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Collects projects through the SE instructor's form, mostly in August.
+         \item Handles the more than half of teams with their own project through a discussion board.
+         \item Does not use GitLab. Students share GitHub repositories with him.
+    \end{itemize}}
+    {\begin{itemize}
+         \item Unwilling to take on extra work from a new platform.
+         \item Disorganized by the discussion board approach.
+         \item Uncertain about whether hosting and external users can work together.
+    \end{itemize}}
+
+    \subsection{Themes}
+    \label{sec:themes}
+
+    Comparing the maps gave the ten themes below. For each, we list which interviews raised it.
+
+    \begin{enumerate}
+        \item \textbf{Project descriptions are inconsistent and do not set expectations.}
+        Students ignore vague descriptions and want hardware, stack, and industry. Supervisors do not
+        know what a proposal should contain, and one team's project differed from its description.
+        Raised in \intref{S}{1}, \intref{ES}{1}, \intref{IS}{1}, \intref{SEI}{1}.
+        \textit{Tension:} the SE instructor and internal supervisor both warn that
+        strict standards could scare away good ideas.
+
+        \item \textbf{Nobody can see which projects are open, taken, or unselected.}
+        Students worry about taken projects, supervisors cannot tell project statuses, and the instructors cannot
+        tell which projects other courses' students chose. Raised in \intref{S}{1}, \intref{ES}{1},
+        \intref{CI}{1}, \intref{SEI}{1}.
+
+        \item \textbf{Student-proposed projects have no clear path and are hard to see.}
+        Many TRON and CS teams, more than half in CS, propose their own project, but these are
+        discussed on a board that supervisors cannot see. Raised in \intref{IS}{1}, \intref{TI}{1},
+        \intref{CI}{1}, \intref{S}{1}.
+
+        \item \textbf{Teammates and students' backgrounds are unknown.}
+        Students rely on friends to form teams, and supervisors know nothing about the students
+        before meeting them. Raised in \intref{S}{1}, \intref{CI}{1}, \intref{ES}{1}, \intref{IS}{1},
+        \intref{TI}{1}.
+
+        \item \textbf{Supervisors get course guidance and schedules too late.}
+        Supervisors want the course outline, expectations, timelines, and examples before proposing. They also
+        do not know how timelines differ across courses. Raised in \intref{ES}{1}, \intref{IS}{1},
+        \intref{SEI}{1}, \intref{TI}{1}.
+
+        \item \textbf{Communication during selection is repetitive, and agreements are not recorded.}
+        Supervisors get many emails, share meeting information by hand, and cannot tell who is talking to
+        whom. Students say a supervisor agreed that the supervisor does not recall. Raised in
+        \intref{ES}{1}, \intref{SEI}{1}, \intref{S}{1}.
+
+        \item \textbf{Too many tools, and users do not want to remember to check another one.}
+        Students and supervisors want one place, and notifications and a checklist in place of checking.
+        Raised in \intref{S}{1}, \intref{ES}{1}, \intref{IS}{1}.
+
+        \item \textbf{Instructor review is repetitive, and records drift after approval.}
+        The SE instructor repeats the same feedback and records go stale. Instructors also populate rosters
+        and track who is in a group by hand. Raised in \intref{SEI}{1}, \intref{TI}{1}, \intref{CI}{1}.
+
+        \item \textbf{Courses differ, so the platform must be configurable.}
+        SE approves by merge request, TRON by group number on Teams, and CS accepts listed projects
+        automatically. Team rules and tools also differ. Raised in \intref{SEI}{1}, \intref{TI}{1},
+        \intref{CI}{1}.
+
+        \item \textbf{Automation and platform involvement must stay limited.}
+        Instructors want to keep approval decisions and feasibility judgments. The CS instructor wants
+        no extra work, the TRON instructor wants the course to remain student-centred, and supervisors
+        already feel the administrative load. Raised in \intref{SEI}{1}, \intref{CI}{1}, \intref{TI}{1},
+        \intref{ES}{1}.
+    \end{enumerate}
+
+    \subsection{How the themes were used}
+
+    Each theme led to stakeholder requirements in the SRS, and these to functional requirements
+    (Table~\ref{tab:trace}). The SRS stakeholder requirements cite the specific interview statements.
+
+    \begin{longtable}{>{\raggedright\arraybackslash}p{0.06\textwidth} >{\raggedright\arraybackslash}p{0.43\textwidth} >{\raggedright\arraybackslash}p{0.43\textwidth}}
+        \caption{From themes to SRS requirements}\label{tab:trace}\\
+        \toprule
+        \textbf{Theme} & \textbf{Stakeholder requirements} & \textbf{Functional requirements}\\
+        \midrule
+        \endfirsthead
+        \toprule
+        \textbf{Theme} & \textbf{Stakeholder requirements} & \textbf{Functional requirements}\\
+        \midrule
+        \endhead
+        1 & \srsref{SR_ProposalTemplate}, \srsref{SR_OptionalFields}, \srsref{SR_ProposalGuidance} & \srsref{FR_SupervisorProposal}, \srsref{FR_ProposalOptionalFields}\\ \hline
+        2 & \srsref{SR_BrowseProjects}, \srsref{SR_ProjectStatus}, \srsref{SR_StatusNotify}, \srsref{SR_UnselectedProjects} & \srsref{FR_ViewApprovedProjects}, \srsref{FR_ViewProjectStatus}, \srsref{FR_ReadCourseInformation}\\ \hline
+        3 & \srsref{SR_StudentProposals} & \srsref{FR_StudentProposal}\\ \hline
+        4 & \srsref{SR_StudentProfiles}, \srsref{SR_TeamContacts} & \srsref{FR_StudentProfile}, \srsref{FR_TeamProfile}, \srsref{FR_TeamDiscovery}, \srsref{FR_AssignTA}\\ \hline
+        5 & \srsref{SR_CourseInfoEarly}, \srsref{SR_ProposalGuidance}, \srsref{SR_CrossCourseTimelines} & \srsref{FR_ReferenceMaterial}\\ \hline
+        6 & \srsref{SR_SinglePlace}, \srsref{SR_TeamContacts}, \srsref{SR_ReviewDialogue} & \srsref{FR_ProjectInterest}, \srsref{FR_DeclineTeam}, \srsref{FR_ProjectThreads}\\ \hline
+        7 & \srsref{SR_PushNotify}, \srsref{SR_Checklist}, \srsref{SR_SinglePlace} & \srsref{FR_ThreadsNotify}, \srsref{FR_RequiredActionsList}, \srsref{FR_ActionRequiredEmail}\\ \hline
+        8 & \srsref{SR_TeamSubmissionChecks}, \srsref{SR_TeamValidity}, \srsref{SR_ReduceAdmin}, \srsref{SR_TAApproval}, \srsref{SR_Enrollment} & \srsref{FR_ApprovalPreflightValidate}, \srsref{FR_ApprovalRevision}, \srsref{FR_ExportCourseInformation}, \srsref{FR_ImportEnrollment}, \srsref{FR_NeedsGroup}\\ \hline
+        9 & \srsref{SR_CourseConfig}, \srsref{SR_Enrollment} & \srsref{FR_DisableFeatures}, \srsref{FR_ExternalApproval}, \srsref{FR_ValidateTeamRules}\\ \hline
+        10 & \srsref{SR_HumanApproval}, \srsref{SR_OptionalFields}, \srsref{SR_ReviewDialogue} & \srsref{FR_ReviewProposal}, \srsref{FR_ApprovalResponse}\\
+        \bottomrule
+    \end{longtable}
+
+    Some requests from interviews did not become requirements, and the SRS lists them as out of scope.
+    Table~\ref{tab:excluded} gives each with the reason.
+
+    \begin{table}[h!]
+        \centering
+        \renewcommand{\arraystretch}{1.2}
+        \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{0.33\textwidth} >{\raggedright\arraybackslash}X}
+            \toprule
+            \textbf{Request} & \textbf{Decision}\\
+            \midrule
+            Booking meetings; suggested meeting times (\intref{CI}{1}, \intref{ES}{1}, \intref{S}{1}) & Not supported. Meetings take place outside the platform.\\
+            Messaging between users (\intref{ES}{1}) & Not supported. Discussion is limited to threads on posts and applications.\\
+            Supervisor feedback and reports during the project (\intref{IS}{1}, \intref{SEI}{1}, \intref{CI}{1}) & Not supported. The platform covers the process up to team project approval.\\
+            Resolving IP and confidentiality questions (\intref{SEI}{1}) & Not supported. This stays with the instructor and university.\\
+            Matching supervisors to student projects (\intref{ES}{1}, \intref{IS}{1}) & Not supported. Student-proposed projects are visible to supervisors, and teams and supervisors find each other.\\
+            Automatic approval decisions (\intref{SEI}{1}) & Never. Decisions stay with instructors and TAs.\\
+            \bottomrule
+        \end{tabularx}
+        \caption{Requests from the interviews that were not included}
+        \label{tab:excluded}
+    \end{table}
+
+    \section{Results and Next Steps}
+    \label{sec:results}
+
+    The interviews shaped the SRS in these ways.
+
+    \begin{itemize}
+        \item The SE instructor's interview set the main problems and priorities, including repetitive review,
+        unselected projects, and record drift. It also led to modularity and to the principle that
+        approval decisions are never automated.
+        \item The TRON and CS interviews showed that courses approve projects differently. This led to the three
+        approval modes (in-platform, external, integrated), configurable course rules, and the
+        requirement to import enrollment from Avenue or a file.
+        \item The CS instructor's data question led to the SRS rationale on hosting and to the scoped access
+        for external supervisors, who are unverified until an instructor approves one of their proposals.
+        \item The supervisor interviews led to the proposal template, early course information, student and
+        team profiles, the recorded agreement between a supervisor and a team, and notifications with a checklist.
+    \end{itemize}
+
+    The following are still open or planned.
+
+    \begin{itemize}
+        \item \textbf{Validation of the SRS.} We will present the SRS to Dr.~Smith in a walkthrough and
+        checklist session, and demonstrate the platform to Dr.~Moradi and Dr.~Wassyng. This feedback will be
+        added to this report as it happens.
+        \item \textbf{More interviews.} We will interview stakeholders again after the first working version,
+        to check that it addresses what we heard. We should also interview TAs, and CS and TRON students,
+        and ask the CS instructor to confirm team sizes and program rules.
+        \item \textbf{Open questions.} How involved the platform should be in the TRON course (\intref{TI}{1}),
+        and whether external supervisors will accept the unverified and verified model, remain open.
+    \end{itemize}
+
+    \section{Limitations}
+    \label{sec:limits}
+
+    \begin{itemize}
+        \item \textbf{Small sample.} We interviewed one student, one internal supervisor, one joint session with two
+        external supervisors, and one instructor per course. The broad claims in this report should be validated
+        with more stakeholders.
+        \item \textbf{Student coverage.} The one student went through the SE (GitLab) process. CS and TRON students
+        are not represented. Our own team's experience as students also shaped the project, and may bias
+        how we read other students' statements.
+        \item \textbf{No TA interview.} TAs do much of the day-to-day work, and we have no direct evidence
+        from them.
+        \item \textbf{External supervisors.} The two external supervisors were first-time supervisors from a
+        single company, and were interviewed together, so one may have influenced the other. Experienced sponsors
+        and sponsors from other industries may see the process differently.
+        \item \textbf{Notes, not transcripts.} Interviews were not recorded, and the notes record our
+        understanding of what was said. We do not have original wording, and some nuance may be lost. The
+        first interviews (October 1 and 7) took place before the guide was finalized and were less structured.
+        \item \textbf{Interpretation.} Thinks and Feels entries in the empathy maps are our inference, and
+        we built the maps after the interviews, from the notes. Interviewees have not reviewed them.
+        \item \textbf{Informal process.} The interviews were part of a course project, and we did not seek
+        formal ethics clearance or written consent. We withheld the names of students and supervisors, but
+        instructors can be identified.
+        \item \textbf{Stakeholder bias.} The SE instructor is also our supervisor, and the SE process is
+        the one we know best, so the requirements may lean toward SE.
+    \end{itemize}
+
+    \newpage
+    \appendix
+
+    \section{Generative AI Use Disclosure}
+    \label{app:ai-use}
+
+    \subsection{AI Tools Used}
+
+    \begin{itemize}
+        \item \textbf{Anthropic's Claude Sonnet 5.5}
+    \end{itemize}
+
+    \subsection{How and Where Used}
+
+    \begin{itemize}
+        \item Helping to map the themes to SRS requirements and drafting the coverage table (Table~\ref{tab:trace} and
+        Table~\ref{tab:coverage}).
+        \item Formatting in \LaTeX{} and the BibTeX entries, especially with the table syntax.
+    \end{itemize}
+
+    \subsection{Verification of AI-Generated Content}
+
+    \begin{itemize}
+        \item The team checked the requirement names in Table~\ref{tab:trace} against the published SRS, and the
+        references against their sources.
+        \item The team is responsible for the accuracy, completeness, and consistency of this document.
+    \end{itemize}
+
+    \bibliographystyle {plainnat}
+    \bibliography {../../../refs/References}
+
+\end{document}
