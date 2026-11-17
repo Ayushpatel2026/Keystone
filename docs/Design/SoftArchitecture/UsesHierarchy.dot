@@ -67,7 +67,7 @@ digraph UsesHierarchy {
                            M_Persistence M_HardwareHiding };
   M_Threads           -> { M_Projects M_StudentsTeams M_Notifications M_Persistence };
   M_Checklist         -> { M_Projects M_StudentsTeams M_ApprovalWorkflow
-                           M_Notifications M_Authorization M_Enrollment };
+                           M_Authorization M_Enrollment M_Notifications };
   M_CourseReport      -> { M_Projects M_StudentsTeams M_Authorization M_Enrollment M_ApprovalWorkflow M_AuditLog };
   M_Enrollment        -> { M_StudentsTeams M_Persistence M_HardwareHiding
                            M_Authentication };
