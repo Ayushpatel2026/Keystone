@@ -287,7 +287,7 @@ The following data types are shared across the Keystone modules.
 \subsubsection{RecordType}
 \begin{enumerate}
     \item User, Course, StudentProfile, Team, TeamProfile, Project, ProjectApplication,
-    Thread, CourseResource, Enrollment, Notification, AuditEntry: The kinds of record that Keystone stores.
+    Thread, CourseResource, Enrollment, Notification, AuditEntry, ChecklistItem: The kinds of record that Keystone stores.
 \end{enumerate}
 
 \subsubsection{EventType}
@@ -1607,16 +1607,14 @@ Avenue to Learn, uploaded enrollment files, persistent enrollment records, and s
 This module notifies users of events by email.
 It stores each notification before delivery, checks the recipient's access at delivery time,
 retries undelivered notifications, and ensures each notification is delivered at most once.
-It also sends deadline reminders, reports external-provider errors, and alerts the operator when the
-audit log fails an integrity check. It does not decide when business events occur.
-The request-handling layer calls \texttt{notify} after a successful action.
+It also reports external-provider errors and alerts the operator when the audit log fails an integrity check.
+It does not decide when events occur or when reminders are due, callers request notifications through \texttt{notify}.
 
 \subsection{Uses}
 
 \begin{itemize}
     \item M\_HardwareHiding
     \item M\_Authorization
-    \item M\_CourseManagement
     \item M\_Persistence
     \item M\_AuditLog
 \end{itemize}
@@ -1626,7 +1624,6 @@ The request-handling layer calls \texttt{notify} after a successful action.
 \subsubsection{Exported Constants}
 \begin{itemize}
     \item $\mathit{MaxDeliveryAttempts}=5$
-    \item $\mathit{ReminderLeadDays}=3$
 \end{itemize}
 
 \subsubsection{Exported Access Programs}
@@ -1648,9 +1645,8 @@ The request-handling layer calls \texttt{notify} after a successful action.
     \midrule
     \endhead
     \endfoot
-    \texttt{notify} & event: Event, candidates: $\operatorname{Set}\langle\text{User}\rangle$ & -- & -- \\
+    \texttt{notify} & event: Event, candidates: $\operatorname{Set}\langle\text{User}\rangle$, tx: TransactionID$^{?}$ & -- & InvalidTransaction \\
     \texttt{processOutbox} & -- & -- & -- \\
-    \texttt{sendReminders} & course: Course, now: DateTime & -- & -- \\
     \texttt{notifyExternalErrors} & instructors: $\operatorname{Set}\langle\text{User}\rangle$ & -- & -- \\
     \texttt{checkAuditIntegrity} & -- & $\operatorname{List}\langle\text{IntegrityViolation}\rangle$ & -- \\
     \texttt{getNotifications} & user: User & $\operatorname{List}\langle\text{Notification}\rangle$ & -- \\
@@ -1681,11 +1677,11 @@ The email service, the operator email address, and persistent notification recor
 
 \begin{itemize}
     \item State variables are loaded from M\_Persistence at system start, before any access program is called.
-    \item The request-handling layer calls \texttt{notify} only after the triggering action has been committed,
-    and supplies as candidates the users associated with the subject.
-    The module does not trust this set, it re-checks access at delivery time.
-    \item A trusted scheduler calls \texttt{processOutbox}, \texttt{sendReminders}, \texttt{notifyExternalErrors},
-    and \texttt{checkAuditIntegrity} periodically, as SystemActor.
+    \item The request-handling layer calls \texttt{notify} with the transaction of the triggering action before
+    that transaction is committed, and supplies as candidates the users associated with the subject.
+    The module does not trust this set. It re-checks access at delivery time.
+    \item A trusted scheduler calls \texttt{processOutbox}, \texttt{notifyExternalErrors}, and \texttt{checkAuditIntegrity}
+    periodically, as SystemActor.
     \item The email service discards repeated deliveries that carry the same NotificationID.
     \item The caller supplies instructors for \texttt{notifyExternalErrors}.
     The message contains only a summary and a link, so no per-record access check is needed.
@@ -1693,17 +1689,22 @@ The email service, the operator email address, and persistent notification recor
 
 \subsubsection{Access Routine Semantics}
 
-\paragraph{\texttt{notify(event, candidates)}}
+\paragraph{\texttt{notify(event, candidates, tx)}}
 \begin{itemize}
-    \item transition: For every $u\in candidates$ for which $\mathit{outbox}$ holds no notification
-    with the same event type, subject, and recipient $u$, create a notification $n$ with a fresh identifier,
+    \item transition: For every $u\in candidates$ for which $\mathit{outbox}$ holds no notification with
+    the same event type, subject, and recipient $u$, create a notification $n$ with a fresh identifier,
     recipient $u$, event $event$, status Pending, and 0 attempts:
     \[
         \mathit{outbox}'=\mathit{outbox}\cup\{n.id\mapsto n\}.
     \]
-    The notifications are stored through M\_Persistence before any delivery is attempted.
+    \begin{itemize}
+        \item If $tx\ne\text{None}$, the notifications are staged in $tx$ and take effect only if $tx$ commits.
+        If $tx$ is rolled back or fails to commit, no notification is added.
+        \item If $tx=\text{None}$, the notifications are saved in their own transaction.
+    \end{itemize}
+    No delivery is attempted by this routine.
     \item output: None.
-    \item exception: None.
+    \item exception: InvalidTransaction if $tx\ne\text{None}$ and $tx$ is not an open transaction.
 \end{itemize}
 
 \paragraph{\texttt{processOutbox()}}
@@ -1726,22 +1727,11 @@ The email service, the operator email address, and persistent notification recor
     \item exception: None.
 \end{itemize}
 
-\paragraph{\texttt{sendReminders(course, now)}}
-\begin{itemize}
-    \item transition: If the course setting \texttt{remindersEnabled} read with
-    $\operatorname{getSettings}(\text{SystemActor},course)$ is true, let $O=\operatorname{getOutstanding}(\text{SystemActor},course)$
-    from M\_Checklist. For every user $u$ and item $i\in O[u]$ with $i.dueDate\ne\text{None}$
-    and $now\le i.dueDate\le now+\mathit{ReminderLeadDays}$ days, call \texttt{notify} with an
-    event of type DeadlineReminder for $i.target$ whose summary names the action and its due date, and candidates $\{u\}$.
-    \item output: None.
-    \item exception: None.
-\end{itemize}
-
 \paragraph{\texttt{notifyExternalErrors(instructors)}}
 \begin{itemize}
     \item transition: Let $E$ be the external-error entries returned by \texttt{getEntries}
     in M\_AuditLog with time later than $\mathit{lastErrorReport}$. If $E\ne\emptyset$,
-    send a summary message to the operator email address and call \texttt{notify} for every $u\in instructors$ with an
+    send a summary message to the operator email address and call \texttt{notify} with $tx=\text{None}$ for every $u\in instructors$ with an
     ExternalProviderError event, then set $\mathit{lastErrorReport}'$ to the time of the newest entry in $E$ and persist it.
     \item output: None.
     \item exception: None.
@@ -1781,8 +1771,8 @@ None.
 \subsection{Module}
 
 This module determines each user's required actions and whether each one is done.
-Completion is derived from the current records and is never stored,
-so a checklist item is complete as soon as the underlying action has happened.
+Completion is derived from the current records and is never stored, so a checklist item is complete as soon as the underlying action has happened.
+It also reminds users of required actions that are due soon, by asking M\_Notifications to notify them.
 
 \subsection{Uses}
 
@@ -1799,7 +1789,9 @@ so a checklist item is complete as soon as the underlying action has happened.
 \subsection{Syntax}
 
 \subsubsection{Exported Constants}
-None.
+\begin{itemize}
+    \item $\mathit{ReminderLeadDays}=3$
+\end{itemize}
 
 \subsubsection{Exported Access Programs}
 
@@ -1821,7 +1813,7 @@ None.
     \endhead
     \endfoot
     \texttt{getChecklist} & user: User, course: Course & $\operatorname{List}\langle\text{ChecklistItem}\rangle$ & Unauthorized \\
-    \texttt{getOutstanding} & user: User, course: Course & $\operatorname{Map}\langle\text{User},\operatorname{List}\langle\text{ChecklistItem}\rangle\rangle$ & Unauthorized \\
+    \texttt{sendReminders} & user: User, course: Course, now: DateTime & -- & Unauthorized \\
     \bottomrule
     \caption{Exported access programs of the Checklist module}
     \label{TblChecklistAccessPrograms}
@@ -1843,6 +1835,9 @@ None.
     maps a required action's name to its due date. An action with no entry has no due date.
     \item The records that determine completion are read through the access programs
     of M\_Enrollment, M\_StudentsTeams, M\_Projects, and M\_ApprovalWorkflow.
+    \item An internal trusted scheduler calls \texttt{sendReminders} periodically, as SystemActor.
+    \item The course setting \texttt{remindersEnabled}, read through M\_CourseManagement,
+    states whether reminders are sent for the course.
 \end{itemize}
 
 \subsubsection{Access Routine Semantics}
@@ -1852,18 +1847,18 @@ None.
     \item transition: None.
     \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$:
     \[
-        out=[\operatorname{item}(user,course,a)\mid a\in\operatorname{requiredActions}(\operatorname{getRole}(user,course),course)].
+        out=[\operatorname{itemFor}(user,course,a)\mid a\in\operatorname{requiredActions}(\operatorname{getRole}(user,course),course)].
     \]
     \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
 \end{itemize}
 
-\paragraph{\texttt{getOutstanding(user, course)}}
+\paragraph{\texttt{sendReminders(user, course, now)}}
 \begin{itemize}
-    \item transition: None.
-    \item output: If $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{true}$:
-    \[
-        out=\{u\mapsto L\mid u\in\operatorname{participants}(course)\land L=[i\mid i\in\operatorname{getChecklist}(u,course)\land i.status\ne\text{Done}]\land L\ne\emptyset\}.
-    \]
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{true}$ and
+    $\operatorname{getSettings}(user,course)[\texttt{remindersEnabled}]$ is true, then for every $(u,i)\in\operatorname{dueItems}(course,now)$
+    call $\operatorname{notify}(e,\{u\},\text{None})$ in M\_Notifications, where $e$ is an event of type DeadlineReminder for $i.target$ in $course$
+    whose summary names the action and its due date. No state of this module changes.
+    \item output: None.
     \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{false}$.
 \end{itemize}
 
@@ -1873,7 +1868,49 @@ None.
     \item[requiredActions(role: UserRole, course: Course): List] The required actions of a role in a course,
     for example a student completing a profile and submitting the team project,
     a supervisor completing a proposal, and an instructor or TA reviewing submissions that await a decision.
+    \item[itemFor(user: User, course: Course, action: String): ChecklistItem] The item
+    $(action,\ dueDate,\ status,\ target)$. The status is Done if the ``Done when'' condition of the
+    action in Table~\ref{TblRequiredActions} holds, otherwise InProgress if its ``InProgress when'' condition holds,
+    otherwise ToDo. The due date is the entry for the action in the \texttt{deadlines} setting, if any.
+    The target is the record the action concerns.
+    \item[dueItems(course: Course, now: DateTime): $\operatorname{Set}\langle(\text{User},\text{ChecklistItem})\rangle$]
+    The pairs $(u,i)$ such that $u\in\operatorname{participants}(course)$, $i=\operatorname{itemFor}(u,course,a)$ for
+    some $a\in\operatorname{requiredActions}(\operatorname{getRole}(u,course),course)$, $i.status\ne\text{Done}$, $i.dueDate\ne\text{None}$,
+    and $now\le i.dueDate\le now+\mathit{ReminderLeadDays}$ days.
 \end{description}
+
+
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.19\textwidth}
+                  >{\raggedright\arraybackslash}p{0.10\textwidth}
+                  >{\raggedright\arraybackslash}p{0.12\textwidth}
+                  >{\raggedright\arraybackslash}p{0.29\textwidth}
+                  >{\raggedright\arraybackslash}p{0.22\textwidth}}
+\toprule
+\textbf{Action} & \textbf{Role} & \textbf{Feature} & \textbf{Done when} & \textbf{InProgress when} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Action} & \textbf{Role} & \textbf{Feature} & \textbf{Done when} & \textbf{InProgress when} \\
+\midrule
+\endhead
+\endfoot
+Complete student profile & Student & -- & the student has a student profile & -- \\
+Join a team & Student & TeamFormation & the student is on a team & -- \\
+Submit team project for approval & Student & ProjectApprovals & the team's status is Team project submitted, Team project under review, Approved, or Approved (change under review) & the team's status is Agreed or Team project changes requested \\
+Submit a project proposal & Supervisor & ProjectProposals & the supervisor has a proposal whose status is not Draft or Proposal changes requested & the supervisor has a proposal in Draft or Proposal changes requested \\
+Respond to team applications & Supervisor & -- & no application to the supervisor's projects has status Applied or Team Accepts - Supervisor Pending & -- \\
+Review project proposals & Instructor & ProjectProposals & no project in the course has status Proposal submitted & -- \\
+Review team project submissions & Instructor, TA & ProjectApprovals & no team in the course has status Team project submitted or Team project under review & -- \\
+Resolve enrollment discrepancies & Instructor, TA & -- & no student of the course has status Flagged & -- \\
+\bottomrule
+\caption{Required actions and how their status is determined}
+\label{TblRequiredActions}
+\end{longtable}
+\endgroup
+
 
 \newpage
 
@@ -2071,6 +2108,9 @@ How records are stored is its secret.
 \subsubsection{State Variables}
 
 \begin{itemize}
+
+    \item $\mathit{store}:\operatorname{Map}\langle\text{RecordRef},\text{StoredRecord}\rangle$
+    - all stored records, initially the contents of the durable storage.
     \item $\mathit{transactions}:\operatorname{Map}\langle\text{TransactionID},\text{ChangeSet}\rangle$ -
     changes staged by transactions that are still open, initially $\emptyset$.
     \item $\mathit{backups}:\operatorname{Map}\langle\text{BackupID},\text{BackupInfo}\rangle$
@@ -2204,9 +2244,19 @@ How records are stored is its secret.
 \subsubsection{Local Functions}
 
 \begin{description}
-    \item[chooseBackup(incident: DateTime): BackupID$^{?}$] Among usable backups created no later
+    \item[chooseBackup(incident: DateTime): BackupInfo$^{?}$] Among usable backups created no later
     than $incident$, returns the latest one created within $\mathit{RecoveryPointWindow}$ before $incident$.
     If there is none, returns the latest usable backup created before the window.
+    \item[applicable(cs: ChangeSet): bool] Evaluated against $\mathit{store}$ before any change of $cs$ is applied. Each record is named by at most one change of $cs$. It is true exactly when
+    \[
+        \begin{aligned}
+            &\forall c\in cs.changes:\\
+            &\quad c.kind=\text{Insert}\Rightarrow c.ref\notin\operatorname{dom}(\mathit{store})\\
+            &\quad\land\ c.kind\in\{\text{Update},\text{Remove}\}\Rightarrow\big(c.ref\in\operatorname{dom}(\mathit{store})\land(c.expectedVersion\ne\text{None}\Rightarrow\mathit{store}[c.ref].version=c.expectedVersion)\big)\\
+            &\land\ \forall(r\mapsto v)\in cs.guards:\ r\in\operatorname{dom}(\mathit{store})\land\mathit{store}[r].version=v.
+        \end{aligned}
+    \]
+    In words, nothing the action read or changed was modified by another committed action since it was read.
 \end{description}
 
 \newpage
