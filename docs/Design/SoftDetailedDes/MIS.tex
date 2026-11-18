@@ -287,7 +287,8 @@ The following data types are shared across the Keystone modules.
 \subsubsection{RecordType}
 \begin{enumerate}
     \item User, Course, StudentProfile, Team, TeamProfile, Project, ProjectApplication,
-    Thread, CourseResource, Enrollment, Notification, AuditEntry, ChecklistItem: The kinds of record that Keystone stores.
+    Thread, CourseResource, Enrollment, Notification, AuditEntry, ChecklistItem,
+    Offer, ApprovalRequest, SyncStatus: The kinds of record that Keystone stores.
 \end{enumerate}
 
 \subsubsection{EventType}
@@ -324,6 +325,38 @@ The following data types are shared across the Keystone modules.
 \begin{enumerate}
     \item StudentNotOnTeam, StudentOnMultipleTeams, TeamWithoutProject,
     TeamWithoutSupervisor: Problems found when validating team composition.
+\end{enumerate}
+
+\subsubsection{TeamMemberRole}
+\begin{enumerate}
+    \item PointOfContact: The team member who represents the team in communication.
+    \item Member: An ordinary team member.
+\end{enumerate}
+
+\subsubsection{OfferKind}
+\begin{enumerate}
+    \item Invitation: A team invites a student to join it.
+    \item Request: A student asks to join a team.
+\end{enumerate}
+
+\subsubsection{RuleViolation}
+\begin{enumerate}
+    \item TooFewMembers: The team has fewer members than the course allows.
+    \item TooManyMembers: The team has more members than the course allows.
+    \item ProgramCombinationNotAllowed: The programs of the team members make a combination the course does not allow.
+\end{enumerate}
+
+\subsubsection{RequestKind}
+\begin{enumerate}
+    \item Initial: A first request for approval.
+    \item Revision: A request for approval of a change to an approved project.
+\end{enumerate}
+
+\subsubsection{ThreadTarget}
+\begin{enumerate}
+    \item ProjectProposal: The discussion is about a project proposal.
+    \item Application: The discussion is about a project application.
+    \item Team: The discussion is about a team.
 \end{enumerate}
 
 \subsection{Data Structures}
@@ -444,18 +477,23 @@ A record containing capstone course information, configuration settings, and enr
 
 \subsubsection{StudentProfile}
 A record containing a student's background, skills, interests, experience, and project preferences.
+It also has the fields program: Program and seekingTeam: bool.
 
 \subsubsection{Team}
 A record representing a group of students participating in the capstone project selection process.
+It also has the fields id: String, course: Course, members: List$\langle$User$\rangle$, membersNeeded: natural number,
+ta: User$^{?}$, and profile: TeamProfile.
 
 \subsubsection{TeamProfile}
 A record containing a team's collective skills, interests, goals, and work style.
 
 \subsubsection{Project}
 A record containing project information, supervisor capacity, course association, and ProjectStatus.
+It also has the fields id: String, supervisor: User, and team: Team$^{?}$.
 
 \subsubsection{ProjectApplication}
 A record representing a team's application to a project, including the associated TeamProjectStatus.
+It also has the fields id: String, team: Team, and project: Project.
 
 \subsubsection{Notification}
 A record (id: NotificationID, recipient: User, event: Event, status: DeliveryStatus, attempts: natural number).
@@ -466,6 +504,29 @@ It describes a required action and is derived from current records, never stored
 
 \subsubsection{Thread}
 A record representing a discussion associated with a project proposal or team.
+It also has the fields id: String, target: ThreadTarget, subject: RecordRef, and replies: List$\langle$Reply$\rangle$.
+
+\subsubsection{Program}
+\[
+\text{Program} = \text{String}
+\]
+The name of a student's academic program.
+
+\subsubsection{Offer}
+A record (id: String, kind: OfferKind, team: Team, student: User).
+It is an invitation from a team to a student, or a request from a student to join a team.
+
+\subsubsection{ApprovalRequest}
+A record (id: String, kind: RequestKind, project: ProjectApplication, status: TeamProjectStatus).
+It is a request for an instructor to approve a team project.
+
+\subsubsection{SyncStatus}
+A record (lastSuccess: DateTime$^{?}$, failed: bool).
+It describes the state of the latest synchronization with an external service.
+
+\subsubsection{Reply}
+A record (id: String, author: User, time: DateTime, text: String).
+It is one message in a Thread.
 
 
 \section[MIS of Hardware-Hiding Module]{MIS of Hardware-Hiding Module (\moduleid{M_HardwareHiding})}
@@ -1599,6 +1660,938 @@ Avenue to Learn, uploaded enrollment files, persistent enrollment records, and s
 
 \newpage
 
+\section[MIS of Projects Module]{MIS of Projects Module (\moduleid{M_Projects})}
+\label{M_Projects}
+
+\subsection{Module}
+
+This module manages project records and their life cycle (see \srsref{FIG-Lifecycle}). It checks proposals against each course's proposal templates, records proposals and their review, tracks how many teams each project can take, and records team applications, supervisor decisions, and agreements. It reserves and releases project slots, withdraws a team's competing applications when the team reaches agreement, and returns the projects a user may see, searched, filtered, and sorted as requested.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Authorization
+    \item M\_CourseManagement
+    \item M\_StudentsTeams
+    \item M\_Notifications
+    \item M\_Persistence
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{saveProposal} & user: User, course: Course, project: Project$^{?}$, values: FieldValues, capacity: $\mathbb{N}$, supervisor: User$^{?}$, submit: bool & Project & Unauthorized, FeatureDisabled, NoTemplate, NotInTeam, InvalidStatus, InvalidCapacity, InvalidProposal \\
+\texttt{reviewProposal} & user: User, project: Project, decision: Action, comment: String & -- & Unauthorized, InvalidStatus, InvalidDecision \\
+\texttt{deleteProject} & user: User, project: Project & -- & Unauthorized, HasReservedTeams \\
+\texttt{closeSelection} & user: User, course: Course & -- & Unauthorized \\
+\texttt{apply} & user: User, project: Project & ProjectApplication & Unauthorized, InvalidStatus, NotInTeam, DuplicateApplication, AlreadyAgreed \\
+\texttt{respondToApplication} & user: User, application: ProjectApplication, decision: Action, comment: String & -- & Unauthorized, InvalidStatus, InvalidDecision, NoSlotAvailable \\
+\texttt{updateApplicationStatus} & application: ProjectApplication, status: TeamProjectStatus & -- & InvalidTransition \\
+\texttt{getProject} & user: User, project: Project & Project & Unauthorized \\
+\texttt{listProjects} & user: User, course: Course, text: String, statuses: $\operatorname{Set}\langle\text{ProjectStatus}\rangle$, sortBy: String & $\operatorname{List}\langle\text{Project}\rangle$ & Unauthorized, InvalidQuery \\
+\texttt{listApplications} & user: User, course: Course, project: Project$^{?}$, team: Team$^{?}$ & $\operatorname{List}\langle\text{ProjectApplication}\rangle$ & Unauthorized \\
+\bottomrule
+\caption{Exported access programs of the Projects module}
+\label{TblProjectsAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{projects}:\operatorname{Map}\langle\text{String},\text{Project}\rangle$ - projects indexed by identifier, initially loaded from M\_Persistence.
+
+    \item $\mathit{applications}:\operatorname{Map}\langle\text{String},\text{ProjectApplication}\rangle$ - team applications indexed by identifier, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+Persistent project and application records.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Users are authenticated through M\_Authentication before any routine is called.
+    \item A routine whose transaction fails to commit in M\_Persistence (ConflictDetected or PersistenceFailure) changes nothing and passes the exception on to its caller, who may repeat the action from a fresh read.
+    \item M\_Authorization enforces the SRS visibility rules through \texttt{hasAccess}, including that no user can see another supervisor's proposals or projects unless the SRS allows it.
+    \item The proposal templates are the course setting \texttt{proposalTemplates}, read with $\operatorname{getSettings}$ and changed only through M\_CourseManagement. For each template kind (\texttt{Supervisor} or \texttt{Student}) it maps field names to true if the field is required, and every template requires a field named \texttt{title}. $T_k$ denotes the template of kind $k$ of the course concerned.
+    \item The caller has re-verified the user, as required by \srsref{FR_ReverifyUsers}, before calling \texttt{deleteProject} and before calling \texttt{respondToApplication} with Accept.
+    \item $\operatorname{notify}(type,subject)$ stands for the call $\operatorname{notify}(e,\mathit{candidates},tx)$ of M\_Notifications, where $e$ is the Event of EventType $type$ for $subject$ (with its course and a summary of what happened), $\mathit{candidates}$ is the set of users connected to $subject$ (its proposer or supervisor, the members of the team concerned, and the course's instructors and TAs), and $tx$ is the transaction of the calling routine. M\_Notifications decides which candidates are notified.
+    \item \texttt{updateApplicationStatus} is called only by M\_ApprovalWorkflow, and its changes are saved in the caller's transaction. The statuses Applied, SupervisorAccepts, Agreed, and DeclinedOrWithdrawn are set by this module's own routines.
+    \item The proposer of a student-proposed project is a team member. How the proposing team is linked to its project, and who names its supervisor, is not decided by the SRS, so \texttt{saveProposal} records them in $\mathit{project}.team$ and $\mathit{project}.supervisor$ and nothing more.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{saveProposal(user, course, project, values, capacity, supervisor, submit)}}
+\begin{itemize}
+    \item transition: Let $r$ be the user's role in $course$ (from $\operatorname{getRole}$). The template kind $k$ is Student if the proposer is a Student and Supervisor otherwise.
+    \begin{itemize}
+        \item \emph{Create} ($project=\text{None}$): If $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{true}$, $\operatorname{isFeatureEnabled}(user,course,\text{ProjectProposals})=\text{true}$, $T_k$ exists, $\operatorname{dom}(values)\subseteq\operatorname{dom}(T_k)$, $capacity\ge1$, and, if $r=\text{Student}$, the user is in a team ($\operatorname{getTeam}(user,course,\text{None})\ne\text{None}$) and $capacity=1$, create a project $p$ with $p.course=course$, $p.proposer=user$, $p.fields=values$, $p.capacity=capacity$, $p.reserved=\emptyset$, and $p.status=\text{Draft}$. If $r=\text{Student}$, then $p.team=\operatorname{getTeam}(user,course,\text{None})$ and $p.supervisor=supervisor$. Otherwise $p.team=\text{None}$ and $p.supervisor=user$ ($supervisor$ is ignored). Then $\mathit{projects}'=\mathit{projects}\cup\{p.id\mapsto p\}$. A draft may be incomplete.
+        \item \emph{Update} ($project\ne\text{None}$): If $\operatorname{hasAccess}(user,project.course,\text{Update},project)=\text{true}$ and $capacity\ge\max(1,|project.reserved|)$ (and $capacity=1$ if the proposer is a Student): when $project.status\in\{\text{Draft},\text{ProposalChangesRequested}\}$ and $\operatorname{dom}(values)\subseteq\operatorname{dom}(T_k)$, the project's $fields$, $capacity$, and (for a Student proposer) $supervisor$ are replaced. When $project.status\in\{\text{Open},\text{Full}\}$, only $capacity$ changes, $values$ is ignored, and $submit$ must be false. If the status was Open and $capacity=|project.reserved|$ it becomes Full. If it was Full and $capacity>|project.reserved|$ it becomes Open. A status change calls $\operatorname{notify}(\text{StatusChanged},project)$.
+        \item \emph{Submit}: If $submit$ is true, the saved project has status Draft or ProposalChangesRequested, $\operatorname{isFeatureEnabled}(user,c,\text{ProjectProposals})=\text{true}$ for its course $c$, and every field marked required in $T_k$ is present and non-empty in its fields, its status becomes ProposalSubmitted. Call $\operatorname{recordPendingWork}(c,\text{ProjectProposals},project.id,\text{true})$ and $\operatorname{notify}(\text{StatusChanged},project)$.
+    \end{itemize}
+    Persist and audit the change.
+    \item output: The saved project.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if the required $\operatorname{hasAccess}$ check is false.
+        \item FeatureDisabled if ProjectProposals is not enabled in the course.
+        \item NoTemplate if the course has no template of kind $k$.
+        \item NotInTeam if the user is a Student who is not in a team in the course (create).
+        \item InvalidStatus if, on an update, the status is not Draft, ProposalChangesRequested, Open, or Full, or $submit$ is true for an Open or Full project.
+        \item InvalidCapacity if $capacity<\max(1,|project.reserved|)$, or the proposer is a Student and $capacity\ne1$.
+        \item InvalidProposal if a field name in $values$ is not in $T_k$, or $submit$ is true and a required field is missing or empty. The exception lists the field names.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{reviewProposal(user, project, decision, comment)}}
+\begin{itemize}
+    \item transition: Let $c=project.course$. If $decision\in\{\text{Approve},\text{Reject},\text{RequestChanges},\text{Withdraw}\}$ and $\operatorname{hasAccess}(user,c,decision,project)=\text{true}$:
+    \begin{itemize}
+        \item Approve, Reject, or RequestChanges, allowed when $project.status=\text{ProposalSubmitted}$:
+        \[
+        \mathit{projects}'[project.id].status=
+        \begin{cases}
+            \text{Open}, & decision=\text{Approve},\\
+            \text{ProposalRejected}, & decision=\text{Reject},\\
+            \text{ProposalChangesRequested}, & decision=\text{RequestChanges},
+        \end{cases}
+        \]
+        and $\mathit{projects}'[project.id].comment=comment$. Call $\operatorname{recordPendingWork}(c,\text{ProjectProposals},project.id,\text{false})$ and $\operatorname{notify}(\text{ProposalDecision},project)$. If $decision=\text{Approve}$, also call $\operatorname{notify}(\text{NewProjectListed},project)$, and if the proposer signed in through the ExternalProvider call $\operatorname{verifyExternalSupervisor}(project.proposer,project)$.
+        \item Withdraw (by the proposer), allowed when $project.status\in\{\text{Draft},\text{ProposalSubmitted},\text{ProposalChangesRequested}\}$ or ($project.status=\text{Open}\land project.reserved=\emptyset$): the status becomes ProposalWithdrawn. If the status was ProposalSubmitted, call $\operatorname{recordPendingWork}(c,\text{ProjectProposals},project.id,\text{false})$. Every application to the project is ended (see $\operatorname{endApplication}$).
+    \end{itemize}
+    Persist and audit the changes.
+    \item output: None.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,c,decision,project)=\text{false}$.
+        \item InvalidStatus if the project's status does not allow the decision, or a Withdraw is requested for a project that has reserved teams.
+        \item InvalidDecision if $decision$ is not Approve, Reject, RequestChanges, or Withdraw.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{deleteProject(user, project)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,project.course,\text{Delete},project)=\text{true}$ and $project.reserved=\emptyset$, remove the project and its applications:
+    \[
+    \mathit{projects}'=\mathit{projects}\setminus\{project.id\mapsto project\}.
+    \]
+    If the status was ProposalSubmitted, call $\operatorname{recordPendingWork}(project.course,\text{ProjectProposals},project.id,\text{false})$. Persist and audit the changes.
+    \item output: None.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,project.course,\text{Delete},project)=\text{false}$.
+        \item HasReservedTeams if $project.reserved\ne\emptyset$.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{closeSelection(user, course)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{Configure},course)=\text{true}$: every project $p$ of the course with $p.status\in\{\text{Open},\text{Full}\}$ becomes Closed, and every application to it in status Applied or SupervisorAccepts is ended (see $\operatorname{endApplication}$). Applications already Agreed or later are unchanged. Persist and audit the changes.
+    \item output: None.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Configure},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{apply(user, project)}}
+\begin{itemize}
+    \item transition: Let $c=project.course$ and $t=\operatorname{getTeam}(user,c,\text{None})$. If $\operatorname{hasAccess}(user,c,\text{Apply},project)=\text{true}$, $project.status=\text{Open}$, $t\ne\text{None}$, $t$ has no application to $project$ whose status is not DeclinedOrWithdrawn, and $t$ has no application with status Agreed or later, create an application $a$ with $a.project=project$, $a.team=t$, $a.status=\text{Applied}$:
+    \[
+    \mathit{applications}'=\mathit{applications}\cup\{a.id\mapsto a\}.
+    \]
+    An application uses no slot, so the project's status is unchanged. Call $\operatorname{notify}(\text{StatusChanged},a)$. Persist and audit the changes.
+    \item output: $out=a$.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,c,\text{Apply},project)=\text{false}$.
+        \item InvalidStatus if $project.status\ne\text{Open}$.
+        \item NotInTeam if the user is not in a team in the course.
+        \item DuplicateApplication if the team already has an active application to the project.
+        \item AlreadyAgreed if the team already has an application with status Agreed or later.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{respondToApplication(user, application, decision, comment)}}
+\begin{itemize}
+    \item transition: Let $p=\mathit{projects}[application.project]$ and $c=p.course$. The user is on the \emph{supervisor side} if $user=p.supervisor$, and on the \emph{team side} if $user\in application.team.members$. Let $a=\text{Withdraw}$ if the user is on the team side and $decision=\text{Decline}$, and $a=decision$ otherwise. If $decision\in\{\text{Accept},\text{Decline}\}$ and $\operatorname{hasAccess}(user,c,a,application)=\text{true}$:
+    \begin{itemize}
+        \item Supervisor side, Accept, allowed when $application.status=\text{Applied}$ and $p.status=\text{Open}$: the status becomes SupervisorAccepts and $\operatorname{adjustSlot}(p,application.team,\text{true})$.
+        \item Team side, Accept, allowed when $application.status=\text{SupervisorAccepts}$: the status becomes Agreed. The slot was reserved when the supervisor accepted, so no slot changes. Every other application of the same team with status Applied or SupervisorAccepts is ended (see $\operatorname{endApplication}$).
+        \item Supervisor side, Decline, allowed when $application.status\in\{\text{Applied},\text{SupervisorAccepts},\text{Agreed},\text{TeamProjectChangesRequested}\}$: $\operatorname{endApplication}(application)$.
+        \item Team side, Decline (a withdrawal), allowed when $application.status\in\{\text{Applied},\text{SupervisorAccepts},\text{Agreed},\text{TeamProjectChangesRequested},\text{Approved}\}$: $\operatorname{endApplication}(application)$. Withdrawing an Approved application is how a team that dissolves after approval releases its slot.
+    \end{itemize}
+    Call $\operatorname{notify}(\text{AgreementReached},application)$ if the team side accepted, and $\operatorname{notify}(\text{ApplicationDecision},application)$ otherwise. The $comment$ (an optional reason) is stored with the notification. All changes are saved in one transaction and audited.
+    \item output: None.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if the user is on neither side, or $\operatorname{hasAccess}(user,c,a,application)=\text{false}$.
+        \item InvalidDecision if $decision$ is not Accept or Decline.
+        \item InvalidStatus if the application's status does not allow the decision (the team cannot accept before the supervisor, and a withdrawal is not allowed while a review is in progress).
+        \item NoSlotAvailable if the supervisor accepts and $p.status\ne\text{Open}$.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{updateApplicationStatus(application, status)}}
+\begin{itemize}
+    \item transition: Called only by M\_ApprovalWorkflow. If the change from $application.status$ to $status$ is one of the following: TeamProjectSubmitted to TeamProjectUnderReview, TeamProjectChangesRequested, TeamProjectRejected, or Approved; TeamProjectUnderReview to TeamProjectChangesRequested, TeamProjectRejected, or Approved; Agreed or TeamProjectChangesRequested to TeamProjectSubmitted; Approved to ApprovedChangeUnderReview; ApprovedChangeUnderReview to Approved:
+    \[
+    \mathit{applications}'[application.id].status=status.
+    \]
+    If $status=\text{TeamProjectRejected}$ and $\operatorname{holdsSlot}(application.status)$, call $\operatorname{adjustSlot}(\mathit{projects}[application.project],application.team,\text{false})$. The changes are saved in the caller's transaction and audited.
+    \item output: None.
+    \item exception: InvalidTransition if the change is not one of those listed.
+\end{itemize}
+
+\paragraph{\texttt{getProject(user, project)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,project.course,\text{Read},project)=\text{true}$:
+    \[
+    out=\mathit{projects}[project.id].
+    \]
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,project.course,\text{Read},project)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{listProjects(user, course, text, statuses, sortBy)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$ and $sortBy\in\{\text{title},\text{remaining}\}$, the list of projects $p$ of the course such that $\operatorname{hasAccess}(user,course,\text{Read},p)$, $statuses=\emptyset\lor p.status\in statuses$, and $text=\epsilon$ or $text$ occurs, ignoring case, in some value of $p.fields$. The list is ordered by title ascending if $sortBy=\text{title}$, or by remaining slots ($p.capacity-|p.reserved|$) descending if $sortBy=\text{remaining}$. Ties are ordered by identifier.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+        \item InvalidQuery if $sortBy$ is not title or remaining.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{listApplications(user, course, project, team)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$, the applications that the user may read, restricted to $project$ if $project\ne\text{None}$ and to $team$ if $team\ne\text{None}$:
+    \[
+    out=[a\mid a\in\mathit{applications},\ \text{the project of }a\text{ is in }course\land(project=\text{None}\lor a.project=project)\land(team=\text{None}\lor a.team=team)\land\operatorname{hasAccess}(user,course,\text{Read},a)].
+    \]
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[holdsSlot(status: TeamProjectStatus): bool] Returns true for SupervisorAccepts, Agreed, TeamProjectSubmitted, TeamProjectUnderReview, TeamProjectChangesRequested, Approved, and ApprovedChangeUnderReview.
+    \item[adjustSlot(project: Project, team: Team, reserve: bool): --] Adds $team.id$ to $project.reserved$ if $reserve$, and removes it otherwise. The project becomes Full if $|project.reserved|$ now equals $project.capacity$, and a Full project that lost a slot becomes Open. A status change calls $\operatorname{notify}(\text{StatusChanged},project)$.
+    \item[endApplication(application: ProjectApplication): --] Sets the application's status to DeclinedOrWithdrawn. If $\operatorname{holdsSlot}$ was true for its previous status, calls $\operatorname{adjustSlot}$ with $reserve$ false for its project and team.
+\end{description}
+
+\newpage
+
+\section[MIS of Students and Teams Module]{MIS of Students and Teams Module (\moduleid{M_StudentsTeams})}
+\label{M_StudentsTeams}
+
+\subsection{Module}
+
+This module manages how students form teams. It stores and shows student and team profiles, creates teams, handles invitations and join requests, records member roles and the assigned TA, and finds students and teams that are looking for each other. It checks a team against the course's team rules, which are read from the course settings, and reports any rule the team breaks.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Authorization
+    \item M\_CourseManagement
+    \item M\_Notifications
+    \item M\_Persistence
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{saveStudentProfile} & user: User, course: Course, profile: StudentProfile$^{?}$ & -- & Unauthorized, InvalidProfile, ProfileNotFound, InTeam \\
+\texttt{getStudentProfile} & user: User, course: Course, student: User & StudentProfile & Unauthorized, ProfileNotFound \\
+\texttt{saveTeam} & user: User, course: Course, team: Team$^{?}$, profile: TeamProfile, membersNeeded: $\mathbb{N}$, pointOfContact: User$^{?}$, ta: User$^{?}$ & Team & Unauthorized, FeatureDisabled, NoProfile, AlreadyInTeam, InvalidProfile, NotAMember, InvalidTA \\
+\texttt{getTeam} & user: User, course: Course, team: Team$^{?}$ & Team$^{?}$ & Unauthorized \\
+\texttt{listTeams} & user: User, course: Course, filter: String & $\operatorname{List}\langle\text{Team}\rangle$ & Unauthorized, InvalidFilter \\
+\texttt{listSeeking} & user: User, course: Course & $\operatorname{List}\langle\text{User}\rangle$ & Unauthorized \\
+\texttt{listUnteamed} & user: User, course: Course, enrolled: $\operatorname{List}\langle\text{User}\rangle$ & $\operatorname{List}\langle\text{User}\rangle$ & Unauthorized \\
+\texttt{makeOffer} & user: User, team: Team, student: User, kind: OfferKind & Offer & Unauthorized, FeatureDisabled, NoProfile, AlreadyInTeam, TeamFull, DuplicateOffer \\
+\texttt{respondToOffer} & user: User, offer: Offer, accept: bool & -- & Unauthorized, OfferNotFound, AlreadyInTeam, TeamFull \\
+\texttt{removeFromTeam} & user: User, team: Team, member: User$^{?}$ & -- & Unauthorized, NotAMember, CannotRemovePointOfContact \\
+\texttt{validateTeam} & user: User, team: Team & $\operatorname{Set}\langle\text{RuleViolation}\rangle$ & Unauthorized \\
+\bottomrule
+\caption{Exported access programs of the Students and Teams module}
+\label{TblStudentsTeamsAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{profiles}:\operatorname{Map}\langle\text{Course},\operatorname{Map}\langle\text{User},\text{StudentProfile}\rangle\rangle$ - student profiles of each course, initially loaded from M\_Persistence.
+
+    \item $\mathit{teams}:\operatorname{Map}\langle\text{String},\text{Team}\rangle$ - teams indexed by identifier, initially loaded from M\_Persistence.
+
+    \item $\mathit{offers}:\operatorname{Map}\langle\text{String},\text{Offer}\rangle$ - pending invitations and join requests indexed by identifier, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+Persistent profile, team, and offer records.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Users are authenticated through M\_Authentication, and are enrolled in the course, before any routine is called.
+    \item A routine whose transaction fails to commit in M\_Persistence (ConflictDetected or PersistenceFailure) changes nothing and passes the exception on to its caller, who may repeat the action from a fresh read.
+    \item M\_Authorization enforces the SRS visibility rules through \texttt{hasAccess}.
+    \item The caller has re-verified the user, as required by \srsref{FR_ReverifyUsers}, before deleting a student profile, leaving a team, or dissolving a team.
+    \item A user is in at most one team per course.
+    \item For a course $c$, $\mathit{min}_c$, $\mathit{max}_c$, and $\mathit{combos}_c$ are the course settings \texttt{minTeamSize} (default 1), \texttt{maxTeamSize} (default None, meaning no maximum), and \texttt{allowedCombinations} (default $\emptyset$, meaning any combination of programs), read with $\operatorname{getSettings}$ and changed only through M\_CourseManagement. A team is \emph{full} if $\mathit{max}_c\ne\text{None}\land|team.members|\ge\mathit{max}_c$.
+    \item The caller has ended every application of a team that holds a project slot (with \texttt{respondToApplication} in M\_Projects) before the team's last member leaves or the team is dissolved, because this module cannot see applications.
+    \item Pending offers count as pending work of the TeamFormation feature, so M\_CourseManagement refuses to turn the feature off while any exist.
+    \item $\operatorname{notify}(type,subject)$ stands for the call $\operatorname{notify}(e,\mathit{candidates},tx)$ of M\_Notifications, where $e$ is the Event of EventType $type$ for $subject$ (with its course and a summary of what happened), $\mathit{candidates}$ is the set of users connected to $subject$ (the members of the team concerned, the student concerned, and the course's instructors and TAs), and $tx$ is the transaction of the calling routine. M\_Notifications decides which candidates are notified.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{saveStudentProfile(user, course, profile)}}
+\begin{itemize}
+    \item transition:
+    \begin{itemize}
+        \item $profile\ne\text{None}$: Let $a=\text{Update}$ if $user\in\operatorname{dom}(\mathit{profiles}[course])$, otherwise $a=\text{Create}$. If $\operatorname{hasAccess}(user,course,a,profile)=\text{true}$ and $profile$ has valid values for the fields the SRS requires, including its program, then $\mathit{profiles}'[course]=\mathit{profiles}[course]\oplus\{user\mapsto profile\}$.
+        \item $profile=\text{None}$ (delete the user's profile): If $user\in\operatorname{dom}(\mathit{profiles}[course])$, $\operatorname{teamOf}(user,course)=\text{None}$, and $\operatorname{hasAccess}(user,course,\text{Delete},\mathit{profiles}[course][user])=\text{true}$, the profile is removed from $\mathit{profiles}[course]$ and the user's pending offers are removed (see $\operatorname{dropOffers}$).
+    \end{itemize}
+    Persist and audit the change.
+    \item output: None.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if the required $\operatorname{hasAccess}$ check is false.
+        \item InvalidProfile if the profile has an invalid or missing required value.
+        \item ProfileNotFound if a delete is requested and the user has no profile in the course.
+        \item InTeam if a delete is requested and the user is in a team in the course.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{getStudentProfile(user, course, student)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $student\in\operatorname{dom}(\mathit{profiles}[course])$ and $\operatorname{hasAccess}(user,course,\text{Read},\mathit{profiles}[course][student])=\text{true}$:
+    \[
+    out=\mathit{profiles}[course][student].
+    \]
+    \item exception:
+    \begin{itemize}
+        \item ProfileNotFound if $student\notin\operatorname{dom}(\mathit{profiles}[course])$.
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},\mathit{profiles}[course][student])=\text{false}$.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{saveTeam(user, course, team, profile, membersNeeded, pointOfContact, ta)}}
+\begin{itemize}
+    \item transition: A team profile is valid if it has valid values for the fields the SRS requires.
+    \begin{itemize}
+        \item \emph{Create} ($team=\text{None}$): If $\operatorname{hasAccess}(user,course,\text{Create},course)=\text{true}$, $\operatorname{isFeatureEnabled}(user,course,\text{TeamFormation})=\text{true}$, $user\in\operatorname{dom}(\mathit{profiles}[course])$, $\operatorname{teamOf}(user,course)=\text{None}$, and $profile$ is valid, create a team $t$ with $t.course=course$, $t.members=\{user\mapsto\text{PointOfContact}\}$, $t.membersNeeded=membersNeeded$, $t.ta=\text{None}$, and $t.profile=profile$, and set $\mathit{teams}'=\mathit{teams}\cup\{t.id\mapsto t\}$. Pending offers involving $user$ in the course are removed (see $\operatorname{dropOffers}$). The arguments $pointOfContact$ and $ta$ are ignored.
+        \item \emph{Update} ($team\ne\text{None}$): If $\operatorname{hasAccess}(user,team.course,\text{Update},team)=\text{true}$ and $profile$ is valid, then $\mathit{teams}'[team.id].profile=profile$ and $\mathit{teams}'[team.id].membersNeeded=membersNeeded$. If $pointOfContact\ne\text{None}$ and $pointOfContact\in\operatorname{dom}(team.members)$, $pointOfContact$ becomes PointOfContact and the previous PointOfContact becomes Member. If $ta\ne\text{None}$, $\operatorname{hasAccess}(user,team.course,\text{Assign},team)=\text{true}$, and $\operatorname{getRole}(ta,team.course)=\text{TA}$, then $\mathit{teams}'[team.id].ta=ta$. A change of point of contact or TA calls $\operatorname{notify}(\text{StatusChanged},team)$.
+    \end{itemize}
+    A team with $membersNeeded>0$ is recruiting. Persist and audit the changes.
+    \item output: The saved team.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if the required $\operatorname{hasAccess}$ check is false.
+        \item FeatureDisabled if TeamFormation is not enabled in the course (create).
+        \item NoProfile if the user has no student profile in the course (create).
+        \item AlreadyInTeam if the user is already in a team in the course (create).
+        \item InvalidProfile if $profile$ is not valid.
+        \item NotAMember if $pointOfContact\ne\text{None}$ and is not a member of the team.
+        \item InvalidTA if $ta\ne\text{None}$ and $ta$ does not have the TA role in the course.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{getTeam(user, course, team)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$: if $team=\text{None}$, $out=\operatorname{teamOf}(user,course)$ (the user's own team, or None). Otherwise, if $\operatorname{hasAccess}(user,course,\text{Read},team)=\text{true}$, $out=\mathit{teams}[team.id]$.
+    \item exception: Unauthorized if the required $\operatorname{hasAccess}$ check is false.
+\end{itemize}
+
+\paragraph{\texttt{listTeams(user, course, filter)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $filter\in\{\text{All},\text{Recruiting},\text{Noncompliant}\}$, the teams of the course ordered by identifier:
+    \[
+    out=[t\mid t\in\mathit{teams},\ t.course=course\land\operatorname{hasAccess}(user,course,\text{Read},t)\land\mathit{matches}(t)],
+    \]
+    where $\mathit{matches}(t)$ is true for All, $t.membersNeeded>0$ for Recruiting, and $\operatorname{violations}(t)\ne\emptyset$ for Noncompliant. The Noncompliant filter lets staff review, after the rules change, the teams that break at least one rule. These teams are not changed or invalidated.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$, or $filter=\text{Noncompliant}$ and $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{false}$.
+        \item InvalidFilter if $filter$ is not All, Recruiting, or Noncompliant.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{listSeeking(user, course)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$, the students who are looking for a team, ordered by identifier:
+    \[
+    out=[u\mid u\in\operatorname{dom}(\mathit{profiles}[course]),\ \mathit{profiles}[course][u].seekingTeam\land\operatorname{teamOf}(u,course)=\text{None}\land\operatorname{hasAccess}(user,course,\text{Read},\mathit{profiles}[course][u])].
+    \]
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{listUnteamed(user, course, enrolled)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{true}$, the enrolled students who are on no team, in the order of $enrolled$:
+    \[
+    out=[u\mid u\in enrolled,\ \operatorname{teamOf}(u,course)=\text{None}].
+    \]
+    The caller supplies $enrolled$ from M\_Enrollment, which this module does not use.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{makeOffer(user, team, student, kind)}}
+\begin{itemize}
+    \item transition: Let $c=team.course$. If $kind=\text{Request}$ the student is the user ($student=user$ is used, and the argument is ignored). Let $o$ be a new offer with $o.team=team$, $o.user=student$, and $o.kind=kind$. If $\operatorname{hasAccess}(user,c,a,o)=\text{true}$, where $a=\text{AddMember}$ for an Invitation and $a=\text{Create}$ for a Request, $\operatorname{isFeatureEnabled}(user,c,\text{TeamFormation})=\text{true}$, $student\in\operatorname{dom}(\mathit{profiles}[c])$, $\operatorname{teamOf}(student,c)=\text{None}$, $team$ is not full, and no offer exists for the same team and student:
+    \[
+    \mathit{offers}'=\mathit{offers}\cup\{o.id\mapsto o\}.
+    \]
+    Call $\operatorname{recordPendingWork}(c,\text{TeamFormation},o.id,\text{true})$ and $\operatorname{notify}(\text{StatusChanged},team)$. Persist and audit the changes.
+    \item output: $out=o$.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,c,a,o)=\text{false}$.
+        \item FeatureDisabled if TeamFormation is not enabled in the course.
+        \item NoProfile if $student$ has no student profile in the course.
+        \item AlreadyInTeam if $student$ is already in a team in the course.
+        \item TeamFull if $team$ is full.
+        \item DuplicateOffer if an offer already exists for the team and student.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{respondToOffer(user, offer, accept)}}
+\begin{itemize}
+    \item transition: Let $t=\mathit{teams}[offer.team]$ and $c=t.course$. The action $a$ is Accept or Decline if $offer.kind=\text{Invitation}$ (the invited student responds), and AddMember if $offer.kind=\text{Request}\land accept$ or Decline if $offer.kind=\text{Request}\land\neg accept$ (a team member responds). If $offer.id\in\operatorname{dom}(\mathit{offers})$, $\operatorname{hasAccess}(user,c,a,offer)=\text{true}$, and, when $accept$, $\operatorname{teamOf}(offer.user,c)=\text{None}$ and $t$ is not full:
+    \[
+    \mathit{offers}'=\mathit{offers}\setminus\{offer.id\mapsto offer\}.
+    \]
+    Call $\operatorname{recordPendingWork}(c,\text{TeamFormation},offer.id,\text{false})$ and $\operatorname{notify}(\text{StatusChanged},t)$. If $accept$:
+    \[
+    \mathit{teams}'[t.id].members=t.members\oplus\{offer.user\mapsto\text{Member}\},
+    \]
+    and every other pending offer involving $offer.user$ in the course is removed (see $\operatorname{dropOffers}$). Persist and audit the changes.
+    \item output: None.
+    \item exception:
+    \begin{itemize}
+        \item OfferNotFound if $offer.id\notin\operatorname{dom}(\mathit{offers})$.
+        \item Unauthorized if $\operatorname{hasAccess}(user,c,a,offer)=\text{false}$.
+        \item AlreadyInTeam if $accept$ and $offer.user$ is already in a team in the course.
+        \item TeamFull if $accept$ and $t$ is full.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{removeFromTeam(user, team, member)}}
+\begin{itemize}
+    \item transition: Let $a=\text{DissolveTeam}$ if $member=\text{None}$, $a=\text{LeaveTeam}$ if $member=user$, and $a=\text{RemoveMember}$ otherwise. If $\operatorname{hasAccess}(user,team.course,a,team)=\text{true}$:
+    \begin{itemize}
+        \item $member=\text{None}$ (dissolve): the team is removed from $\mathit{teams}$, so its members have no team, and its pending offers are removed (see $\operatorname{dropOffers}$).
+        \item $member\ne\text{None}$, where $member\in\operatorname{dom}(team.members)$ and ($member=user\lor team.members[member]=\text{Member}$): $member$ is removed from $\mathit{teams}'[team.id].members$. If $member$ was the PointOfContact and members remain, the remaining member who joined earliest becomes PointOfContact. If no members remain, the team and its pending offers are removed (see $\operatorname{dropOffers}$).
+    \end{itemize}
+    Call $\operatorname{notify}(\text{StatusChanged},team)$. Persist and audit the changes.
+    \item output: None.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,team.course,a,team)=\text{false}$.
+        \item NotAMember if $member\ne\text{None}$ and $member\notin\operatorname{dom}(team.members)$.
+        \item CannotRemovePointOfContact if $member\ne user$ and $team.members[member]=\text{PointOfContact}$.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{validateTeam(user, team)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,team.course,\text{Read},team)=\text{true}$:
+    \[
+    out=\operatorname{violations}(team).
+    \]
+    An empty set means the team satisfies every rule. M\_ApprovalWorkflow uses this check before a submission is sent.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,team.course,\text{Read},team)=\text{false}$.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[teamOf(user: User, course: Course): Team$^{?}$] Returns the team of the course that has $user$ as a member, or None.
+    \item[violations(team: Team): $\operatorname{Set}\langle\text{RuleViolation}\rangle$] With $c=team.course$, $m=|team.members|$, and $P$ the set of programs of the members' student profiles, returns the set containing TooFewMembers if $m<\mathit{min}_c$; TooManyMembers if $\mathit{max}_c\ne\text{None}\land m>\mathit{max}_c$; and ProgramCombinationNotAllowed if $\mathit{combos}_c\ne\emptyset\land P\notin\mathit{combos}_c$.
+    \item[dropOffers(...): --] Removes the given pending offers from $\mathit{offers}$ and calls $\operatorname{recordPendingWork}(course,\text{TeamFormation},id,\text{false})$ for each one removed.
+\end{description}
+
+\newpage
+
+\section[MIS of Recommendation Module]{MIS of Recommendation Module (\moduleid{M_Recommendation})}
+\label{M_Recommendation}
+
+\subsection{Module}
+
+This module suggests teammates, teams, and projects. It reads the profiles and projects the user may see through the modules that own them, and ranks them by how well they match the user's team profile (or student profile, if the user has no team). The matching method is the secret of the module, so it can be changed, extended to more criteria, or removed without changing any other module. The module keeps no state of its own.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Authorization
+    \item M\_StudentsTeams
+    \item M\_Projects
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{recommend} & user: User, course: Course, target: String, k: $\mathbb{N}$ & $\operatorname{List}\langle\text{Value}\rangle$ & Unauthorized, NoProfile, InvalidTarget \\
+\bottomrule
+\caption{Exported access programs of the Recommendation module}
+\label{TblRecommendationAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+None.
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Users are authenticated through M\_Authentication before any routine is called.
+    \item M\_StudentsTeams and M\_Projects return only the records the user may read, so this module does not check access to individual records.
+    \item A student without a team has a student profile before asking for recommendations.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{recommend(user, course, target, k)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$ and $target\in\{\text{Teammates},\text{Teams},\text{Projects}\}$, let the \emph{seeker} be the user's team (from $\operatorname{getTeam}(user,course,\text{None})$) with its team profile if the user is in a team, and otherwise the user's student profile (from $\operatorname{getStudentProfile}$). Let the candidates $C$ be:
+    \begin{itemize}
+        \item Teammates: $\operatorname{listSeeking}(user,course)\setminus\{user\}$ (students looking for a team), matched on their student profiles.
+        \item Teams: $\operatorname{listTeams}(user,course,\text{Recruiting})$ without the user's own team, matched on their team profiles.
+        \item Projects: $\operatorname{listProjects}(user,course,\epsilon,\{\text{Open}\},\text{title})$, matched on their fields.
+    \end{itemize}
+    Then $out$ is a list such that:
+    \[
+    \begin{aligned}
+    &out\text{ contains only elements of }C,\text{ each at most once},\quad|out|\le k,\\
+    &\forall c\in out:\operatorname{match}(\mathit{seeker},c)>0,\\
+    &out\text{ is ordered from highest to lowest }\operatorname{match}(\mathit{seeker},c),\text{ ties by identifier},\\
+    &|out|=\min\left(k,\ |\{c\in C\mid\operatorname{match}(\mathit{seeker},c)>0\}|\right).
+    \end{aligned}
+    \]
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+        \item NoProfile if the user has no team and no student profile.
+        \item InvalidTarget if $target$ is not Teammates, Teams, or Projects.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[match(x: Value, c: Value): {$[0,1]$}] Returns how well candidate $c$ fits the seeker $x$, where 0 means no match. It is based on shared skills, interests, experience, and project preferences, and depends only on the profile or project information of its arguments, so equal inputs always give equal results. This function is the secret of the module. Changing the matching method changes only this function.
+\end{description}
+
+\newpage
+
+\section[MIS of Approval Workflow Module]{MIS of Approval Workflow Module (\moduleid{M_ApprovalWorkflow})}
+\label{M_ApprovalWorkflow}
+
+\subsection{Module}
+
+This module runs each course's approval of team projects, in the course's approval mode (set in the course settings). In mode InPlatform, it checks a team's submission before it is sent, holds it for review, and records the decision of an instructor or TA, and it handles changes to approved projects while keeping the existing approval in force until the change is accepted. In mode External, it records the outcome that an instructor or TA enters by hand. In mode Integrated, it reads the outcome from the course's external approval system through an adapter and shows when the last read succeeded. In every mode it updates the team-project status through M\_Projects.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_HardwareHiding
+    \item M\_Authorization
+    \item M\_CourseManagement
+    \item M\_Projects
+    \item M\_StudentsTeams
+    \item M\_Notifications
+    \item M\_Persistence
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{submit} & user: User, application: ProjectApplication, content: FieldValues, revision: bool & ApprovalRequest & Unauthorized, FeatureDisabled, WrongMode, InvalidStatus, RequestActive, PreflightFailed \\
+\texttt{recordDecision} & user: User, application: ProjectApplication, decision: Action, comment: String & -- & Unauthorized, FeatureDisabled, WrongMode, InvalidStatus, InvalidDecision \\
+\texttt{synchronize} & application: ProjectApplication & -- & WrongMode, InvalidStatus, ExternalServiceError \\
+\texttt{getApprovedContent} & user: User, application: ProjectApplication & FieldValues$^{?}$ & Unauthorized \\
+\texttt{getSyncStatus} & user: User, course: Course & SyncStatus & Unauthorized \\
+\bottomrule
+\caption{Exported access programs of the Approval Workflow module}
+\label{TblApprovalWorkflowAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{requests}:\operatorname{Map}\langle\text{String},\text{ApprovalRequest}\rangle$ - in-platform approval requests indexed by identifier, initially loaded from M\_Persistence.
+
+    \item $\mathit{approved}:\operatorname{Map}\langle\text{String},\text{FieldValues}\rangle$ - the approved content currently in force, indexed by application identifier, initially loaded from M\_Persistence.
+
+    \item $\mathit{syncStatus}:\operatorname{Map}\langle\text{Course},\text{SyncStatus}\rangle$ - the latest read of each Integrated course's external system, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+The external approval system of a course (for example GitLab), reached through the adapter named in the course settings over server network connections (through M\_HardwareHiding), the system clock, and persistent request and approval records.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Users are authenticated through M\_Authentication before any routine is called.
+    \item A routine whose transaction fails to commit in M\_Persistence (ConflictDetected or PersistenceFailure) changes nothing and passes the exception on to its caller, who may repeat the action from a fresh read.
+    \item The caller has re-verified the user, as required by \srsref{FR_ReverifyUsers}, before calling \texttt{recordDecision}.
+    \item The course settings hold \texttt{approvalMode} (ApprovalMode), \texttt{externalAdapter} (used only in mode Integrated), and \texttt{submissionRequirements} ($\operatorname{Map}\langle\text{String},\text{bool}\rangle$, the course's submission items, each mapped to true if required). They are read with $\operatorname{getSettings}$ and changed only through M\_CourseManagement. $\mathit{mode}_c$ denotes the \texttt{approvalMode} setting of course $c$.
+    \item In modes External and Integrated the team submits to the external system, so \texttt{submit} is available only in mode InPlatform. Changes to an approved project in the other modes are reviewed outside Keystone and have no request here.
+    \item A decision is made by a person (an instructor or TA, as \texttt{hasAccess} decides), never automatically. In mode Integrated the adapter only reads a decision that a person made in the external system.
+    \item \texttt{synchronize} is called only by a trusted scheduled job of Keystone.
+    \item $\operatorname{notify}(type,subject)$ stands for the call $\operatorname{notify}(e,\mathit{candidates},tx)$ of M\_Notifications, where $e$ is the Event of EventType $type$ for $subject$ (with its course and a summary of what happened), $\mathit{candidates}$ is the set of users connected to $subject$ (the members of the team concerned, its supervisor, and the course's instructors and TAs), and $tx$ is the transaction of the calling routine. M\_Notifications decides which candidates are notified.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{submit(user, application, content, revision)}}
+\begin{itemize}
+    \item transition: Let $c$ be the course of the application's project, and $kind=\text{Revision}$ if $revision$ else Initial. If
+    \[
+    \begin{aligned}
+    &\operatorname{hasAccess}(user,c,\text{Submit},application)=\text{true}
+    \land\operatorname{isFeatureEnabled}(user,c,\text{ProjectApprovals})=\text{true}
+    \land\mathit{mode}_c=\text{InPlatform}\\
+    &\land application.status\in\begin{cases}\{\text{Approved}\}, & revision,\\\{\text{Agreed},\text{TeamProjectChangesRequested}\}, & \neg revision,\end{cases}\\
+    &\land\text{no active request exists for }application
+    \land\operatorname{preflight}(user,application,content,kind)=\emptyset,
+    \end{aligned}
+    \]
+    create a request $r$ with $r.application=application$, $r.content=content$, $r.kind=kind$, $r.status=\text{TeamProjectUnderReview}$, and $r.comment=\epsilon$:
+    \[
+    \mathit{requests}'=\mathit{requests}\cup\{r.id\mapsto r\}.
+    \]
+    A request is \emph{active} while its status is TeamProjectUnderReview. For an Initial request, call $\operatorname{updateApplicationStatus}$ with TeamProjectSubmitted and then with TeamProjectUnderReview (the checks have passed, so the submission is forwarded for review). For a Revision request, call it once with ApprovedChangeUnderReview, and $\mathit{approved}[application.id]$ is not changed. Call $\operatorname{recordPendingWork}(c,\text{ProjectApprovals},r.id,\text{true})$ and $\operatorname{notify}(\text{StatusChanged},r)$. All changes are saved in one transaction and audited.
+    \item output: $out=r$.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,c,\text{Submit},application)=\text{false}$.
+        \item FeatureDisabled if ProjectApprovals is not enabled in the course.
+        \item WrongMode if $\mathit{mode}_c\ne\text{InPlatform}$.
+        \item InvalidStatus if the application's status does not allow the submission.
+        \item RequestActive if the application already has an active request.
+        \item PreflightFailed if $\operatorname{preflight}$ finds problems. The exception lists the missing or invalid items and the rules the team breaks, and nothing is sent to the reviewers.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{recordDecision(user, application, decision, comment)}}
+\begin{itemize}
+    \item transition: Let $c$ be the course of the application's project. If $\mathit{mode}_c\in\{\text{InPlatform},\text{External}\}$, $\operatorname{isFeatureEnabled}(user,c,\text{ProjectApprovals})=\text{true}$, $decision\in\{\text{Approve},\text{Reject},\text{RequestChanges}\}$, and $\operatorname{hasAccess}(user,c,decision,application)=\text{true}$:
+    \begin{itemize}
+        \item InPlatform, when the application has an active request $r$: $\operatorname{finalize}(r,decision,comment)$.
+        \item External, when $application.status\in\{\text{Agreed},\text{TeamProjectSubmitted},\text{TeamProjectUnderReview},\text{TeamProjectChangesRequested}\}$: $\operatorname{applyOutcome}(application,decision,comment)$. This records the outcome of the course's external process by hand.
+    \end{itemize}
+    \item output: None.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,c,decision,application)=\text{false}$.
+        \item FeatureDisabled if ProjectApprovals is not enabled in the course.
+        \item WrongMode if $\mathit{mode}_c=\text{Integrated}$ (decisions come from the external system).
+        \item InvalidStatus if no request is active (InPlatform) or the application's status is not one of those listed (External).
+        \item InvalidDecision if $decision$ is not Approve, Reject, or RequestChanges.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{synchronize(application)}}
+\begin{itemize}
+    \item transition: Let $c$ be the course of the application's project. If $\mathit{mode}_c=\text{Integrated}$ and $application.status\in\{\text{Agreed},\text{TeamProjectSubmitted},\text{TeamProjectUnderReview},\text{TeamProjectChangesRequested}\}$, let $(d,m)$ be the decision (None if none has been made yet) and the comment that the course's external system returns, through the adapter named in the course settings, for the team's project. On success, $\mathit{syncStatus}'[c]=(\mathit{now},\text{false})$, and if $d\ne\text{None}$ then $\operatorname{applyOutcome}(application,d,m)$. If the adapter cannot be reached, $\mathit{syncStatus}'[c]=(\mathit{syncStatus}[c].lastSuccess,\text{true})$, the failure is audited, and $\operatorname{notify}(\text{ExternalProviderError},c)$ is called. The changes are saved in one transaction.
+    \item output: None.
+    \item exception:
+    \begin{itemize}
+        \item WrongMode if $\mathit{mode}_c\ne\text{Integrated}$.
+        \item InvalidStatus if the application's status is not one of those listed.
+        \item ExternalServiceError if the adapter cannot be reached (the failed state is still saved).
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{getApprovedContent(user, application)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,c,\text{Read},application)=\text{true}$, where $c$ is the course of the application's project:
+    \[
+    out=
+    \begin{cases}
+        \mathit{approved}[application.id], & application.id\in\operatorname{dom}(\mathit{approved}),\\
+        \text{None}, & \text{otherwise}.
+    \end{cases}
+    \]
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,c,\text{Read},application)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{getSyncStatus(user, course)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$:
+    \[
+    out=\mathit{syncStatus}[course],
+    \]
+    with $\mathit{lastSuccess}=\text{None}$ and $\mathit{failed}=\text{false}$ if no read has been made.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[preflight(user: User, application: ProjectApplication, content: FieldValues, kind: RequestKind): $\operatorname{Set}\langle\text{String}\rangle$] Returns the names of the problems found before a submission is sent, or the empty set if there are none. A problem is reported for each item marked required in the course's \texttt{submissionRequirements} that is missing or empty in $content$; for each rule in $\operatorname{validateTeam}(user,application.team)$; if the application's project is not Open or Full (it is not available); and, when $kind=\text{Initial}$, if the team has another application with status Approved or ApprovedChangeUnderReview (from $\operatorname{listApplications}(user,c,\text{None},application.team)$, where $c$ is the course of the application's project).
+    \item[applyOutcome(application: ProjectApplication, decision: Action, comment: String): --] For an application in status Agreed or TeamProjectChangesRequested, first calls $\operatorname{updateApplicationStatus}$ to TeamProjectSubmitted, and for TeamProjectSubmitted then to TeamProjectUnderReview. Then calls it once with Approved (Approve), TeamProjectRejected (Reject, which releases the team's slot), or TeamProjectChangesRequested (RequestChanges). Calls $\operatorname{notify}(\text{ApprovalDecision},application)$ with the comment and audits the change.
+    \item[finalize(request: ApprovalRequest, decision: Action, comment: String): --] Stores $comment$ and ends the request, with $p=request.application$ and $c$ the course of its project:
+    \begin{itemize}
+        \item Approve: $\mathit{requests}'[request.id].status=\text{Approved}$, $\mathit{approved}'=\mathit{approved}\oplus\{p.id\mapsto request.content\}$ (this replaces any earlier approval and is the only place an approval is replaced), and $\operatorname{updateApplicationStatus}(p,\text{Approved})$.
+        \item Reject: $\mathit{requests}'[request.id].status=\text{TeamProjectRejected}$. If $request.kind=\text{Initial}$, call $\operatorname{updateApplicationStatus}(p,\text{TeamProjectRejected})$, which releases the team's project slot. If $request.kind=\text{Revision}$, call $\operatorname{updateApplicationStatus}(p,\text{Approved})$ and $\mathit{approved}$ is unchanged.
+        \item RequestChanges: $\mathit{requests}'[request.id].status=\text{TeamProjectChangesRequested}$. If $request.kind=\text{Initial}$, call $\operatorname{updateApplicationStatus}(p,\text{TeamProjectChangesRequested})$, and the team keeps its slot. If $request.kind=\text{Revision}$, call $\operatorname{updateApplicationStatus}(p,\text{Approved})$ and $\mathit{approved}$ is unchanged.
+    \end{itemize}
+    In every case, call $\operatorname{recordPendingWork}(c,\text{ProjectApprovals},request.id,\text{false})$ and $\operatorname{notify}(\text{ApprovalDecision},request)$, and audit the change. Either all of these changes are saved or none are.
+\end{description}
+
+\newpage
+
+\section[MIS of Threads Module]{MIS of Threads Module (\moduleid{M_Threads})}
+\label{M_Threads}
+
+\subsection{Module}
+
+This module manages discussion threads attached to project proposals, project applications, and team formations. It creates a thread on a record that allows threads, adds replies, deletes threads, and lists the threads of a record, and it notifies the people involved of new threads and replies. Which kinds of records can have threads, and how many threads each record may have, are decided inside this module.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Authorization
+    \item M\_Projects
+    \item M\_StudentsTeams
+    \item M\_Notifications
+    \item M\_Persistence
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+                  >{\raggedright\arraybackslash}p{0.34\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}
+                  >{\raggedright\arraybackslash}p{0.16\textwidth}}
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+\midrule
+\endhead
+\endfoot
+\texttt{postToThread} & user: User, course: Course, thread: Thread$^{?}$, kind: ThreadTarget, target: Value, subject: String, content: String & Thread & Unauthorized, TargetNotAllowed, ThreadLimitReached, EmptyContent \\
+\texttt{deleteThread} & user: User, thread: Thread & -- & Unauthorized \\
+\texttt{getThreads} & user: User, course: Course, kind: ThreadTarget, target: Value & $\operatorname{List}\langle\text{Thread}\rangle$ & Unauthorized, TargetNotAllowed \\
+\bottomrule
+\caption{Exported access programs of the Threads module}
+\label{TblThreadsAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{threads}:\operatorname{Map}\langle\text{String},\text{Thread}\rangle$ - threads indexed by identifier, initially loaded from M\_Persistence.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+Persistent thread and reply records. M\_Persistence records when each thread and reply was written.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Users are authenticated through M\_Authentication before any routine is called.
+    \item A routine whose transaction fails to commit in M\_Persistence (ConflictDetected or PersistenceFailure) changes nothing and passes the exception on to its caller, who may repeat the action from a fresh read.
+    \item M\_Authorization enforces the SRS visibility rules through \texttt{hasAccess}, so a user can create, read, or reply to a thread only where the SRS allows.
+    \item The caller has re-verified the user, as required by \srsref{FR_ReverifyUsers}, before calling \texttt{deleteThread}.
+    \item The target passed in is a Project (for ProjectProposal), a ProjectApplication (for Application), or a Team (for Team). The module reads it again through $\operatorname{getProject}$, $\operatorname{listApplications}$, or $\operatorname{getTeam}$, so it works on the current record and only for a user who may read it.
+    \item $\operatorname{notify}(type,subject)$ stands for the call $\operatorname{notify}(e,\mathit{candidates},tx)$ of M\_Notifications, where $e$ is the Event of EventType $type$ for $subject$ (with its course and a summary of what happened), $\mathit{candidates}$ is the set of users connected to $subject$ (the thread's participants and the course's instructors and TAs), and $tx$ is the transaction of the calling routine. M\_Notifications decides which candidates are notified.
+\end{itemize}
+
+\subsubsection{Local Constants}
+
+$\mathit{threadLimit}:\operatorname{Map}\langle\text{ThreadTarget},\mathbb{N}\cup\{\text{None}\}\rangle$ is the number of threads each record of a kind may have, where None means no limit and 0 means the kind of record cannot have threads. It is fixed in this module and is currently
+\[
+\mathit{threadLimit}=\{\text{ProjectProposal}\mapsto\text{None},\ \text{Application}\mapsto 1,\ \text{Team}\mapsto\text{None}\}.
+\]
+These values, and the set of target kinds, are the secret of this module (see \srsref{LC_ThreadTargets} in the SRS).
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{postToThread(user, course, thread, kind, target, subject, content)}}
+\begin{itemize}
+    \item transition: If $content\ne\epsilon$, then:
+    \begin{itemize}
+        \item \emph{New thread} ($thread=\text{None}$): If $\operatorname{hasAccess}(user,course,\text{Create},\operatorname{current}(user,course,kind,target))=\text{true}$, $\mathit{threadLimit}[kind]\ne0$, $\operatorname{targetKind}(target)=kind$, and ($\mathit{threadLimit}[kind]=\text{None}$ or the number of threads $h\in\mathit{threads}$ with $h.kind=kind$ and $h.targetID=target.id$ is less than $\mathit{threadLimit}[kind]$), create a thread $h$ with $h.course=course$, $h.kind=kind$, $h.targetID=target.id$, $h.author=user$, $h.subject=subject$, $h.content=content$, and $h.replies$ empty, and set $\mathit{threads}'=\mathit{threads}\cup\{h.id\mapsto h\}$.
+        \item \emph{Reply} ($thread\ne\text{None}$): If $\operatorname{hasAccess}(user,thread.course,\text{SendMessage},thread)=\text{true}$, a reply with author $user$ and content $content$ is added at the end of $\mathit{threads}'[thread.id].replies$.
+    \end{itemize}
+    Call $\operatorname{notify}(\text{ThreadReply},h)$ for the thread $h$ concerned. Persist and audit the changes.
+    \item output: The thread created or replied to.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if the required $\operatorname{hasAccess}$ check is false.
+        \item TargetNotAllowed if $\mathit{threadLimit}[kind]=0$ or $\operatorname{targetKind}(target)\ne kind$ (new thread).
+        \item ThreadLimitReached if the target already has $\mathit{threadLimit}[kind]$ threads (new thread).
+        \item EmptyContent if $content=\epsilon$.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{deleteThread(user, thread)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,thread.course,\text{Delete},thread)=\text{true}$:
+    \[
+    \mathit{threads}'=\mathit{threads}\setminus\{thread.id\mapsto thread\}.
+    \]
+    Persist and audit the change.
+    \item output: None.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,thread.course,\text{Delete},thread)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{getThreads(user, course, kind, target)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},\operatorname{current}(user,course,kind,target))=\text{true}$ and $\operatorname{targetKind}(target)=kind$, the threads on the target that the user may read, in the order they were created:
+    \[
+    out=[h\mid h\in\mathit{threads},\ h.kind=kind\land h.targetID=target.id\land\operatorname{hasAccess}(user,course,\text{Read},h)].
+    \]
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},\operatorname{current}(user,course,kind,target))=\text{false}$.
+        \item TargetNotAllowed if $\operatorname{targetKind}(target)\ne kind$.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[current(user: User, course: Course, kind: ThreadTarget, target: Value): Value] Returns the current target record: $\operatorname{getProject}(user,target)$ for ProjectProposal, the application in $\operatorname{listApplications}(user,course,\text{None},\text{None})$ with the target's identifier for Application, and $\operatorname{getTeam}(user,course,target)$ for Team.
+    \item[targetKind(target: Value): ThreadTarget] Returns ProjectProposal if $target$ is a Project, Application if it is a ProjectApplication, and Team if it is a Team.
+\end{description}
+
+\newpage
+
 \section[MIS of Notifications Module]{MIS of Notifications Module (\moduleid{M_Notifications})}
 \label{M_Notifications}
 
@@ -2581,6 +3574,35 @@ graduate attribute of Problem Analysis and Design.
 
   You should create a PR for your implemented module.  A link to the PR should be part of your reflection.
 
+\end{enumerate}
+
+\textbf{Waqar: }
+\begin{enumerate}
+  \item What went well while writing this deliverable? 
+  One thing that went well was our ability to distribute the work quickly among team members. Everyone was able to take responsibility for different sections and work independently while communicating asynchronously. This allowed us to make consistent progress without needing everyone to be available at the same time. We also did a good job reviewing each other's work and ensuring that the different sections of the document were consistent.
+
+  \item What pain points did you experience during this deliverable, and how
+    did you resolve them?
+    One of the main challenges was ensuring that everyone had a consistent understanding of the design and how the different components would work together. Since we were working asynchronously, there were occasionally differences in how certain features or components were interpreted. We resolved this by communicating through our group chat, discussing uncertainties, and reviewing each other's contributions. This helped us stay aligned and avoid major inconsistencies.
+
+  \item Which of your design decisions stemmed from speaking to your client(s)
+  or a proxy (e.g. your peers, stakeholders, potential users)? For those that
+  were not, why, and where did they come from?
+    Some of our design decisions were influenced by feedback and discussions with our client and professor, particularly regarding the overall functionality and goals of the project. These discussions helped us better understand the expected user experience and prioritize important features. Other decisions were made internally by our team based on technical knowledge, research, and what we believed would provide the most effective and practical solution.
+
+  \item While creating the design doc, what parts of your other documents (e.g.
+  requirements, hazard analysis, etc), it any, needed to be changed, and why?
+    While creating the design document, we reviewed our previous documentation to ensure that everything remained consistent with our proposed design. Some requirements needed clarification or minor adjustments as we gained a better understanding of how certain features would be implemented. We also considered whether our design introduced any new risks that needed to be reflected in the hazard analysis. These changes helped ensure that our documentation accurately represented the current direction of the project.
+
+  \item What are the limitations of your solution?  Put another way, given
+  unlimited resources, what could you do to make the project better? (LO\_ProbSolutions)
+    One limitation of our solution is that, due to time and resource constraints, we cannot implement every feature or improvement we would ideally like to include. Given unlimited resources, we could conduct more extensive user testing, improve the overall user interface, optimize performance, and introduce additional functionality based on user feedback. We could also improve the scalability of the system to better support a larger number of users and projects. This would allow us to create a more complete and polished solution.
+
+  \item Give a brief overview of other design solutions you considered.  What
+  are the benefits and tradeoffs of those other designs compared with the chosen
+  design?  From all the potential options, why did you select the documented design?
+  (LO\_Explores)
+    We considered different approaches to structuring the system and implementing its functionality. Some alternatives involved using simpler architectures that would be easier and faster to develop but could become difficult to maintain as the project grows. Other approaches offered greater flexibility and scalability but introduced additional complexity and development time. We ultimately selected our documented design because it provided a reasonable balance between maintainability, scalability, complexity, and the resources available to our team.
 \end{enumerate}
 
 \end{document}
