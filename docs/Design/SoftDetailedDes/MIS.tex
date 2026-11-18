@@ -20,6 +20,7 @@
 \usepackage{caption}
 \usepackage{fullpage}
 \usepackage{parskip}
+\usepackage[margin=0.75in]{geometry}
 
 \hypersetup{
 bookmarks=true,     % show bookmarks bar?
@@ -62,7 +63,7 @@ urlcolor=cyan          % color of external links
 \begin{tabularx}{\textwidth}{p{3cm}p{2cm}X}
 \toprule {\bf Date} & {\bf Version} & {\bf Notes}\\
 \midrule
-Date 1 & 1.0 & Notes\\
+Nov 16th 2026 & 1.0 & Added MIS for Modules: Checklists, Notifications, Audit Log, Persistence and Course Reports\\
 Date 2 & 1.1 & Notes\\
 \bottomrule
 \end{tabularx}
@@ -126,13 +127,23 @@ $M\cup\{k\mapsto v\}$ & Adds a new key-value pair to mapping $M$. \\
 $M\setminus\{k\mapsto v\}$ & Removes a key-value pair from mapping $M$. \\
 $M\oplus\{k\mapsto v\}$ & Adds or replaces the value associated with key $k$ in mapping $M$. \\
 -- & No input, program return value, or exported exception, according to column. \\
+$T^{?}$ & Shorthand for $T\cup\{\text{None}\}$, an optional value. \\
+$L \mathbin{+\!\!+} L'$ & Concatenation of lists $L$ and $L'$. \\
+$\mathit{now}$ & Current time supplied by the environment. \\
 \bottomrule
 \end{tabularx}
 \caption{Notation used in the module specifications}
 \label{TblNotation}
 \end{table}
 
-A transition describes the post-state of a successful call. State variables not mentioned remain unchanged. Unless stated otherwise, an exported exception leaves module state unchanged and produces no normal output. Output denotes a program return value, effects on the screen and other external resources are stated separately.
+A transition describes the post-state of a successful call.
+State variables not mentioned remain unchanged.
+Unless stated otherwise, an exported exception leaves module state unchanged and produces no normal output.
+Output denotes a program return value, effects on the screen and other external resources are stated separately.
+
+Where a transition says to persist and audit a change, the persisted changes and
+the audit entry are staged in one \texttt{M\_Persistence} transaction
+(\texttt{beginTransaction}, \texttt{stage}, \texttt{commit}), so either both are saved or neither is.
 
 \newpage
 
@@ -196,6 +207,7 @@ The following data types are shared across the Keystone modules.
     \item AddMember, RemoveMember, LeaveTeam, DissolveTeam: Manage team membership.
     \item ChangeCredentials, ChangeEmail, LinkAuthentication, ChangeCourseAssociation: Change account credentials, email, linked sign-in, or course association.
     \item SendMessage, ViewReport: Send a discussion message or view a course report.
+    \item Backup, Restore, ViewAuditLog: Create or restore a backup of the stored records, or read the audit log
 \end{enumerate}
 
 \subsubsection{AuthProvider}
@@ -272,13 +284,49 @@ The following data types are shared across the Keystone modules.
     \item Integrated: Approval is synchronized through an external adapter.
 \end{enumerate}
 
+\subsubsection{RecordType}
+\begin{enumerate}
+    \item User, Course, StudentProfile, Team, TeamProfile, Project, ProjectApplication,
+    Thread, CourseResource, Enrollment, Notification, AuditEntry, ChecklistItem: The kinds of record that Keystone stores.
+\end{enumerate}
+
+\subsubsection{EventType}
+\begin{enumerate}
+    \item NewProjectListed, ProposalDecision, ApplicationDecision, AgreementReached,
+    StatusChanged, ThreadReply, ApprovalDecision: Events caused by user actions that notify the users involved.
+    \item DeadlineReminder: A required action is due soon.
+    \item ExternalProviderError: An external service failed.
+    \item AuditIntegrityAlert: The audit log failed an integrity check.
+\end{enumerate}
+
+\subsubsection{DeliveryStatus}
+\begin{enumerate}
+    \item Pending: Stored and not yet delivered. Delivery will be retried.
+    \item Sent: Delivery was confirmed.
+    \item Failed: The maximum number of delivery attempts was reached.
+    \item Suppressed: The recipient was no longer authorized to see the subject when delivery was attempted.
+\end{enumerate}
+
+\subsubsection{ChecklistStatus}
+\begin{enumerate}
+    \item ToDo, InProgress, Done: Completion state of a required action.
+\end{enumerate}
+
+\subsubsection{IntegrityProblem}
+\begin{enumerate}
+    \item EntryModified: An audit entry no longer matches its integrity seal.
+    \item EntryMissing: An audit entry was removed from the sequence.
+    \item ChainBroken: The sequence of integrity seals is inconsistent.
+    \item StorageMissing: The audit log storage is absent.
+\end{enumerate}
+
+\subsubsection{CompositionIssueKind}
+\begin{enumerate}
+    \item StudentNotOnTeam, StudentOnMultipleTeams, TeamWithoutProject,
+    TeamWithoutSupervisor: Problems found when validating team composition.
+\end{enumerate}
+
 \subsection{Data Structures}
-
-\subsubsection{Dictionary}
-For types $K$ and $V$, a finite mapping from keys of type $K$ to values of type $V$, written $\operatorname{Map}\langle K,V\rangle$.
-
-\subsubsection{List}
-For any type $T$, an ordered collection of elements of type $T$.
 
 \subsubsection{CourseResource}
 A course document or link with an identifier, course association, and publication status.
@@ -310,6 +358,81 @@ A record containing the proposed enrollment additions, existing matches, student
 \subsubsection{ImportID}
 A unique string identifying a pending enrollment import.
 
+\subsubsection{SystemActor}
+A distinguished \texttt{User} that represents scheduled system work.
+It cannot sign in, and \texttt{M\_Authorization} gives it only the Read and ViewReport actions on course data.
+
+\subsubsection{RecordRef}
+A pair (type: RecordType, id: String) that identifies one stored record.
+
+\subsubsection{Version}
+A natural number that is 1 when a record is first saved and increases by one every time the record is changed.
+
+\subsubsection{StoredRecord}
+A record (ref: RecordRef, version: Version, values: FieldValues, updatedAt: DateTime).
+\texttt{updatedAt} is set by \texttt{M\_Persistence} each time the record is saved.
+
+\subsubsection{Change}
+A record (kind, ref: RecordRef, values: FieldValues, expectedVersion: Version$^{?}$),
+where kind is Insert, Update, or Remove. If \textit{expectedVersion} is present,
+the change is applied only if the stored record still has that version.
+
+\subsubsection{ChangeSet}
+A record (changes: List$\langle$Change$\rangle$, guards: $\operatorname{Map}\langle$RecordRef, Version$\rangle$).
+The guards name records that were read but are not changed, and the change set is applied only
+if every guarded record still has the given version.
+
+\subsubsection{TransactionID}
+A string that identifies a transaction that has been started and has not yet been committed or rolled back.
+
+\subsubsection{BackupID}
+A string that uniquely identifies a backup.
+
+\subsubsection{BackupInfo}
+A record (id: BackupID, createdAt: DateTime, usable: bool).
+
+\subsubsection{RestoreResult}
+A record (backup: BackupID, createdAt: DateTime, windowMet: bool).
+\textit{windowMet} is true when the restored state is no older than the recovery point window.
+
+\subsubsection{ChangeDetails}
+A record (before: FieldValues, after: FieldValues, note: String). It holds the values changed by an action,
+such as an approval decision, a status change, or a role change, or the description of an error.
+It excludes sensitive information.
+
+\subsubsection{AuditEntry}
+A record (id: String, time: DateTime, actor: UserID$^{?}$, role: UserRole$^{?}$,
+action: Action$^{?}$, entityType: RecordType$^{?}$, entityID: String$^{?}$,
+service: String$^{?}$, details: ChangeDetails). Entries of user actions have an actor, a role, and an action.
+Entries of external-service errors have a service and no actor.
+
+\subsubsection{AuditFilter}
+A record of optional criteria (actor, action, entityType, entityID, from, to, externalErrorsOnly: bool).
+
+\subsubsection{IntegrityViolation}
+A record (problem: IntegrityProblem, entryID: String$^{?}$).
+
+\subsubsection{Event}
+A record (type: EventType, course: Course, subject: RecordRef, summary: String).
+The summary states what happened and contains no confidential, IP, or profile fields.
+
+\subsubsection{NotificationID}
+A string that uniquely identifies one notification to one recipient.
+
+\subsubsection{ReportRow}
+A record (course: Course, project: Project, projectStatus: ProjectStatus, team:
+Team$^{?}$, members: List$\langle$User$\rangle$, supervisor: User$^{?}$, ta: User$^{?}$,
+teamProjectStatus: TeamProjectStatus$^{?}$).
+
+\subsubsection{ReportFilter}
+A record of optional criteria (projectStatus, teamProjectStatus, supervisor).
+
+\subsubsection{CompositionIssue}
+A record (kind: CompositionIssueKind, subject: RecordRef).
+
+\subsubsection{ReportFile}
+A downloadable document containing report rows. Its format is hidden by \texttt{M\_CourseReport}.
+
 \subsubsection{ViewData}
 The record or collection supplied by the owning module to populate a view, with fields and types defined in that module's specification.
 
@@ -335,10 +458,11 @@ A record containing project information, supervisor capacity, course association
 A record representing a team's application to a project, including the associated TeamProjectStatus.
 
 \subsubsection{Notification}
-A record containing information about an event or action communicated to a user.
+A record (id: NotificationID, recipient: User, event: Event, status: DeliveryStatus, attempts: natural number).
 
 \subsubsection{ChecklistItem}
-A record describing a required user action and its completion status.
+A record (name: String, dueDate: DateTime$^{?}$, status: ChecklistStatus, target: RecordRef).
+It describes a required action and is derived from current records, never stored.
 
 \subsubsection{Thread}
 A record representing a discussion associated with a project proposal or team.
@@ -847,7 +971,8 @@ Persistent user roles, course associations, supervisor verification records, and
 \begin{itemize}
     \item User identities are authenticated through M\_Authentication before authorization checks.
 
-    \item Access decisions follow the role permissions and visibility requirements defined in the SRS.
+    \item Access decisions follow the role permissions and visibility requirements defined in the SRS
+    (see SRS tables \srsref{TAB-Visibility} and \srsref{TAB-ExternalAccess}).
 
     \item The requesting module authenticates the actor and completes any required re-verification before requesting a role change.
 \end{itemize}
@@ -1474,6 +1599,810 @@ Avenue to Learn, uploaded enrollment files, persistent enrollment records, and s
 
 \newpage
 
+\section[MIS of Notifications Module]{MIS of Notifications Module (\moduleid{M_Notifications})}
+\label{M_Notifications}
+
+\subsection{Module}
+
+This module notifies users of events by email.
+It stores each notification before delivery, checks the recipient's access at delivery time,
+retries undelivered notifications, and ensures each notification is delivered at most once.
+It also reports external-provider errors and alerts the operator when the audit log fails an integrity check.
+It does not decide when events occur or when reminders are due, callers request notifications through \texttt{notify}.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_HardwareHiding
+    \item M\_Authorization
+    \item M\_Persistence
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+\begin{itemize}
+    \item $\mathit{MaxDeliveryAttempts}=5$
+\end{itemize}
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.25\textwidth}
+        >{\raggedright\arraybackslash}p{0.33\textwidth}
+        >{\raggedright\arraybackslash}p{0.22\textwidth}
+        >{\raggedright\arraybackslash}p{0.10\textwidth}}
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endhead
+    \endfoot
+    \texttt{notify} & event: Event, candidates: $\operatorname{Set}\langle\text{User}\rangle$, tx: TransactionID$^{?}$ & -- & InvalidTransaction \\
+    \texttt{processOutbox} & -- & -- & -- \\
+    \texttt{notifyExternalErrors} & instructors: $\operatorname{Set}\langle\text{User}\rangle$ & -- & -- \\
+    \texttt{checkAuditIntegrity} & -- & $\operatorname{List}\langle\text{IntegrityViolation}\rangle$ & -- \\
+    \texttt{getNotifications} & user: User & $\operatorname{List}\langle\text{Notification}\rangle$ & -- \\
+    \bottomrule
+    \caption{Exported access programs of the Notifications module}
+    \label{TblNotificationsAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{outbox}:\operatorname{Map}\langle\text{NotificationID},\text{Notification}\rangle$ -
+    every notification and its delivery status, initially loaded from M\_Persistence.
+    \item $\mathit{lastErrorReport}:\text{DateTime}$ - time of the newest external-provider error already reported,
+    initially loaded from M\_Persistence.
+    \item $\mathit{integrityAlerted}:\text{bool}$ - true while an integrity alert has been sent and the log has
+    not yet passed a check, initially false.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+The email service, the operator email address, and persistent notification records.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item State variables are loaded from M\_Persistence at system start, before any access program is called.
+    \item The request-handling layer calls \texttt{notify} with the transaction of the triggering action before
+    that transaction is committed, and supplies as candidates the users associated with the subject.
+    The module does not trust this set. It re-checks access at delivery time.
+    \item A trusted scheduler calls \texttt{processOutbox}, \texttt{notifyExternalErrors}, and \texttt{checkAuditIntegrity}
+    periodically, as SystemActor.
+    \item The email service discards repeated deliveries that carry the same NotificationID.
+    \item The caller supplies instructors for \texttt{notifyExternalErrors}.
+    The message contains only a summary and a link, so no per-record access check is needed.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{notify(event, candidates, tx)}}
+\begin{itemize}
+    \item transition: For every $u\in candidates$ for which $\mathit{outbox}$ holds no notification with
+    the same event type, subject, and recipient $u$, create a notification $n$ with a fresh identifier,
+    recipient $u$, event $event$, status Pending, and 0 attempts:
+    \[
+        \mathit{outbox}'=\mathit{outbox}\cup\{n.id\mapsto n\}.
+    \]
+    \begin{itemize}
+        \item If $tx\ne\text{None}$, the notifications are staged in $tx$ and take effect only if $tx$ commits.
+        If $tx$ is rolled back or fails to commit, no notification is added.
+        \item If $tx=\text{None}$, the notifications are saved in their own transaction.
+    \end{itemize}
+    No delivery is attempted by this routine.
+    \item output: None.
+    \item exception: InvalidTransaction if $tx\ne\text{None}$ and $tx$ is not an open transaction.
+\end{itemize}
+
+\paragraph{\texttt{processOutbox()}}
+\begin{itemize}
+    \item transition: For every $n\in\mathit{outbox}$ with $n.status=\text{Pending}$:
+    \begin{itemize}
+        \item If $\neg\operatorname{hasAccess}(n.recipient,n.event.course,\text{Read},n.event.subject)$,
+        then $n.status'=\text{Suppressed}$ and nothing is delivered.
+        \item Otherwise, deliver a message to the recipient containing only $n.event.summary$ and a link to the subject,
+        identified by $n.id$.
+        \begin{itemize}
+            \item If delivery is confirmed, $n.status'=\text{Sent}$.
+            \item Otherwise $n.attempts'=n.attempts+1$, and if $n.attempts'=\mathit{MaxDeliveryAttempts}$
+            then $n.status'=\text{Failed}$ and the failure is recorded with \texttt{recordExternalError} in M\_AuditLog.
+        \end{itemize}
+    \end{itemize}
+    A notification that is Sent, Failed, or Suppressed is never delivered again, and a notification remains stored
+    until it reaches one of these states. Changes are saved through M\_Persistence.
+    \item output: None.
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{notifyExternalErrors(instructors)}}
+\begin{itemize}
+    \item transition: Let $E$ be the external-error entries returned by \texttt{getEntries}
+    in M\_AuditLog with time later than $\mathit{lastErrorReport}$. If $E\ne\emptyset$,
+    send a summary message to the operator email address and call \texttt{notify} with $tx=\text{None}$ for every $u\in instructors$ with an
+    ExternalProviderError event, then set $\mathit{lastErrorReport}'$ to the time of the newest entry in $E$ and persist it.
+    \item output: None.
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{checkAuditIntegrity()}}
+\begin{itemize}
+    \item transition: Let $V=\operatorname{verifyIntegrity}()$ from M\_AuditLog.
+    \[
+        \begin{aligned}
+            V\ne\emptyset\land\neg\mathit{integrityAlerted}&\Rightarrow \text{an alert identifying the problems is sent directly to the operator email address}\land\mathit{integrityAlerted}'=\text{true},\\
+            V=\emptyset&\Rightarrow\mathit{integrityAlerted}'=\text{false}.
+        \end{aligned}
+    \]
+    The alert is sent directly and not through the outbox, because the outbox shares storage with the log
+    that may have been tampered with.
+    \item output: $out=V$.
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{getNotifications(user)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: $out=[n\mid n\in\operatorname{ran}(\mathit{outbox})\land n.recipient=user]$, in every status.
+    A user can read only their own notifications, which lets the checklist show notifications whose email failed.
+    \item exception: None.
+\end{itemize}
+
+\subsubsection{Local Functions}
+None.
+
+\newpage
+
+\section[MIS of Checklist Module]{MIS of Checklist Module (\moduleid{M_Checklist})}
+\label{M_Checklist}
+
+\subsection{Module}
+
+This module determines each user's required actions and whether each one is done.
+Completion is derived from the current records and is never stored, so a checklist item is complete as soon as the underlying action has happened.
+It also reminds users of required actions that are due soon, by asking M\_Notifications to notify them.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Authorization
+    \item M\_CourseManagement
+    \item M\_Enrollment
+    \item M\_StudentsTeams
+    \item M\_Projects
+    \item M\_ApprovalWorkflow
+    \item M\_Notifications
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+\begin{itemize}
+    \item $\mathit{ReminderLeadDays}=3$
+\end{itemize}
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}
+        >{\raggedright\arraybackslash}p{0.28\textwidth}
+        >{\raggedright\arraybackslash}p{0.28\textwidth}
+        >{\raggedright\arraybackslash}p{0.12\textwidth}}
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endhead
+    \endfoot
+    \texttt{getChecklist} & user: User, course: Course & $\operatorname{List}\langle\text{ChecklistItem}\rangle$ & Unauthorized \\
+    \texttt{sendReminders} & user: User, course: Course, now: DateTime & -- & Unauthorized \\
+    \bottomrule
+    \caption{Exported access programs of the Checklist module}
+    \label{TblChecklistAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+None.
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item The course setting \texttt{deadlines}, read through M\_CourseManagement,
+    maps a required action's name to its due date. An action with no entry has no due date.
+    \item The records that determine completion are read through the access programs
+    of M\_Enrollment, M\_StudentsTeams, M\_Projects, and M\_ApprovalWorkflow.
+    \item An internal trusted scheduler calls \texttt{sendReminders} periodically, as SystemActor.
+    \item The course setting \texttt{remindersEnabled}, read through M\_CourseManagement,
+    states whether reminders are sent for the course.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{getChecklist(user, course)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{true}$:
+    \[
+        out=[\operatorname{itemFor}(user,course,a)\mid a\in\operatorname{requiredActions}(\operatorname{getRole}(user,course),course)].
+    \]
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{Read},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{sendReminders(user, course, now)}}
+\begin{itemize}
+    \item transition: If $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{true}$ and
+    $\operatorname{getSettings}(user,course)[\texttt{remindersEnabled}]$ is true, then for every $(u,i)\in\operatorname{dueItems}(course,now)$
+    call $\operatorname{notify}(e,\{u\},\text{None})$ in M\_Notifications, where $e$ is an event of type DeadlineReminder for $i.target$ in $course$
+    whose summary names the action and its due date. No state of this module changes.
+    \item output: None.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{false}$.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[requiredActions(role: UserRole, course: Course): List] The required actions of a role in a course,
+    for example a student completing a profile and submitting the team project,
+    a supervisor completing a proposal, and an instructor or TA reviewing submissions that await a decision.
+    \item[itemFor(user: User, course: Course, action: String): ChecklistItem] The item
+    $(action,\ dueDate,\ status,\ target)$. The status is Done if the ``Done when'' condition of the
+    action in Table~\ref{TblRequiredActions} holds, otherwise InProgress if its ``InProgress when'' condition holds,
+    otherwise ToDo. The due date is the entry for the action in the \texttt{deadlines} setting, if any.
+    The target is the record the action concerns.
+    \item[dueItems(course: Course, now: DateTime): $\operatorname{Set}\langle(\text{User},\text{ChecklistItem})\rangle$]
+    The pairs $(u,i)$ such that $u\in\operatorname{participants}(course)$, $i=\operatorname{itemFor}(u,course,a)$ for
+    some $a\in\operatorname{requiredActions}(\operatorname{getRole}(u,course),course)$, $i.status\ne\text{Done}$, $i.dueDate\ne\text{None}$,
+    and $now\le i.dueDate\le now+\mathit{ReminderLeadDays}$ days.
+\end{description}
+
+
+\begingroup
+\small
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.19\textwidth}
+                  >{\raggedright\arraybackslash}p{0.10\textwidth}
+                  >{\raggedright\arraybackslash}p{0.12\textwidth}
+                  >{\raggedright\arraybackslash}p{0.29\textwidth}
+                  >{\raggedright\arraybackslash}p{0.22\textwidth}}
+\toprule
+\textbf{Action} & \textbf{Role} & \textbf{Feature} & \textbf{Done when} & \textbf{InProgress when} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{Action} & \textbf{Role} & \textbf{Feature} & \textbf{Done when} & \textbf{InProgress when} \\
+\midrule
+\endhead
+\endfoot
+Complete student profile & Student & -- & the student has a student profile & -- \\
+Join a team & Student & TeamFormation & the student is on a team & -- \\
+Submit team project for approval & Student & ProjectApprovals & the team's status is Team project submitted, Team project under review, Approved, or Approved (change under review) & the team's status is Agreed or Team project changes requested \\
+Submit a project proposal & Supervisor & ProjectProposals & the supervisor has a proposal whose status is not Draft or Proposal changes requested & the supervisor has a proposal in Draft or Proposal changes requested \\
+Respond to team applications & Supervisor & -- & no application to the supervisor's projects has status Applied or Team Accepts - Supervisor Pending & -- \\
+Review project proposals & Instructor & ProjectProposals & no project in the course has status Proposal submitted & -- \\
+Review team project submissions & Instructor, TA & ProjectApprovals & no team in the course has status Team project submitted or Team project under review & -- \\
+Resolve enrollment discrepancies & Instructor, TA & -- & no student of the course has status Flagged & -- \\
+\bottomrule
+\caption{Required actions and how their status is determined}
+\label{TblRequiredActions}
+\end{longtable}
+\endgroup
+
+
+\newpage
+
+\section[MIS of Course Report Module]{MIS of Course Report Module (\moduleid{M_CourseReport})}
+\label{M_CourseReport}
+
+\subsection{Module}
+
+This module gives instructors and TAs an overview of projects, teams, supervisors, and their status,
+identifies unselected projects, validates team composition, and exports a course report.
+The format of the exported report is hidden by this module.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_Authorization
+    \item M\_Enrollment
+    \item M\_Projects
+    \item M\_StudentsTeams
+    \item M\_ApprovalWorkflow
+    \item M\_AuditLog
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.24\textwidth}
+        >{\raggedright\arraybackslash}p{0.30\textwidth}
+        >{\raggedright\arraybackslash}p{0.26\textwidth}
+        >{\raggedright\arraybackslash}p{0.12\textwidth}}
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endhead
+    \endfoot
+    \texttt{getOverview} & user: User, courses: $\operatorname{Set}\langle\text{Course}\rangle$, filter: ReportFilter & $\operatorname{List}\langle\text{ReportRow}\rangle$ & Unauthorized \\
+    \texttt{getUnselectedProjects} & user: User, course: Course & $\operatorname{List}\langle\text{ReportRow}\rangle$ & Unauthorized \\
+    \texttt{validateTeamComposition} & user: User, course: Course & $\operatorname{List}\langle\text{CompositionIssue}\rangle$ & Unauthorized \\
+    \texttt{exportReport} & user: User, course: Course & ReportFile & Unauthorized, ValidationFailed \\
+    \bottomrule
+    \caption{Exported access programs of the Course Report module}
+    \label{TblCourseReportAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+None.
+
+\subsubsection{Environment Variables}
+None.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item The project, team, supervisor, TA, and approval records of a course are read through
+    the access programs of M\_Projects, M\_StudentsTeams, and M\_ApprovalWorkflow.
+    \item The report is generated from current records at the time of the function call.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{getOverview(user, courses, filter)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\forall c\in courses:\operatorname{hasAccess}(user,c,\text{ViewReport},c)$,
+    return the rows of all the courses that satisfy the filter:
+    \[
+        out=[r\mid c\in courses\land r\in\operatorname{rows}(c)\land\operatorname{matches}(r,filter)].
+    \]
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,c,\text{ViewReport},c)=\text{false}$
+    for any $c\in courses$. No rows are returned.
+\end{itemize}
+
+\paragraph{\texttt{getUnselectedProjects(user, course)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{true}$:
+    \[
+        out=[r\mid r\in\operatorname{rows}(course)\land r.projectStatus=\text{Closed}\land\neg\operatorname{hasApprovedTeam}(r.project)].
+    \]
+    Each row holds the project and its supervisor.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{validateTeamComposition(user, course)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{true}$, return one issue for each of the following:
+    \begin{itemize}
+        \item an enrolled student who is on no team (StudentNotOnTeam) or on more than one team (StudentOnMultipleTeams),
+        \item a team with no project (TeamWithoutProject) or no supervisor (TeamWithoutSupervisor).
+    \end{itemize}
+    The result is empty when the composition is valid.
+    \item exception: Unauthorized if $\operatorname{hasAccess}(user,course,\text{ViewReport},course)=\text{false}$.
+\end{itemize}
+
+\paragraph{\texttt{exportReport(user, course)}}
+\begin{itemize}
+    \item transition: If the export succeeds, record it in M\_AuditLog with the user's role and the Export action.
+    \item output: If $\operatorname{hasAccess}(user,course,\text{Export},course)=\text{true}$ and $\operatorname{validateTeamComposition}(user,course)=\emptyset$,
+    return a report containing the rows whose team-project status is Approved or Approved (change under review).
+    Each row lists the project title, the team members, and the supervisor.
+    \item exception:
+    \begin{itemize}
+        \item Unauthorized if $\operatorname{hasAccess}(user,course,\text{Export},course)=\text{false}$.
+        \item ValidationFailed if the team composition has any issue.
+        No report is produced and the caller can list the issues with \texttt{validateTeamComposition}.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[matches(row: ReportRow, filter: ReportFilter): bool] Returns true if the row satisfies every criterion present in the filter.
+    \item[hasApprovedTeam(project: Project): bool] Returns true if some team's status on the project is Approved or Approved (change under review).
+\end{description}
+
+\newpage
+
+\section[MIS of Persistence Module]{MIS of Persistence Module (\moduleid{M_Persistence})}
+\label{M_Persistence}
+
+\subsection{Module}
+
+This module stores, reads, and changes all of Keystone's records.
+It applies all changes made by one user action together, detects conflicting concurrent changes,
+keeps stored records encrypted, creates and restores backups, and removes personal data on request.
+How records are stored is its secret.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_HardwareHiding
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+\begin{itemize}
+    \item $\mathit{BackupInterval}=24$ hours
+    \item $\mathit{RecoveryPointWindow}=24$ hours
+\end{itemize}
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}
+        >{\raggedright\arraybackslash}p{0.30\textwidth}
+        >{\raggedright\arraybackslash}p{0.20\textwidth}
+        >{\raggedright\arraybackslash}p{0.20\textwidth}}
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endhead
+    \endfoot
+    \texttt{load} & ref: RecordRef & StoredRecord & RecordNotFound \\
+    \texttt{query} & type: RecordType, criteria: FieldValues & $\operatorname{List}\langle\text{StoredRecord}\rangle$ & -- \\
+    \texttt{beginTransaction} & -- & TransactionID & -- \\
+    \texttt{stage} & tx: TransactionID, changes: ChangeSet & -- & InvalidTransaction \\
+    \texttt{commit} & tx: TransactionID & -- & InvalidTransaction, ConflictDetected, PersistenceFailure \\
+    \texttt{rollback} & tx: TransactionID & -- & InvalidTransaction \\
+    \texttt{createBackup} & -- & BackupID & PersistenceFailure \\
+    \texttt{listBackups} & -- & $\operatorname{List}\langle\text{BackupInfo}\rangle$ & -- \\
+    \texttt{restoreBackup} & incident: DateTime, key: EncryptionKey & RestoreResult & NoBackupAvailable, InvalidKey \\
+    \texttt{purgePersonalData} & subject: UserID & -- & PersistenceFailure \\
+    \bottomrule
+    \caption{Exported access programs of the Persistence module}
+    \label{TblPersistenceAccessPrograms}
+\end{longtable}
+\endgroup
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+
+    \item $\mathit{store}:\operatorname{Map}\langle\text{RecordRef},\text{StoredRecord}\rangle$
+    - all stored records, initially the contents of the durable storage.
+    \item $\mathit{transactions}:\operatorname{Map}\langle\text{TransactionID},\text{ChangeSet}\rangle$ -
+    changes staged by transactions that are still open, initially $\emptyset$.
+    \item $\mathit{backups}:\operatorname{Map}\langle\text{BackupID},\text{BackupInfo}\rangle$
+    - catalogue of backups, initially loaded from the backup storage.
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+\begin{itemize}
+    \item Encryption key
+\end{itemize}
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item Callers hold no access to storage except through this module.
+    \item Callers authorize all users before making function calls to this module,
+    by checking $\operatorname{hasAccess}$ for the relevant action.
+    This module sits below \texttt{M\_Authorization} in the uses hierarchy and cannot check it.
+    \item Every record in the store and every backup is encrypted, and the key is never held in the store.
+\end{itemize}
+
+\subsubsection{Invariants}
+
+\begin{itemize}
+    \item At any time, $\mathit{store}$ equals the state produced by applying the committed change
+    sets one at a time in some order (serializability).
+    \item For every $r\in\operatorname{ran}(\mathit{store})$: $r.version\ge1$ and $r.updatedAt$ is the time of
+    the last committed change to $r$.
+    \item Stored records and backups cannot be read without the encryption key.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{load(ref)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: $ref\in\operatorname{dom}(\mathit{store})\Rightarrow out=\mathit{store}[ref]$.
+    \item exception: $ref\notin\operatorname{dom}(\mathit{store})\Rightarrow exc=\text{RecordNotFound}$.
+\end{itemize}
+
+\paragraph{\texttt{query(type, criteria)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: $out=[r\mid r\in\operatorname{ran}(\mathit{store})\land r.ref.type=type\land\forall k\in\operatorname{dom}(criteria):r.values[k]=criteria[k]]$.
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{beginTransaction()}}
+\begin{itemize}
+    \item transition: For a fresh identifier $t$, $\mathit{transactions}'=\mathit{transactions}\cup\{t\mapsto(\emptyset,\emptyset)\}$.
+    \item output: $out=t$.
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{stage(tx, changes)}}
+\begin{itemize}
+    \item transition: If $tx\in\operatorname{dom}(\mathit{transactions})$, the changes of $changes$ are appended
+    to those of $\mathit{transactions}[tx]$ and its guards are united with those of $changes$. $\mathit{store}$ is unchanged.
+    \item output: None.
+    \item exception: $tx\notin\operatorname{dom}(\mathit{transactions})\Rightarrow exc=\text{InvalidTransaction}$.
+\end{itemize}
+
+\paragraph{\texttt{commit(tx)}}
+\begin{itemize}
+    \item transition: Let $cs=\mathit{transactions}[tx]$. If $\operatorname{applicable}(cs)$, apply all changes of $cs$ together, in order:
+    \[
+        \begin{aligned}
+            \text{Insert}&:\ \mathit{store}'=\mathit{store}\oplus\{ref\mapsto(ref,1,values,\mathit{now})\},\\
+            \text{Update}&:\ \mathit{store}'[ref]=(ref,\mathit{store}[ref].version+1,\mathit{store}[ref].values\oplus values,\mathit{now}),\\
+            \text{Remove}&:\ \mathit{store}'=\mathit{store}\setminus\{ref\mapsto\mathit{store}[ref]\}.
+        \end{aligned}
+    \]
+    Either all changes are saved or none are. In both outcomes the transaction is closed:
+    $\mathit{transactions}'=\mathit{transactions}\setminus\{tx\mapsto cs\}$.
+    \item output: None.
+    \item exception:
+    \begin{itemize}
+        \item InvalidTransaction if $tx\notin\operatorname{dom}(\mathit{transactions})$.
+        \item ConflictDetected if $\neg\operatorname{applicable}(cs)$. The store is unchanged and the caller
+        should repeat the whole action from a fresh read.
+        \item PersistenceFailure if the changes cannot be saved. The store is unchanged.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{rollback(tx)}}
+\begin{itemize}
+    \item transition: If $tx\in\operatorname{dom}(\mathit{transactions})$, $\mathit{transactions}'=\mathit{transactions}\setminus\{tx\mapsto\mathit{transactions}[tx]\}$. $\mathit{store}$ is unchanged.
+    \item output: None.
+    \item exception: $tx\notin\operatorname{dom}(\mathit{transactions})\Rightarrow exc=\text{InvalidTransaction}$.
+\end{itemize}
+
+\paragraph{\texttt{createBackup()}}
+\begin{itemize}
+    \item transition: For a fresh identifier $b$, save a copy of $\mathit{store}$ in the backup storage and set $\mathit{backups}'=\mathit{backups}\cup\{b\mapsto(b,\mathit{now},\text{true})\}$.
+    A backup is also created when the system first starts with no backups, and whenever $\mathit{now}-\max_{x\in\mathit{backups}}x.createdAt\ge\mathit{BackupInterval}$.
+    \item output: $out=b$.
+    \item exception: PersistenceFailure if the backup cannot be saved. No backup is added.
+\end{itemize}
+
+\paragraph{\texttt{listBackups()}}
+\begin{itemize}
+    \item transition: None.
+    \item output: $out=\operatorname{List}(\operatorname{ran}(\mathit{backups}))$.
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{restoreBackup(incident, key)}}
+\begin{itemize}
+    \item transition: If $key$ is the encryption key and $\operatorname{chooseBackup}(incident)\ne\text{None}$,
+    let $b$ be that backup. Then $\mathit{store}'$ equals the contents of $b$ and $\mathit{transactions}'=\emptyset$.
+    \item output: $out=(b.id,\ b.createdAt,\ \mathit{incident}-\mathit{RecoveryPointWindow}\le b.createdAt)$.
+    \item exception:
+    \begin{itemize}
+        \item InvalidKey if $key$ is not the encryption key. Nothing is restored.
+        \item NoBackupAvailable if $\operatorname{chooseBackup}(incident)=\text{None}$.
+    \end{itemize}
+\end{itemize}
+
+\paragraph{\texttt{purgePersonalData(subject)}}
+\begin{itemize}
+    \item transition: Remove the personal fields of the user $subject$ and every record owned by the subject,
+    such as their profile, from $\mathit{store}$ and from every backup.
+    The user record is kept only as a tombstone holding the identifier,
+    so that other records that refer to the subject (for example audit entries) no longer identify a person.
+    \item output: None.
+    \item exception: PersistenceFailure if the data cannot be removed from the store or from every backup.
+    In that case no partial removal is left in place.
+\end{itemize}
+
+\subsubsection{Local Functions}
+
+\begin{description}
+    \item[chooseBackup(incident: DateTime): BackupInfo$^{?}$] Among usable backups created no later
+    than $incident$, returns the latest one created within $\mathit{RecoveryPointWindow}$ before $incident$.
+    If there is none, returns the latest usable backup created before the window.
+    \item[applicable(cs: ChangeSet): bool] Evaluated against $\mathit{store}$ before any change of $cs$ is applied. Each record is named by at most one change of $cs$. It is true exactly when
+    \[
+        \begin{aligned}
+            &\forall c\in cs.changes:\\
+            &\quad c.kind=\text{Insert}\Rightarrow c.ref\notin\operatorname{dom}(\mathit{store})\\
+            &\quad\land\ c.kind\in\{\text{Update},\text{Remove}\}\Rightarrow\big(c.ref\in\operatorname{dom}(\mathit{store})\land(c.expectedVersion\ne\text{None}\Rightarrow\mathit{store}[c.ref].version=c.expectedVersion)\big)\\
+            &\land\ \forall(r\mapsto v)\in cs.guards:\ r\in\operatorname{dom}(\mathit{store})\land\mathit{store}[r].version=v.
+        \end{aligned}
+    \]
+    In words, nothing the action read or changed was modified by another committed action since it was read.
+\end{description}
+
+\newpage
+
+\section[MIS of Audit Log Module]{MIS of Audit Log Module (\moduleid{M_AuditLog})}
+\label{M_AuditLog}
+
+\subsection{Module}
+
+This module records user actions and external-service errors in an append-only log.
+Each entry is sealed together with the entry before it, so that any change, removal, or deletion of the log
+can be detected. How the entries are stored and sealed is its secret.
+
+\subsection{Uses}
+
+\begin{itemize}
+    \item M\_HardwareHiding
+    \item M\_Persistence
+\end{itemize}
+
+\subsection{Syntax}
+
+\subsubsection{Exported Constants}
+None.
+
+\subsubsection{Exported Access Programs}
+
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.2}
+\begin{longtable}{>{\raggedright\arraybackslash}p{0.22\textwidth}
+        >{\raggedright\arraybackslash}p{0.36\textwidth}
+        >{\raggedright\arraybackslash}p{0.22\textwidth}
+        >{\raggedright\arraybackslash}p{0.14\textwidth}}
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{Name} & \textbf{In} & \textbf{Out} & \textbf{Exceptions} \\
+    \midrule
+    \endhead
+    \endfoot
+    \texttt{record} & actor: UserID$^{?}$, role: UserRole$^{?}$, action: Action, entityType: RecordType, entityID: String, details: ChangeDetails, tx: TransactionID$^{?}$ & -- & InvalidTransaction \\
+    \texttt{recordExternalError} & service: String, description: String & -- & -- \\
+    \texttt{getEntries} & filter: AuditFilter & $\operatorname{List}\langle\text{AuditEntry}\rangle$ & -- \\
+    \texttt{verifyIntegrity} & -- & $\operatorname{List}\langle\text{IntegrityViolation}\rangle$ & -- \\
+    \bottomrule
+    \caption{Exported access programs of the Audit Log module}
+    \label{TblAuditLogAccessPrograms}
+\end{longtable}
+\endgroup
+
+No access program changes or removes an existing entry.
+
+\subsection{Semantics}
+
+\subsubsection{State Variables}
+
+\begin{itemize}
+    \item $\mathit{log}:\operatorname{List}\langle(\text{AuditEntry},\text{Seal})\rangle$
+    - entries in order, each with its seal, initially loaded from M\_Persistence.
+    A Seal is a value computed from an entry and the seal before it, using a secret key.
+    \item $\mathit{chainHead}:\text{Seal}$ - the seal of the newest entry,
+    initially the seal of the last entry of $\mathit{log}$ (or the initial seal if $\mathit{log}$ is empty).
+\end{itemize}
+
+\subsubsection{Environment Variables}
+
+The sealing key, which is never held in the persistent store.
+
+\subsubsection{Assumptions}
+
+\begin{itemize}
+    \item State variables are loaded from M\_Persistence at system start, before any access program is called.
+    \item Callers authorize \texttt{getEntries} before calling it by checking $\operatorname{hasAccess}(user,course,\text{ViewAuditLog},course)$.
+    This module sits below \texttt{M\_Authorization} in the uses hierarchy and cannot check it.
+    \item Entries refer to actors by UserID only. When a person's data is removed (\texttt{purgePersonalData} in M\_Persistence),
+    the identifier no longer identifies a person, so entries remain unchanged and anonymous.
+    \item \texttt{details} excludes passwords, tokens, and other sensitive information.
+\end{itemize}
+
+\subsubsection{Invariants}
+
+\begin{itemize}
+    \item $\mathit{log}$ only grows: entries are appended in time order and are never changed or removed.
+    \item For every $k$, the seal of entry $k$ equals $\operatorname{seal}(\text{seal of entry }k{-}1,\text{entry }k)$,
+    and $\mathit{chainHead}$ is the seal of the last entry.
+\end{itemize}
+
+\subsubsection{Access Routine Semantics}
+
+\paragraph{\texttt{record(actor, role, action, entityType, entityID, details, tx)}}
+\begin{itemize}
+    \item transition: Let $e$ be the entry with a fresh identifier, time $\mathit{now}$, and the given actor, role,
+    action, entity type, entity identifier, and details, and let $s=\operatorname{seal}(\mathit{chainHead},e)$. Then:
+    \[
+        \mathit{log}'=\mathit{log}\mathbin{+\!\!+}[(e,s)],\qquad\mathit{chainHead}'=s.
+    \]
+    \begin{itemize}
+        \item If $tx\ne\text{None}$, the entry is staged in $tx$ with a guard on the previous entry, and takes effect
+        only if $tx$ commits. If $tx$ is rolled back or fails to commit, no entry is added.
+        \item If $tx=\text{None}$, the entry is saved in its own transaction, which is repeated if a concurrent entry makes it conflict.
+    \end{itemize}
+    \item output: None.
+    \item exception: InvalidTransaction if $tx\ne\text{None}$ and $tx$ is not an open transaction.
+\end{itemize}
+
+\paragraph{\texttt{recordExternalError(service, description)}}
+\begin{itemize}
+    \item transition: Append an entry with time $\mathit{now}$, no actor, role, or action, the given service name, and
+    the description in its details, in the same way as \texttt{record} with $tx=\text{None}$.
+    \item output: None.
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{getEntries(filter)}}
+\begin{itemize}
+    \item transition: None.
+    \item output: $out=[e\mid(e,s)\in\mathit{log}\land e\text{ satisfies every criterion present in }filter]$, in order.
+    If $filter.externalErrorsOnly$, only entries with a service are returned.
+    \item exception: None.
+\end{itemize}
+
+\paragraph{\texttt{verifyIntegrity()}}
+\begin{itemize}
+    \item transition: None.
+    \item output: Re-read the stored entries and seals and recompute the chain with the sealing key. Return the problems found:
+    \[
+        out=\left[(p,id)\ \middle|\ \begin{aligned}
+                                        &p=\text{StorageMissing}\ \text{if the log storage is absent};\\
+                                        &p=\text{EntryModified}\ \text{if an entry's seal does not match its content};\\
+                                        &p=\text{EntryMissing}\ \text{if an entry is absent from the sequence};\\
+                                        &p=\text{ChainBroken}\ \text{if the sequence of seals is inconsistent}
+        \end{aligned}\right].
+    \]
+    The result is empty exactly when the stored log is unaltered. Entries re-sealed by someone without the key are reported as EntryModified.
+    \item exception: None.
+\end{itemize}
+
+\subsubsection{Local Functions}
+None
+
+\newpage
+
 \bibliographystyle {plainnat}
 \bibliography {../../../refs/References}
 
@@ -1518,28 +2447,127 @@ whether material was generated by a human or an AI system.}
 
 \section{Appendix --- Reflection}
 
-\wss{Not required for CAS 741 projects}
-
 The information in this section will be used to evaluate the team members on the
 graduate attribute of Problem Analysis and Design.
 
 \input{../../Reflection.text}
 
+\textbf{Ayush: }
 \begin{enumerate}
-  \item What went well while writing this deliverable? 
+  \item What went well while writing this deliverable?
+
+  I think it was pretty easy to come up with most of our modules and the specification because our
+  application does have some obvious business logic boundaries such as courses, projects, teams, authentication,
+  authorization, notifications, etc. We also already had a fairly detailed SRS, so we weren't starting from scratch.
+  We could use our existing requirements and anticipated changes to guide the decomposition and figure out which responsibilities belonged where.
+
   \item What pain points did you experience during this deliverable, and how
     did you resolve them?
+
+  It was really hard to decide whether certain modules should be merged or kept separate.
+  We did not want to have too many modules, since that could introduce unnecessary complexity and coupling
+  between them. What we want is high cohesion and low coupling, which is sometimes harder to achieve when
+  there are more modules.
+
+  For example, we debated whether notifications and checklists should be together because a checklist
+  item essentially reminds a user that they need to complete a task. Ultimately, we decided to separate
+  them because they have different responsibilities. The Checklist module is responsible for tracking required
+  actions and their completion status, whereas the Notifications module is responsible for communicating
+  events and actions to users. Although the two modules interact, the underlying logic and the things
+  likely to change independently are different.
+
+  Another example was Email Service, which was initially a separate module but was eventually merged into
+  Notifications. We realized that delivering notifications is the responsibility of the Notifications module,
+  and the mechanism used to deliver them should be hidden as an implementation detail.
+  Whether notifications are delivered through email or another mechanism should not matter to the rest of the system.
+  Keeping this responsibility inside Notifications provides better information hiding and avoids exposing
+  unnecessary implementation details to other modules.
+  We resolved these decisions by looking at the responsibilities and secrets of each module,
+  rather than simply grouping functionality based on how closely related the features seemed from a user's perspective.
+
   \item Which of your design decisions stemmed from speaking to your client(s)
   or a proxy (e.g. your peers, stakeholders, potential users)? For those that
   were not, why, and where did they come from?
+
+  We didn't really discuss the actual software design or module decomposition with our stakeholders.
+  Instead, our conversations focused on understanding their goals, problems, and desired functionality.
+  We then translated those conversations into requirements, which ultimately informed our design.
+  I don't think stakeholders necessarily need to dictate how we structure our software, since that is
+  part of our responsibility as software engineers.
+
+  That being said, a few modules and their responsibilities were directly influenced by
+  stakeholder conversations. For example, the Enrollment module came from our conversations with Dr. Wassyng
+  about how students should be added to the system and how their course enrollment should be managed.
+  Similarly, the Course Report module stems from Dr. Smith's desire to have a detailed summary of capstone
+  teams and other project-related information.
+
+  Most of the remaining design decisions came from our own analysis of the requirements and anticipated changes.
+  We used principles such as information hiding, high cohesion, and low coupling to decide how responsibilities
+  should be divided. We also considered which parts of the system were likely to change independently,
+  particularly since different courses and departments may have different rules and workflows.
+
   \item While creating the design doc, what parts of your other documents (e.g.
-  requirements, hazard analysis, etc), it any, needed to be changed, and why?
+  requirements, hazard analysis, etc), if any, needed to be changed, and why?
+
+  The data dictionary in the SRS needed to be updated to reflect the new types and attributes that we
+  identified while working through the design. Once we started defining module interfaces, we had a much
+  better understanding of the actual data structures that would be shared between modules.
+  The Likely Changes section of the SRS also needed some updates.
+  When we started thinking more deeply about the design, we realized there were additional
+  implementation details and requirements that could potentially change in the future.
+  We wanted to make sure these changes were properly documented so that the Module Guide could account for them through information hiding.
+  Overall, the design process helped us identify some areas where our original requirements documentation wasn't
+  detailed enough, so we had to revisit it to keep the documents consistent.
+
   \item What are the limitations of your solution?  Put another way, given
   unlimited resources, what could you do to make the project better? (LO\_ProbSolutions)
+
+  One limitation of our current design is that it is still fairly tightly scoped around our
+  initial understanding of how capstone courses operate. Although we tried to make the platform
+  configurable so that different courses and departments can use it, there will likely be edge cases
+  and workflows that we haven't accounted for yet. For example, different departments may have
+  completely different team formation rules, project approval processes, or enrollment procedures.
+
+  Given unlimited resources, I would spend more time validating the design with additional instructors,
+  TAs, and students from different departments and universities.
+  This would help us identify requirements and workflows that we may have overlooked and make the
+  platform more flexible without unnecessarily complicating the architecture.
+
   \item Give a brief overview of other design solutions you considered.  What
   are the benefits and tradeoffs of those other designs compared with the chosen
   design?  From all the potential options, why did you select the documented design?
   (LO\_Explores)
+
+  The main design alternatives we considered involved different ways of breaking down the system into
+  modules and assigning responsibilities to each one.
+
+  One alternative was to have fewer, larger modules that grouped related functionality together.
+  For example, we could have combined Authentication and Authorization into a single Security module,
+  or combined Notifications and Checklists into a single User Engagement module.
+  The main benefit would be having fewer modules and potentially fewer interfaces to maintain.
+  However, this would also mean that modules would have more responsibilities and potentially lower cohesion.
+  It would also make changes harder to isolate. For example, changing how users authenticate should not
+  necessarily require changes to how their permissions are managed.
+
+  Another alternative was to decompose the system into many smaller modules, each responsible for a very specific feature.
+  This could improve separation of concerns and make individual modules easier to understand.
+  However, it could also introduce unnecessary complexity, with more interfaces and dependencies to manage.
+  We didn't want to create modules that were so small that they had to constantly interact with one another to
+  accomplish even simple tasks.
+
+  We ultimately chose a middle ground, where modules are organized around distinct responsibilities and,
+  more importantly, the design decisions and implementation details that are likely to change independently.
+  This follows the principle of information hiding and gives us a reasonable balance between cohesion, coupling,
+  and maintainability.
+
+  For example, keeping the Approval Workflow separate from Projects allows us to change how approvals are handled,
+  such as switching between in-platform and external GitLab-based approvals, without having to redesign the
+  entire project management functionality. Similarly, separating Persistence from the business logic
+  allows us to change the underlying storage implementation without requiring every module to know how data is stored.
+
+  Overall, we chose this design because it provides a good balance between modularity and simplicity while
+  making the system easier to extend and maintain as requirements evolve.
+
   \item (After you have implemented another team's module, which means this
   isn't filled in until after the original deadline). What did you learn by
   implementing another team's module? Were all the details you needed in the

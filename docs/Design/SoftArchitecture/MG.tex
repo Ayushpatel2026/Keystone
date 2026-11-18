@@ -18,6 +18,7 @@
     linkcolor=red,
     urlcolor=blue
 }
+\usepackage[margin=0.75in]{geometry}
 
 \input{../../Comments.text}
 \input{../../Common.text}
@@ -621,7 +622,7 @@ to be implemented.
 
 \begin{description}
 \item[Secrets:] How users are notified of events.
-\item[Services:] Decides who to notify about each event, writes the message, delivers it through an external service, and keeps it until delivery is confirmed. Runs timed work, such as deadline reminders and retries of undelivered notifications.
+\item[Services:] Delivers notifications to the users the caller names, writes the message, delivers it through an external service, and keeps it until delivery is confirmed. Runs timed work, such as deadline reminders and retries of undelivered notifications.
 \item[Implemented By:] \projname{}
 \item[Type of Module:] Abstract Object
 \end{description}
@@ -672,6 +673,7 @@ to be implemented.
 \begin{description}
 \item[Secrets:] How audit records are kept.
 \item[Services:] Records each user action and each error from an external service, and lets authorized users read the records.
+Verifies that a log has not been altered.
 \item[Implemented By:] \projname{}
 \item[Type of Module:] Abstract Object
 \end{description}
@@ -764,7 +766,7 @@ changes.
   \srsref{NFR_EncryptRest} & \idref{M_Persistence} \\ \hline
   \srsref{NFR_PasswordHash} & \idref{M_Authentication} \\ \hline
   \srsref{NFR_AuditLog} & \idref{M_AuditLog} \\ \hline
-  \srsref{NFR_AuditTamper} & \idref{M_AuditLog} \\ \hline
+  \srsref{NFR_AuditTamper} & \idref{M_AuditLog}, \idref{M_Notifications} \\ \hline
   \srsref{NFR_ComplianceAODA} & \idref{M_UserInterface} \\ \hline
 
   \bottomrule
