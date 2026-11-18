@@ -65,6 +65,7 @@ urlcolor=cyan          % color of external links
 \midrule
 Nov 16th 2026 & 1.0 & Added MIS for Modules: Checklists, Notifications, Audit Log, Persistence and Course Reports\\
 Date 2 & 1.1 & Notes\\
+Nov. 15, 2026 & 1.0 & Added the MIS of the Projects, Students and Teams, Recommendation, Approval Workflow, and Threads modules, and the shared types they need\\
 \bottomrule
 \end{tabularx}
 
@@ -72,9 +73,10 @@ Date 2 & 1.1 & Notes\\
 
 \section{Symbols, Abbreviations and Acronyms}
 
-See SRS Documentation at \url{https://ayushpatel2026.github.io/Keystone/SRS/SRS.pdf}
-
-\wss{Also add any additional symbols, abbreviations or acronyms}
+See the SRS documentation at
+\url{https://github.com/Ayushpatel2026/Keystone/raw/main/pdfs/SRS/SRS.pdf}.
+The symbols used to write the specifications are listed in
+Table~\ref{TblNotation}.
 
 \newpage
 
@@ -86,8 +88,10 @@ See SRS Documentation at \url{https://ayushpatel2026.github.io/Keystone/SRS/SRS.
 
 \section{Introduction}
 
-The following document details the Module Interface Specifications for \projname{},
-a capstone project discovery and management platform.
+The following document details the Module Interface Specifications for
+\projname{}, a platform that makes capstone project proposals, project discovery,
+team formation, and team project approval transparent, consistent, and easy to
+manage for students, supervisors, and course instructors.
 
 Complementary documents include the System Requirement Specifications
 and Module Guide.  The full documentation and implementation can be
@@ -109,6 +113,8 @@ specifies its inputs, output, state transition, and exception conditions.
 \midrule
 bool & Boolean values $\{\text{true},\text{false}\}$. \\
 String & Finite sequence of characters where $\epsilon$ is the empty string. \\
+$\mathbb{N}$ & Natural numbers $\{0,1,2,\dots\}$. \\
+$[0,1]$ & Real numbers from 0 to 1 inclusive. \\
 $\emptyset$ & Empty set or map, according to its declared type. \\
 None & Absence of a value where $T\cup\{\text{None}\}$ denotes an optional value. \\
 $x$, $x'$ & Values of state variable $x$ before and after a routine. \\
@@ -120,6 +126,8 @@ $out$, $exc$ & Routine return value and raised exception, respectively. \\
 $\mathcal{V}$, $\mathcal{F}$ & Sets of registered UI view and form names. \\
 $\operatorname{Map}\langle K,V\rangle$ & Mapping from keys of type $K$ to values of type $V$. \\
 $\operatorname{Set}\langle T\rangle$ & Set of values of type $T$. \\
+$\operatorname{List}\langle T\rangle$ & Ordered sequence of values of type $T$. \\
+$\vert S\vert$ & Number of elements in set or list $S$. \\
 $k\mapsto v$ & Associates key $k$ with value $v$. \\
 $\operatorname{dom}(M)$ & Set of keys in mapping $M$. \\
 $M[k]$ & Value associated with key $k$ in mapping $M$. \\
@@ -324,9 +332,53 @@ The following data types are shared across the Keystone modules.
 \begin{enumerate}
     \item StudentNotOnTeam, StudentOnMultipleTeams, TeamWithoutProject,
     TeamWithoutSupervisor: Problems found when validating team composition.
+\subsubsection{Program}
+\begin{enumerate}
+    \item SE, CS, TRON: The program of a student, as in the SRS.
+\end{enumerate}
+
+\subsubsection{TeamMemberRole}
+\begin{enumerate}
+    \item PointOfContact: Team member who is the team's contact for supervisors and staff, and who manages membership.
+    \item Member: Ordinary team member.
+\end{enumerate}
+
+\subsubsection{OfferKind}
+\begin{enumerate}
+    \item Invitation: A team invites a student to join.
+    \item Request: A student asks to join a team.
+\end{enumerate}
+
+\subsubsection{RuleViolation}
+\begin{enumerate}
+    \item TooFewMembers: Team has fewer members than the course minimum.
+    \item TooManyMembers: Team has more members than the course maximum.
+    \item ProgramCombinationNotAllowed: The programs of the members are not a permitted combination.
+\end{enumerate}
+
+\subsubsection{RequestKind}
+\begin{enumerate}
+    \item Initial: First in-platform approval request for a team's project.
+    \item Revision: In-platform request to change a project that is already approved.
+\end{enumerate}
+
+\subsubsection{ThreadTarget}
+\begin{enumerate}
+    \item ProjectProposal: A discussion attached to a project or its proposal.
+    \item Application: A discussion attached to a team's project application.
+    \item Team: A discussion attached to a team's formation.
 \end{enumerate}
 
 \subsection{Data Structures}
+
+\subsubsection{Dictionary}
+For types $K$ and $V$, a finite mapping from keys of type $K$ to values of type $V$, written $\operatorname{Map}\langle K,V\rangle$.
+
+\subsubsection{List}
+For any type $T$, an ordered collection of elements of type $T$.
+
+\subsubsection{DateTime}
+A date and time, as in the SRS data dictionary.
 
 \subsubsection{CourseResource}
 A course document or link with an identifier, course association, and publication status.
@@ -440,22 +492,31 @@ The record or collection supplied by the owning module to populate a view, with 
 A record representing a Keystone user, including their identity and assigned roles.
 
 \subsubsection{Course}
-A record containing capstone course information, configuration settings, and enrollment information.
+A record containing capstone course information, configuration settings, and enrollment information. The course settings used by the Students and Teams, Approval Workflow, and Projects modules are \texttt{minTeamSize} ($\mathbb{N}$), \texttt{maxTeamSize} ($\mathbb{N}$), \texttt{allowedCombinations} ($\operatorname{Set}\langle\operatorname{Set}\langle\text{Program}\rangle\rangle$), \texttt{approvalMode} (ApprovalMode), \texttt{externalAdapter} (the configuration of the external approval system), and \texttt{submissionRequirements} ($\operatorname{Map}\langle\text{String},\text{bool}\rangle$, each submission item mapped to true if it is required).
 
 \subsubsection{StudentProfile}
-A record containing a student's background, skills, interests, experience, and project preferences.
+A record containing a student's background, skills, interests, experience, and project preferences. It also contains the student's \emph{program} (Program) and \emph{seekingTeam} (bool, true if the student is looking for a team).
 
 \subsubsection{Team}
-A record representing a group of students participating in the capstone project selection process.
+A record representing a group of students participating in the capstone project selection process, with fields $\mathit{id}$, $\mathit{course}$, $\mathit{members}$ ($\operatorname{Map}\langle\text{User},\text{TeamMemberRole}\rangle$), $\mathit{membersNeeded}$ ($\mathbb{N}$, the number of members the team is recruiting), $\mathit{ta}$ ($\text{User}\cup\{\text{None}\}$), and $\mathit{profile}$ (TeamProfile).
 
 \subsubsection{TeamProfile}
 A record containing a team's collective skills, interests, goals, and work style.
 
 \subsubsection{Project}
-A record containing project information, supervisor capacity, course association, and ProjectStatus.
+A record containing project information, supervisor capacity, course association, and ProjectStatus, with fields $\mathit{id}$, $\mathit{course}$, $\mathit{proposer}$ (User), $\mathit{supervisor}$ ($\text{User}\cup\{\text{None}\}$), $\mathit{team}$ ($\text{Team}\cup\{\text{None}\}$, the team that proposed a student-proposed project), $\mathit{fields}$ (FieldValues), $\mathit{status}$ (ProjectStatus), $\mathit{capacity}$ ($\mathbb{N}$), $\mathit{reserved}$ ($\operatorname{Set}\langle\text{String}\rangle$, the identifiers of the teams holding a slot), and $\mathit{comment}$ (String, the reviewer's feedback).
 
 \subsubsection{ProjectApplication}
-A record representing a team's application to a project, including the associated TeamProjectStatus.
+A record representing a team's application to a project, with fields $\mathit{id}$, $\mathit{project}$, $\mathit{team}$, and the associated TeamProjectStatus $\mathit{status}$.
+
+\subsubsection{Offer}
+A record of a pending invitation or join request, with fields $\mathit{id}$, $\mathit{team}$, $\mathit{user}$ (the student invited or asking), and $\mathit{kind}$ (OfferKind).
+
+\subsubsection{ApprovalRequest}
+A record of an in-platform request to approve a team project or a change to it, with fields $\mathit{id}$, $\mathit{application}$, $\mathit{content}$ (FieldValues), $\mathit{kind}$ (RequestKind), $\mathit{status}$ (TeamProjectStatus), and $\mathit{comment}$ (String).
+
+\subsubsection{SyncStatus}
+A record with fields $\mathit{lastSuccess}$ ($\text{DateTime}\cup\{\text{None}\}$) and $\mathit{failed}$ (bool), describing the latest attempt to read approval outcomes from a course's external system.
 
 \subsubsection{Notification}
 A record (id: NotificationID, recipient: User, event: Event, status: DeliveryStatus, attempts: natural number).
@@ -465,7 +526,10 @@ A record (name: String, dueDate: DateTime$^{?}$, status: ChecklistStatus, target
 It describes a required action and is derived from current records, never stored.
 
 \subsubsection{Thread}
-A record representing a discussion associated with a project proposal or team.
+A record representing a discussion attached to a project proposal, a project application, or a team formation, with fields $\mathit{id}$, $\mathit{course}$, $\mathit{kind}$ (ThreadTarget), $\mathit{targetID}$ (String), $\mathit{author}$ (User), $\mathit{subject}$ (String), $\mathit{content}$ (String, the first post), and $\mathit{replies}$ ($\operatorname{List}\langle\text{Reply}\rangle$).
+
+\subsubsection{Reply}
+A record of one reply in a thread, with fields $\mathit{author}$ (User) and $\mathit{content}$ (String). M\_Persistence records when it was written.
 
 
 \section[MIS of Hardware-Hiding Module]{MIS of Hardware-Hiding Module (\moduleid{M_HardwareHiding})}
@@ -2275,6 +2339,11 @@ can be detected. How the entries are stored and sealed is its secret.
 \begin{itemize}
     \item M\_HardwareHiding
     \item M\_Persistence
+    \item M\_Authorization
+    \item M\_CourseManagement
+    \item M\_Notifications
+    \item M\_Persistence
+    \item M\_AuditLog
 \end{itemize}
 
 \subsection{Syntax}
@@ -2412,36 +2481,17 @@ None
 
 \section{Appendix --- Generative AI Use Disclosure}
 
-\wss{ChatGPT (version 5) was used to brainstorm ideas for the template for this disclose section.}
-
 \subsection{AI Tools Used}
 
-\wss{Give the name of the AI tool(s) used and the version.}
+Claude Sonnet 5.5.
 
 \subsection{How and Where Used}
 
-\wss{Explain what the tool(s) were used for.  Examples include: brainstorming,
-explaining a technical concept, reviewing the document, generating or modifying
-text, generating or modifying diagrams, identifying errors or omissions or
-inconsistencies.}
-
-\wss{For each of the uses, identify which parts of the document were affected.}
-
-\wss{You do not need to report every interaction, but you should disclose the 
-uses that materially contributed to your work}
+Claude was used to draft the MIS of the Projects, Students and Teams, Recommendation, Approval Workflow, and Threads modules, and the shared enums and data structures those modules added to Section~\ref{SecDataTypes} (Program, TeamMemberRole, OfferKind, RuleViolation, RequestKind, ThreadTarget, DateTime, Offer, ApprovalRequest, SyncStatus, and Reply, plus the fields added to the Course, StudentProfile, Team, Project, ProjectApplication, and Thread records). It was also used to fill in the introduction, revision history, and notation rows needed by those modules, and to check the drafts against the SRS and the uses hierarchy of the Module Guide.
 
 \subsection{Verification of AI-Generated Content}
 
-\wss{\begin{itemize}
-    \item Describe how the team checked AI-generated or AI-assisted material
-    before including it in the document.
-    \item In particular, verify factual claims, technical assertions,
-    requirements, calculations, references, and other information for which an
-    AI system may produce incorrect or fabricated results.
-    \item \textbf{The team is responsible for the accuracy, completeness,
-consistency, and appropriateness of the submitted document, regardless of
-whether material was generated by a human or an AI system.}
-\end{itemize}}
+\wss{Describe how the team checked the AI-generated material above against the SRS, the Module Guide, and the implementation before including it. The team is responsible for the accuracy, completeness, consistency, and appropriateness of the submitted document, regardless of whether material was generated by a human or an AI system.}
 
 \newpage{}
 
