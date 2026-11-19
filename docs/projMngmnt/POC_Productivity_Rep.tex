@@ -36,6 +36,32 @@ the report.}
 
 \wss{What will you be demonstrating}
 
+\textbf{Feasibility risk.}
+Project availability and team assignment state may become inconsistent
+across the project lifecycle and the team-on-project lifecycle defined
+in the SRS. A team can apply to several projects and a project can
+accept several teams (up to its capacity), and a single action in one
+lifecycle has effects on other records. A supervisor accepting a team
+reserves a slot, which can make the project full and close its other
+pending applications. A team agreeing to one project withdraws its other
+applications and releases any slots reserved for it elsewhere. A
+decline, withdrawal, or rejection releases a slot only if one was
+reserved.
+
+To address this risk, we will use three seeded teams: Team Amazing Engineers, Team Fantastic Coders, and Team Capstone Legends. They will apply to two projects: Automated Assembly Line, which can accept one team, and Autonomous Waste Sorting System, which can accept two teams. Each project has its own supervisor. Both projects initially have zero reserved slots and are Open. After each action, we will display capacity, reserved slots, available slots, and each affected application's status, refresh the team and supervisor views, and run the Development Plan's consistency checks.
+
+\begin{enumerate}
+    \item Team Amazing Engineers and Team Fantastic Coders each apply to both projects. Team Capstone Legends applies only to Autonomous Waste Sorting System. All applications are Applied, both reservation counts remain zero, and both projects remain Open. Repeating an application is rejected without changing state.
+    \item The Automated Assembly Line supervisor accepts Team Amazing Engineers. Reservations change from 0 to 1, available slots become zero, and the project becomes Full. Team Fantastic Coders's pending application closes. An attempt to accept Team Fantastic Coders using its stale application is rejected without exceeding capacity.
+    \item The Autonomous Waste Sorting System supervisor accepts Team Amazing Engineers. Reservations change from 0 to 1, one slot remains available, and the project stays Open. Accepting Team Fantastic Coders changes reservations from 1 to 2, makes the project Full, and closes Team Capstone Legends' pending application.
+    \item Team Amazing Engineers accepts Automated Assembly Line. Its status becomes Agreed without reserving another slot. Its competing application to Autonomous Waste Sorting System is withdrawn, releasing that reservation: the count changes from 2 to 1 and the project reopens. Team Amazing Engineers cannot apply elsewhere after agreeing.
+    \item Team Fantastic Coders withdraws from Autonomous Waste Sorting System after supervisor acceptance. Reservations change from 1 to 0. A second withdrawal is rejected and cannot reduce the count below zero.
+    \item Submit Team Amazing Engineers' agreed project, Automated Assembly Line, for review and have the instructor approve it, retaining its reserved slot. Reset the demo data to the state before that approval, then have the instructor reject the submission to show the slot being released and the project reopening.
+    \item Confirm that the refreshed team and supervisor views agree and that every invalid action leaves the stored state unchanged. Slot counts must remain between zero and capacity, match the slot-holding applications, and leave each agreed team committed to only one project.
+\end{enumerate}
+
+We plan to demonstrate the PoC live over five minutes using a basic frontend connected to our FastAPI backend. The UI will let us perform the planned actions and display the resulting project availability and team-project statuses. We will prepare a recording of the demonstration as a backup in case technical issues prevent the live demo. As specified in the Development Plan, the PoC will use seeded users without authentication. A basic actor selector will let us switch between teams, supervisors, and the instructor in the same browser, passing the selected actor's identifier to the backend for each action. We will refresh the relevant views after actions to show their updated statuses.
+
 \section{Team Meeting Attendance}
 
 \wss{For each team member how many team meetings have they attended over the
@@ -49,17 +75,16 @@ number of team meetings held by the team.}
 \toprule
 \textbf{Student} & \textbf{Meetings}\\
 \midrule
-Total & Num\\
-Name 1 & Num\\
-Name 2 & Num\\
-Name 3 & Num\\
-Name 4 & Num\\
-Name 5 & Num\\
+Total & 1\\
+Ayush Patel & 1\\
+Ahmed RashRash & 1\\
+Andrew Habib & 1\\
+Waqar Ul-Hassan & 1\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\wss{If needed, an explanation for the counts can be provided here.}
+We held one formal team meeting, which everyone attended. Most of our coordination happens through Microsoft Teams, where we communicate nearly every day, and GitHub issues, where we organize and assign work. When questions or problems come up, we message each other and agree on who will handle them. This approach has worked well for our team, so we have had little need for additional formal meetings.
 
 \section{Supervisor/Stakeholder Meeting Attendance}
 
@@ -70,7 +95,7 @@ table should be the total number of supervisor and team meetings held by the
 team.  If there is no supervisor, there will usually be meetings with
 stakeholders (potential users) that can serve a similar purpose.}
 
-\noindent \textbf{Supervisor's Name: } [fill in this information]
+\noindent \textbf{Supervisor's Name: } Dr. Smith
 
 \begin{table}[H]
 \centering
@@ -78,17 +103,16 @@ stakeholders (potential users) that can serve a similar purpose.}
 \toprule
 \textbf{Student} & \textbf{Meetings}\\
 \midrule
-Total & Num\\
-Name 1 & Num\\
-Name 2 & Num\\
-Name 3 & Num\\
-Name 4 & Num\\
-Name 5 & Num\\
+Total & 6\\
+Ayush Patel & 5\\
+Ahmed RashRash & 5\\
+Andrew Habib & 6\\
+Waqar Ul-Hassan & 6\\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\wss{If needed, an explanation for the counts can be provided here.}
+We held six stakeholder interviews involving seven people: Dr.Spencer Smith (SE capstone instructor and our supervisor), an internal supervisor, a capstone student, two external supervisors interviewed together, Dr.Alan Wassyng (TRON capstone instructor), and Dr.Mehdi Moradi (CS capstone instructor). These interviews helped us understand the current project selection and approval processes and informed our requirements. The joint interview with the two external supervisors counts as one meeting.
 
 \section{Lecture Attendance}
 
@@ -109,12 +133,11 @@ and the POC demos}
 \toprule
 \textbf{Student} & \textbf{Lectures}\\
 \midrule
-Total & Num\\
-Name 1 & Num\\
-Name 2 & Num\\
-Name 3 & Num\\
-Name 4 & Num\\
-Name 5 & Num\\
+Total & 13\\
+Ayush Patel & 10\\
+Ahmed RashRash & 6\\
+Andrew Habib & 8\\
+Waqar Ul-Hassan & 4\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -127,7 +150,7 @@ Name 5 & Num\\
 with the TA were attended over the time period of interest. The first row is the
 total number of discussion meetings scheduled by the TA with the team.}
 
-\noindent \textbf{TA's Name: } [fill in this information]
+\noindent \textbf{TA's Name: } Chris Schankula
 
 \begin{table}[H]
 \centering
@@ -135,12 +158,11 @@ total number of discussion meetings scheduled by the TA with the team.}
 \toprule
 \textbf{Student} & \textbf{Meetings}\\
 \midrule
-Total & Num\\
-Name 1 & Num\\
-Name 2 & Num\\
-Name 3 & Num\\
-Name 4 & Num\\
-Name 5 & Num\\
+Total & 4\\
+Ayush Patel & 4\\
+Ahmed RashRash & 4\\
+Andrew Habib & 4\\
+Waqar Ul-Hassan & 4\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -172,12 +194,11 @@ which may not be reflected in the commit counts for the main branch.}
 \textbf{Student} & \textbf{Commits} & \textbf{Percent} & \textbf{Lines Added} &
 \textbf{Lines Deleted} & \textbf{Pull Requests}\\
 \midrule
-Total & Num & 100\% & total added & total deleted & total PRs\\
-Name 1 & Num & \% & num & num & num\\
-Name 2 & Num & \% & num & num & num\\
-Name 3 & Num & \% & num & num & num\\
-Name 4 & Num & \% & num & num & num\\
-Name 5 & Num & \% & num & num & num\\
+Total & 255 & 100\% & 37,702 & 10,174 & 90\\
+Ayush Patel & 65 & 25.49\% & 22,908 & 6,101 & 38\\
+Ahmed RashRash & 94 & 36.86\% & 5,171 & 2,279 & 16\\
+Andrew Habib & 47 & 18.43\% & 5,158 & 983 & 15\\
+Waqar Ul-Hassan & 49 & 19.22\% & 4,465 & 811 & 21\\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -199,11 +220,10 @@ issues (C only)) over the time period of interest.}
 \toprule
 \textbf{Student} & \textbf{Authored (O+C)} & \textbf{Assigned (C only)}\\
 \midrule
-Name 1 & Num & Num \\
-Name 2 & Num & Num \\
-Name 3 & Num & Num \\
-Name 4 & Num & Num \\
-Name 5 & Num & Num \\
+Ayush Patel & 60 & 44 \\
+Ahmed RashRash & 6 & 27 \\
+Andrew Habib & 33 & 34 \\
+Waqar Ul-Hassan & 0 & 32 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -212,11 +232,15 @@ Name 5 & Num & Num \\
 
 \section{CICD via GitHub Actions}
 
+We use GitHub Actions to check backend changes and build our documentation on pushes and pull requests targeting \texttt{main}. The \href{https://github.com/Ayushpatel2026/Keystone/blob/main/.github/workflows/backend-ci.yml}{backend workflow} runs Ruff linting and formatting checks, mypy type checking, and Pytest with a PostgreSQL test database when backend files change. The \href{https://github.com/Ayushpatel2026/Keystone/blob/main/.github/workflows/latex-pages.yml}{documentation workflow} compiles the LaTeX documents and Graphviz diagrams, updates generated PDFs, and publishes the documentation through GitHub Pages. We plan to continue using these workflows as the implementation and test suite grow.
+
 \wss{Say how CICD technology is used and will be used in your project.}
 
 \wss{Provide links to your CICD yaml files}
 
 \section{Custom Documents (CDs)}
+
+The Development Plan identifies the User/Stakeholder/Client Interview Report as our fall custom document and the Usability Testing Report as our winter custom document. The Interview Report records our stakeholder interviews, findings, and their connection to the requirements. The Usability Testing Report is planned to evaluate how users interact with the implemented system. These custom-document plans remain unchanged.
 
 \wss{What is the plan (as documented in TeamComposition.csv) for the team's
 CDs?  Should the CDs be modified now that the team knows more about the
@@ -224,8 +248,12 @@ project?}
 
 \section{Team Charter Trigger Items}
 
+Our team charter, recorded in the Development Plan, defines an attendance trigger of missing two consecutive meetings or being late three times in a row. Members are expected to arrive no more than ten minutes late and remain for the full meeting. The first trigger occurrence requires the member to bring snacks or coffee to the next team meeting. A second occurrence in the same term requires a check-in with the TA. Genuine emergencies are exempt, and members should notify the team as soon as reasonably possible. If an emergency affects a deliverable, the team redistributes the work or raises the issue with the TA or instructor.
+
+
 \wss{Provide a summary of the quantified triggers identified in the team's
 charter.}
+No team charter triggers were activated during this reporting period, so no corrective actions were required. The team considers the current triggers appropriate and does not see a need to revise them. Communication and coordination have been working well.
 
 \wss{Provide a list of any violations of the triggers.  If the team wishes, the
 violations can be summarized on aggregate, instead of naming specific team
@@ -235,6 +263,8 @@ members.}
 triggers, if they are found to be too weak, strong or ambiguous.}
 
 \section{Additional Productivity Metrics}
+
+We do not track any additional productivity metrics beyond those reported above.
 
 \wss{If your team has additional metrics of productivity, please feel free to
 add them to this report.  If not, please explicitly state that there are no additional
