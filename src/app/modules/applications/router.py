@@ -152,3 +152,52 @@ def _decision_error(exc: Exception) -> HTTPException:
         status.HTTP_403_FORBIDDEN,
         detail="Only the project's supervisor can accept or decline its applications",
     )
+
+
+@router.post("/{application_id}/agree", response_model=ApplicationRead)
+async def agree_to_project_endpoint(
+    application_id: uuid.UUID, session: SessionDep, user: CurrentUserDep
+) -> ProjectApplication:
+    try:
+        return await service.agree_to_project(session, user, application_id)
+    except service.ApplicationNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Application not found") from None
+    except service.NotTeamMemberError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, detail="Only a team member can accept its project offer"
+        ) from None
+    except (service.InvalidTransitionError, service.TeamAlreadyAgreedError) as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(exc)) from None
+
+
+@router.post("/{application_id}/withdraw", response_model=ApplicationRead)
+async def withdraw_application_endpoint(
+    application_id: uuid.UUID, session: SessionDep, user: CurrentUserDep
+) -> ProjectApplication:
+    try:
+        return await service.withdraw_application(session, user, application_id)
+    except service.ApplicationNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Application not found") from None
+    except service.NotTeamMemberError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, detail="Only a team member can withdraw its application"
+        ) from None
+    except service.InvalidTransitionError as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(exc)) from None
+
+
+@router.post("/{application_id}/reject", response_model=ApplicationRead)
+async def reject_submission_endpoint(
+    application_id: uuid.UUID, session: SessionDep, user: CurrentUserDep
+) -> ProjectApplication:
+    try:
+        return await service.reject_submission(session, user, application_id)
+    except service.ApplicationNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Application not found") from None
+    except service.CourseAccessDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Only authorized course instructors and TAs can reject submissions",
+        ) from None
+    except service.InvalidTransitionError as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(exc)) from None
