@@ -23,6 +23,7 @@ from app.modules.projects.service import (
     ProjectNotFoundError,
     ProjectNotOpenError,
     lock_project,
+    lock_projects,
     release_slot,
     require_open_for_applications,
     reserve_slot,
@@ -51,6 +52,10 @@ __all__ = [
     "get_application",
     "supervisor_accept",
     "supervisor_decline",
+    "agree_to_project",
+    "withdraw_application",
+    "reject_submission",
+    "InvalidTransitionError",
 ]
 
 
@@ -387,3 +392,143 @@ async def supervisor_decline(
     return await _commit_decision(
         session, user, application_id, ApplicationEvent.SUPERVISOR_DECLINE
     )
+
+
+async def agree_to_project(
+    session: AsyncSession, user: User, application_id: uuid.UUID
+) -> ProjectApplication:
+    # PoC: uses the signed-in team member without an additional re-verification challenge.
+    try:
+        # Find the application and lock its team.
+        application = await get_application(session, user, application_id)
+        team_id = application.team_id
+        await lock_team(session, team_id)
+        # Only a student on this team can agree.
+        if user.role != UserRole.STUDENT or not await is_member(session, team_id, user.id):
+            raise NotTeamMemberError(str(user.id))
+
+        # Get the IDs of every project this team applied to.
+        project_ids = list(
+            await session.scalars(
+                select(ProjectApplication.project_id).where(ProjectApplication.team_id == team_id)
+            )
+        )
+        # Lock those projects and look them up by ID.
+        projects = {p.id: p for p in await lock_projects(session, project_ids)}
+        # Lock and reload the team's applications with their latest statuses.
+        applications = list(
+            await session.scalars(
+                select(ProjectApplication)
+                .where(ProjectApplication.team_id == team_id)
+                .order_by(ProjectApplication.id)
+                .with_for_update(of=ProjectApplication)
+                .execution_options(populate_existing=True)
+            )
+        )
+        # Find the application the team wants to accept.
+        selected = next((a for a in applications if a.id == application_id), None)
+        if selected is None:
+            raise ApplicationNotFoundError(str(application_id))
+        application = selected
+        # The team cannot agree to a second project.
+        if any(a.id != application_id and has_agreement(a.status) for a in applications):
+            raise TeamAlreadyAgreedError(str(team_id))
+
+        # Check the transition and mark this application as Agreed.
+        outcome = apply_event(application.status, ApplicationEvent.TEAM_ACCEPT, Actor.TEAM)
+        application.status = outcome.new_status
+        # Close the team's other pending or supervisor-accepted applications.
+        for other in applications:
+            if other.id == application_id or other.status not in {
+                ApplicationStatus.APPLIED,
+                ApplicationStatus.SUPERVISOR_ACCEPTS,
+            }:
+                continue
+            outcome = apply_event(other.status, ApplicationEvent.SYSTEM_CLOSE, Actor.SYSTEM)
+            # Free a competing reservation only if it held a slot.
+            if outcome.slot_delta == -1:
+                release_slot(projects[other.project_id])
+            other.status = outcome.new_status
+        # Save the agreement, withdrawals, and slot changes together.
+        await session.commit()
+    except Exception:
+        # Undo all changes if any part fails.
+        await session.rollback()
+        raise
+
+    # Reload and return the saved application.
+    await session.refresh(application)
+    return application
+
+
+async def _lock_application_for_action(
+    session: AsyncSession, user: User, application_id: uuid.UUID
+) -> tuple[ProjectApplication, Project]:
+    # Check visibility before locking the team, project, and application in that order.
+    visible = await get_application(session, user, application_id)
+    team_id, project_id = visible.team_id, visible.project_id
+    await lock_team(session, team_id)
+    project = await lock_project(session, project_id)
+    application = await session.scalar(
+        select(ProjectApplication)
+        .where(ProjectApplication.id == application_id)
+        .with_for_update(of=ProjectApplication)
+        .execution_options(populate_existing=True)
+    )
+    if application is None:
+        raise ApplicationNotFoundError(str(application_id))
+    return application, project
+
+
+async def withdraw_application(
+    session: AsyncSession, user: User, application_id: uuid.UUID
+) -> ProjectApplication:
+    try:
+        application, project = await _lock_application_for_action(session, user, application_id)
+        # Only a student on the applying team may withdraw.
+        if user.role != UserRole.STUDENT or not await is_member(
+            session, application.team_id, user.id
+        ):
+            raise NotTeamMemberError(str(user.id))
+
+        # The lifecycle rejects repeated withdrawals and withdrawal after approval.
+        outcome = apply_event(application.status, ApplicationEvent.TEAM_WITHDRAW, Actor.TEAM)
+        if outcome.slot_delta == -1:
+            release_slot(project)
+        application.status = outcome.new_status
+        # Save the withdrawal and any slot release together.
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+
+    await session.refresh(application)
+    return application
+
+
+async def reject_submission(
+    session: AsyncSession, user: User, application_id: uuid.UUID
+) -> ProjectApplication:
+    # PoC: a simple decision without feedback or an additional re-verification challenge.
+    try:
+        application, project = await _lock_application_for_action(session, user, application_id)
+        # Only instructors and TAs assigned to this course may reject.
+        if user.role not in {UserRole.INSTRUCTOR, UserRole.TA} or project.course_id not in (
+            _member_course_ids(user) or set()
+        ):
+            raise CourseAccessDeniedError(str(project.course_id))
+
+        actor = Actor.INSTRUCTOR if user.role == UserRole.INSTRUCTOR else Actor.TA
+        # Rejection is allowed only while the team project is under review.
+        outcome = apply_event(application.status, ApplicationEvent.INSTRUCTOR_REJECT, actor)
+        if outcome.slot_delta == -1:
+            release_slot(project)
+        application.status = outcome.new_status
+        # Save the rejection and slot release together.
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+
+    await session.refresh(application)
+    return application
