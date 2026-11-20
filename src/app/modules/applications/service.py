@@ -6,17 +6,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.applications.lifecycle import (
     INITIAL_STATUS,
+    Actor,
+    ActorNotPermittedError,
+    ApplicationEvent,
     ApplicationStatus,
+    InvalidTransitionError,
+    apply_event,
     has_agreement,
+    is_pending,
 )
 from app.modules.applications.models import ProjectApplication
 from app.modules.applications.schemas import ApplicationCreate
-from app.modules.projects.models import Project
+from app.modules.projects.models import Project, ProjectStatus
 from app.modules.projects.service import (
+    ProjectCapacityFullError,
     ProjectNotFoundError,
     ProjectNotOpenError,
     lock_project,
+    release_slot,
     require_open_for_applications,
+    reserve_slot,
 )
 from app.modules.teams.models import TeamMember
 from app.modules.teams.service import TeamNotFoundError, is_member, lock_team
@@ -33,9 +42,15 @@ __all__ = [
     "DuplicateApplicationError",
     "ApplicationNotFoundError",
     "CourseAccessDeniedError",
+    "NotProjectSupervisorError",
+    "ProjectCapacityFullError",
+    "InvalidTransitionError",
+    "ActorNotPermittedError",
     "apply_to_project",
     "list_applications",
     "get_application",
+    "supervisor_accept",
+    "supervisor_decline",
 ]
 
 
@@ -67,6 +82,12 @@ class ApplicationNotFoundError(Exception):
 
 class CourseAccessDeniedError(Exception):
     # A course filter names a course the user is not a member of (MIS: Unauthorized).
+    pass
+
+
+class NotProjectSupervisorError(Exception):
+    # The user can see the application (e.g. a team member, TA or instructor) but is not the
+    # supervisor of its project, so they can't accept or decline it.
     pass
 
 
@@ -243,3 +264,112 @@ async def apply_to_project(
     # Reload so server-generated fields (created_at, updated_at) are populated after commit.
     await session.refresh(application)
     return application
+
+
+# ---------------------------------------------------------------------------
+# Supervisor decisions (SRS FR_DeclineTeam, MIS respondToApplication, supervisor side).
+# Accept:  Applied -> Supervisor Accepts, reserving one of the project's slots.
+# Decline: Applied or Supervisor Accepts -> Declined or withdrawn, releasing the slot if held.
+# Which moves are legal, and what they do to the slot count, is decided by lifecycle.py.
+# ---------------------------------------------------------------------------
+
+
+async def _lock_application(session: AsyncSession, application_id: uuid.UUID) -> ProjectApplication:
+    # Lock the application row and re-read it, so its status can't change (or be stale)
+    # between the lifecycle check and the write.
+    application = await session.scalar(
+        select(ProjectApplication)
+        .where(ProjectApplication.id == application_id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
+    if application is None:
+        raise ApplicationNotFoundError(str(application_id))
+    return application
+
+
+async def _close_pending_applications(session: AsyncSession, project_id: uuid.UUID) -> None:
+    # Called once a project is Full. A full project must have no applications still waiting for
+    # a decision (lifecycle invariant FULL_WITH_PENDING_APPS), so each one is closed by the
+    # system. The caller holds the project lock, so no new application can arrive meanwhile.
+    pending = await session.scalars(
+        select(ProjectApplication)
+        .where(ProjectApplication.project_id == project_id)
+        .order_by(ProjectApplication.id)
+        .with_for_update()
+        .execution_options(populate_existing=True)
+    )
+    for other in pending:
+        if is_pending(other.status):
+            closed = apply_event(other.status, ApplicationEvent.SYSTEM_CLOSE, Actor.SYSTEM)
+            other.status = closed.new_status
+
+
+async def _supervisor_decide(
+    session: AsyncSession, user: User, application_id: uuid.UUID, event: ApplicationEvent
+) -> ProjectApplication:
+    # Unlocked lookup first, scoped to what the user may read: an application outside their
+    # scope is reported as not found, exactly like GET /applications/{id}.
+    found = await session.scalar(
+        _visible_applications_query(user).where(ProjectApplication.id == application_id)
+    )
+    if found is None:
+        raise ApplicationNotFoundError(str(application_id))
+
+    # Same lock order as apply_to_project (team, then project) so the two can't deadlock.
+    # The team lock serialises this against the team's own actions, the project lock
+    # against other decisions and applications on the same project.
+    await lock_team(session, found.team_id)
+    project = await lock_project(session, found.project_id)
+
+    if user.role != UserRole.SUPERVISOR or project.supervisor_id != user.id:
+        raise NotProjectSupervisorError(str(application_id))
+
+    application = await _lock_application(session, application_id)
+
+    # Raises InvalidTransitionError when the status doesn't allow the decision, e.g. accepting
+    # an application that was already declined or withdrawn.
+    outcome = apply_event(application.status, event, Actor.SUPERVISOR)
+
+    # Change the slot count first: reserve_slot raises if the project is Closed or has no
+    # free slot, and nothing has been modified yet at that point.
+    if outcome.slot_delta > 0:
+        reserve_slot(project)
+    elif outcome.slot_delta < 0:
+        release_slot(project)
+    application.status = outcome.new_status
+
+    if project.status == ProjectStatus.FULL:
+        await _close_pending_applications(session, project.id)
+
+    return application
+
+
+async def _commit_decision(
+    session: AsyncSession, user: User, application_id: uuid.UUID, event: ApplicationEvent
+) -> ProjectApplication:
+    # Transaction boundary: the locks taken in _supervisor_decide are held until commit or
+    # rollback, so the checks, the slot change and the status change are atomic.
+    try:
+        application = await _supervisor_decide(session, user, application_id, event)
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+
+    await session.refresh(application)
+    return application
+
+
+async def supervisor_accept(
+    session: AsyncSession, user: User, application_id: uuid.UUID
+) -> ProjectApplication:
+    return await _commit_decision(session, user, application_id, ApplicationEvent.SUPERVISOR_ACCEPT)
+
+
+async def supervisor_decline(
+    session: AsyncSession, user: User, application_id: uuid.UUID
+) -> ProjectApplication:
+    return await _commit_decision(
+        session, user, application_id, ApplicationEvent.SUPERVISOR_DECLINE
+    )
