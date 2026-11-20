@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.applications.lifecycle import (
     INITIAL_STATUS,
+    PENDING,
     Actor,
     ActorNotPermittedError,
     ApplicationEvent,
@@ -13,7 +14,6 @@ from app.modules.applications.lifecycle import (
     InvalidTransitionError,
     apply_event,
     has_agreement,
-    is_pending,
 )
 from app.modules.applications.models import ProjectApplication
 from app.modules.applications.schemas import ApplicationCreate
@@ -288,21 +288,29 @@ async def _lock_application(session: AsyncSession, application_id: uuid.UUID) ->
     return application
 
 
-async def _close_pending_applications(session: AsyncSession, project_id: uuid.UUID) -> None:
+async def _close_pending_applications(
+    session: AsyncSession, project_id: uuid.UUID, keep_id: uuid.UUID
+) -> None:
     # Called once a project is Full. A full project must have no applications still waiting for
     # a decision (lifecycle invariant FULL_WITH_PENDING_APPS), so each one is closed by the
     # system. The caller holds the project lock, so no new application can arrive meanwhile.
+    # keep_id is the application the caller just decided on; it is excluded explicitly rather
+    # than relying on autoflush having already written its new status before this SELECT.
+    # Filtering on PENDING in SQL also means only rows we will actually close get locked.
     pending = await session.scalars(
         select(ProjectApplication)
-        .where(ProjectApplication.project_id == project_id)
+        .where(
+            ProjectApplication.project_id == project_id,
+            ProjectApplication.id != keep_id,
+            ProjectApplication.status.in_(PENDING),
+        )
         .order_by(ProjectApplication.id)
         .with_for_update()
         .execution_options(populate_existing=True)
     )
     for other in pending:
-        if is_pending(other.status):
-            closed = apply_event(other.status, ApplicationEvent.SYSTEM_CLOSE, Actor.SYSTEM)
-            other.status = closed.new_status
+        closed = apply_event(other.status, ApplicationEvent.SYSTEM_CLOSE, Actor.SYSTEM)
+        other.status = closed.new_status
 
 
 async def _supervisor_decide(
@@ -316,13 +324,19 @@ async def _supervisor_decide(
     if found is None:
         raise ApplicationNotFoundError(str(application_id))
 
+    # Reject non-supervisors before taking any locks, so they can't hold up other requests.
+    if user.role != UserRole.SUPERVISOR:
+        raise NotProjectSupervisorError(str(application_id))
+
     # Same lock order as apply_to_project (team, then project) so the two can't deadlock.
     # The team lock serialises this against the team's own actions, the project lock
     # against other decisions and applications on the same project.
     await lock_team(session, found.team_id)
     project = await lock_project(session, found.project_id)
 
-    if user.role != UserRole.SUPERVISOR or project.supervisor_id != user.id:
+    # Second line of defence: _visible_applications_query already hides other supervisors'
+    # applications (404), but re-check ownership against the freshly locked project row.
+    if project.supervisor_id != user.id:
         raise NotProjectSupervisorError(str(application_id))
 
     application = await _lock_application(session, application_id)
@@ -340,7 +354,7 @@ async def _supervisor_decide(
     application.status = outcome.new_status
 
     if project.status == ProjectStatus.FULL:
-        await _close_pending_applications(session, project.id)
+        await _close_pending_applications(session, project.id, keep_id=application.id)
 
     return application
 
