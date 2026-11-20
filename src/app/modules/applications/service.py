@@ -1,22 +1,26 @@
 import uuid
 
-from sqlalchemy import select
+from sqlalchemy import ColumnElement, Select, false, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.applications.lifecycle import (
     INITIAL_STATUS,
+    ApplicationStatus,
     has_agreement,
 )
 from app.modules.applications.models import ProjectApplication
 from app.modules.applications.schemas import ApplicationCreate
+from app.modules.projects.models import Project
 from app.modules.projects.service import (
     ProjectNotFoundError,
     ProjectNotOpenError,
     lock_project,
     require_open_for_applications,
 )
+from app.modules.teams.models import TeamMember
 from app.modules.teams.service import TeamNotFoundError, is_member, lock_team
+from app.modules.users.models import User, UserRole
 
 # Re-exported so the router can write service.TeamNotFoundError etc.
 __all__ = [
@@ -27,7 +31,11 @@ __all__ = [
     "CourseMismatchError",
     "TeamAlreadyAgreedError",
     "DuplicateApplicationError",
+    "ApplicationNotFoundError",
+    "CourseAccessDeniedError",
     "apply_to_project",
+    "list_applications",
+    "get_application",
 ]
 
 
@@ -49,6 +57,116 @@ class TeamAlreadyAgreedError(Exception):
 class DuplicateApplicationError(Exception):
     # The team already applied to this project.
     pass
+
+
+class ApplicationNotFoundError(Exception):
+    # No application with this id exists, OR it exists but the user may not read it. The two
+    # cases are deliberately indistinguishable so ids outside the user's scope aren't revealed.
+    pass
+
+
+class CourseAccessDeniedError(Exception):
+    # A course filter names a course the user is not a member of (MIS: Unauthorized).
+    pass
+
+
+# ---------------------------------------------------------------------------
+# Reading applications (MIS listApplications).
+# Visibility follows the SRS table: an application is readable by its participants (members
+# of the applying team and the project's supervisor) and by the course's instructors and TAs.
+# ---------------------------------------------------------------------------
+
+
+def _member_course_ids(user: User) -> set[uuid.UUID] | None:
+    # The courses the user belongs to, or None for roles that aren't tied to a course
+    # (supervisors). Instructors can have several courses, students and TAs exactly one.
+    # Only the profile matching the role is touched: async sessions can't lazy-load, so
+    # probing the other profiles (as User.course_id does) could fail on a partly loaded user.
+    match user.role:
+        case UserRole.INSTRUCTOR:
+            if user.instructor is None:
+                return set()
+            return {link.course_id for link in user.instructor.course_links}
+        case UserRole.STUDENT:
+            return {user.student.course_id} if user.student is not None else set()
+        case UserRole.TA:
+            return {user.ta.course_id} if user.ta is not None else set()
+        case _:
+            return None
+
+
+def _visible_to(user: User) -> ColumnElement[bool]:
+    # A WHERE clause selecting exactly the applications this user may read. Expects the query
+    # to have Project joined, since project-side roles are scoped through the project.
+    match user.role:
+        case UserRole.STUDENT:
+            # Applications made by any team the student is on.
+            return ProjectApplication.team_id.in_(
+                select(TeamMember.team_id).where(TeamMember.student_id == user.id)
+            )
+        case UserRole.SUPERVISOR:
+            # Every application to a project they supervise.
+            return Project.supervisor_id == user.id
+        case UserRole.INSTRUCTOR | UserRole.TA:
+            # Every application in a course they teach or assist.
+            course_ids = _member_course_ids(user) or set()
+            return Project.course_id.in_(course_ids) if course_ids else false()
+        case _:
+            # Unknown role: show nothing rather than everything.
+            return false()
+
+
+def _visible_applications_query(user: User) -> Select[tuple[ProjectApplication]]:
+    # Applications don't store a course; it comes from the project. A team can only apply
+    # within its own course, so the project's course is also the team's course.
+    return (
+        select(ProjectApplication)
+        .join(Project, Project.id == ProjectApplication.project_id)
+        .where(_visible_to(user))
+    )
+
+
+async def list_applications(
+    session: AsyncSession,
+    user: User,
+    course_id: uuid.UUID | None = None,
+    project_id: uuid.UUID | None = None,
+    team_id: uuid.UUID | None = None,
+    status: ApplicationStatus | None = None,
+) -> list[ProjectApplication]:
+    # Filters only ever narrow the user's visible set, so filtering on a project or team the
+    # user can't see returns an empty list rather than leaking anything.
+    if course_id is not None:
+        member_courses = _member_course_ids(user)
+        # Supervisors aren't course members, so for them the course is just a filter.
+        if member_courses is not None and course_id not in member_courses:
+            raise CourseAccessDeniedError(str(course_id))
+
+    query = _visible_applications_query(user)
+
+    if course_id is not None:
+        query = query.where(Project.course_id == course_id)
+    if project_id is not None:
+        query = query.where(ProjectApplication.project_id == project_id)
+    if team_id is not None:
+        query = query.where(ProjectApplication.team_id == team_id)
+    if status is not None:
+        query = query.where(ProjectApplication.status == status)
+
+    # Newest first; id breaks ties so the order is stable across requests.
+    query = query.order_by(ProjectApplication.created_at.desc(), ProjectApplication.id)
+    return list((await session.scalars(query)).all())
+
+
+async def get_application(
+    session: AsyncSession, user: User, application_id: uuid.UUID
+) -> ProjectApplication:
+    application = await session.scalar(
+        _visible_applications_query(user).where(ProjectApplication.id == application_id)
+    )
+    if application is None:
+        raise ApplicationNotFoundError(str(application_id))
+    return application
 
 
 async def _apply(

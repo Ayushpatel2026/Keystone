@@ -1,13 +1,20 @@
 import uuid
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.core.database import SessionDep
 from app.modules.applications import service
+from app.modules.applications.lifecycle import ApplicationStatus
 from app.modules.applications.models import ProjectApplication
 from app.modules.applications.schemas import ApplicationCreate, ApplicationRead
+from app.modules.auth.users import current_active_user
+from app.modules.users.models import User
 
 router = APIRouter(prefix="/api/applications", tags=["applications"])
+
+# The signed-in user, from the bearer token. Requests without a valid token get a 401.
+CurrentUserDep = Annotated[User, Depends(current_active_user)]
 
 # TODO: POC ONLY - student_id is an explicitly chosen actor, not proof of identity.
 # After the PoC, take it from the authenticated user (Depends(current_active_user)).
@@ -52,3 +59,41 @@ async def apply_to_project_endpoint(
         raise HTTPException(
             status.HTTP_409_CONFLICT, detail="The team has already applied to this project"
         ) from None
+
+
+# Unlike the PoC write endpoints above, reads are scoped to the authenticated user: a caller
+# only ever sees the applications their role allows (see service.list_applications).
+@router.get("", response_model=list[ApplicationRead])
+async def list_applications_endpoint(
+    session: SessionDep,
+    user: CurrentUserDep,
+    course_id: uuid.UUID | None = None,
+    project_id: uuid.UUID | None = None,
+    team_id: uuid.UUID | None = None,
+    # Named status_filter so it doesn't shadow fastapi's `status` module; the query
+    # parameter is still ?status=...
+    status_filter: Annotated[ApplicationStatus | None, Query(alias="status")] = None,
+) -> list[ProjectApplication]:
+    try:
+        return await service.list_applications(
+            session,
+            user,
+            course_id=course_id,
+            project_id=project_id,
+            team_id=team_id,
+            status=status_filter,
+        )
+    except service.CourseAccessDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN, detail="You are not a member of this course"
+        ) from None
+
+
+@router.get("/{application_id}", response_model=ApplicationRead)
+async def get_application_endpoint(
+    application_id: uuid.UUID, session: SessionDep, user: CurrentUserDep
+) -> ProjectApplication:
+    try:
+        return await service.get_application(session, user, application_id)
+    except service.ApplicationNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Application not found") from None
