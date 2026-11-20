@@ -97,3 +97,58 @@ async def get_application_endpoint(
         return await service.get_application(session, user, application_id)
     except service.ApplicationNotFoundError:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Application not found") from None
+
+
+# Supervisor decisions. The acting supervisor is the authenticated user, never a parameter.
+@router.post("/{application_id}/accept", response_model=ApplicationRead)
+async def supervisor_accept_endpoint(
+    application_id: uuid.UUID, session: SessionDep, user: CurrentUserDep
+) -> ProjectApplication:
+    try:
+        return await service.supervisor_accept(session, user, application_id)
+    except service.ProjectCapacityFullError:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, detail="The project has no free slots left"
+        ) from None
+    except service.ProjectNotOpenError as exc:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT,
+            detail=f"The project is not accepting teams (status: {exc.args[0]})",
+        ) from None
+    except _DECISION_ERRORS as exc:
+        raise _decision_error(exc) from None
+
+
+@router.post("/{application_id}/decline", response_model=ApplicationRead)
+async def supervisor_decline_endpoint(
+    application_id: uuid.UUID, session: SessionDep, user: CurrentUserDep
+) -> ProjectApplication:
+    try:
+        return await service.supervisor_decline(session, user, application_id)
+    except _DECISION_ERRORS as exc:
+        raise _decision_error(exc) from None
+
+
+# Errors shared by accept and decline.
+_DECISION_ERRORS = (
+    service.ApplicationNotFoundError,
+    service.NotProjectSupervisorError,
+    service.ActorNotPermittedError,
+    service.InvalidTransitionError,
+)
+
+
+def _decision_error(exc: Exception) -> HTTPException:
+    if isinstance(exc, service.ApplicationNotFoundError):
+        return HTTPException(status.HTTP_404_NOT_FOUND, detail="Application not found")
+    if isinstance(exc, service.InvalidTransitionError):
+        # Typically a stale view: the application was already decided or withdrawn.
+        return HTTPException(
+            status.HTTP_409_CONFLICT,
+            detail=f"This decision is not allowed in the application's current status ({exc})",
+        )
+    # NotProjectSupervisorError or ActorNotPermittedError.
+    return HTTPException(
+        status.HTTP_403_FORBIDDEN,
+        detail="Only the project's supervisor can accept or decline its applications",
+    )
