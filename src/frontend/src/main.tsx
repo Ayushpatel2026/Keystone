@@ -3,16 +3,10 @@
 import '@fontsource-variable/inter/opsz.css'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router'
-import { AppProviders } from './app/AppProviders.tsx'
-import { routes } from './app/routes.tsx'
-
-const router = createBrowserRouter(routes)
+import { App } from '@/app'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <AppProviders>
-      <RouterProvider router={router} />
-    </AppProviders>
+    <App />
   </StrictMode>,
 )

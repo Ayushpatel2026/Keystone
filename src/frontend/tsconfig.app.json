@@ -21,7 +21,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* Imports: "@/lib/auth" is "src/lib/auth" */
+    "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src"]
 }
