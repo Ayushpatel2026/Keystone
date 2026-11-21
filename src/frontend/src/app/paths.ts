@@ -5,7 +5,7 @@
  * one-line change:
  *   <Link to={paths.projectDetail(project.id)}>...</Link>
  *
- * When adding a route, add its path here and its page in router.tsx.
+ * When adding a route, add its path here and its page in routes.tsx.
  */
 export const paths = {
   home: '/',
