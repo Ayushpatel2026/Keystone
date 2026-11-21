@@ -9,7 +9,7 @@ import { useState } from 'react'
 import ColorModeIconDropdown from '../../theme/ColorModeIconDropdown'
 import { BrandMark } from './BrandMark'
 import { NavMenu } from './NavMenu'
-import { UserSummary } from './UserSummary'
+import { UserSwitcher } from './UserSwitcher'
 
 /**
  * Top bar with a slide-out menu, below the medium breakpoint (phones and
@@ -61,7 +61,7 @@ export function MobileNavbar() {
         }}
       >
         <Stack sx={{ width: 'min(280px, 80dvw)', height: '100%' }}>
-          <UserSummary />
+          <UserSwitcher />
           <Divider />
           <NavMenu
             onNavigate={() => {

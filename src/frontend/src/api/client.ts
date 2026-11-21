@@ -1,5 +1,5 @@
-import createClient from 'openapi-fetch'
-import type { paths } from './schema'
+import { authMiddleware } from '../auth/session'
+import { createApiClient } from './createApiClient'
 
 /**
  * Typed client for the Keystone API.
@@ -12,7 +12,9 @@ import type { paths } from './schema'
  *     params: { path: { project_id: id } },
  *   })
  *
- * No baseUrl: requests go to the same origin, and the Vite dev server (or
- * nginx in production) forwards /api and /auth to the backend.
+ * Requests carry the token of the user picked in the switcher (see
+ * src/auth/session.ts).
  */
-export const api = createClient<paths>()
+export const api = createApiClient()
+
+api.use(authMiddleware)

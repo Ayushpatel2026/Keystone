@@ -4,7 +4,7 @@ import MuiDrawer, { drawerClasses } from '@mui/material/Drawer'
 import { styled } from '@mui/material/styles'
 import { BrandMark } from './BrandMark'
 import { NavMenu } from './NavMenu'
-import { UserSummary } from './UserSummary'
+import { UserSwitcher } from './UserSwitcher'
 
 export const drawerWidth = 240
 
@@ -47,7 +47,7 @@ export function SideMenu() {
       >
         <NavMenu />
       </Box>
-      <UserSummary />
+      <UserSwitcher />
     </Drawer>
   )
 }
