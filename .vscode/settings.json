@@ -12,9 +12,9 @@
         "%WORKSPACE_FOLDER%/.latexindent.yaml"
     ],
     "python-envs.defaultEnvManager": "ms-python.python:system",
-    "python.analysis.extraPaths": ["src/backend"],
+    "python.analysis.extraPaths": ["backend"],
 
-    // Frontend: Prettier formats on save (config in src/frontend/.prettierrc.json).
+    // Frontend: Prettier formats on save (config in frontend/.prettierrc.json).
     "prettier.requireConfig": true,
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode",

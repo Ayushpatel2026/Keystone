@@ -12,8 +12,8 @@ You need:
 - **uv**, the same one the backend uses. The frontend's API types are
   generated from the backend's code, so `npm run dev` calls into it.
 - **The backend running** on `localhost:8000`, to see real data. With Docker
-  running and a `src/backend/.env` file (database settings and
-  `KEYSTONE_SECRET_KEY`), run this in `src/backend`:
+  running and a `backend/.env` file (database settings and
+  `KEYSTONE_SECRET_KEY`), run this in `backend`:
 
   ```powershell
   docker compose up -d --wait
