@@ -55,6 +55,8 @@ __all__ = [
     "agree_to_project",
     "withdraw_application",
     "reject_submission",
+    "submit_project",
+    "approve_submission",
 ]
 
 
@@ -490,31 +492,44 @@ async def withdraw_application(
     return application
 
 
-async def reject_submission(
+async def submit_project(
     session: AsyncSession, user: User, application_id: uuid.UUID
 ) -> ProjectApplication:
-    # PoC: a simple decision without feedback or an additional re-verification challenge.
+    # Agreed -> Team project submitted -> Team project under review, in one transaction.
+    # For the POC - the automated submission checks are skipped, so
+    # the system forwards the submission to review immediately. "Submitted" is therefore a
+    # transient state that is never visible between requests.
+    # TODO - add the preflight checks and a submit for review endpoint POST POC
     try:
-        # Check visibility, then lock the team, project, and application in order.
+        # Check visibility first so out-of-scope applications still return 404.
         visible = await get_application(session, user, application_id)
-        # Reject other roles before taking locks, preserving visibility-first 404 responses.
-        if user.role not in {UserRole.INSTRUCTOR, UserRole.TA}:
-            raise CourseAccessDeniedError(str(application_id))
-        team_id, project_id = visible.team_id, visible.project_id
-        await lock_team(session, team_id)
-        project = await lock_project(session, project_id)
-        application = await _lock_application(session, application_id)
-        # Only instructors and TAs assigned to this course may reject.
-        if project.course_id not in (_member_course_ids(user) or set()):
-            raise CourseAccessDeniedError(str(project.course_id))
 
-        actor = Actor.INSTRUCTOR if user.role == UserRole.INSTRUCTOR else Actor.TA
-        # Rejection is allowed only while the team project is under review.
-        outcome = apply_event(application.status, ApplicationEvent.INSTRUCTOR_REJECT, actor)
-        if outcome.slot_delta == -1:
-            release_slot(project)
-        application.status = outcome.new_status
-        # Save the rejection and slot release together.
+        # Reject other roles before taking locks.
+        if user.role != UserRole.STUDENT:
+            raise NotTeamMemberError(str(user.id))
+
+        team_id = visible.team_id
+
+        # Lock order stays team -> (project) -> application. The project lock is skipped
+        # because submitting never changes the slot count or the project's status.
+        await lock_team(session, team_id)
+
+        if not await is_member(session, team_id, user.id):
+            raise NotTeamMemberError(str(user.id))
+
+        application = await _lock_application(session, application_id)
+
+        # Raises InvalidTransitionError unless the application is Agreed (covers a repeat
+        # submit, submitting before the supervisor/team agreed, and submitting after approval).
+        submitted = apply_event(application.status, ApplicationEvent.SUBMIT, Actor.TEAM)
+        application.status = submitted.new_status
+
+        # TODO - post POC - preflight checks must pass before the system forwards to review.
+        forwarded = apply_event(
+            application.status, ApplicationEvent.FORWARD_TO_REVIEW, Actor.SYSTEM
+        )
+        application.status = forwarded.new_status
+
         await session.commit()
     except Exception:
         await session.rollback()
@@ -522,3 +537,60 @@ async def reject_submission(
 
     await session.refresh(application)
     return application
+
+
+async def _staff_review_decision(
+    session: AsyncSession, user: User, application_id: uuid.UUID, event: ApplicationEvent
+) -> ProjectApplication:
+    # an instructor or TA of the project's course decides on a
+    # team project that is under review. The lifecycle decides which statuses allow the event.
+    try:
+        # Check visibility, then lock the team, project, and application in order.
+        visible = await get_application(session, user, application_id)
+
+        # Reject other roles before taking locks, preserving visibility-first 404 responses.
+        if user.role not in {UserRole.INSTRUCTOR, UserRole.TA}:
+            raise CourseAccessDeniedError(str(application_id))
+
+        team_id, project_id = visible.team_id, visible.project_id
+        await lock_team(session, team_id)
+        project = await lock_project(session, project_id)
+        application = await _lock_application(session, application_id)
+
+        # Only instructors and TAs assigned to this course may decide.
+        if project.course_id not in (_member_course_ids(user) or set()):
+            raise CourseAccessDeniedError(str(project.course_id))
+
+        actor = Actor.INSTRUCTOR if user.role == UserRole.INSTRUCTOR else Actor.TA
+        outcome = apply_event(application.status, event, actor)
+
+        # Approve keeps the slot, reject releases it and reopens a Full project.
+        if outcome.slot_delta > 0:
+            reserve_slot(project)
+        elif outcome.slot_delta < 0:
+            release_slot(project)
+
+        application.status = outcome.new_status
+        await session.commit()
+    except Exception:
+        await session.rollback()
+        raise
+
+    await session.refresh(application)
+    return application
+
+
+async def approve_submission(
+    session: AsyncSession, user: User, application_id: uuid.UUID
+) -> ProjectApplication:
+    return await _staff_review_decision(
+        session, user, application_id, ApplicationEvent.INSTRUCTOR_APPROVE
+    )
+
+
+async def reject_submission(
+    session: AsyncSession, user: User, application_id: uuid.UUID
+) -> ProjectApplication:
+    return await _staff_review_decision(
+        session, user, application_id, ApplicationEvent.INSTRUCTOR_REJECT
+    )
