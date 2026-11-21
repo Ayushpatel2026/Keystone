@@ -12,14 +12,19 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "gen:api": "uv --directory ../backend run python -m app.export_openapi ../frontend/src/api/openapi.json && openapi-typescript src/api/openapi.json -o src/api/schema.d.ts",
+    "predev": "npm run gen:api"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.108.2",
+    "openapi-fetch": "^0.17.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@tanstack/eslint-plugin-query": "^5.108.2",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^8.0.0",
     "@testing-library/react": "^16.3.3",
@@ -35,6 +40,7 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
     "jsdom": "^31.0.1",
+    "openapi-typescript": "^7.13.0",
     "prettier": "^3.10.1",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.72.1",
@@ -43,5 +49,10 @@
   },
   "engines": {
     "node": ">=26"
+  },
+  "overrides": {
+    "openapi-typescript": {
+      "typescript": "$typescript"
+    }
   }
 }
