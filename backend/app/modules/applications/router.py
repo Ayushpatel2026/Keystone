@@ -205,3 +205,37 @@ async def reject_submission_endpoint(
         ) from None
     except service.InvalidTransitionError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=str(exc)) from None
+
+
+@router.post("/{application_id}/submit", response_model=ApplicationRead)
+async def submit_project_endpoint(
+    application_id: uuid.UUID, session: SessionDep, user: CurrentUserDep
+) -> ProjectApplication:
+    try:
+        return await service.submit_project(session, user, application_id)
+    except service.ApplicationNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Application not found") from None
+    except service.NotTeamMemberError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Only a team member can submit its project for review",
+        ) from None
+    except service.InvalidTransitionError as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(exc)) from None
+
+
+@router.post("/{application_id}/approve", response_model=ApplicationRead)
+async def approve_submission_endpoint(
+    application_id: uuid.UUID, session: SessionDep, user: CurrentUserDep
+) -> ProjectApplication:
+    try:
+        return await service.approve_submission(session, user, application_id)
+    except service.ApplicationNotFoundError:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Application not found") from None
+    except service.CourseAccessDeniedError:
+        raise HTTPException(
+            status.HTTP_403_FORBIDDEN,
+            detail="Only authorized course instructors and TAs can approve submissions",
+        ) from None
+    except service.InvalidTransitionError as exc:
+        raise HTTPException(status.HTTP_409_CONFLICT, detail=str(exc)) from None
