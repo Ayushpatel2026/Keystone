@@ -57,9 +57,8 @@ Keystone/
 │   └── Reflection.text        # Shared reflection prompts
 ├── pdfs/                      # Compiled PDFs of each deliverable
 ├── refs/                      # Shared bibliography (References.bib)
-└── src/                       # Application code
-    ├── backend/               # FastAPI + PostgreSQL (uv project, Alembic migrations)
-    └── frontend/              # React + TypeScript (Vite)
+├── backend/                   # FastAPI + PostgreSQL (uv project, Alembic migrations)
+└── frontend/                  # React + TypeScript (Vite); setup in frontend/README.md
 ```
 
 ## Documentation
@@ -69,7 +68,7 @@ The documentation for this project is updated on the project's [Github.io page](
 
 ## Planned Tech Stack
 
-React (TypeScript) · Python / FastAPI · PostgreSQL · Docker · GitHub Actions (CI) · pytest, Jest, Playwright · SonarQube
+React (TypeScript) · Python / FastAPI · PostgreSQL · Docker · GitHub Actions (CI) · pytest, Vitest, Playwright · SonarQube
 
 ## License
 

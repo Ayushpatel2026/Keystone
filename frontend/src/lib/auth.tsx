@@ -19,7 +19,7 @@ export type DemoUser =
 
 /**
  * The password every seeded account shares (`SEED_PASSWORD` in
- * src/backend/app/core/seed.py). The PoC has no real sign-in: the user picks
+ * backend/app/core/seed.py). The PoC has no real sign-in: the user picks
  * who to act as, and the app signs in as them behind the scenes. Accounts
  * made through /auth/register have their own passwords, so only seeded users
  * can be picked.
