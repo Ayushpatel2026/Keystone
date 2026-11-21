@@ -55,7 +55,6 @@ __all__ = [
     "agree_to_project",
     "withdraw_application",
     "reject_submission",
-    "InvalidTransitionError",
 ]
 
 
@@ -323,11 +322,7 @@ async def _supervisor_decide(
 ) -> ProjectApplication:
     # Unlocked lookup first, scoped to what the user may read: an application outside their
     # scope is reported as not found, exactly like GET /applications/{id}.
-    found = await session.scalar(
-        _visible_applications_query(user).where(ProjectApplication.id == application_id)
-    )
-    if found is None:
-        raise ApplicationNotFoundError(str(application_id))
+    found = await get_application(session, user, application_id)
 
     # Reject non-supervisors before taking any locks, so they can't hold up other requests.
     if user.role != UserRole.SUPERVISOR:
@@ -414,7 +409,7 @@ async def agree_to_project(
             )
         )
         # Lock those projects and look them up by ID.
-        projects = {p.id: p for p in await lock_projects(session, project_ids)}
+        projects_by_id = {p.id: p for p in await lock_projects(session, project_ids)}
         # Lock and reload the team's applications with their latest statuses.
         applications = list(
             await session.scalars(
@@ -447,7 +442,7 @@ async def agree_to_project(
             outcome = apply_event(other.status, ApplicationEvent.SYSTEM_CLOSE, Actor.SYSTEM)
             # Free a competing reservation only if it held a slot.
             if outcome.slot_delta == -1:
-                release_slot(projects[other.project_id])
+                release_slot(projects_by_id[other.project_id])
             other.status = outcome.new_status
         # Save the agreement, withdrawals, and slot changes together.
         await session.commit()
@@ -461,30 +456,16 @@ async def agree_to_project(
     return application
 
 
-async def _lock_application_for_action(
-    session: AsyncSession, user: User, application_id: uuid.UUID
-) -> tuple[ProjectApplication, Project]:
-    # Check visibility before locking the team, project, and application in that order.
-    visible = await get_application(session, user, application_id)
-    team_id, project_id = visible.team_id, visible.project_id
-    await lock_team(session, team_id)
-    project = await lock_project(session, project_id)
-    application = await session.scalar(
-        select(ProjectApplication)
-        .where(ProjectApplication.id == application_id)
-        .with_for_update(of=ProjectApplication)
-        .execution_options(populate_existing=True)
-    )
-    if application is None:
-        raise ApplicationNotFoundError(str(application_id))
-    return application, project
-
-
 async def withdraw_application(
     session: AsyncSession, user: User, application_id: uuid.UUID
 ) -> ProjectApplication:
     try:
-        application, project = await _lock_application_for_action(session, user, application_id)
+        # Check visibility, then lock the team, project, and application in order.
+        visible = await get_application(session, user, application_id)
+        team_id, project_id = visible.team_id, visible.project_id
+        await lock_team(session, team_id)
+        project = await lock_project(session, project_id)
+        application = await _lock_application(session, application_id)
         # Only a student on the applying team may withdraw.
         if user.role != UserRole.STUDENT or not await is_member(
             session, application.team_id, user.id
@@ -511,7 +492,12 @@ async def reject_submission(
 ) -> ProjectApplication:
     # PoC: a simple decision without feedback or an additional re-verification challenge.
     try:
-        application, project = await _lock_application_for_action(session, user, application_id)
+        # Check visibility, then lock the team, project, and application in order.
+        visible = await get_application(session, user, application_id)
+        team_id, project_id = visible.team_id, visible.project_id
+        await lock_team(session, team_id)
+        project = await lock_project(session, project_id)
+        application = await _lock_application(session, application_id)
         # Only instructors and TAs assigned to this course may reject.
         if user.role not in {UserRole.INSTRUCTOR, UserRole.TA} or project.course_id not in (
             _member_course_ids(user) or set()

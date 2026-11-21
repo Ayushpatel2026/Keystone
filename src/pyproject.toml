@@ -45,3 +45,4 @@ addopts = "--cov=app --cov-report=term-missing --cov-report=xml"
 
 [tool.coverage.run]
 branch = false
+concurrency = ["thread", "greenlet"]
