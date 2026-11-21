@@ -41,7 +41,7 @@ jobs:
             exit 0
           fi
 
-          if git diff --name-only "$BASE" HEAD | grep -qE '^(src/frontend/|\.github/workflows/frontend-ci\.yml$)'; then
+          if git diff --name-only "$BASE" HEAD | grep -qE '^(src/frontend/|src/backend/(app/|pyproject\.toml$|uv\.lock$)|\.github/workflows/frontend-ci\.yml$)'; then
             echo "run_ci=true" >> $GITHUB_OUTPUT
           else
             echo "No frontend changes detected. Skipping CI."
@@ -68,6 +68,23 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      # The API types aren't committed; they're generated from the backend here,
+      # so lint, type check and tests always run against the current API.
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: src/backend/.python-version
+
+      - name: Install backend dependencies
+        working-directory: src/backend
+        run: uv sync --frozen --no-dev
+
+      - name: Generate API types
+        run: npm run gen:api
 
       # Fails only on high or critical advisories, so minor ones in dev tools
       # don't block merges. Run `npm audit` locally to see everything.
