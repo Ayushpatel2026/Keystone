@@ -1,6 +1,9 @@
 {
     "recommendations": [
         "James-Yu.latex-workshop",
-        "tintinweb.graphviz-interactive-preview"
+        "tintinweb.graphviz-interactive-preview",
+        "esbenp.prettier-vscode",
+        "dbaeumer.vscode-eslint",
+        "charliermarsh.ruff"
     ]
 }

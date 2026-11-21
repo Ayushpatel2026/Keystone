@@ -1,4 +1,5 @@
 {
+    // Off globally so LaTeX files are not reformatted on save.
     "editor.formatOnSave": false,
     "latex-workshop.formatting.latex": "latexindent",
     "latex-workshop.formatting.latexindent.args": [
@@ -11,5 +12,37 @@
         "%WORKSPACE_FOLDER%/.latexindent.yaml"
     ],
     "python-envs.defaultEnvManager": "ms-python.python:system",
-    "python.analysis.extraPaths": ["src/backend"]
+    "python.analysis.extraPaths": ["src/backend"],
+
+    // Frontend: Prettier formats on save (config in src/frontend/.prettierrc.json).
+    "prettier.requireConfig": true,
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[typescriptreact]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+    "[css]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.formatOnSave": true
+    },
+
+    // Backend: Ruff formats and sorts imports on save, matching CI.
+    "[python]": {
+        "editor.defaultFormatter": "charliermarsh.ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports.ruff": "explicit"
+        }
+    }
 }
