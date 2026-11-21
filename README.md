@@ -57,7 +57,9 @@ Keystone/
 │   └── Reflection.text        # Shared reflection prompts
 ├── pdfs/                      # Compiled PDFs of each deliverable
 ├── refs/                      # Shared bibliography (References.bib)
-└── (src/ coming soon)         # Application code (React + FastAPI)
+└── src/                       # Application code
+    ├── backend/               # FastAPI + PostgreSQL (uv project, Alembic migrations)
+    └── frontend/              # React + TypeScript (Vite)
 ```
 
 ## Documentation
