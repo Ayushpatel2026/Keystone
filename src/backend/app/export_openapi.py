@@ -25,6 +25,7 @@ def main() -> None:
     from app.main import app
 
     output = Path(sys.argv[1])
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(app.openapi(), indent=2) + "\n", encoding="utf-8")
     print(f"Wrote OpenAPI schema to {output}")
 
