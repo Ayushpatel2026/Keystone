@@ -240,7 +240,7 @@ The following documents define what is verified and how the verification is orga
       and owns the system test results for it.\\
       \addlinespace
       Unit test owner & Ayush Patel &
-      Owns the backend (pytest) and frontend (Jest) unit tests and their coverage, and reviews unit tests in
+      Owns the backend (pytest) and frontend (Vitest) unit tests and their coverage, and reviews unit tests in
       pull requests for whether they test the intended behaviour.\\
       \addlinespace
       Integration test owner & Ahmed Rashrash &
@@ -365,7 +365,7 @@ The following documents define what is verified and how the verification is orga
 
   \begin{itemize}
     \item \textbf{Unit tests (owner: Ayush).} Backend unit tests with pytest cover the API endpoints and the
-    core logic. Frontend unit tests with Jest cover components, including form validation and the display of statuses.
+    core logic. Frontend unit tests with Vitest cover components, including form validation and the display of statuses.
     Test design follows the guidance in the Development Plan \citep{DevelopmentPlan},
     including boundary values and expected failures.
     The target is about 80\% statement coverage. Section~\ref{sec:unit-tests} describes the unit tests in detail.
@@ -430,9 +430,9 @@ The following documents define what is verified and how the verification is orga
       \addlinespace
       pytest, pytest-cov & Backend unit tests and coverage (Cobertura XML) & Every push and pull request\\
       \addlinespace
-      Jest & Frontend unit tests and coverage (LCOV) & Every push and pull request\\
+      Vitest & Frontend unit tests and coverage (LCOV) & Every push and pull request\\
       \addlinespace
-      SonarQube & Code quality analysis, and coverage reporting from the pytest-cov and Jest reports & Every pull request and merge to main\\
+      SonarQube & Code quality analysis, and coverage reporting from the pytest-cov and Vitest reports & Every pull request and merge to main\\
       \addlinespace
       pip-audit, npm audit & Known vulnerabilities in dependencies & Every pull request and merge to main\\
       \addlinespace

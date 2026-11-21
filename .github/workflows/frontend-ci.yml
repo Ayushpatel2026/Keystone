@@ -69,12 +69,24 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Fails only on high or critical advisories, so minor ones in dev tools
+      # don't block merges. Run `npm audit` locally to see everything.
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
+
+      - name: Check formatting (Prettier)
+        run: npm run format:check
+
       - name: Run ESLint
         run: npm run lint
 
       # `build` runs `tsc -b` first, so this is also the type check.
       - name: Type check and build
         run: npm run build
+
+      # Writes coverage/lcov.info for SonarQube to import.
+      - name: Run tests with coverage
+        run: npm run coverage
 
   # Mark THIS job as required in branch protection. It always runs, passes
   # when src/frontend didn't change, and fails if detection or the real CI failed.
