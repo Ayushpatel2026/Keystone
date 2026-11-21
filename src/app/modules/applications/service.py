@@ -392,14 +392,17 @@ async def supervisor_decline(
 async def agree_to_project(
     session: AsyncSession, user: User, application_id: uuid.UUID
 ) -> ProjectApplication:
-    # PoC: uses the signed-in team member without an additional re-verification challenge.
+    # TODO: After PoC, re-verify the team member before agreement (SRS FR_ReverifyUsers).
     try:
-        # Find the application and lock its team.
+        # Check visibility first so out-of-scope applications still return 404.
         application = await get_application(session, user, application_id)
         team_id = application.team_id
+        # Reject other roles before taking locks.
+        if user.role != UserRole.STUDENT:
+            raise NotTeamMemberError(str(user.id))
         await lock_team(session, team_id)
         # Only a student on this team can agree.
-        if user.role != UserRole.STUDENT or not await is_member(session, team_id, user.id):
+        if not await is_member(session, team_id, user.id):
             raise NotTeamMemberError(str(user.id))
 
         # Get the IDs of every project this team applied to.
@@ -494,14 +497,15 @@ async def reject_submission(
     try:
         # Check visibility, then lock the team, project, and application in order.
         visible = await get_application(session, user, application_id)
+        # Reject other roles before taking locks, preserving visibility-first 404 responses.
+        if user.role not in {UserRole.INSTRUCTOR, UserRole.TA}:
+            raise CourseAccessDeniedError(str(application_id))
         team_id, project_id = visible.team_id, visible.project_id
         await lock_team(session, team_id)
         project = await lock_project(session, project_id)
         application = await _lock_application(session, application_id)
         # Only instructors and TAs assigned to this course may reject.
-        if user.role not in {UserRole.INSTRUCTOR, UserRole.TA} or project.course_id not in (
-            _member_course_ids(user) or set()
-        ):
+        if project.course_id not in (_member_course_ids(user) or set()):
             raise CourseAccessDeniedError(str(project.course_id))
 
         actor = Actor.INSTRUCTOR if user.role == UserRole.INSTRUCTOR else Actor.TA

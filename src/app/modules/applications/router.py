@@ -166,7 +166,11 @@ async def agree_to_project_endpoint(
         raise HTTPException(
             status.HTTP_403_FORBIDDEN, detail="Only a team member can accept its project offer"
         ) from None
-    except (service.InvalidTransitionError, service.TeamAlreadyAgreedError) as exc:
+    except service.TeamAlreadyAgreedError:
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, detail="The team has already agreed to a project"
+        ) from None
+    except service.InvalidTransitionError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=str(exc)) from None
 
 
