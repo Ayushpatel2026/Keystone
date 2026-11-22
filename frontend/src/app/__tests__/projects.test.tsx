@@ -8,7 +8,55 @@ import { server } from '@/testing/mocks/server'
 import { renderApp } from '@/testing/test-utils'
 
 describe('project catalog', () => {
-  it('displays project details, availability, and the details link', async () => {
+  it.each([
+    { status: 'open', label: 'Open', reserved: 1, available: 1 },
+    { status: 'full', label: 'Full', reserved: 2, available: 0 },
+    { status: 'closed', label: 'Closed', reserved: 1, available: 1 },
+  ] as const)(
+    'displays $label projects and their slot counts',
+    async ({ status, label, reserved, available }) => {
+      // Each card shows the status and slot counts returned by the API.
+      server.use(
+        http.get('/api/projects', () =>
+          HttpResponse.json([
+            {
+              ...project,
+              status,
+              slots_reserved: reserved,
+              slots_available: available,
+            },
+          ]),
+        ),
+      )
+      renderApp('/projects')
+      await screen.findByRole('heading', { name: project.title })
+      expect(screen.getByText(label)).toBeInTheDocument()
+      expect(
+        screen.getByText(
+          `Capacity: ${reserved} of 2 slots reserved | Available: ${available}`,
+        ),
+      ).toBeInTheDocument()
+    },
+  )
+
+  it('sends the Closed availability filter to the API', async () => {
+    // Selecting Closed requests closed projects from the backend.
+    const requests: URLSearchParams[] = []
+    server.use(
+      http.get('/api/projects', ({ request }) => {
+        requests.push(new URL(request.url).searchParams)
+        return HttpResponse.json([])
+      }),
+    )
+    const user = userEvent.setup()
+    renderApp('/projects')
+    await screen.findByText('No projects match your filters.')
+    await user.click(screen.getByRole('combobox', { name: 'Availability' }))
+    await user.click(await screen.findByRole('option', { name: 'Closed' }))
+    await waitFor(() => expect(requests.at(-1)?.get('status')).toBe('closed'))
+  })
+
+  it('displays project details and the details link', async () => {
     // The catalog card shows the API values and links to that project's URL.
     server.use(http.get('/api/projects', () => HttpResponse.json([project])))
     renderApp('/projects')
@@ -17,10 +65,6 @@ describe('project catalog', () => {
       await screen.findByRole('heading', { name: project.title }),
     ).toBeInTheDocument()
     expect(screen.getByText(project.background)).toBeInTheDocument()
-    expect(screen.getByText('Open')).toBeInTheDocument()
-    expect(
-      screen.getByText(/Capacity: 2 teams \| Reserved: 1 \| Available: 1/),
-    ).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'View details' })).toHaveAttribute(
       'href',
       `/projects/${project.id}`,
