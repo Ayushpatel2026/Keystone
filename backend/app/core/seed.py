@@ -2,12 +2,14 @@ import asyncio
 from typing import Any
 
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from app.core.database import build_engine
 from app.modules.auth.manager import password_helper
 from app.modules.courses.models import Course, CourseProgram
 from app.modules.courses.service import normalize_course_code
+from app.modules.projects.models import Project, ProjectStatus
+from app.modules.teams.models import Team, TeamMember
 from app.modules.users.models import (
     TA,
     Instructor,
@@ -132,6 +134,35 @@ SEED_USERS: list[dict[str, Any]] = [
 ]
 
 
+SEED_PROJECTS = [
+    (
+        "Smart Campus Navigation",
+        "Help users find accessible routes across campus.",
+        1,
+        "david.supervisor@example.com",
+    ),
+    (
+        "Automated Assembly Line",
+        "Automate an assembly line using sensors and process controls.",
+        1,
+        "david.supervisor@example.com",
+    ),
+    (
+        "Autonomous Waste Sorting System",
+        "Identify and sort recyclable materials using computer vision and robotics.",
+        2,
+        "grace.professor@mcmaster.ca",
+    ),
+]
+
+
+SEED_TEAMS = [
+    ("Team Amazing Engineers", STUDENT_NAMES[:3]),
+    ("Team Fantastic Coders", STUDENT_NAMES[3:6]),
+    ("Team Capstone Legends", STUDENT_NAMES[6:]),
+]
+
+
 def _build_user(
     spec: dict[str, Any],
     courses: dict[str, Course],
@@ -190,76 +221,127 @@ def _build_user(
     return user
 
 
-async def seed_users() -> None:
+async def seed_courses(session: AsyncSession) -> dict[str, Course]:
+    courses: dict[str, Course] = {}
 
+    for course_data in SEED_COURSES:
+        normalized_code = normalize_course_code(course_data["code"])
+
+        course = await session.scalar(select(Course).where(Course.code == normalized_code))
+
+        if course is None:
+            course = Course(
+                **{
+                    **course_data,
+                    "code": normalized_code,
+                }
+            )
+
+            session.add(course)
+
+            # Flush assigns generated UUIDs without committing.
+            await session.flush()
+
+            print(f"Created course: {normalized_code}")
+
+        else:
+            print(f"Existing course: {normalized_code}")
+
+        courses[normalized_code] = course
+    return courses
+
+
+async def seed_users(session: AsyncSession, courses: dict[str, Course]) -> dict[str, User]:
+    users: dict[str, User] = {}
+    for spec in SEED_USERS:
+        email = spec["email"].lower()
+
+        existing = await session.scalar(select(User).where(User.email == email))
+
+        # Idempotent seeding: running twice won't create duplicates.
+        if existing is not None:
+            users[email] = existing
+            print(f"Skipping existing user: {email}")
+            continue
+
+        user = _build_user(spec, courses)
+
+        session.add(user)
+        users[email] = user
+
+        print(f"Created {spec['role'].value}: {email}")
+    await session.flush()
+    return users
+
+
+async def seed_projects(
+    session: AsyncSession, courses: dict[str, Course], users: dict[str, User]
+) -> None:
+    course = courses[normalize_course_code(SE_CODE)]
+    # Reuse the projects from the PoC plan without resetting existing demo progress.
+    for title, background, capacity, email in SEED_PROJECTS:
+        project = await session.scalar(
+            select(Project).where(Project.course_id == course.id, Project.title == title)
+        )
+        if project is None:
+            session.add(
+                Project(
+                    title=title,
+                    background=background,
+                    supervisor_id=users[email].id,
+                    course_id=course.id,
+                    supervisor_capacity=capacity,
+                    slots_reserved=0,
+                    status=ProjectStatus.OPEN,
+                )
+            )
+            print(f"Created project: {title}")
+        else:
+            print(f"Existing project: {title}")
+
+
+async def seed_teams(
+    session: AsyncSession, courses: dict[str, Course], users: dict[str, User]
+) -> None:
+    course = courses[normalize_course_code(SE_CODE)]
+    # Three demo teams share the eight seeded students, with no duplicate membership.
+    for name, members in SEED_TEAMS:
+        team = await session.scalar(
+            select(Team).where(Team.course_id == course.id, Team.name == name)
+        )
+        if team is not None:
+            print(f"Existing team: {name}")
+            continue
+        team = Team(course_id=course.id, name=name)
+        session.add(team)
+        await session.flush()
+        for first, last in members:
+            student = users[f"{first}.{last}@mcmaster.ca".lower()]
+            membership = await session.scalar(
+                select(TeamMember).where(TeamMember.student_id == student.id).limit(1)
+            )
+            if membership is None:
+                session.add(TeamMember(team_id=team.id, student_id=student.id))
+            else:
+                print(f"Keeping existing team membership: {student.email}")
+        print(f"Created team: {name}")
+
+
+async def seed_all() -> None:
     engine = build_engine()
-
-    session_factory = async_sessionmaker(
-        engine,
-        expire_on_commit=False,
-    )
-
+    session_factory = async_sessionmaker(engine, expire_on_commit=False)
     try:
         async with session_factory() as session:
-            # ----------------------------------------------------
-            # 1. Create/retrieve courses.
-            # ----------------------------------------------------
-
-            courses: dict[str, Course] = {}
-
-            for course_data in SEED_COURSES:
-                normalized_code = normalize_course_code(course_data["code"])
-
-                course = await session.scalar(select(Course).where(Course.code == normalized_code))
-
-                if course is None:
-                    course = Course(
-                        **{
-                            **course_data,
-                            "code": normalized_code,
-                        }
-                    )
-
-                    session.add(course)
-
-                    # Flush assigns generated UUIDs without committing.
-                    await session.flush()
-
-                    print(f"Created course: {normalized_code}")
-
-                else:
-                    print(f"Existing course: {normalized_code}")
-
-                courses[normalized_code] = course
-
-            # ----------------------------------------------------
-            # 2. Create/retrieve users.
-            # ----------------------------------------------------
-
-            for spec in SEED_USERS:
-                email = spec["email"].lower()
-
-                existing = await session.scalar(select(User).where(User.email == email))
-
-                # Idempotent seeding: running twice won't create duplicates.
-                if existing is not None:
-                    print(f"Skipping existing user: {email}")
-                    continue
-
-                user = _build_user(spec, courses)
-
-                session.add(user)
-
-                print(f"Created {spec['role'].value}: {email}")
-
-            # Commit all new courses/users/profiles together.
+            courses = await seed_courses(session)
+            users = await seed_users(session, courses)
+            await seed_projects(session, courses, users)
+            await seed_teams(session, courses, users)
+            # Save all seed data together.
             await session.commit()
-
-            print("User seeding completed successfully.")
-
+            print("Development seeding completed successfully.")
     finally:
         await engine.dispose()
 
 
 if __name__ == "__main__":
-    asyncio.run(seed_users())
+    asyncio.run(seed_all())

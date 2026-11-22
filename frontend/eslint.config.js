@@ -61,12 +61,11 @@ export default defineConfig([
               ],
               from: ['./src/features', './src/app'],
             },
-            // Example, once features/projects exists:
-            // {
-            //   target: './src/features/projects',
-            //   from: './src/features',
-            //   except: ['./projects'],
-            // },
+            {
+              target: './src/features/projects',
+              from: './src/features',
+              except: ['./projects'],
+            },
           ],
         },
       ],
