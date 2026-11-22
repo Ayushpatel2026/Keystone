@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { api } from '@/lib/api-client'
 
-/** Course names for project labels and filters. */
+/** Fetch courses for labels and filters. */
 export function useCourses() {
   return useQuery({
     queryKey: ['courses'],

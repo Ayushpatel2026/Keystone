@@ -11,7 +11,7 @@ import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { paths } from '@/config/paths'
-import { useCourses } from '@/features/projects/api/get-courses'
+import { useCourses } from '@/features/courses/api/get-courses'
 import { useUsers } from '@/lib/auth'
 import {
   useProjects,

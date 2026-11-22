@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography'
 import { Link, useParams } from 'react-router'
 import { paths } from '@/config/paths'
 import { useProject } from '@/features/projects/api/get-project'
-import { useCourses } from '@/features/projects/api/get-courses'
+import { useCourses } from '@/features/courses/api/get-courses'
 import { useUsers } from '@/lib/auth'
 
 /** Full details and availability for the project selected from the catalog. */

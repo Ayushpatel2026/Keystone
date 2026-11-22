@@ -66,6 +66,11 @@ export default defineConfig([
               from: './src/features',
               except: ['./projects'],
             },
+            {
+              target: './src/features/courses',
+              from: './src/features',
+              except: ['./courses'],
+            },
           ],
         },
       ],
