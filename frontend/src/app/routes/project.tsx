@@ -1,5 +1,7 @@
 import Alert from '@mui/material/Alert'
 import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
 import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
@@ -27,6 +29,7 @@ export function ProjectDetailPage() {
       <Button
         component={Link}
         to={paths.projects}
+        variant="outlined"
         sx={{ alignSelf: 'flex-start' }}
       >
         Back to projects
@@ -43,44 +46,57 @@ export function ProjectDetailPage() {
           <Typography variant="h4" component="h1">
             {project.title}
           </Typography>
-          <Chip
-            label={
-              project.status.charAt(0).toUpperCase() + project.status.slice(1)
-            }
-            color={project.status === 'open' ? 'success' : 'default'}
-            sx={{ alignSelf: 'flex-start' }}
-          />
-          <Typography>
-            Course:{' '}
-            {course
-              ? `${course.code} - ${course.name}`
-              : courses.isPending
-                ? 'Loading...'
-                : 'Unavailable'}
-          </Typography>
-          <Typography>
-            Supervisor:{' '}
-            {supervisor
-              ? `${supervisor.first_name} ${supervisor.last_name}`
-              : users.isPending
-                ? 'Loading...'
-                : 'Unavailable'}
-          </Typography>
-          <Typography variant="h6" component="h2">
-            Background
-          </Typography>
-          <Typography sx={{ whiteSpace: 'pre-wrap' }}>
-            {project.background}
-          </Typography>
-          <Typography variant="h6" component="h2">
-            Availability
-          </Typography>
-          <Typography>Capacity: {project.supervisor_capacity} teams</Typography>
-          <Typography>Reserved slots: {project.slots_reserved}</Typography>
-          <Typography>Available slots: {project.slots_available}</Typography>
-          <Typography color="text.secondary">
-            Last updated: {new Date(project.updated_at).toLocaleString()}
-          </Typography>
+          <Card variant="outlined">
+            <CardContent>
+              <Stack spacing={2}>
+                <Chip
+                  label={
+                    project.status.charAt(0).toUpperCase() +
+                    project.status.slice(1)
+                  }
+                  color={project.status === 'open' ? 'success' : 'default'}
+                  sx={{ alignSelf: 'flex-start' }}
+                />
+                <Typography>
+                  Course:{' '}
+                  {course
+                    ? `${course.code} - ${course.name}`
+                    : courses.isPending
+                      ? 'Loading...'
+                      : 'Unavailable'}
+                </Typography>
+                <Typography>
+                  Supervisor:{' '}
+                  {supervisor
+                    ? `${supervisor.first_name} ${supervisor.last_name}`
+                    : users.isPending
+                      ? 'Loading...'
+                      : 'Unavailable'}
+                </Typography>
+                <Typography variant="h6" component="h2">
+                  Background
+                </Typography>
+                <Typography sx={{ whiteSpace: 'pre-wrap' }}>
+                  {project.background}
+                </Typography>
+                <Typography variant="h6" component="h2">
+                  Availability
+                </Typography>
+                <Typography>
+                  Capacity: {project.supervisor_capacity} teams
+                </Typography>
+                <Typography>
+                  Reserved slots: {project.slots_reserved}
+                </Typography>
+                <Typography>
+                  Available slots: {project.slots_available}
+                </Typography>
+                <Typography color="text.secondary">
+                  Last updated: {new Date(project.updated_at).toLocaleString()}
+                </Typography>
+              </Stack>
+            </CardContent>
+          </Card>
         </>
       )}
     </Stack>

@@ -131,38 +131,74 @@ export function ProjectCatalogPage() {
         <Typography>No projects match your filters.</Typography>
       )}
       {projects.isSuccess &&
-        projects.data?.map((project) => (
-          <Card key={project.id} variant="outlined">
-            <CardContent>
-              <Stack spacing={2}>
-                <Typography variant="h6" component="h2">
-                  {project.title}
-                </Typography>
-                <Chip
-                  label={
-                    project.status.charAt(0).toUpperCase() +
-                    project.status.slice(1)
-                  }
-                  color={project.status === 'open' ? 'success' : 'default'}
-                  sx={{ alignSelf: 'flex-start' }}
-                />
-                <Typography>{project.background}</Typography>
-                <Typography color="text.secondary">
-                  Capacity: {project.supervisor_capacity} teams | Reserved:{' '}
-                  {project.slots_reserved}
-                  {' | '}Available: {project.slots_available}
-                </Typography>
-                <Button
-                  component={Link}
-                  to={paths.projectDetail(project.id)}
-                  sx={{ alignSelf: 'flex-start' }}
-                >
-                  View details
-                </Button>
-              </Stack>
-            </CardContent>
-          </Card>
-        ))}
+        projects.data?.map((project) => {
+          const course = courses.data?.find(
+            (item) => item.id === project.course_id,
+          )
+          const supervisor = supervisors.find(
+            (item) => item.id === project.supervisor_id,
+          )
+          return (
+            <Card key={project.id} variant="outlined">
+              <CardContent>
+                <Stack spacing={2}>
+                  <Stack
+                    direction="row"
+                    sx={{
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                    }}
+                    spacing={2}
+                  >
+                    <Typography variant="h6" component="h2">
+                      {project.title}
+                    </Typography>
+                    <Chip
+                      size="small"
+                      label={
+                        project.status.charAt(0).toUpperCase() +
+                        project.status.slice(1)
+                      }
+                      color={project.status === 'open' ? 'success' : 'default'}
+                      sx={{ flexShrink: 0 }}
+                    />
+                  </Stack>
+                  <Stack spacing={0.5}>
+                    <Typography>
+                      Supervisor:{' '}
+                      {supervisor
+                        ? `${supervisor.first_name} ${supervisor.last_name}`
+                        : 'Unavailable'}
+                    </Typography>
+                    <Typography color="text.secondary">
+                      Course:{' '}
+                      {course
+                        ? `${course.code} - ${course.name}`
+                        : 'Unavailable'}
+                    </Typography>
+                    <Typography>
+                      Capacity: {project.slots_reserved} of{' '}
+                      {project.supervisor_capacity} slots reserved
+                      {' | '}Available: {project.slots_available}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Updated {new Date(project.updated_at).toLocaleString()}
+                    </Typography>
+                  </Stack>
+                  <Typography>{project.background}</Typography>
+                  <Button
+                    component={Link}
+                    to={paths.projectDetail(project.id)}
+                    variant="outlined"
+                    sx={{ alignSelf: 'flex-start' }}
+                  >
+                    View details
+                  </Button>
+                </Stack>
+              </CardContent>
+            </Card>
+          )
+        })}
     </Stack>
   )
 }

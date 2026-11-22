@@ -7,8 +7,39 @@ import { server } from '@/testing/mocks/server'
 import { renderApp } from '@/testing/test-utils'
 
 describe('project details', () => {
+  it.each([
+    { status: 'open', label: 'Open', reserved: 1, available: 1 },
+    { status: 'full', label: 'Full', reserved: 2, available: 0 },
+    { status: 'closed', label: 'Closed', reserved: 1, available: 1 },
+  ] as const)(
+    'displays $label project details and slot counts',
+    async ({ status, label, reserved, available }) => {
+      // Closed projects may still have free slots, while Full projects have none.
+      server.use(
+        http.get(`/api/projects/${project.id}`, () =>
+          HttpResponse.json({
+            ...project,
+            status,
+            slots_reserved: reserved,
+            slots_available: available,
+          }),
+        ),
+      )
+      renderApp(`/projects/${project.id}`)
+      await screen.findByRole('heading', { name: project.title })
+      expect(screen.getByText(label)).toBeInTheDocument()
+      expect(screen.getByText('Capacity: 2 teams')).toBeInTheDocument()
+      expect(
+        screen.getByText(`Reserved slots: ${reserved}`),
+      ).toBeInTheDocument()
+      expect(
+        screen.getByText(`Available slots: ${available}`),
+      ).toBeInTheDocument()
+    },
+  )
+
   it('loads the requested project and shows its details and readable names', async () => {
-    // The selected URL loads the correct project, course, supervisor, and availability.
+    // The selected URL loads the correct project, background, course, and supervisor.
     server.use(
       http.get(`/api/projects/${project.id}`, () => HttpResponse.json(project)),
       http.get('/api/courses', () => HttpResponse.json([course])),
@@ -24,10 +55,6 @@ describe('project details', () => {
     expect(
       await screen.findByText('Supervisor: David Supervisor'),
     ).toBeInTheDocument()
-    expect(screen.getByText('Open')).toBeInTheDocument()
-    expect(screen.getByText('Capacity: 2 teams')).toBeInTheDocument()
-    expect(screen.getByText('Reserved slots: 1')).toBeInTheDocument()
-    expect(screen.getByText('Available slots: 1')).toBeInTheDocument()
     expect(screen.getByText(/Last updated:/)).toBeInTheDocument()
   })
 
