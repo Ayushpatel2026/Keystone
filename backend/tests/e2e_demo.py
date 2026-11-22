@@ -20,7 +20,7 @@ import uuid
 import requests
 
 BASE = "http://127.0.0.1:8000"
-PASSWORD = "dev-password-1"
+PASSWORD = "dev-password-123"
 
 http = requests.Session()
 failures: list[str] = []
