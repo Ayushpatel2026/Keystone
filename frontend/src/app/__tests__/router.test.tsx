@@ -1,9 +1,11 @@
 import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { http, HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'
 import { actAs } from '@/lib/auth'
 import { alice, carol, david } from '@/testing/mocks/fixtures'
 import { renderApp } from '@/testing/test-utils'
+import { server } from '@/testing/mocks/server'
 
 /** The link labels in the side menu's main section, top to bottom. */
 function menuLinks() {
@@ -96,10 +98,27 @@ describe('role-only pages', () => {
 
 describe('shared pages', () => {
   it('passes the URL parameter to the project page', async () => {
+    server.use(
+      http.get('/api/projects/abc-123', () =>
+        HttpResponse.json({
+          id: 'abc-123',
+          title: 'Automated Assembly Line',
+          background: 'Automate assembly tasks.',
+          supervisor_id: david.id,
+          course_id: '00000000-0000-4000-8000-0000000000c1',
+          supervisor_capacity: 1,
+          slots_reserved: 0,
+          slots_available: 1,
+          status: 'open',
+          created_at: '2026-09-01T00:00:00Z',
+          updated_at: '2026-09-01T00:00:00Z',
+        }),
+      ),
+    )
     renderApp('/projects/abc-123')
 
     expect(
-      await screen.findByRole('heading', { name: 'Project abc-123' }),
+      await screen.findByRole('heading', { name: 'Automated Assembly Line' }),
     ).toBeInTheDocument()
   })
 
