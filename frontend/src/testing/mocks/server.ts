@@ -12,6 +12,8 @@ export const server = setupServer(
   http.get('/api/users', () => HttpResponse.json(users)),
   http.get('/api/projects', () => HttpResponse.json([])),
   http.get('/api/courses', () => HttpResponse.json([])),
+  http.get('/api/applications', () => HttpResponse.json([])),
+  http.get('/api/teams', () => HttpResponse.json([])),
 
   http.post('/auth/login', async ({ request }) => {
     const form = new URLSearchParams(await request.text())
