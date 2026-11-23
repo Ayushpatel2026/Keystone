@@ -31,6 +31,11 @@ function team(id: string, name: string): Team {
   }
 }
 
+export const teamApplying = team(
+  '00000000-0000-4000-8000-0000000000b0',
+  'Team Amazing Engineers',
+)
+
 export const teamUnderReview = team(
   '00000000-0000-4000-8000-0000000000b1',
   'Team Alpha',

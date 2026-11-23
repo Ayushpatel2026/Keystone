@@ -10,10 +10,13 @@ import { Link, useParams } from 'react-router'
 import { paths } from '@/config/paths'
 import { useProject } from '@/features/projects/api/get-project'
 import { useCourses } from '@/features/courses/api/get-courses'
-import { useUsers } from '@/lib/auth'
+import { useApplyToProject } from '@/features/projects/api/apply-to-project'
+import { useMyTeam } from '@/features/teams/api/get-my-team'
+import { useActingAs, useUsers } from '@/lib/auth'
 
 /** Full details and availability for the project selected from the catalog. */
 export function ProjectDetailPage() {
+  const actingAs = useActingAs()
   const { projectId } = useParams()
   const projectQuery = useProject(projectId ?? '')
   const project = projectQuery.data
@@ -94,10 +97,68 @@ export function ProjectDetailPage() {
                 <Typography color="text.secondary">
                   Last updated: {new Date(project.updated_at).toLocaleString()}
                 </Typography>
+                {actingAs?.role === 'student' &&
+                  (project.status !== 'open' ? (
+                    <Alert severity="info">
+                      This project is not open for applications.
+                    </Alert>
+                  ) : actingAs.course_id !== project.course_id ? (
+                    <Alert severity="info">
+                      You can only apply to projects in your course.
+                    </Alert>
+                  ) : (
+                    <ApplyToProject
+                      key={`${actingAs.id}:${project.id}`}
+                      studentId={actingAs.id}
+                      courseId={actingAs.course_id}
+                      projectId={project.id}
+                    />
+                  ))}
               </Stack>
             </CardContent>
           </Card>
         </>
+      )}
+    </Stack>
+  )
+}
+
+/** Resolve the student's team before allowing an application. */
+function ApplyToProject({
+  studentId,
+  courseId,
+  projectId,
+}: {
+  studentId: string
+  courseId: string
+  projectId: string
+}) {
+  const team = useMyTeam(studentId, courseId)
+  const application = useApplyToProject()
+
+  if (team.isPending) return <CircularProgress aria-label="Loading your team" />
+  if (team.isError) return <Alert severity="error">{team.error.message}</Alert>
+  if (!team.data)
+    return (
+      <Alert severity="info">You must belong to a team before applying.</Alert>
+    )
+  const teamId = team.data.id
+
+  return (
+    <Stack spacing={2}>
+      <Button
+        variant="contained"
+        sx={{ alignSelf: 'flex-start' }}
+        disabled={application.isPending || application.isSuccess}
+        onClick={() => application.mutate({ studentId, teamId, projectId })}
+      >
+        {application.isPending ? 'Applying…' : 'Apply'}
+      </Button>
+      {application.isError && (
+        <Alert severity="error">{application.error.message}</Alert>
+      )}
+      {application.isSuccess && (
+        <Alert severity="success">Your team has applied to this project.</Alert>
       )}
     </Stack>
   )
