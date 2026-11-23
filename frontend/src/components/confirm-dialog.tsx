@@ -5,13 +5,15 @@ import DialogActions from '@mui/material/DialogActions'
 import DialogContent from '@mui/material/DialogContent'
 import DialogContentText from '@mui/material/DialogContentText'
 import DialogTitle from '@mui/material/DialogTitle'
-import type { ReviewDecision } from '@/features/teams/api/review-application'
+import { useId } from 'react'
 
-interface ConfirmReviewDialogProps {
+interface ConfirmDialogProps {
   open: boolean
-  decision: ReviewDecision
-  teamName: string
-  projectTitle: string
+  title: string
+  children: React.ReactNode
+  /** Label of the confirm button, e.g. "Approve". */
+  confirmLabel: string
+  confirmColor?: 'primary' | 'success' | 'error'
   /** True while the request is in flight: buttons are disabled. */
   pending: boolean
   /** The backend's message if the last attempt failed. */
@@ -20,51 +22,34 @@ interface ConfirmReviewDialogProps {
   onClose: () => void
 }
 
-const copy = {
-  approve: {
-    title: 'Approve this team project?',
-    body: 'The team will be approved for this project.',
-    button: 'Approve',
-    color: 'success',
-  },
-  reject: {
-    title: 'Reject this team project?',
-    body: "The team's slot on the project will be released. This can't be undone.",
-    button: 'Reject',
-    color: 'error',
-  },
-} as const
-
 /**
- * Asks the reviewer to confirm an approve or reject, so a stray click never
- * decides a submission. Stays open on failure to show the backend's reason.
+ * Asks the user to confirm an action, so a stray click never changes
+ * anything. Stays open on failure to show the reason.
  */
-export function ConfirmReviewDialog({
+export function ConfirmDialog({
   open,
-  decision,
-  teamName,
-  projectTitle,
+  title,
+  children,
+  confirmLabel,
+  confirmColor = 'primary',
   pending,
   error,
   onConfirm,
   onClose,
-}: ConfirmReviewDialogProps) {
-  const text = copy[decision]
+}: ConfirmDialogProps) {
+  const titleId = useId()
 
   return (
     <Dialog
       open={open}
       onClose={pending ? undefined : onClose}
-      aria-labelledby="confirm-review-title"
+      aria-labelledby={titleId}
       fullWidth
       maxWidth="xs"
     >
-      <DialogTitle id="confirm-review-title">{text.title}</DialogTitle>
+      <DialogTitle id={titleId}>{title}</DialogTitle>
       <DialogContent>
-        <DialogContentText>
-          <strong>{teamName}</strong> on <strong>{projectTitle}</strong>.{' '}
-          {text.body}
-        </DialogContentText>
+        <DialogContentText>{children}</DialogContentText>
         {error && (
           <Alert severity="error" sx={{ mt: 2 }}>
             {error}
@@ -79,9 +64,9 @@ export function ConfirmReviewDialog({
           onClick={onConfirm}
           disabled={pending}
           variant="contained"
-          color={text.color}
+          color={confirmColor}
         >
-          {pending ? 'Saving...' : text.button}
+          {pending ? 'Saving...' : confirmLabel}
         </Button>
       </DialogActions>
     </Dialog>
