@@ -10,6 +10,7 @@ import { api } from '@/lib/api-client'
 export function useTeamApplications(teamId: string) {
   return useQuery({
     queryKey: ['applications', { teamId }],
+    enabled: teamId.length > 0,
     queryFn: async ({ signal }) => {
       const { data, error } = await api.GET('/api/applications', {
         params: { query: { team_id: teamId } },

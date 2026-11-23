@@ -6,13 +6,17 @@ import Chip from '@mui/material/Chip'
 import CircularProgress from '@mui/material/CircularProgress'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { paths } from '@/config/paths'
 import { useProject } from '@/features/projects/api/get-project'
 import { useCourses } from '@/features/courses/api/get-courses'
-import { useApplyToProject } from '@/features/projects/api/apply-to-project'
+import { useApplyToProject } from '@/features/applications/api/apply-to-project'
+import { useTeamApplications } from '@/features/applications/api/get-team-applications'
 import { useMyTeam } from '@/features/teams/api/get-my-team'
 import { useActingAs, useUsers } from '@/lib/auth'
+import type { components } from '@/types/api'
 
 /** Full details and availability for the project selected from the catalog. */
 export function ProjectDetailPage() {
@@ -26,6 +30,27 @@ export function ProjectDetailPage() {
   const supervisor = users.data?.find(
     (item) => item.id === project?.supervisor_id,
   )
+  let applicationControl = null
+  if (project && actingAs?.role === 'student') {
+    if (actingAs.course_id !== project.course_id) {
+      applicationControl = (
+        <Alert severity="info">
+          You can only apply to projects in your course.
+        </Alert>
+      )
+    } else {
+      applicationControl = (
+        <ApplyToProject
+          key={`${actingAs.id}:${project.id}`}
+          studentId={actingAs.id}
+          courseId={actingAs.course_id}
+          projectId={project.id}
+          projectTitle={project.title}
+          projectStatus={project.status}
+        />
+      )
+    }
+  }
 
   return (
     <Stack spacing={3}>
@@ -97,23 +122,7 @@ export function ProjectDetailPage() {
                 <Typography color="text.secondary">
                   Last updated: {new Date(project.updated_at).toLocaleString()}
                 </Typography>
-                {actingAs?.role === 'student' &&
-                  (project.status !== 'open' ? (
-                    <Alert severity="info">
-                      This project is not open for applications.
-                    </Alert>
-                  ) : actingAs.course_id !== project.course_id ? (
-                    <Alert severity="info">
-                      You can only apply to projects in your course.
-                    </Alert>
-                  ) : (
-                    <ApplyToProject
-                      key={`${actingAs.id}:${project.id}`}
-                      studentId={actingAs.id}
-                      courseId={actingAs.course_id}
-                      projectId={project.id}
-                    />
-                  ))}
+                {applicationControl}
               </Stack>
             </CardContent>
           </Card>
@@ -128,12 +137,18 @@ function ApplyToProject({
   studentId,
   courseId,
   projectId,
+  projectTitle,
+  projectStatus,
 }: {
   studentId: string
   courseId: string
   projectId: string
+  projectTitle: string
+  projectStatus: components['schemas']['ProjectStatus']
 }) {
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const team = useMyTeam(studentId, courseId)
+  const applications = useTeamApplications(team.data?.id ?? '')
   const application = useApplyToProject()
 
   if (team.isPending) return <CircularProgress aria-label="Loading your team" />
@@ -143,20 +158,69 @@ function ApplyToProject({
       <Alert severity="info">You must belong to a team before applying.</Alert>
     )
   const teamId = team.data.id
+  const applied =
+    application.isSuccess ||
+    applications.data?.some((item) => item.project_id === projectId)
+
+  if (applications.isError)
+    return <Alert severity="error">{applications.error.message}</Alert>
+
+  if (!applications.isPending && !applied && projectStatus !== 'open')
+    return (
+      <Alert severity="info">This project is not open for applications.</Alert>
+    )
+
+  let buttonLabel = 'Apply'
+  if (applied) buttonLabel = 'Applied'
+  if (application.isPending) buttonLabel = 'Applying…'
 
   return (
     <Stack spacing={2}>
       <Button
         variant="contained"
-        sx={{ alignSelf: 'flex-start' }}
-        disabled={application.isPending || application.isSuccess}
-        onClick={() => application.mutate({ studentId, teamId, projectId })}
+        sx={{
+          alignSelf: 'flex-start',
+          '&.Mui-disabled': {
+            backgroundImage: 'none',
+            bgcolor: 'action.disabledBackground',
+            color: 'text.secondary',
+            boxShadow: 'none',
+            borderColor: 'divider',
+          },
+        }}
+        disabled={
+          applications.isPending ||
+          applications.isFetching ||
+          application.isPending ||
+          applied
+        }
+        onClick={() => {
+          application.reset()
+          setConfirmOpen(true)
+        }}
       >
-        {application.isPending ? 'Applying…' : 'Apply'}
+        {buttonLabel}
       </Button>
-      {application.isError && (
-        <Alert severity="error">{application.error.message}</Alert>
-      )}
+      <ConfirmDialog
+        open={confirmOpen}
+        title={`Apply to ${projectTitle}?`}
+        confirmLabel="Confirm"
+        pending={application.isPending}
+        error={application.isError ? application.error.message : null}
+        onConfirm={() =>
+          application.mutate(
+            { studentId, teamId, projectId },
+            { onSuccess: () => setConfirmOpen(false) },
+          )
+        }
+        onClose={() => {
+          setConfirmOpen(false)
+          application.reset()
+        }}
+      >
+        Apply to this project on behalf of {team.data.name}? The supervisor will
+        review your application.
+      </ConfirmDialog>
       {application.isSuccess && (
         <Alert severity="success">Your team has applied to this project.</Alert>
       )}
