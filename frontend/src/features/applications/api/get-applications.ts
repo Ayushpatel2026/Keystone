@@ -5,20 +5,10 @@ import type { components } from '@/types/api'
 export type Application = components['schemas']['ApplicationRead']
 export type ApplicationStatus = Application['status']
 
-/** Submissions waiting for an instructor or TA to approve or reject. */
-export const awaitingReview: ApplicationStatus[] = ['team_project_under_review']
-
-/** Submissions an instructor or TA has already decided on. */
-export const reviewed: ApplicationStatus[] = [
-  'approved',
-  'approved_change_under_review',
-  'team_project_rejected',
-]
-
 /**
- * Every application the signed-in user may see. For an instructor or TA the
- * backend returns only applications in the courses they teach or assist, so
- * no course filter is needed here.
+ * Every application the signed-in user may see. The backend scopes it by
+ * role: a supervisor gets applications to their own projects, an instructor
+ * or TA those in their course(s), a student their teams' applications.
  */
 export function useApplications() {
   return useQuery({

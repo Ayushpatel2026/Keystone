@@ -8,37 +8,39 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useState } from 'react'
 import { Link } from 'react-router'
+import { ConfirmDialog } from '@/components/confirm-dialog'
 import { paths } from '@/config/paths'
-import { useCourses } from '@/features/courses/api/get-courses'
-import { useProjects } from '@/features/projects/api/get-projects'
 import {
-  awaitingReview,
-  reviewed,
   useApplications,
   type Application,
-  type ApplicationStatus,
-} from '@/features/teams/api/get-applications'
+} from '@/features/applications/api/get-applications'
+import {
+  applicationStatusChip,
+  awaitingReview,
+  reviewed,
+} from '@/features/applications/utils/status'
+import { useCourses } from '@/features/courses/api/get-courses'
+import { useProjects } from '@/features/projects/api/get-projects'
 import { useTeams } from '@/features/teams/api/get-teams'
 import {
   useReviewApplication,
   type ReviewDecision,
 } from '@/features/teams/api/review-application'
-import { ConfirmReviewDialog } from '@/features/teams/components/confirm-review-dialog'
 
-const statusChip: Partial<
-  Record<
-    ApplicationStatus,
-    { label: string; color: 'warning' | 'success' | 'error' }
-  >
-> = {
-  team_project_under_review: { label: 'Under review', color: 'warning' },
-  approved: { label: 'Approved', color: 'success' },
-  approved_change_under_review: {
-    label: 'Approved, change under review',
+const reviewCopy = {
+  approve: {
+    title: 'Approve this team project?',
+    body: 'The team will be approved for this project.',
+    button: 'Approve',
     color: 'success',
   },
-  team_project_rejected: { label: 'Rejected', color: 'error' },
-}
+  reject: {
+    title: 'Reject this team project?',
+    body: "The team's slot on the project will be released. This can't be undone.",
+    button: 'Reject',
+    color: 'error',
+  },
+} as const
 
 interface PendingReview {
   application: Application
@@ -76,6 +78,7 @@ export function TeamsPage() {
     []
   const decided =
     applications.data?.filter((item) => reviewed.includes(item.status)) ?? []
+  const dialogText = reviewCopy[pendingReview?.decision ?? 'approve']
 
   function openReview(application: Application, decision: ReviewDecision) {
     review.reset()
@@ -109,7 +112,7 @@ export function TeamsPage() {
     const team = teamOf(application)
     const project = projectOf(application)
     const course = courses.data?.find((item) => item.id === project?.course_id)
-    const chip = statusChip[application.status]
+    const chip = applicationStatusChip[application.status]
     return (
       <Card key={application.id} variant="outlined">
         <CardContent>
@@ -122,14 +125,12 @@ export function TeamsPage() {
               <Typography variant="h6" component="h3">
                 {teamName(application)}
               </Typography>
-              {chip && (
-                <Chip
-                  size="small"
-                  label={chip.label}
-                  color={chip.color}
-                  sx={{ flexShrink: 0 }}
-                />
-              )}
+              <Chip
+                size="small"
+                label={chip.label}
+                color={chip.color}
+                sx={{ flexShrink: 0 }}
+              />
             </Stack>
             <Stack spacing={0.5}>
               <Typography>
@@ -244,18 +245,24 @@ export function TeamsPage() {
           </Stack>
         </>
       )}
-      <ConfirmReviewDialog
+      <ConfirmDialog
         open={dialogOpen}
-        decision={pendingReview?.decision ?? 'approve'}
-        teamName={pendingReview ? teamName(pendingReview.application) : ''}
-        projectTitle={
-          pendingReview ? projectTitle(pendingReview.application) : ''
-        }
+        title={dialogText.title}
+        confirmLabel={dialogText.button}
+        confirmColor={dialogText.color}
         pending={review.isPending}
         error={review.error?.message ?? null}
         onConfirm={confirmReview}
         onClose={closeReview}
-      />
+      >
+        {pendingReview && (
+          <>
+            <strong>{teamName(pendingReview.application)}</strong> on{' '}
+            <strong>{projectTitle(pendingReview.application)}</strong>.{' '}
+          </>
+        )}
+        {dialogText.body}
+      </ConfirmDialog>
     </Stack>
   )
 }
