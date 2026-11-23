@@ -8,6 +8,7 @@ import { TeamApplications } from '@/features/applications/components/team-applic
 import { useMyTeam } from '@/features/teams/api/get-my-team'
 import { TeamDetails } from '@/features/teams/components/team-details'
 import { useActingAs } from '@/lib/auth'
+import { useProjects } from '@/features/projects/api/get-projects'
 
 /**
  * Students: their team and its applications, each with its status (#237).
@@ -31,6 +32,7 @@ function MyTeam({
 }) {
   const queryClient = useQueryClient()
   const team = useMyTeam(studentId, courseId)
+  const projects = useProjects({ course_id: courseId })
 
   return (
     <Stack spacing={3}>
@@ -63,7 +65,7 @@ function MyTeam({
       {team.data && (
         <>
           <TeamDetails team={team.data} studentId={studentId} />
-          <TeamApplications teamId={team.data.id} courseId={courseId} />
+          <TeamApplications teamId={team.data.id} projects={projects} />
         </>
       )}
     </Stack>

@@ -8,19 +8,9 @@ interface ActOnApplicationInput {
   action: TeamActionName
 }
 
-// One call per action. openapi-fetch checks the path literal against the
-// generated types, so a dynamic path string wouldn't type-check. A switch
-// keeps it fully typed.
 function callAction(action: TeamActionName, application_id: string) {
   const init = { params: { path: { application_id } } }
-  switch (action) {
-    case 'agree':
-      return api.POST('/api/applications/{application_id}/agree', init)
-    case 'submit':
-      return api.POST('/api/applications/{application_id}/submit', init)
-    case 'withdraw':
-      return api.POST('/api/applications/{application_id}/withdraw', init)
-  }
+  return api.POST(`/api/applications/{application_id}/${action}`, init)
 }
 
 /**
