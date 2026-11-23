@@ -12,17 +12,20 @@ import { ApplicationCard } from '@/features/applications/components/application-
 import { ConfirmActionDialog } from '@/features/applications/components/confirm-action-dialog'
 import type { PendingAction } from '@/features/applications/types/application'
 import { sortOpenFirst } from '@/features/applications/utils/application-status'
-import { useCourseProjects } from '@/features/projects/api/get-course-projects'
 import { useUsers } from '@/lib/auth'
 import { fullName } from '@/lib/utils/full-name'
+import type { components } from '@/types/api'
+import type { UseQueryResult } from '@tanstack/react-query'
+
+type Project = components['schemas']['ProjectRead']
 
 interface TeamApplicationsProps {
   teamId: string
-  courseId: string
+  projects: UseQueryResult<Project[], Error>
 }
 
 /** A team's applications, with the actions the team can take on each. */
-export function TeamApplications({ teamId, courseId }: TeamApplicationsProps) {
+export function TeamApplications({ teamId, projects }: TeamApplicationsProps) {
   // The action waiting for the user to confirm. null means the dialog is closed.
   const [pending, setPending] = useState<PendingAction | null>(null)
 
@@ -30,7 +33,6 @@ export function TeamApplications({ teamId, courseId }: TeamApplicationsProps) {
   // An application only has ids, so the project title, capacity and supervisor
   // come from the project list and the user list. The user list is the same
   // query the "Acting as" switcher uses, so it's usually already cached.
-  const projects = useCourseProjects(courseId)
   const users = useUsers()
   const actOnApplication = useActOnApplication()
 
@@ -58,7 +60,7 @@ export function TeamApplications({ teamId, courseId }: TeamApplicationsProps) {
     )
   }
 
-  if (applications.isPending || projects.isPending) {
+  if (applications.isPending || projects.isPending || users.isPending) {
     return <CircularProgress aria-label="Loading applications" />
   }
   if (applications.isError) {
@@ -66,6 +68,10 @@ export function TeamApplications({ teamId, courseId }: TeamApplicationsProps) {
   }
   if (projects.isError) {
     return <Alert severity="error">{projects.error.message}</Alert>
+  }
+
+  if (users.isError) {
+    return <Alert severity="error">{users.error.message}</Alert>
   }
 
   const projectsById = new Map(projects.data.map((p) => [p.id, p]))

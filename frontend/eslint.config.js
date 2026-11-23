@@ -71,6 +71,16 @@ export default defineConfig([
               from: './src/features',
               except: ['./courses'],
             },
+            {
+              target: './src/features/applications',
+              from: './src/features',
+              except: ['./applications'],
+            },
+            {
+              target: './src/features/teams',
+              from: './src/features',
+              except: ['./teams'],
+            },
           ],
         },
       ],

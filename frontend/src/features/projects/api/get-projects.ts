@@ -19,5 +19,7 @@ export function useProjects(filters: ProjectFilters = {}) {
       if (error) throw new Error('Could not load projects.', { cause: error })
       return data
     },
+    // no auto refresh for now, this allows us to see some stale data for demo purposes
+    refetchOnWindowFocus: false,
   })
 }
