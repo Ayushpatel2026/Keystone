@@ -150,17 +150,25 @@ describe('applying to a project', () => {
     const previousReads = applicationReads
     await router.navigate(`/projects/${project.id}`)
     const button = await screen.findByRole('button', { name: 'Apply' })
+    await waitFor(() => expect(button).toBeEnabled())
     await user.click(button)
+    await screen.findByRole('dialog', { name: `Apply to ${project.title}?` })
+    expect(submitted).toBeUndefined()
+    await user.click(screen.getByRole('button', { name: 'Confirm' }))
     expect(
-      await screen.findByRole('button', { name: 'Applying…' }),
+      await screen.findByRole('button', { name: 'Saving...' }),
     ).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
     await screen.findByText('Your team has applied to this project.')
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    )
     expect(submitted).toEqual({
       team_id: teamApplying.id,
       project_id: project.id,
     })
     expect(studentId).toBe(alice.id)
-    expect(screen.getByRole('button', { name: 'Apply' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: 'Applied' })).toBeDisabled()
     // Inactive queries refetch when the user returns to My Team.
     await router.navigate('/team')
     await screen.findByText('Applied')
@@ -168,6 +176,11 @@ describe('applying to a project', () => {
       screen.getByRole('heading', { name: project.title }),
     ).toBeInTheDocument()
     expect(applicationReads).toBeGreaterThan(previousReads)
+    // Returning to the project still shows Applied instead of offering a duplicate.
+    await router.navigate(`/projects/${project.id}`)
+    expect(
+      await screen.findByRole('button', { name: 'Applied' }),
+    ).toBeDisabled()
   })
 
   it.each([
@@ -179,6 +192,7 @@ describe('applying to a project', () => {
     server.use(
       http.get(`/api/projects/${project.id}`, () => HttpResponse.json(project)),
       http.get('/api/teams', () => HttpResponse.json([teamApplying])),
+      http.get('/api/applications', () => HttpResponse.json([])),
       http.post('/api/applications', () =>
         HttpResponse.json({ detail: message }, { status: 409 }),
       ),
@@ -186,11 +200,42 @@ describe('applying to a project', () => {
     await actAs(alice)
     const user = userEvent.setup()
     renderApp(`/projects/${project.id}`)
-    await user.click(await screen.findByRole('button', { name: 'Apply' }))
+    const button = await screen.findByRole('button', { name: 'Apply' })
+    await waitFor(() => expect(button).toBeEnabled())
+    await user.click(button)
+    await user.click(await screen.findByRole('button', { name: 'Confirm' }))
     expect(await screen.findByText(message)).toBeInTheDocument()
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(
       screen.queryByText('Your team has applied to this project.'),
     ).not.toBeInTheDocument()
+  })
+
+  it('cancels confirmation without submitting an application', async () => {
+    // Opening and cancelling the dialog makes no write request.
+    let submissions = 0
+    server.use(
+      http.get(`/api/projects/${project.id}`, () => HttpResponse.json(project)),
+      http.get('/api/teams', () => HttpResponse.json([teamApplying])),
+      http.get('/api/applications', () => HttpResponse.json([])),
+      http.post('/api/applications', () => {
+        submissions += 1
+        return HttpResponse.json({}, { status: 201 })
+      }),
+    )
+    await actAs(alice)
+    const user = userEvent.setup()
+    renderApp(`/projects/${project.id}`)
+    const button = await screen.findByRole('button', { name: 'Apply' })
+    await waitFor(() => expect(button).toBeEnabled())
+    await user.click(button)
+    await screen.findByRole('dialog', { name: `Apply to ${project.title}?` })
+    await user.click(screen.getByRole('button', { name: 'Cancel' }))
+    await waitFor(() =>
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument(),
+    )
+    expect(submissions).toBe(0)
+    expect(screen.getByRole('button', { name: 'Apply' })).toBeEnabled()
   })
 
   it('requires a team before applying', async () => {
@@ -207,6 +252,53 @@ describe('applying to a project', () => {
     ).not.toBeInTheDocument()
   })
 
+  it.each(['open', 'full', 'closed'] as const)(
+    'shows Applied for an existing application on a %s project',
+    async (status) => {
+      // Existing applications disable Apply even after a fresh page load.
+      let submissions = 0
+      server.use(
+        http.get(`/api/projects/${project.id}`, () =>
+          HttpResponse.json({
+            ...project,
+            status,
+            slots_reserved:
+              status === 'full'
+                ? project.supervisor_capacity
+                : project.slots_reserved,
+            slots_available: status === 'full' ? 0 : project.slots_available,
+          }),
+        ),
+        http.get('/api/teams', () => HttpResponse.json([teamApplying])),
+        http.get('/api/applications', async () => {
+          await delay(150)
+          return HttpResponse.json([
+            {
+              id: '00000000-0000-4000-8000-0000000000d1',
+              team_id: teamApplying.id,
+              project_id: project.id,
+              status: 'applied',
+              created_at: project.created_at,
+              updated_at: project.updated_at,
+            },
+          ])
+        }),
+        http.post('/api/applications', () => {
+          submissions += 1
+          return HttpResponse.json({}, { status: 409 })
+        }),
+      )
+      await actAs(alice)
+      renderApp(`/projects/${project.id}`)
+      expect(
+        await screen.findByRole('button', { name: 'Apply' }),
+      ).toBeDisabled()
+      const button = await screen.findByRole('button', { name: 'Applied' })
+      expect(button).toBeDisabled()
+      expect(submissions).toBe(0)
+    },
+  )
+
   it.each(['full', 'closed'] as const)(
     'does not offer Apply for a %s project',
     async (status) => {
@@ -215,6 +307,8 @@ describe('applying to a project', () => {
         http.get(`/api/projects/${project.id}`, () =>
           HttpResponse.json({ ...project, status }),
         ),
+        http.get('/api/teams', () => HttpResponse.json([teamApplying])),
+        http.get('/api/applications', () => HttpResponse.json([])),
       )
       await actAs(alice)
       renderApp(`/projects/${project.id}`)
