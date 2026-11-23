@@ -6,10 +6,17 @@ export type ProjectFilters = NonNullable<
   paths['/api/projects']['get']['parameters']['query']
 >
 
-/** Load projects using the backend's optional course, supervisor, and status filters. */
-export function useProjects(filters: ProjectFilters = {}) {
+/**
+ * Load projects using the backend's optional course, supervisor, and status filters.
+ * Pass `enabled: false` to wait, e.g. until a filter's value is known.
+ */
+export function useProjects(
+  filters: ProjectFilters = {},
+  { enabled = true }: { enabled?: boolean } = {},
+) {
   return useQuery({
     queryKey: ['projects', filters],
+    enabled,
     queryFn: async ({ signal }) => {
       const { data, error } = await api.GET('/api/projects', {
         params: { query: filters },

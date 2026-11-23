@@ -10,22 +10,30 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { paths } from '@/config/paths'
-import {
-  useApplications,
-  type Application,
-} from '@/features/applications/api/get-applications'
-import {
-  applicationStatusChip,
-  awaitingReview,
-  reviewed,
-} from '@/features/applications/utils/status'
-import { useCourses } from '@/features/courses/api/get-courses'
-import { useProjects } from '@/features/projects/api/get-projects'
-import { useTeams } from '@/features/teams/api/get-teams'
+import { useApplications } from '@/features/applications/api/get-applications'
 import {
   useReviewApplication,
   type ReviewDecision,
-} from '@/features/teams/api/review-application'
+} from '@/features/applications/api/review-application'
+import type {
+  Application,
+  ApplicationStatus,
+} from '@/features/applications/types/application'
+import {
+  statusChipColor,
+  statusInfo,
+} from '@/features/applications/utils/application-status'
+import { useCourses } from '@/features/courses/api/get-courses'
+import { useProjects } from '@/features/projects/api/get-projects'
+import { useTeams } from '@/features/teams/api/get-teams'
+import { fullName } from '@/lib/utils/full-name'
+
+/** Already decided by an instructor or TA, so listed without actions. */
+const reviewed: ApplicationStatus[] = [
+  'approved',
+  'approved_change_under_review',
+  'team_project_rejected',
+]
 
 const reviewCopy = {
   approve: {
@@ -74,11 +82,19 @@ export function TeamsPage() {
     projectOf(application)?.title ?? 'Unknown project'
 
   const toReview =
-    applications.data?.filter((item) => awaitingReview.includes(item.status)) ??
-    []
+    applications.data?.filter(
+      (item) => item.status === 'team_project_under_review',
+    ) ?? []
   const decided =
     applications.data?.filter((item) => reviewed.includes(item.status)) ?? []
   const dialogText = reviewCopy[pendingReview?.decision ?? 'approve']
+  // Wait for the details too, so cards don't flash "Unknown team". If they
+  // fail, the cards still show, with a warning above them.
+  const loading =
+    applications.isPending ||
+    teams.isPending ||
+    projects.isPending ||
+    courses.isPending
 
   function openReview(application: Application, decision: ReviewDecision) {
     review.reset()
@@ -112,7 +128,6 @@ export function TeamsPage() {
     const team = teamOf(application)
     const project = projectOf(application)
     const course = courses.data?.find((item) => item.id === project?.course_id)
-    const chip = applicationStatusChip[application.status]
     return (
       <Card key={application.id} variant="outlined">
         <CardContent>
@@ -127,8 +142,8 @@ export function TeamsPage() {
               </Typography>
               <Chip
                 size="small"
-                label={chip.label}
-                color={chip.color}
+                label={statusInfo[application.status].label}
+                color={statusChipColor(application.status)}
                 sx={{ flexShrink: 0 }}
               />
             </Stack>
@@ -152,10 +167,7 @@ export function TeamsPage() {
                 Members:{' '}
                 {team && team.members.length > 0
                   ? team.members
-                      .map(
-                        (member) =>
-                          `${member.user.first_name} ${member.user.last_name}`,
-                      )
+                      .map((member) => fullName(member.user))
                       .join(', ')
                   : 'Unavailable'}
               </Typography>
@@ -204,7 +216,7 @@ export function TeamsPage() {
           {notice}
         </Alert>
       )}
-      {applications.isPending && (
+      {loading && !applications.isError && (
         <CircularProgress aria-label="Loading applications" />
       )}
       {applications.isError && (
@@ -217,7 +229,7 @@ export function TeamsPage() {
           Could not load team submissions. Please try again.
         </Alert>
       )}
-      {applications.isSuccess && (
+      {applications.isSuccess && !loading && (
         <>
           <Stack spacing={2} component="section" aria-labelledby="to-review">
             <Typography variant="h5" component="h2" id="to-review">

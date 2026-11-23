@@ -18,12 +18,12 @@ Only add the folders a feature needs.
 
 Expected features and the issues that start them:
 
-| Folder         | What it covers                                                                  | Issues     |
-| -------------- | ------------------------------------------------------------------------------- | ---------- |
-| `projects`     | Project list and details, applying, supervisor accept                           | #236, #238 |
-| `applications` | Loading applications and their status labels; a team's agree, decline, withdraw | #237, #239 |
-| `teams`        | Teams and the course staff's approve or reject                                  | #240       |
-| `demo`         | Demo reset and the consistency checks                                           | #242       |
+| Folder         | What it covers                                                                                                                          | Issues                 |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `projects`     | Project list and details, applying                                                                                                      | #236                   |
+| `applications` | Applications and their status labels; a team's agree, decline, withdraw; supervisor accept or decline; course staff's approve or reject | #237, #238, #239, #240 |
+| `teams`        | Teams and their members                                                                                                                 | #240                   |
+| `demo`         | Demo reset and the consistency checks                                                                                                   | #242                   |
 
 Rules (ESLint checks the first two):
 

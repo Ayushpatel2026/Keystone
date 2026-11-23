@@ -12,20 +12,22 @@ import { Link } from 'react-router'
 import { ConfirmDialog } from '@/components/confirm-dialog'
 import { paths } from '@/config/paths'
 import {
-  useApplications,
-  type Application,
-} from '@/features/applications/api/get-applications'
-import {
-  applicationStatusChip,
-  awaitingSupervisor,
-} from '@/features/applications/utils/status'
-import {
   useDecideApplication,
   type SupervisorDecision,
-} from '@/features/projects/api/decide-application'
+} from '@/features/applications/api/decide-application'
+import { useApplications } from '@/features/applications/api/get-applications'
+import type { Application } from '@/features/applications/types/application'
+import {
+  statusChipColor,
+  statusInfo,
+} from '@/features/applications/utils/application-status'
 import { useProjects } from '@/features/projects/api/get-projects'
 import { useTeams } from '@/features/teams/api/get-teams'
 import { useActingAs } from '@/lib/auth'
+import { fullName } from '@/lib/utils/full-name'
+
+/** Waiting for the project's supervisor to accept or decline. */
+const isWaiting = (application: Application) => application.status === 'applied'
 
 const decisionCopy = {
   accept: {
@@ -53,7 +55,8 @@ interface PendingDecision {
  */
 export function MyProjectsPage() {
   const me = useActingAs()
-  const projects = useProjects({ supervisor_id: me?.id })
+  // Without a supervisor_id the backend returns every project, so wait for it.
+  const projects = useProjects({ supervisor_id: me?.id }, { enabled: !!me })
   const applications = useApplications()
   const teams = useTeams()
   const decide = useDecideApplication()
@@ -105,8 +108,6 @@ export function MyProjectsPage() {
 
   function renderApplication(application: Application) {
     const team = teamOf(application)
-    const chip = applicationStatusChip[application.status]
-    const waiting = awaitingSupervisor.includes(application.status)
     return (
       <Stack key={application.id} spacing={1}>
         <Stack
@@ -119,26 +120,21 @@ export function MyProjectsPage() {
           </Typography>
           <Chip
             size="small"
-            label={chip.label}
-            color={chip.color}
+            label={statusInfo[application.status].label}
+            color={statusChipColor(application.status)}
             sx={{ flexShrink: 0 }}
           />
         </Stack>
         <Typography>
           Members:{' '}
           {team && team.members.length > 0
-            ? team.members
-                .map(
-                  (member) =>
-                    `${member.user.first_name} ${member.user.last_name}`,
-                )
-                .join(', ')
+            ? team.members.map((member) => fullName(member.user)).join(', ')
             : 'Unavailable'}
         </Typography>
         <Typography variant="body2" color="text.secondary">
-          Applied {new Date(application.created_at).toLocaleString()}
+          Updated {new Date(application.updated_at).toLocaleString()}
         </Typography>
-        {waiting && (
+        {isWaiting(application) && (
           <Stack direction="row" spacing={1}>
             <Button
               variant="contained"
@@ -162,7 +158,10 @@ export function MyProjectsPage() {
     )
   }
 
-  const loading = projects.isPending || applications.isPending
+  // Wait for team details too, so cards don't flash "Unknown team". If they
+  // fail, the cards still show, with a warning above them.
+  const loading =
+    projects.isPending || applications.isPending || teams.isPending
   const failed = projects.isError || applications.isError
 
   return (
@@ -198,7 +197,7 @@ export function MyProjectsPage() {
           Could not load your projects and applications. Please try again.
         </Alert>
       )}
-      {projects.isSuccess && applications.isSuccess && (
+      {projects.isSuccess && applications.isSuccess && !loading && (
         <>
           {projects.data.length === 0 && (
             <Typography>You don&apos;t have any projects yet.</Typography>
@@ -207,10 +206,9 @@ export function MyProjectsPage() {
             const projectApps = applications.data.filter(
               (item) => item.project_id === project.id,
             )
-            const waiting = projectApps.filter((item) =>
-              awaitingSupervisor.includes(item.status),
-            )
-            // Waiting for a decision first, then the rest (each newest first).
+            const waiting = projectApps.filter(isWaiting)
+            // Waiting for a decision first, then the rest, each in the
+            // order the server returned them.
             const sorted = [
               ...waiting,
               ...projectApps.filter((item) => !waiting.includes(item)),
