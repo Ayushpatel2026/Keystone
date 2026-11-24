@@ -1,6 +1,5 @@
 import FactCheckRoundedIcon from '@mui/icons-material/FactCheckRounded'
 import GroupsRoundedIcon from '@mui/icons-material/GroupsRounded'
-import ScienceRoundedIcon from '@mui/icons-material/ScienceRounded'
 import WorkHistoryRoundedIcon from '@mui/icons-material/WorkHistoryRounded'
 import WorkRoundedIcon from '@mui/icons-material/WorkRounded'
 import type { Role } from '@/lib/authorization'
@@ -46,14 +45,9 @@ export const navItemsByRole: Record<Role, NavItem[]> = {
   ],
 }
 
-/** Shown to everyone at the bottom of the menu, apart from the role's pages. */
-export const secondaryNavItems: NavItem[] = [
-  { label: 'Demo', to: paths.demo, icon: <ScienceRoundedIcon /> },
-]
-
 /** Every item in any menu, for looking up a page's label. */
 export const allNavItems: NavItem[] = [
-  ...new Set([...Object.values(navItemsByRole).flat(), ...secondaryNavItems]),
+  ...new Set(Object.values(navItemsByRole).flat()),
 ]
 
 /** Where `/` sends a role. */

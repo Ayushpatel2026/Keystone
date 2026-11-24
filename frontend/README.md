@@ -37,6 +37,23 @@ requests to the backend, so the browser sees one origin and there's no CORS
 setup. If the backend runs somewhere else, set `KEYSTONE_API_URL` before
 `npm run dev`.
 
+### Resetting the demo data
+
+The seed script only adds what's missing, so it won't undo applications made
+during a run-through. To start over from the seeded state, stop the backend and
+run this in `backend`:
+
+```powershell
+docker compose down -v
+docker compose up -d --wait
+uv run alembic upgrade head
+uv run python -m app.core.seed
+```
+
+`down -v` deletes the local database volume, so only do this against your own
+dev database. Then start the backend again, refresh the browser and pick a
+user under **Acting as**.
+
 ### Picking a user
 
 The proof of concept has no real sign-in. Use **Acting as** at the bottom of
@@ -49,12 +66,11 @@ request then carries their token.
 Each role gets its own menu, and `/` sends it to its home page (the first
 item):
 
-| Role             | Menu                      | Pages                       |
-| ---------------- | ------------------------- | --------------------------- |
-| Student          | Projects, My team         | `/projects`, `/team`        |
-| Supervisor       | My projects, Projects     | `/my-projects`, `/projects` |
-| Instructor or TA | Teams, Projects           | `/teams`, `/projects`       |
-| Everyone         | Demo (bottom of the menu) | `/demo`                     |
+| Role             | Menu                  | Pages                       |
+| ---------------- | --------------------- | --------------------------- |
+| Student          | Projects, My team     | `/projects`, `/team`        |
+| Supervisor       | My projects, Projects | `/my-projects`, `/projects` |
+| Instructor or TA | Teams, Projects       | `/teams`, `/projects`       |
 
 URLs name things, not roles: there's one `/projects/:id` page, and it shows
 each role its own actions (students apply, the project's supervisor accepts or

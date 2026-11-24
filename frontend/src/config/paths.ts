@@ -17,5 +17,4 @@ export const paths = {
   myTeam: '/team',
   myProjects: '/my-projects',
   teams: '/teams',
-  demo: '/demo',
 } as const

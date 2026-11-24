@@ -23,7 +23,6 @@ Expected features and the issues that start them:
 | `projects`     | Project list and details, applying                                                                                                      | #236                   |
 | `applications` | Applications and their status labels; a team's agree, decline, withdraw; supervisor accept or decline; course staff's approve or reject | #237, #238, #239, #240 |
 | `teams`        | Teams and their members                                                                                                                 | #240                   |
-| `demo`         | Demo reset and the consistency checks                                                                                                   | #242                   |
 
 Rules (ESLint checks the first two):
 
