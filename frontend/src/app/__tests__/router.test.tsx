@@ -42,14 +42,13 @@ describe('home page', () => {
 
 describe('menu', () => {
   it.each([
-    ['nobody', null, ['Demo']],
-    ['a student', alice, ['Projects', 'My team', 'Demo']],
-    ['a supervisor', david, ['My projects', 'Projects', 'Demo']],
-    ['an instructor', carol, ['Teams', 'Projects', 'Demo']],
+    ['a student', alice, ['Projects', 'My team']],
+    ['a supervisor', david, ['My projects', 'Projects']],
+    ['an instructor', carol, ['Teams', 'Projects']],
   ])('shows %s their own pages', async (_who, user, links) => {
     if (user) await actAs(user)
-    renderApp('/demo')
-    await screen.findByRole('heading', { name: 'Demo' })
+    renderApp('/no-such-page')
+    await screen.findByRole('heading', { name: 'Page not found' })
 
     expect(menuLinks()).toEqual(links)
   })

@@ -6,11 +6,7 @@ import ListItemText from '@mui/material/ListItemText'
 import Stack from '@mui/material/Stack'
 import { matchPath, NavLink, useLocation } from 'react-router'
 import { useActingAs } from '@/lib/auth'
-import {
-  navItemsByRole,
-  type NavItem,
-  secondaryNavItems,
-} from '@/components/layouts/nav-items'
+import { navItemsByRole } from '@/components/layouts/nav-items'
 
 interface NavMenuProps {
   /** Called after a link is clicked, e.g. to close the mobile drawer. */
@@ -18,7 +14,7 @@ interface NavMenuProps {
 }
 
 /**
- * The list of page links: the current role's pages, then the demo tools.
+ * The list of page links for the current role.
  * Adapted from the template's MenuContent.
  */
 export function NavMenu({ onNavigate }: NavMenuProps) {
@@ -26,40 +22,31 @@ export function NavMenu({ onNavigate }: NavMenuProps) {
   const actingAs = useActingAs()
   const mainItems = actingAs ? navItemsByRole[actingAs.role] : []
 
-  const renderItems = (items: NavItem[]) => (
-    <List>
-      {items.map((item) => {
-        // Highlight the item for its page and anything under it, so
-        // /projects/123 still highlights "Projects".
-        const selected =
-          matchPath({ path: item.to, end: false }, pathname) !== null
-        return (
-          <ListItem key={item.to} disablePadding sx={{ display: 'block' }}>
-            <ListItemButton
-              component={NavLink}
-              to={item.to}
-              selected={selected}
-              onClick={onNavigate}
-              // 40px tall: the SRS's minimum size for controls.
-              sx={{ minHeight: 40 }}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.label} />
-            </ListItemButton>
-          </ListItem>
-        )
-      })}
-    </List>
-  )
-
   return (
-    <Stack
-      component="nav"
-      aria-label="Main"
-      sx={{ flexGrow: 1, p: 1, justifyContent: 'space-between' }}
-    >
-      {renderItems(mainItems)}
-      {renderItems(secondaryNavItems)}
+    <Stack component="nav" aria-label="Main" sx={{ flexGrow: 1, p: 1 }}>
+      <List>
+        {mainItems.map((item) => {
+          // Highlight the item for its page and anything under it, so
+          // /projects/123 still highlights "Projects".
+          const selected =
+            matchPath({ path: item.to, end: false }, pathname) !== null
+          return (
+            <ListItem key={item.to} disablePadding sx={{ display: 'block' }}>
+              <ListItemButton
+                component={NavLink}
+                to={item.to}
+                selected={selected}
+                onClick={onNavigate}
+                // 40px tall: the SRS's minimum size for controls.
+                sx={{ minHeight: 40 }}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.label} />
+              </ListItemButton>
+            </ListItem>
+          )
+        })}
+      </List>
     </Stack>
   )
 }

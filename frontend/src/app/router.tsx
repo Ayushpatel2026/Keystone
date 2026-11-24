@@ -1,6 +1,5 @@
 import { type RouteObject } from 'react-router'
 import { courseStaff } from '@/lib/authorization'
-import { DemoPage } from '@/app/routes/demo'
 import { MyProjectsPage } from '@/app/routes/my-projects'
 import { ProjectCatalogPage } from '@/app/routes/projects'
 import { ProjectDetailPage } from '@/app/routes/project'
@@ -50,7 +49,6 @@ export const routes: RouteObject[] = [
           </RequireRole>
         ),
       },
-      { path: 'demo', element: <DemoPage /> },
       { path: '*', element: <NotFoundPage /> },
     ],
   },
